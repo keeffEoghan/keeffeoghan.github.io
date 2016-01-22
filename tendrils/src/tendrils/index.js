@@ -382,7 +382,7 @@ export default (canvas, numBlocks = Math.pow(2, 8)) => {
                 updateGUI();
             },
             '1 - Flow': () => {
-                Object.assign(debug, {
+                Object.assign(debug, defaultSettings, {
                         showFlow: true,
 
                         noiseSpeed: 0.0002
@@ -408,7 +408,7 @@ export default (canvas, numBlocks = Math.pow(2, 8)) => {
                 updateGUI();
             },
             '3 - Flow only': () => {
-                Object.assign(debug, {
+                Object.assign(debug, defaultSettings, {
                         autoClearView: true,
                         showFlow: false,
 
@@ -432,7 +432,7 @@ export default (canvas, numBlocks = Math.pow(2, 8)) => {
                 updateGUI();
             },
             '4 - Noise only': () => {
-                Object.assign(debug, {
+                Object.assign(debug, defaultSettings, {
                         autoClearView: false,
                         showFlow: false,
 
