@@ -393,6 +393,8 @@ export default (canvas, numBlocks = Math.pow(2, 8)) => {
                         showFlow: false
                     });
 
+                controllers.restart();
+
                 Object.assign(colorGUI, {
                         opacity: 0.8,
                         color: [255, 255, 255]
