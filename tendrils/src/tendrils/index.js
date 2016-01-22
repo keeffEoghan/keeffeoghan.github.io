@@ -15,9 +15,9 @@ const glslify = require('glslify');
 import Particles from './particles';
 
 
-let debug;
+let debug = {};
 
-export default (canvas, numBlocks = Math.pow(2, 9)) => {
+export default (canvas, numBlocks = Math.pow(2, 8)) => {
     const gl = glContext(canvas, {
                 alpha: true,
                 preserveDrawingBuffer: true
@@ -77,7 +77,7 @@ export default (canvas, numBlocks = Math.pow(2, 9)) => {
         });
     }
 
-    reset();
+    reset(0.02, -0.3);
 
 
     const start = Date.now();
@@ -148,7 +148,8 @@ export default (canvas, numBlocks = Math.pow(2, 9)) => {
         gl.lineWidth(debug.flowWidth);
 
         particles.draw((uniforms) => Object.assign(uniforms, draw(uniforms), {
-                    flowStrength: 0.5
+                    flowStrength: 0.5,
+                    debug: false
                 },
                 debug),
             gl.LINES);
@@ -156,41 +157,53 @@ export default (canvas, numBlocks = Math.pow(2, 9)) => {
 
         // Render to the view.
 
-        if(debug.fadeOpacity) {
-            buffers[0].bind();
+        if(debug.showFlow) {
+            gl.bindFramebuffer(gl.FRAMEBUFFER, null);
+
+            particles.draw((uniforms) => Object.assign(uniforms, draw(uniforms), {
+                        flowStrength: 0.5,
+                        debug: true
+                    },
+                    debug),
+                gl.LINES);
         }
         else {
-            gl.bindFramebuffer(gl.FRAMEBUFFER, null);
+            if(debug.fadeOpacity) {
+                buffers[0].bind();
+            }
+            else {
+                gl.bindFramebuffer(gl.FRAMEBUFFER, null);
+            }
+
+            if(debug.autoClearView) {
+                gl.clear(gl.COLOR_BUFFER_BIT);
+            }
+
+            if(debug.fadeOpacity) {
+                // Copy and fade the last view into the current view.
+
+                fadeShader.bind();
+
+                Object.assign(fadeShader.uniforms, {
+                        opacity: debug.fadeOpacity,
+                        view: buffers[1].color[0].bind(0),
+                        viewSize
+                    });
+
+                triangle(gl);
+            }
+
+            particles.render = renderShader;
+
+            gl.lineWidth(1);
+
+            particles.draw((uniforms) => Object.assign(uniforms, draw(uniforms), {
+                        flow: flow.color[0].bind(2),
+                        color: [1, 1, 1, 1]
+                    },
+                    debug),
+                gl.LINES);
         }
-
-        if(debug.autoClearView) {
-            gl.clear(gl.COLOR_BUFFER_BIT);
-        }
-
-        if(debug.fadeOpacity) {
-            // Copy and fade the last view into the current view.
-
-            fadeShader.bind();
-
-            Object.assign(fadeShader.uniforms, {
-                    opacity: debug.fadeOpacity,
-                    view: buffers[1].color[0].bind(0),
-                    viewSize
-                });
-
-            triangle(gl);
-        }
-
-        particles.render = renderShader;
-
-        gl.lineWidth(1);
-
-        particles.draw((uniforms) => Object.assign(uniforms, draw(uniforms), {
-                    flow: flow.color[0].bind(2),
-                    color: [1, 1, 1, 1]
-                },
-                debug),
-            gl.LINES);
 
 
         // Copy and fade the view to the screen.
@@ -234,66 +247,257 @@ export default (canvas, numBlocks = Math.pow(2, 9)) => {
 
     // DEBUG
 
-    debug = {
-        pause: false,
-        autoClearView: false,
-
-        startRadius: 0.01,
-        startSpeed: -0.7,
-
-        flowStrength: 0.3,
-        flowWidth: 3,
-
-        flowWeight: 0.82,
-        wanderWeight: 0.0001,
-
-        noiseSpeed: 0.0002,
-        damping: 0.8,
-
-        fadeOpacity: 0.9,
-
-        clearView: () => {
-            buffers.forEach((buffer) => {
-                buffer.bind();
-                gl.clear(gl.COLOR_BUFFER_BIT);
-            });
-
-            gl.bindFramebuffer(gl.FRAMEBUFFER, null);
-            gl.clear(gl.COLOR_BUFFER_BIT);
-        },
-        clearFlow: () => {
-            flow.bind();
-            gl.clear(gl.COLOR_BUFFER_BIT);
-        },
-        reset,
-        restart: () => {
-            debug.clearView();
-            debug.clearFlow();
-            debug.reset(debug.startRadius, debug.startSpeed);
-        }
-    };
-
     let gui = new dat.GUI();
 
+    function updateGUI() {
+        for(let f in gui.__folders) {
+            gui.__folders[f].__controllers.forEach((controller) =>
+                    controller.updateDisplay());
+        }
+    }
+
+
+    // Settings
+
+    const defaultSettings = {
+            autoClearView: false,
+            showFlow: false,
+
+            startRadius: 0.02,
+            startSpeed: -0.3,
+
+            flowStrength: 0.3,
+            flowWidth: 3,
+
+            flowWeight: 0.82,
+            wanderWeight: 0.0001,
+
+            noiseSpeed: 0.0002,
+            damping: 0.8,
+
+            fadeOpacity: 0
+        };
+
+    Object.assign(debug, defaultSettings);
+
+
+    let settings = gui.addFolder('settings');
+
     for(let d in debug) {
-        gui.add(debug, d);
+        settings.add(debug, d);
     }
 
 
     // DAT.GUI's color controllers are a bit fucked.
 
-    let temp = { color: [255, 255, 255], opacity: 0.6 };
+    let colorGUI = { color: [255, 255, 255], opacity: 0.4 };
 
     function convertColor() {
         debug.color = [
-                ...temp.color.slice(0, 3).map((c) => c/255),
-                temp.opacity
+                ...colorGUI.color.slice(0, 3).map((c) => c/255),
+                colorGUI.opacity
             ];
     }
 
-    gui.addColor(temp, 'color').onChange(convertColor);
-    gui.add(temp, 'opacity').onChange(convertColor);
+    settings.addColor(colorGUI, 'color').onChange(convertColor);
+    settings.add(colorGUI, 'opacity').onChange(convertColor);
     convertColor();
 
+
+    // Controls
+
+    let controllers = {
+            paused: false,
+            cyclingColor: false,
+
+            clearView() {
+                buffers.forEach((buffer) => {
+                    buffer.bind();
+                    gl.clear(gl.COLOR_BUFFER_BIT);
+                });
+
+                gl.bindFramebuffer(gl.FRAMEBUFFER, null);
+                gl.clear(gl.COLOR_BUFFER_BIT);
+            },
+            clearFlow() {
+                flow.bind();
+                gl.clear(gl.COLOR_BUFFER_BIT);
+            },
+            reset,
+            restart() {
+                this.clearView();
+                this.clearFlow();
+                this.reset(debug.startRadius, debug.startSpeed);
+            }
+        };
+
+
+    let controls = gui.addFolder('controls');
+
+    for(let c in controllers) {
+        controls.add(controllers, c);
+    }
+
+    controls.open();
+
+
+    function cycleColor() {
+        if(controllers.cyclingColor) {
+            Object.assign(colorGUI, {
+                opacity: 0.8,
+                color: [
+                    Math.sin(Date.now()*0.009)*200,
+                    100+Math.sin(Date.now()*0.006)*155,
+                    200+Math.sin(Date.now()*0.003)*55
+                ]
+            });
+
+            convertColor();
+        }
+
+        requestAnimationFrame(cycleColor);
+    }
+
+    cycleColor();
+
+
+    // Presets
+
+    let presets = gui.addFolder('presets');
+
+    let presetters = {
+            '0 - Intro': () => {
+                Object.assign(debug, defaultSettings);
+
+                controllers.restart();
+
+                Object.assign(colorGUI, {
+                        opacity: 0.4,
+                        color: [255, 255, 255]
+                    });
+
+                convertColor();
+
+                controllers.cyclingColor = false;
+                updateGUI();
+            },
+            '1 - Flow': () => {
+                Object.assign(debug, {
+                        showFlow: true,
+
+                        noiseSpeed: 0.0002
+                    });
+
+                controllers.cyclingColor = false;
+                updateGUI();
+            },
+            '2 - Fluid (kinda)': () => {
+                Object.assign(debug, defaultSettings, {
+                        autoClearView: true,
+                        showFlow: false
+                    });
+
+                Object.assign(colorGUI, {
+                        opacity: 0.8,
+                        color: [255, 255, 255]
+                    });
+
+                convertColor();
+
+                controllers.cyclingColor = false;
+                updateGUI();
+            },
+            '3 - Flow only': () => {
+                Object.assign(debug, {
+                        autoClearView: true,
+                        showFlow: false,
+
+                        flowWeight: 0.82,
+                        wanderWeight: 0,
+
+                        startRadius: 0.6,
+                        startSpeed: -0.06
+                    });
+
+                controllers.restart();
+
+                Object.assign(colorGUI, {
+                        opacity: 0.8,
+                        color: [100, 200, 255]
+                    });
+
+                convertColor();
+
+                controllers.cyclingColor = false;
+                updateGUI();
+            },
+            '4 - Noise only': () => {
+                Object.assign(debug, {
+                        autoClearView: false,
+                        showFlow: false,
+
+                        flowWeight: 0,
+                        wanderWeight: 0.002,
+
+                        noiseSpeed: 0,
+
+                        startRadius: 0.5,
+                        startSpeed: 0
+                    });
+
+                controllers.restart();
+
+                Object.assign(colorGUI, {
+                        opacity: 0.1,
+                        color: [255, 150, 0]
+                    });
+
+                convertColor();
+
+                controllers.cyclingColor = false;
+                updateGUI();
+            },
+            '5 - Styles': () => {
+                Object.assign(debug, defaultSettings, {
+                        startRadius: 1.77,
+                        startSpeed: -0.0001,
+
+                        fadeOpacity: 0.6
+                    });
+
+                controllers.restart();
+
+                Object.assign(colorGUI, {
+                        opacity: 0.8,
+                        color: [55, 155, 255]
+                    });
+
+                convertColor();
+
+                controllers.cyclingColor = false;
+                updateGUI();
+            },
+            '6 - Mad styles': () => {
+                Object.assign(debug, defaultSettings, {
+                        startRadius: 0.3,
+                        startSpeed: -0.03
+                    });
+
+                controllers.restart();
+
+                controllers.cyclingColor = true;
+
+                updateGUI();
+            }
+        };
+
+    for(let p in presetters) {
+        presets.add(presetters, p);
+    }
+
+    presets.open();
+
+
     self.debug = debug;
+    self.gui = gui;
 };
