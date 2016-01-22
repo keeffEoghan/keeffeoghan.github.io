@@ -338,8 +338,6 @@ export default (canvas, numBlocks = Math.pow(2, 8)) => {
         controls.add(controllers, c);
     }
 
-    controls.open();
-
 
     function cycleColor() {
         if(controllers.cyclingColor) {
@@ -492,8 +490,6 @@ export default (canvas, numBlocks = Math.pow(2, 8)) => {
     for(let p in presetters) {
         presets.add(presetters, p);
     }
-
-    presets.open();
 
 
     self.debug = debug;
