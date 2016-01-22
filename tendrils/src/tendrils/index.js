@@ -383,9 +383,7 @@ export default (canvas, numBlocks = Math.pow(2, 8)) => {
             },
             '1 - Flow': () => {
                 Object.assign(debug, defaultSettings, {
-                        showFlow: true,
-
-                        noiseSpeed: 0.0002
+                        showFlow: true
                     });
 
                 controllers.cyclingColor = false;
@@ -479,8 +477,8 @@ export default (canvas, numBlocks = Math.pow(2, 8)) => {
             },
             '6 - Mad styles': () => {
                 Object.assign(debug, defaultSettings, {
-                        startRadius: 0.3,
-                        startSpeed: -0.03
+                        startRadius: 0.1,
+                        startSpeed: 0.05
                     });
 
                 controllers.restart();
