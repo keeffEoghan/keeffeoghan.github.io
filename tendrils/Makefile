@@ -1,5 +1,5 @@
 APP_NAME = gerry-okeeffe-gardens
-runner = gulp
+runner = npm run gulp
 
 help:
 	@echo "gerry-okeeffe-gardens"

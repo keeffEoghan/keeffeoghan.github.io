@@ -6,6 +6,9 @@
   "authors": [
     "Eoghan O'Keeffe <keeffeoghan@gmail.com>"
   ],
+  "scripts": {
+    "gulp": "gulp"
+  },
   "dependencies": {
     "a-big-triangle": "^1.0.2",
     "dat-gui": "^0.5.0",
