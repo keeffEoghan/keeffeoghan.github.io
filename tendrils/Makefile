@@ -1,8 +1,8 @@
-APP_NAME = gerry-okeeffe-gardens
+APP_NAME = tendrils
 runner = npm run gulp
 
 help:
-	@echo "gerry-okeeffe-gardens"
+	@echo "tendrils"
 	@echo ""
 	@echo "The following commands are available:"
 	@echo ""

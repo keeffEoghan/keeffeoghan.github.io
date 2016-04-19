@@ -17,7 +17,7 @@ import Particles from './particles';
 
 let debug = {};
 
-export default (canvas, numBlocks = Math.pow(2, 8)) => {
+export default (canvas, numBlocks = Math.pow(2, 10)) => {
     const gl = glContext(canvas, {
                 alpha: true,
                 preserveDrawingBuffer: true
@@ -84,19 +84,11 @@ export default (canvas, numBlocks = Math.pow(2, 8)) => {
     let time = 0;
 
     function render() {
-        if(debug.pause) {
-            return;
-        }
-
         const width = gl.drawingBufferWidth;
         const height = gl.drawingBufferHeight;
 
+        let viewSize = [width, height];
 
-        // Physics
-
-        // Disabling blending here is important – if it's still enabled your
-        // simulation will behave differently to what you'd expect.
-        gl.disable(gl.BLEND);
 
         // Time
 
@@ -107,25 +99,31 @@ export default (canvas, numBlocks = Math.pow(2, 8)) => {
         let dt = time-t0;
 
 
-        let viewSize = [width, height];
+        // Physics
 
-        particles.step((uniforms) => Object.assign(uniforms, {
-                dt,
-                time,
-                start,
-                flow: flow.color[0].bind(1),
-                viewSize
-            },
-            {
-                flowWeight: 500000,
-                wanderWeight: 0.0001,
-                noiseSpeed: 0.0001,
-                damping: 0.975
-            },
-            debug));
+        if(!debug.paused) {
+            // Disabling blending here is important – if it's still enabled your
+            // simulation will behave differently to what you'd expect.
+            gl.disable(gl.BLEND);
 
-        gl.enable(gl.BLEND);
-        gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
+            particles.step((uniforms) => Object.assign(uniforms, {
+                    dt,
+                    time,
+                    start,
+                    flow: flow.color[0].bind(1),
+                    viewSize
+                },
+                {
+                    flowWeight: 500000,
+                    wanderWeight: 0.0001,
+                    noiseSpeed: 0.0001,
+                    damping: 0.975
+                },
+                debug));
+
+            gl.enable(gl.BLEND);
+            gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
+        }
 
 
         // Flow FBO and view renders
@@ -168,7 +166,7 @@ export default (canvas, numBlocks = Math.pow(2, 8)) => {
                 gl.LINES);
         }
         else {
-            if(debug.fadeOpacity) {
+            if(debug.fadeOpacity < 1) {
                 buffers[0].bind();
             }
             else {
@@ -179,7 +177,7 @@ export default (canvas, numBlocks = Math.pow(2, 8)) => {
                 gl.clear(gl.COLOR_BUFFER_BIT);
             }
 
-            if(debug.fadeOpacity) {
+            if(debug.fadeOpacity < 1) {
                 // Copy and fade the last view into the current view.
 
                 fadeShader.bind();
@@ -208,7 +206,7 @@ export default (canvas, numBlocks = Math.pow(2, 8)) => {
 
         // Copy and fade the view to the screen.
 
-        if(debug.fadeOpacity) {
+        if(debug.fadeOpacity < 1) {
             gl.bindFramebuffer(gl.FRAMEBUFFER, null);
             gl.clear(gl.COLOR_BUFFER_BIT);
 
@@ -260,6 +258,8 @@ export default (canvas, numBlocks = Math.pow(2, 8)) => {
     // Settings
 
     const defaultSettings = {
+            paused: false,
+
             autoClearView: false,
             showFlow: false,
 
@@ -275,7 +275,7 @@ export default (canvas, numBlocks = Math.pow(2, 8)) => {
             noiseSpeed: 0.0002,
             damping: 0.8,
 
-            fadeOpacity: 0
+            fadeOpacity: 1
         };
 
     Object.assign(debug, defaultSettings);
@@ -307,7 +307,6 @@ export default (canvas, numBlocks = Math.pow(2, 8)) => {
     // Controls
 
     let controllers = {
-            paused: false,
             cyclingColor: false,
 
             clearView() {
