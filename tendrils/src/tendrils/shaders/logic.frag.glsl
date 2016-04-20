@@ -8,6 +8,7 @@ uniform vec2 viewSize;
 
 uniform float time;
 
+uniform float maxSpeed;
 uniform float damping;
 uniform float flowWeight;
 uniform float wanderWeight;
@@ -38,15 +39,16 @@ void main() {
     vec2 flowForce = flowAtScreenPosition(screenPos, flow);
 
 
-    // Accumulate weighted forces
-    vel += (flowForce*flowWeight)+(wanderForce*wanderWeight);
+    // Accumulate weighted forces and damping
+    vel = (vel*damping)+(flowForce*flowWeight)+(wanderForce*wanderWeight);
+    
+    // Clamp the velocity
+    float speed = length(vel);
+    
+    vel = (vel/speed)*min(speed, maxSpeed);
 
     // Integrate motion
     pos += vel;
-
-    // Damping
-    vel *= damping;
-
 
     gl_FragColor = vec4(pos, vel);
 }

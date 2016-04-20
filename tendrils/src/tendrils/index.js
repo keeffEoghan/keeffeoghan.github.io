@@ -27,7 +27,10 @@ export default (canvas, numBlocks = Math.pow(2, 10)) => {
 
     let flow = FBO(gl, [1, 1], { float: true });
 
-    let buffers = [FBO(gl, [1, 1], { float: true }), FBO(gl, [1, 1], { float: true })];
+    let buffers = [
+            FBO(gl, [1, 1], { float: true }),
+            FBO(gl, [1, 1], { float: true })
+        ];
 
 
     const shape = [numBlocks, numBlocks];
@@ -56,7 +59,7 @@ export default (canvas, numBlocks = Math.pow(2, 10)) => {
 
     let tempPos = [];
 
-    function reset(radius = numBlocks*0.0005, speed = -0.005) {
+    function reset(radius = numBlocks*0.005, speed = -0.005) {
         particles.populate((u, v, data) => {
             let a = Math.random()*Math.PI*2;
             let l = Math.random();
@@ -77,7 +80,7 @@ export default (canvas, numBlocks = Math.pow(2, 10)) => {
         });
     }
 
-    reset(0.02, -0.3);
+    reset(0.2, 0.01);
 
 
     const start = Date.now();
@@ -114,10 +117,11 @@ export default (canvas, numBlocks = Math.pow(2, 10)) => {
                     viewSize
                 },
                 {
+                    maxSpeed: 0.02,
+                    damping: 0.975,
                     flowWeight: 500000,
                     wanderWeight: 0.0001,
-                    noiseSpeed: 0.0001,
-                    damping: 0.975
+                    noiseSpeed: 0.0001
                 },
                 debug));
 
@@ -263,17 +267,19 @@ export default (canvas, numBlocks = Math.pow(2, 10)) => {
             autoClearView: false,
             showFlow: false,
 
-            startRadius: 0.02,
-            startSpeed: -0.3,
+            startRadius: 0.2,
+            startSpeed: 0.01,
 
-            flowStrength: 0.3,
+            maxSpeed: 0.007,
+            damping: 0.7,
+
+            flowStrength: 0.4,
             flowWidth: 3,
 
-            flowWeight: 0.82,
+            flowWeight: 0.75,
             wanderWeight: 0.0001,
 
             noiseSpeed: 0.0002,
-            damping: 0.8,
 
             fadeOpacity: 1
         };
@@ -290,7 +296,7 @@ export default (canvas, numBlocks = Math.pow(2, 10)) => {
 
     // DAT.GUI's color controllers are a bit fucked.
 
-    let colorGUI = { color: [255, 255, 255], opacity: 0.4 };
+    let colorGUI = { color: [255, 255, 255], opacity: 0.2 };
 
     function convertColor() {
         debug.color = [
@@ -369,7 +375,7 @@ export default (canvas, numBlocks = Math.pow(2, 10)) => {
                 controllers.restart();
 
                 Object.assign(colorGUI, {
-                        opacity: 0.4,
+                        opacity: 0.2,
                         color: [255, 255, 255]
                     });
 
