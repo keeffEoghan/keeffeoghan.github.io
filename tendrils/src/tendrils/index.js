@@ -17,9 +17,8 @@ import Particles from './particles';
 
 let debug = {};
 
-export default (canvas, numBlocks = Math.pow(2, 10)) => {
+export default (canvas, numBlocks = Math.pow(2, 9)) => {
     const gl = glContext(canvas, {
-                // alpha: true,
                 preserveDrawingBuffer: true
             },
             render);
