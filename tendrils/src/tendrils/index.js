@@ -150,6 +150,7 @@ export default (canvas, numBlocks = Math.pow(2, 9)) => {
 
         particles.draw((uniforms) => Object.assign(uniforms, draw(uniforms), {
                     flowStrength: 0.5,
+                    maxSpeed: 0.02,
                     debug: false
                 },
                 debug),
@@ -163,6 +164,7 @@ export default (canvas, numBlocks = Math.pow(2, 9)) => {
 
             particles.draw((uniforms) => Object.assign(uniforms, draw(uniforms), {
                         flowStrength: 0.5,
+                        maxSpeed: 0.02,
                         debug: true
                     },
                     debug),
@@ -269,14 +271,14 @@ export default (canvas, numBlocks = Math.pow(2, 9)) => {
             startRadius: 0.2,
             startSpeed: 0.01,
 
-            maxSpeed: 0.007,
+            maxSpeed: 0.006,
             damping: 0.7,
 
             flowStrength: 0.4,
             flowWidth: 3,
 
-            flowWeight: 0.75,
-            wanderWeight: 0.0001,
+            flowWeight: 0.8,
+            wanderWeight: 0.0002,
 
             noiseSpeed: 0.0002,
 
