@@ -17,9 +17,9 @@ import Particles from './particles';
 
 let debug = {};
 
-export default (canvas, numBlocks = Math.pow(2, 10)) => {
+export default (canvas, numBlocks = 750) => {
     const gl = glContext(canvas, {
-                alpha: true,
+                // alpha: true,
                 preserveDrawingBuffer: true
             },
             render);
@@ -341,7 +341,7 @@ export default (canvas, numBlocks = Math.pow(2, 10)) => {
     function cycleColor() {
         if(controllers.cyclingColor) {
             Object.assign(colorGUI, {
-                opacity: 0.8,
+                opacity: 0.2,
                 color: [
                     Math.sin(Date.now()*0.009)*200,
                     100+Math.sin(Date.now()*0.006)*155,

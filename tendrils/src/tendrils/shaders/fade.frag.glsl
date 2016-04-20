@@ -9,6 +9,7 @@ uniform float opacity;
 void main() {
     // vec4 fragment = texture2D(view, gl_FragCoord.xy/viewSize);
     vec4 fragment = fxaa(view, gl_FragCoord.xy, viewSize);
+
     float a = fragment.a*opacity;
 
     // gl_FragColor = mix(vec4(0.0), fragment, a);
