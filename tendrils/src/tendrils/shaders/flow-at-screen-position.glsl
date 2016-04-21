@@ -1,9 +1,9 @@
 /**
- * @return The screen-space position for a given state position.
+ * @return The screen-space position and age for a given state position.
  */
-vec2 flowAtScreenPosition(in vec2 screenPosition, in sampler2D flow) {
+vec3 flowAtScreenPosition(in vec2 screenPosition, in sampler2D flow) {
     // Screen -> UV
-    return texture2D(flow, (screenPosition+vec2(1.0))*0.5).xy;
+    return texture2D(flow, (screenPosition+vec2(1.0))*0.5).xyz;
 }
 
 #pragma glslify: export(flowAtScreenPosition)
