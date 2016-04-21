@@ -24,8 +24,8 @@ const defaultSettings = {
         autoClearView: true,
         showFlow: false,
 
-        startRadius: 0.5,
-        startSpeed: 0.01,
+        startRadius: 0.4,
+        startSpeed: 0.05,
 
         maxSpeed: 0.007,
         damping: 0.72,
@@ -40,13 +40,15 @@ const defaultSettings = {
         wanderWeight: 0.0002,
 
         fadeOpacity: 1,
-        color: [1, 1, 1, 0.4]
+        color: [1, 1, 1, 0.4],
+
+        respawnRate: 0.001
     };
 
 let settings = Object.assign({}, defaultSettings);
 
 
-function tendrils(canvas, rootNum = settings.rootNum) {
+function tendrils(canvas) {
     const gl = glContext(canvas, {
                 preserveDrawingBuffer: true
             },
@@ -90,41 +92,49 @@ function tendrils(canvas, rootNum = settings.rootNum) {
                 render: renderShader
             });
 
-        // @todo Make the spwan rate more flexible.
-        spawnData = ndarray(new Float32Array(rootNum*4), [rootNum, 1, 4]);
+
+        const side = Math.ceil(rootNum*settings.respawnRate);
+
+        spawnData = ndarray(new Float32Array(rootNum*4), [side, side, 4]);
     }
 
-    setup(rootNum);
+    setup(settings.rootNum);
 
 
     const tempData = [];
 
-    function reset(radius = settings.startRadius, speed = settings.startSpeed) {
-        function spawn(data, u, v) {
-            let a = Math.random()*Math.PI*2;
-            let l = Math.random();
+    function spawn(data, u, v) {
+        const radius = settings.startRadius;
+        const speed = settings.startSpeed;
 
-            // Position
-            data[0] = Math.cos(a)*l*radius;
-            data[1] = Math.sin(a)*l*radius;
+        const angle = Math.random()*Math.PI*2;
+        const scaled = Math.random()*radius;
+
+        // Position
+        data[0] = Math.cos(angle)*scaled;
+        data[1] = Math.sin(angle)*scaled;
 
 
-            // Velocity
-            // data[2] = data[0]*speed;
-            // data[3] = data[1]*speed;
-            data[2] = (Math.random()-0.5)*speed;
-            data[3] = (Math.random()-0.5)*speed;
+        // Velocity
+        // data[2] = data[0]*speed;
+        // data[3] = data[1]*speed;
+        data[2] = (Math.random()-0.5)*speed;
+        data[3] = (Math.random()-0.5)*speed;
 
-            return data;
-        }
+        return data;
+    }
 
+    function reset() {
         particles.populate(spawn);
 
-        for(let i = 0; i < rootNum; ++i) {
-            let spawned = spawn(tempData);
+        for(let i = 0; i < spawnData.shape[0]; ++i) {
+            for(let j = 0; j < spawnData.shape[1]; ++j) {
+                let spawned = spawn(tempData);
 
-            for(let n = 0; n < 4; ++n) {
-                spawnData.set(i, 0, n, spawned[n]);
+                spawnData.set(i, j, 0, spawned[0]);
+                spawnData.set(i, j, 1, spawned[1]);
+                spawnData.set(i, j, 2, spawned[2]);
+                spawnData.set(i, j, 3, spawned[3]);
             }
         }
     }
@@ -136,12 +146,52 @@ function tendrils(canvas, rootNum = settings.rootNum) {
      */
 
     let respawnOffset = [0, 0];
+    let spawnDataOffset = 0;
 
     function respawn() {
-        respawnOffset[0] = (respawnOffset[0]+1)%rootNum;
+        // Step the respawn shape horizontally and vertically within the FBO
+        
+        const maxOffset = [
+                shape[0]-spawnData.shape[0],
+                shape[1]-spawnData.shape[1]
+            ];
+
+        respawnOffset[0] += spawnData.shape[0];
+
+        if(respawnOffset[0] >= shape[0]) {
+            respawnOffset[0] = 0;
+            respawnOffset[1] += spawnData.shape[1];
+
+            if(respawnOffset[1] >= shape[1]) {
+                respawnOffset[1] = 0;
+            }
+
+            respawnOffset[1] = Math.min(respawnOffset[1], maxOffset[1]);
+        }
+
+        respawnOffset[0] = Math.min(respawnOffset[0], maxOffset[0]);
+
+
+        // Reset this part of the FBO
 
         particles.buffers.forEach((buffer) =>
             buffer.color[0].setPixels(spawnData, respawnOffset));
+
+
+        // Finally, change some of the spawn data values for next time too
+        
+        spawnDataOffset += spawnData.shape[0]*4;
+
+        if(spawnDataOffset >= spawnData.data.length) {
+            spawnDataOffset = 0;
+        }
+
+        spawnDataOffset = Math.min(spawnDataOffset,
+            spawnData.data.length-(spawnData.shape[1]*4));
+
+        for(let s = 0; s < spawnData.shape[1]; s += 4) {
+            spawnData.data.set(spawn(tempData), spawnDataOffset+s);
+        }
     }
 
 
@@ -559,7 +609,7 @@ function tendrils(canvas, rootNum = settings.rootNum) {
 
     resize();
 
-    setInterval(respawn, 1000/20);
+    setInterval(respawn, 100);
 
     restart();
 }
