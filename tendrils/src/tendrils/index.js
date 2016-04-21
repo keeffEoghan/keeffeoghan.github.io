@@ -15,7 +15,33 @@ const glslify = require('glslify');
 import Particles from './particles';
 
 
-let debug = {};
+const defaultSettings = {
+        paused: false,
+
+        autoClearView: true,
+        showFlow: false,
+
+        startRadius: 0.2,
+        startSpeed: 0.01,
+
+        maxSpeed: 0.007,
+        damping: 0.72,
+
+        flowDecay: 0.001,
+        flowStrength: 0.4,
+        flowWidth: 5,
+
+        noiseSpeed: 0.0005,
+
+        flowWeight: 0.7,
+        wanderWeight: 0.0002,
+
+        fadeOpacity: 1,
+        color: [1, 1, 1, 0.4]
+    };
+
+let settings = Object.assign({}, defaultSettings);
+
 
 export default (canvas, numBlocks = Math.pow(2, 9)) => {
     const gl = glContext(canvas, {
@@ -79,7 +105,7 @@ export default (canvas, numBlocks = Math.pow(2, 9)) => {
         });
     }
 
-    reset(0.2, 0.01);
+    reset(settings.startRadius, settings.startSpeed);
 
 
     const start = Date.now();
@@ -103,7 +129,7 @@ export default (canvas, numBlocks = Math.pow(2, 9)) => {
 
         // Physics
 
-        if(!debug.paused) {
+        if(!settings.paused) {
             // Disabling blending here is important – if it's still enabled your
             // simulation will behave differently to what you'd expect.
             gl.disable(gl.BLEND);
@@ -115,17 +141,7 @@ export default (canvas, numBlocks = Math.pow(2, 9)) => {
                     flow: flow.color[0].bind(1),
                     viewSize
                 },
-                {
-                    maxSpeed: 0.02,
-                    damping: 0.975,
-
-                    flowDecay: 0.001,
-
-                    flowWeight: 1,
-                    wanderWeight: 0.0001,
-                    noiseSpeed: 0.0001
-                },
-                debug));
+                settings));
 
             gl.enable(gl.BLEND);
             gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
@@ -149,51 +165,47 @@ export default (canvas, numBlocks = Math.pow(2, 9)) => {
         flow.bind();
         particles.render = flowShader;
 
-        gl.lineWidth(debug.flowWidth);
+        gl.lineWidth(settings.flowWidth);
 
         particles.draw((uniforms) => Object.assign(uniforms, draw(uniforms), {
                     time,
-                    flowStrength: 0.5,
-                    maxSpeed: 0.02,
                     debug: false
                 },
-                debug),
+                settings),
             gl.LINES);
 
 
         // Render to the view.
 
-        if(debug.showFlow) {
+        if(settings.showFlow) {
             gl.bindFramebuffer(gl.FRAMEBUFFER, null);
 
             particles.draw((uniforms) => Object.assign(uniforms, draw(uniforms), {
                         time,
-                        flowStrength: 0.5,
-                        maxSpeed: 0.02,
                         debug: true
                     },
-                    debug),
+                    settings),
                 gl.LINES);
         }
         else {
-            if(debug.fadeOpacity < 1) {
+            if(settings.fadeOpacity < 1) {
                 buffers[0].bind();
             }
             else {
                 gl.bindFramebuffer(gl.FRAMEBUFFER, null);
             }
 
-            if(debug.autoClearView) {
+            if(settings.autoClearView) {
                 gl.clear(gl.COLOR_BUFFER_BIT);
             }
 
-            if(debug.fadeOpacity < 1) {
+            if(settings.fadeOpacity < 1) {
                 // Copy and fade the last view into the current view.
 
                 fadeShader.bind();
 
                 Object.assign(fadeShader.uniforms, {
-                        opacity: debug.fadeOpacity,
+                        opacity: settings.fadeOpacity,
                         view: buffers[1].color[0].bind(0),
                         viewSize
                     });
@@ -205,18 +217,18 @@ export default (canvas, numBlocks = Math.pow(2, 9)) => {
 
             gl.lineWidth(1);
 
-            particles.draw((uniforms) => Object.assign(uniforms, draw(uniforms), {
-                        flow: flow.color[0].bind(2),
-                        color: [1, 1, 1, 1]
+            particles.draw((uniforms) => Object.assign(uniforms,
+                    draw(uniforms), {
+                        flow: flow.color[0].bind(2)
                     },
-                    debug),
+                    settings),
                 gl.LINES);
         }
 
 
         // Copy and fade the view to the screen.
 
-        if(debug.fadeOpacity < 1) {
+        if(settings.fadeOpacity < 1) {
             gl.bindFramebuffer(gl.FRAMEBUFFER, null);
             gl.clear(gl.COLOR_BUFFER_BIT);
 
@@ -253,6 +265,8 @@ export default (canvas, numBlocks = Math.pow(2, 9)) => {
     resize();
 
 
+
+
     // DEBUG
 
     let gui = new dat.GUI();
@@ -267,54 +281,32 @@ export default (canvas, numBlocks = Math.pow(2, 9)) => {
 
     // Settings
 
-    const defaultSettings = {
-            paused: false,
 
-            autoClearView: false,
-            showFlow: false,
+    let settingsGUI = gui.addFolder('settings');
 
-            startRadius: 0.2,
-            startSpeed: 0.01,
-
-            maxSpeed: 0.007,
-            damping: 0.73,
-
-            flowDecay: 0.0006,
-
-            flowStrength: 0.4,
-            flowWidth: 3,
-
-            flowWeight: 0.65,
-            wanderWeight: 0.0003,
-
-            noiseSpeed: 0.0003,
-
-            fadeOpacity: 1
-        };
-
-    Object.assign(debug, defaultSettings);
-
-
-    let settings = gui.addFolder('settings');
-
-    for(let d in debug) {
-        settings.add(debug, d);
+    for(let s in settings) {
+        if(!(typeof settings[s]).match(/(object|array)/gi)) {
+            settingsGUI.add(settings, s);
+        }
     }
 
 
     // DAT.GUI's color controllers are a bit fucked.
 
-    let colorGUI = { color: [255, 255, 255], opacity: 0.2 };
+    let colorGUI = {
+            color: settings.color.slice(0, 3).map((c) => c*255),
+            opacity: settings.color[3]
+        };
 
     function convertColor() {
-        debug.color = [
+        settings.color = [
                 ...colorGUI.color.slice(0, 3).map((c) => c/255),
                 colorGUI.opacity
             ];
     }
 
-    settings.addColor(colorGUI, 'color').onChange(convertColor);
-    settings.add(colorGUI, 'opacity').onChange(convertColor);
+    settingsGUI.addColor(colorGUI, 'color').onChange(convertColor);
+    settingsGUI.add(colorGUI, 'opacity').onChange(convertColor);
     convertColor();
 
 
@@ -340,15 +332,15 @@ export default (canvas, numBlocks = Math.pow(2, 9)) => {
             restart() {
                 this.clearView();
                 this.clearFlow();
-                this.reset(debug.startRadius, debug.startSpeed);
+                this.reset(settings.startRadius, settings.startSpeed);
             }
         };
 
 
-    let controls = gui.addFolder('controls');
+    let controlsGUI = gui.addFolder('controls');
 
     for(let c in controllers) {
-        controls.add(controllers, c);
+        controlsGUI.add(controllers, c);
     }
 
 
@@ -374,11 +366,11 @@ export default (canvas, numBlocks = Math.pow(2, 9)) => {
 
     // Presets
 
-    let presets = gui.addFolder('presets');
+    let presetsGUI = gui.addFolder('presets');
 
     let presetters = {
             '0 - Intro': () => {
-                Object.assign(debug, defaultSettings);
+                Object.assign(settings, defaultSettings);
 
                 controllers.restart();
 
@@ -393,7 +385,7 @@ export default (canvas, numBlocks = Math.pow(2, 9)) => {
                 updateGUI();
             },
             '1 - Flow': () => {
-                Object.assign(debug, defaultSettings, {
+                Object.assign(settings, defaultSettings, {
                         showFlow: true
                     });
 
@@ -401,7 +393,7 @@ export default (canvas, numBlocks = Math.pow(2, 9)) => {
                 updateGUI();
             },
             '2 - Fluid (kinda)': () => {
-                Object.assign(debug, defaultSettings, {
+                Object.assign(settings, defaultSettings, {
                         autoClearView: true,
                         showFlow: false
                     });
@@ -419,7 +411,7 @@ export default (canvas, numBlocks = Math.pow(2, 9)) => {
                 updateGUI();
             },
             '3 - Flow only': () => {
-                Object.assign(debug, defaultSettings, {
+                Object.assign(settings, defaultSettings, {
                         autoClearView: true,
                         showFlow: false,
 
@@ -443,7 +435,7 @@ export default (canvas, numBlocks = Math.pow(2, 9)) => {
                 updateGUI();
             },
             '4 - Noise only': () => {
-                Object.assign(debug, defaultSettings, {
+                Object.assign(settings, defaultSettings, {
                         autoClearView: false,
                         showFlow: false,
 
@@ -469,7 +461,7 @@ export default (canvas, numBlocks = Math.pow(2, 9)) => {
                 updateGUI();
             },
             '5 - Styles': () => {
-                Object.assign(debug, defaultSettings, {
+                Object.assign(settings, defaultSettings, {
                         startRadius: 1.77,
                         startSpeed: -0.0001,
 
@@ -489,7 +481,7 @@ export default (canvas, numBlocks = Math.pow(2, 9)) => {
                 updateGUI();
             },
             '6 - Mad styles': () => {
-                Object.assign(debug, defaultSettings, {
+                Object.assign(settings, defaultSettings, {
                         startRadius: 0.1,
                         startSpeed: 0.05
                     });
@@ -503,10 +495,10 @@ export default (canvas, numBlocks = Math.pow(2, 9)) => {
         };
 
     for(let p in presetters) {
-        presets.add(presetters, p);
+        presetsGUI.add(presetters, p);
     }
 
 
-    self.debug = debug;
+    self.settings = settings;
     self.gui = gui;
 };
