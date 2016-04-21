@@ -42,25 +42,13 @@ export default function Particles(gl, options = {}) {
 
     this.gl = gl;
 
-    if(!options.logic) {
-        throw new Error('Please pass in the "logic" shader option');
-    }
-
-    if(!options.vert) {
-        throw new Error('Please pass in the "vert" shader option');
-    }
-
-    if(!options.frag) {
-        throw new Error('Please pass in the "frag" shader option');
-    }
-
     // The dimensions of the state data FBOs. Can be 1:1 with the number of
     // particle vertices, or
     this.shape = (options.shape || [64, 64]);
     this.geomShape = (options.geomShape || [...this.shape]);
 
     this.logic = Shader(gl, logicVert, options.logic);
-    this.render = Shader(gl, options.vert, options.frag);
+    this.render = (options.render || Shader(gl, options.vert, options.frag));
 
     this.logicVertSource = logicVert;
 
