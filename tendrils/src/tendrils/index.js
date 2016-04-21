@@ -16,6 +16,8 @@ import Particles from './particles';
 
 
 const defaultSettings = {
+        numBlocks: Math.pow(2, 10),
+
         paused: false,
 
         autoClearView: true,
@@ -29,7 +31,7 @@ const defaultSettings = {
 
         flowDecay: 0.001,
         flowStrength: 0.4,
-        flowWidth: 5,
+        flowWidth: 3,
 
         noiseSpeed: 0.0005,
 
@@ -43,7 +45,7 @@ const defaultSettings = {
 let settings = Object.assign({}, defaultSettings);
 
 
-export default (canvas, numBlocks = Math.pow(2, 9)) => {
+function tendrils(canvas, numBlocks = settings.numBlocks) {
     const gl = glContext(canvas, {
                 preserveDrawingBuffer: true
             },
@@ -58,22 +60,8 @@ export default (canvas, numBlocks = Math.pow(2, 9)) => {
         ];
 
 
-    const shape = [numBlocks, numBlocks];
-
-    const particles = Particles(gl, {
-            shape: shape,
-
-            // Double the numBlocks of (vertical neighbour) vertices, to have
-            // pairs alternating between previous and current state.
-            // (Vertical neighbours, because WebGL iterates column-major.)
-            geomShape: [shape[0], shape[1]*2],
-
-            logic: glslify('./shaders/logic.frag.glsl'),
-            vert: glslify('./shaders/render.vert.glsl'),
-            frag: glslify('./shaders/render.frag.glsl')
-        });
-
-    const renderShader = particles.render;
+    const renderShader = Shader(gl, glslify('./shaders/render.vert.glsl'),
+                glslify('./shaders/render.frag.glsl'));
 
     const flowShader = Shader(gl, glslify('./shaders/flow.vert.glsl'),
                 glslify('./shaders/flow.frag.glsl'));
@@ -82,9 +70,31 @@ export default (canvas, numBlocks = Math.pow(2, 9)) => {
                 glslify('./shaders/fade.frag.glsl'));
 
 
+    let shape;
+    let particles;
+
+    function setup(numBlocks) {
+        shape = [numBlocks, numBlocks];
+
+        particles = Particles(gl, {
+                shape: shape,
+
+                // Double the numBlocks of (vertical neighbour) vertices, to have
+                // pairs alternating between previous and current state.
+                // (Vertical neighbours, because WebGL iterates column-major.)
+                geomShape: [shape[0], shape[1]*2],
+
+                logic: glslify('./shaders/logic.frag.glsl'),
+                render: renderShader
+            });
+    }
+
+    setup(numBlocks);
+
+
     let tempPos = [];
 
-    function reset(radius = numBlocks*0.005, speed = -0.005) {
+    function reset(radius = settings.startRadius, speed = settings.startSpeed) {
         particles.populate((u, v, data) => {
             let a = Math.random()*Math.PI*2;
             let l = Math.random();
@@ -105,7 +115,26 @@ export default (canvas, numBlocks = Math.pow(2, 9)) => {
         });
     }
 
-    reset(settings.startRadius, settings.startSpeed);
+    function clearView() {
+        buffers.forEach((buffer) => {
+            buffer.bind();
+            gl.clear(gl.COLOR_BUFFER_BIT);
+        });
+
+        gl.bindFramebuffer(gl.FRAMEBUFFER, null);
+        gl.clear(gl.COLOR_BUFFER_BIT);
+    }
+
+    function clearFlow() {
+        flow.bind();
+        gl.clear(gl.COLOR_BUFFER_BIT);
+    }
+
+    function restart() {
+        clearView();
+        clearFlow();
+        reset(settings.startRadius, settings.startSpeed);
+    }
 
 
     const start = Date.now();
@@ -263,6 +292,7 @@ export default (canvas, numBlocks = Math.pow(2, 9)) => {
         throttle(resize, 100, { leading: true }), false);
 
     resize();
+    restart();
 
 
 
@@ -284,11 +314,22 @@ export default (canvas, numBlocks = Math.pow(2, 9)) => {
 
     let settingsGUI = gui.addFolder('settings');
 
+
+    // Generic settings; no need to do anything special here
+
     for(let s in settings) {
         if(!(typeof settings[s]).match(/(object|array)/gi)) {
             settingsGUI.add(settings, s);
         }
     }
+
+
+    // Changing numBlocks triggers a reset
+    settingsGUI.__controllers[Object.keys(settings).indexOf('numBlocks')]
+        .onFinishChange((n) => {
+            setup(n);
+            restart();
+        });
 
 
     // DAT.GUI's color controllers are a bit fucked.
@@ -315,25 +356,10 @@ export default (canvas, numBlocks = Math.pow(2, 9)) => {
     let controllers = {
             cyclingColor: false,
 
-            clearView() {
-                buffers.forEach((buffer) => {
-                    buffer.bind();
-                    gl.clear(gl.COLOR_BUFFER_BIT);
-                });
-
-                gl.bindFramebuffer(gl.FRAMEBUFFER, null);
-                gl.clear(gl.COLOR_BUFFER_BIT);
-            },
-            clearFlow() {
-                flow.bind();
-                gl.clear(gl.COLOR_BUFFER_BIT);
-            },
+            clearView,
+            clearFlow,
             reset,
-            restart() {
-                this.clearView();
-                this.clearFlow();
-                this.reset(settings.startRadius, settings.startSpeed);
-            }
+            restart
         };
 
 
@@ -501,4 +527,6 @@ export default (canvas, numBlocks = Math.pow(2, 9)) => {
 
     self.settings = settings;
     self.gui = gui;
-};
+}
+
+export default tendrils;
