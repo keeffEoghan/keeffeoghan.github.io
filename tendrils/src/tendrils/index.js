@@ -17,9 +17,8 @@ import Particles from './particles';
 
 let debug = {};
 
-export default (canvas, numBlocks = Math.pow(2, 10)) => {
+export default (canvas, numBlocks = Math.pow(2, 9)) => {
     const gl = glContext(canvas, {
-                // alpha: true,
                 preserveDrawingBuffer: true
             },
             render);
@@ -119,7 +118,10 @@ export default (canvas, numBlocks = Math.pow(2, 10)) => {
                 {
                     maxSpeed: 0.02,
                     damping: 0.975,
-                    flowWeight: 500000,
+
+                    flowDecay: 0.001,
+
+                    flowWeight: 1,
                     wanderWeight: 0.0001,
                     noiseSpeed: 0.0001
                 },
@@ -150,7 +152,9 @@ export default (canvas, numBlocks = Math.pow(2, 10)) => {
         gl.lineWidth(debug.flowWidth);
 
         particles.draw((uniforms) => Object.assign(uniforms, draw(uniforms), {
+                    time,
                     flowStrength: 0.5,
+                    maxSpeed: 0.02,
                     debug: false
                 },
                 debug),
@@ -163,7 +167,9 @@ export default (canvas, numBlocks = Math.pow(2, 10)) => {
             gl.bindFramebuffer(gl.FRAMEBUFFER, null);
 
             particles.draw((uniforms) => Object.assign(uniforms, draw(uniforms), {
+                        time,
                         flowStrength: 0.5,
+                        maxSpeed: 0.02,
                         debug: true
                     },
                     debug),
@@ -271,15 +277,17 @@ export default (canvas, numBlocks = Math.pow(2, 10)) => {
             startSpeed: 0.01,
 
             maxSpeed: 0.007,
-            damping: 0.7,
+            damping: 0.73,
+
+            flowDecay: 0.0006,
 
             flowStrength: 0.4,
             flowWidth: 3,
 
-            flowWeight: 0.75,
-            wanderWeight: 0.0001,
+            flowWeight: 0.65,
+            wanderWeight: 0.0003,
 
-            noiseSpeed: 0.0002,
+            noiseSpeed: 0.0003,
 
             fadeOpacity: 1
         };

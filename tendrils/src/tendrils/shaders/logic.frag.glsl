@@ -10,6 +10,9 @@ uniform float time;
 
 uniform float maxSpeed;
 uniform float damping;
+
+uniform float flowDecay;
+
 uniform float flowWeight;
 uniform float wanderWeight;
 uniform float noiseSpeed;
@@ -36,7 +39,10 @@ void main() {
     // self-influence.)
 
     vec2 screenPos = screenPosition(pos, viewSize);
-    vec2 flowForce = flowAtScreenPosition(screenPos, flow);
+    vec3 flowData = flowAtScreenPosition(screenPos, flow);
+
+    // The flow degrades over time
+    vec2 flowForce = flowData.xy*max(0.0, 1.0-((time-flowData.z)*flowDecay));
 
 
     // Accumulate weighted forces and damping
