@@ -16,7 +16,7 @@ import Particles from './particles';
 
 
 const defaultSettings = {
-        numBlocks: Math.pow(2, 10),
+        rootNum: Math.pow(2, 10),
 
         paused: false,
 
@@ -45,7 +45,7 @@ const defaultSettings = {
 let settings = Object.assign({}, defaultSettings);
 
 
-function tendrils(canvas, numBlocks = settings.numBlocks) {
+function tendrils(canvas, rootNum = settings.rootNum) {
     const gl = glContext(canvas, {
                 preserveDrawingBuffer: true
             },
@@ -73,13 +73,13 @@ function tendrils(canvas, numBlocks = settings.numBlocks) {
     let shape;
     let particles;
 
-    function setup(numBlocks) {
-        shape = [numBlocks, numBlocks];
+    function setup(rootNum) {
+        shape = [rootNum, rootNum];
 
         particles = Particles(gl, {
                 shape: shape,
 
-                // Double the numBlocks of (vertical neighbour) vertices, to have
+                // Double the rootNum of (vertical neighbour) vertices, to have
                 // pairs alternating between previous and current state.
                 // (Vertical neighbours, because WebGL iterates column-major.)
                 geomShape: [shape[0], shape[1]*2],
@@ -89,7 +89,7 @@ function tendrils(canvas, numBlocks = settings.numBlocks) {
             });
     }
 
-    setup(numBlocks);
+    setup(rootNum);
 
 
     let tempPos = [];
@@ -324,8 +324,8 @@ function tendrils(canvas, numBlocks = settings.numBlocks) {
     }
 
 
-    // Changing numBlocks triggers a reset
-    settingsGUI.__controllers[Object.keys(settings).indexOf('numBlocks')]
+    // Changing rootNum triggers a reset
+    settingsGUI.__controllers[Object.keys(settings).indexOf('rootNum')]
         .onFinishChange((n) => {
             setup(n);
             restart();
