@@ -28,22 +28,22 @@ const defaultSettings = {
         startSpeed: 0.01,
 
         maxSpeed: 0.01,
-        damping: 0.056,
+        damping: 0.045,
 
         flowDecay: 0.001,
         flowWidth: 3,
 
         noiseSpeed: 0.0005,
 
-        forceWeight: 0.004,
+        forceWeight: 0.014,
         flowWeight: 1,
-        wanderWeight: 0.0015,
+        wanderWeight: 0.0016,
 
         fadeOpacity: 1,
-        color: [1, 1, 1, 0.25],
+        color: [1, 1, 1, 0.4],
 
-        respawnAmount: 0.005,
-        respawnRate: 100
+        respawnAmount: 0.007,
+        respawnTick: 100
     };
 
 let settings = Object.assign({}, defaultSettings);
@@ -394,8 +394,8 @@ function tendrils(canvas) {
     function respawnSweep() {
         clearInterval(respawnTick);
 
-        if(settings.respawnRate) {
-            respawnTick = setInterval(respawn, settings.respawnRate);
+        if(settings.respawnTick) {
+            respawnTick = setInterval(respawn, settings.respawnTick);
         }
     }
 
@@ -454,7 +454,7 @@ function tendrils(canvas) {
                 setupSpawnData(settings.rootNum);
             });
 
-        settingsGUI.__controllers[settingsKeys.indexOf('respawnRate')]
+        settingsGUI.__controllers[settingsKeys.indexOf('respawnTick')]
             .onFinishChange((n) => {
                 respawnSweep();
             });
