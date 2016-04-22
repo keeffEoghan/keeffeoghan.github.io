@@ -7,15 +7,18 @@ uniform vec2 resolution;
 uniform vec2 viewSize;
 
 uniform float time;
+uniform float dt;
 
 uniform float maxSpeed;
 uniform float damping;
 
 uniform float flowDecay;
 
+uniform float noiseSpeed;
+
+uniform float forceWeight;
 uniform float flowWeight;
 uniform float wanderWeight;
-uniform float noiseSpeed;
 
 #pragma glslify: noise = require('glsl-noise/simplex/3d')
 #pragma glslify: screenPosition = require('./screen-position')
@@ -46,7 +49,10 @@ void main() {
 
 
     // Accumulate weighted forces and damping
-    vel = (vel*damping)+(flowForce*flowWeight)+(wanderForce*wanderWeight);
+    vel = (vel*damping*dt)+
+        (forceWeight*
+            ((flowForce*flowWeight*dt)+
+            (wanderForce*wanderWeight*dt)));
     
     // Clamp the velocity
     float speed = length(vel);

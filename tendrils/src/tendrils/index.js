@@ -25,22 +25,22 @@ const defaultSettings = {
         showFlow: false,
 
         startRadius: 0.4,
-        startSpeed: 0.02,
+        startSpeed: 0.01,
 
-        maxSpeed: 0.007,
-        damping: 0.72,
+        maxSpeed: 0.01,
+        damping: 0.056,
 
         flowDecay: 0.001,
-        flowStrength: 0.4,
         flowWidth: 3,
 
         noiseSpeed: 0.0005,
 
-        flowWeight: 0.7,
-        wanderWeight: 0.0002,
+        forceWeight: 0.004,
+        flowWeight: 1,
+        wanderWeight: 0.0015,
 
         fadeOpacity: 1,
-        color: [1, 1, 1, 0.4],
+        color: [1, 1, 1, 0.25],
 
         respawnAmount: 0.005,
         respawnRate: 100
@@ -109,11 +109,11 @@ function tendrils(canvas) {
     const tempData = [];
 
     function spawn(data, u, v) {
-        const radius = settings.startRadius;
-        const speed = settings.startSpeed;
+        let radius = settings.startRadius;
+        let speed = settings.startSpeed;
 
-        const angle = Math.random()*Math.PI*2;
-        const scaled = Math.random()*radius;
+        let angle = Math.random()*Math.PI*2;
+        let scaled = Math.random()*radius;
 
         // Position
         data[0] = Math.cos(angle)*scaled;
@@ -121,10 +121,12 @@ function tendrils(canvas) {
 
 
         // Velocity
-        // data[2] = data[0]*speed;
-        // data[3] = data[1]*speed;
-        data[2] = (Math.random()-0.5)*speed;
-        data[3] = (Math.random()-0.5)*speed;
+
+        angle = Math.random()*Math.PI*2;
+        scaled = Math.random()*speed;
+
+        data[2] = Math.cos(angle)*scaled;
+        data[3] = Math.sin(angle)*scaled;
 
         return data;
     }
@@ -261,7 +263,8 @@ function tendrils(canvas) {
             gl.disable(gl.BLEND);
 
             particles.step((uniforms) => Object.assign(uniforms, {
-                    dt,
+                    // dt,
+                    dt: 1000/60,
                     time,
                     start,
                     flow: flow.color[0].bind(1),
