@@ -24,7 +24,7 @@ const defaultSettings = {
         autoClearView: true,
         showFlow: false,
 
-        startRadius: 0.4,
+        startRadius: 0.6,
         startSpeed: 0.01,
 
         maxSpeed: 0.01,
