@@ -6,8 +6,6 @@ uniform sampler2D data;
 uniform vec2 resolution;
 uniform vec2 viewSize;
 
-uniform float flowStrength;
-
 attribute vec2 uv;
 
 varying vec2 flow;
@@ -22,5 +20,5 @@ void main() {
 
     // Linear interpolation - inaccurate for vectors, will it be OK without
     // sudden turns, or do we need a per-fragment lookup?
-    flow = state.zw*flowStrength;
+    flow = state.zw;
 }
