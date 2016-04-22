@@ -17,7 +17,7 @@ import Particles from './particles';
 
 
 const defaultSettings = {
-        rootNum: Math.pow(2, 10),
+        rootNum: Math.pow(2, 9),
 
         paused: false,
 
