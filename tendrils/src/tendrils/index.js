@@ -410,6 +410,8 @@ function tendrils(canvas) {
     // DEBUG {
         let gui = new dat.GUI();
 
+        gui.close();
+
         function updateGUI() {
             for(let f in gui.__folders) {
                 gui.__folders[f].__controllers.forEach((controller) =>
