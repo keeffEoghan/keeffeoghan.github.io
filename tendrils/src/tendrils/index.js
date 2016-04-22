@@ -8,6 +8,7 @@ import glContext from 'gl-context';
 import FBO from 'gl-fbo';
 import Shader from 'gl-shader';
 import triangle from 'a-big-triangle';
+import ndarray from 'ndarray';
 import throttle from 'lodash.throttle';
 import dat from 'dat-gui';
 const glslify = require('glslify');
@@ -23,8 +24,8 @@ const defaultSettings = {
         autoClearView: true,
         showFlow: false,
 
-        startRadius: 0.2,
-        startSpeed: 0.01,
+        startRadius: 0.4,
+        startSpeed: 0.02,
 
         maxSpeed: 0.007,
         damping: 0.72,
@@ -39,13 +40,16 @@ const defaultSettings = {
         wanderWeight: 0.0002,
 
         fadeOpacity: 1,
-        color: [1, 1, 1, 0.4]
+        color: [1, 1, 1, 0.4],
+
+        respawnAmount: 0.005,
+        respawnRate: 100
     };
 
 let settings = Object.assign({}, defaultSettings);
 
 
-function tendrils(canvas, rootNum = settings.rootNum) {
+function tendrils(canvas) {
     const gl = glContext(canvas, {
                 preserveDrawingBuffer: true
             },
@@ -72,6 +76,7 @@ function tendrils(canvas, rootNum = settings.rootNum) {
 
     let shape;
     let particles;
+    let spawnData;
 
     function setup(rootNum) {
         shape = [rootNum, rootNum];
@@ -87,33 +92,125 @@ function tendrils(canvas, rootNum = settings.rootNum) {
                 logic: glslify('./shaders/logic.frag.glsl'),
                 render: renderShader
             });
+
+        setupSpawnData(rootNum);
     }
 
-    setup(rootNum);
 
+    function setupSpawnData(rootNum) {
+        const side = Math.ceil(rootNum*settings.respawnAmount);
 
-    let tempPos = [];
-
-    function reset(radius = settings.startRadius, speed = settings.startSpeed) {
-        particles.populate((u, v, data) => {
-            let a = Math.random()*Math.PI*2;
-            let l = Math.random();
-
-            tempPos[0] = Math.cos(a)*l;
-            tempPos[1] = Math.sin(a)*l;
-
-            // Position
-            data[0] = tempPos[0]*radius;
-            data[1] = tempPos[1]*radius;
-
-
-            // Velocity
-            data[2] = data[0]*speed;
-            data[3] = data[1]*speed;
-            // data[2] = (Math.random()-0.5)*speed;
-            // data[3] = (Math.random()-0.5)*speed;
-        });
+        spawnData = ndarray(new Float32Array(side*side*4), [side, side, 4]);
     }
+
+    setup(settings.rootNum);
+
+
+    const tempData = [];
+
+    function spawn(data, u, v) {
+        const radius = settings.startRadius;
+        const speed = settings.startSpeed;
+
+        const angle = Math.random()*Math.PI*2;
+        const scaled = Math.random()*radius;
+
+        // Position
+        data[0] = Math.cos(angle)*scaled;
+        data[1] = Math.sin(angle)*scaled;
+
+
+        // Velocity
+        // data[2] = data[0]*speed;
+        // data[3] = data[1]*speed;
+        data[2] = (Math.random()-0.5)*speed;
+        data[3] = (Math.random()-0.5)*speed;
+
+        return data;
+    }
+
+    function reset() {
+        particles.populate(spawn);
+
+        for(let i = 0; i < spawnData.shape[0]; ++i) {
+            for(let j = 0; j < spawnData.shape[1]; ++j) {
+                let spawned = spawn(tempData);
+
+                spawnData.set(i, j, 0, spawned[0]);
+                spawnData.set(i, j, 1, spawned[1]);
+                spawnData.set(i, j, 2, spawned[2]);
+                spawnData.set(i, j, 3, spawned[3]);
+            }
+        }
+    }
+
+
+    /**
+     * Set particles at a moving offset to their spawn positions.
+     * For now, this is just the center.
+     */
+
+    let respawnOffset = [0, 0];
+    let spawnDataOffset = 0;
+
+    function respawn() {
+        if(spawnData.shape[0]) {
+            // Step the respawn shape horizontally and vertically within the FBO
+
+            // X
+            
+            respawnOffset[0] += spawnData.shape[0];
+
+            // Wrap
+            if(respawnOffset[0] >= shape[0]) {
+                respawnOffset[0] = 0;
+                // Step down Y - carriage return style
+                respawnOffset[1] += spawnData.shape[1];
+            }
+
+            // Check bounds
+            respawnOffset[0] = Math.min(respawnOffset[0],
+                shape[0]-spawnData.shape[0]);
+
+
+            // Y
+
+            // Wrap
+            if(respawnOffset[1] >= shape[1]) {
+                respawnOffset[1] = 0;
+            }
+
+            // Check bounds
+            respawnOffset[1] = Math.min(respawnOffset[1],
+                shape[1]-spawnData.shape[1]);
+
+
+            // Reset this part of the FBO
+            particles.buffers.forEach((buffer) =>
+                buffer.color[0].setPixels(spawnData, respawnOffset));
+
+
+            // Finally, change some of the spawn data values for next time too,
+            // a line at a time
+            
+            // Linear data stepping, no need for 2D
+            spawnDataOffset += spawnData.shape[0]*4;
+
+            // Wrap
+            if(spawnDataOffset >= spawnData.data.length) {
+                spawnDataOffset = 0;
+            }
+
+            // Check bounds
+            spawnDataOffset = Math.min(spawnDataOffset,
+                spawnData.data.length-(spawnData.shape[0]*4));
+
+            for(let s = 0; s < spawnData.shape[1]; s += 4) {
+                spawnData.data.set(spawn(tempData), spawnDataOffset+s);
+            }
+        }
+    }
+
 
     function clearView() {
         buffers.forEach((buffer) => {
@@ -288,245 +385,272 @@ function tendrils(canvas, rootNum = settings.rootNum) {
             ];
     }
 
+
+    let respawnTick;
+
+    function respawnSweep() {
+        clearInterval(respawnTick);
+
+        if(settings.respawnRate) {
+            respawnTick = setInterval(respawn, settings.respawnRate);
+        }
+    }
+
+
+    // Go
+
     self.addEventListener('resize',
         throttle(resize, 100, { leading: true }), false);
 
     resize();
+    respawnSweep();
     restart();
 
 
+    // DEBUG {
+        let gui = new dat.GUI();
 
-
-    // DEBUG
-
-    let gui = new dat.GUI();
-
-    function updateGUI() {
-        for(let f in gui.__folders) {
-            gui.__folders[f].__controllers.forEach((controller) =>
-                    controller.updateDisplay());
+        function updateGUI() {
+            for(let f in gui.__folders) {
+                gui.__folders[f].__controllers.forEach((controller) =>
+                        controller.updateDisplay());
+            }
         }
-    }
 
 
-    // Settings
+        // Settings
 
 
-    let settingsGUI = gui.addFolder('settings');
+        let settingsGUI = gui.addFolder('settings');
 
 
-    // Generic settings; no need to do anything special here
+        // Generic settings; no need to do anything special here
 
-    for(let s in settings) {
-        if(!(typeof settings[s]).match(/(object|array)/gi)) {
-            settingsGUI.add(settings, s);
+        let settingsKeys = [];
+
+        for(let s in settings) {
+            if(!(typeof settings[s]).match(/(object|array)/gi)) {
+                settingsGUI.add(settings, s);
+                settingsKeys.push(s);
+            }
         }
-    }
 
 
-    // Changing rootNum triggers a reset
-    settingsGUI.__controllers[Object.keys(settings).indexOf('rootNum')]
-        .onFinishChange((n) => {
-            setup(n);
-            restart();
-        });
-
-
-    // DAT.GUI's color controllers are a bit fucked.
-
-    let colorGUI = {
-            color: settings.color.slice(0, 3).map((c) => c*255),
-            opacity: settings.color[3]
-        };
-
-    function convertColor() {
-        settings.color = [
-                ...colorGUI.color.slice(0, 3).map((c) => c/255),
-                colorGUI.opacity
-            ];
-    }
-
-    settingsGUI.addColor(colorGUI, 'color').onChange(convertColor);
-    settingsGUI.add(colorGUI, 'opacity').onChange(convertColor);
-    convertColor();
-
-
-    // Controls
-
-    let controllers = {
-            cyclingColor: false,
-
-            clearView,
-            clearFlow,
-            reset,
-            restart
-        };
-
-
-    let controlsGUI = gui.addFolder('controls');
-
-    for(let c in controllers) {
-        controlsGUI.add(controllers, c);
-    }
-
-
-    function cycleColor() {
-        if(controllers.cyclingColor) {
-            Object.assign(colorGUI, {
-                opacity: 0.2,
-                color: [
-                    Math.sin(Date.now()*0.009)*200,
-                    100+Math.sin(Date.now()*0.006)*155,
-                    200+Math.sin(Date.now()*0.003)*55
-                ]
+        // Some special cases
+        
+        settingsGUI.__controllers[settingsKeys.indexOf('rootNum')]
+            .onFinishChange((n) => {
+                setup(n);
+                restart();
             });
 
-            convertColor();
+        settingsGUI.__controllers[settingsKeys.indexOf('respawnAmount')]
+            .onFinishChange((n) => {
+                setupSpawnData(settings.rootNum);
+            });
+
+        settingsGUI.__controllers[settingsKeys.indexOf('respawnRate')]
+            .onFinishChange((n) => {
+                respawnSweep();
+            });
+
+
+        // DAT.GUI's color controllers are a bit fucked.
+
+        let colorGUI = {
+                color: settings.color.slice(0, 3).map((c) => c*255),
+                opacity: settings.color[3]
+            };
+
+        function convertColor() {
+            settings.color = [
+                    ...colorGUI.color.slice(0, 3).map((c) => c/255),
+                    colorGUI.opacity
+                ];
         }
 
-        requestAnimationFrame(cycleColor);
-    }
+        settingsGUI.addColor(colorGUI, 'color').onChange(convertColor);
+        settingsGUI.add(colorGUI, 'opacity').onChange(convertColor);
+        convertColor();
 
-    cycleColor();
+
+        // Controls
+
+        let controllers = {
+                cyclingColor: false,
+
+                clearView,
+                clearFlow,
+                reset,
+                restart
+            };
 
 
-    // Presets
+        let controlsGUI = gui.addFolder('controls');
 
-    let presetsGUI = gui.addFolder('presets');
+        for(let c in controllers) {
+            controlsGUI.add(controllers, c);
+        }
 
-    let presetters = {
-            '0 - Intro': () => {
-                Object.assign(settings, defaultSettings);
 
-                controllers.restart();
-
+        function cycleColor() {
+            if(controllers.cyclingColor) {
                 Object.assign(colorGUI, {
-                        opacity: 0.2,
-                        color: [255, 255, 255]
-                    });
+                    opacity: 0.2,
+                    color: [
+                        Math.sin(Date.now()*0.009)*200,
+                        100+Math.sin(Date.now()*0.006)*155,
+                        200+Math.sin(Date.now()*0.003)*55
+                    ]
+                });
 
                 convertColor();
-
-                controllers.cyclingColor = false;
-                updateGUI();
-            },
-            '1 - Flow': () => {
-                Object.assign(settings, defaultSettings, {
-                        showFlow: true
-                    });
-
-                controllers.cyclingColor = false;
-                updateGUI();
-            },
-            '2 - Fluid (kinda)': () => {
-                Object.assign(settings, defaultSettings, {
-                        autoClearView: true,
-                        showFlow: false
-                    });
-
-                controllers.restart();
-
-                Object.assign(colorGUI, {
-                        opacity: 0.8,
-                        color: [255, 255, 255]
-                    });
-
-                convertColor();
-
-                controllers.cyclingColor = false;
-                updateGUI();
-            },
-            '3 - Flow only': () => {
-                Object.assign(settings, defaultSettings, {
-                        autoClearView: true,
-                        showFlow: false,
-
-                        flowWeight: 0.82,
-                        wanderWeight: 0,
-
-                        startRadius: 0.6,
-                        startSpeed: -0.06
-                    });
-
-                controllers.restart();
-
-                Object.assign(colorGUI, {
-                        opacity: 0.8,
-                        color: [100, 200, 255]
-                    });
-
-                convertColor();
-
-                controllers.cyclingColor = false;
-                updateGUI();
-            },
-            '4 - Noise only': () => {
-                Object.assign(settings, defaultSettings, {
-                        autoClearView: false,
-                        showFlow: false,
-
-                        flowWeight: 0,
-                        wanderWeight: 0.002,
-
-                        noiseSpeed: 0,
-
-                        startRadius: 0.5,
-                        startSpeed: 0
-                    });
-
-                controllers.restart();
-
-                Object.assign(colorGUI, {
-                        opacity: 0.1,
-                        color: [255, 150, 0]
-                    });
-
-                convertColor();
-
-                controllers.cyclingColor = false;
-                updateGUI();
-            },
-            '5 - Styles': () => {
-                Object.assign(settings, defaultSettings, {
-                        startRadius: 1.77,
-                        startSpeed: -0.0001,
-
-                        fadeOpacity: 0.6
-                    });
-
-                controllers.restart();
-
-                Object.assign(colorGUI, {
-                        opacity: 0.8,
-                        color: [55, 155, 255]
-                    });
-
-                convertColor();
-
-                controllers.cyclingColor = false;
-                updateGUI();
-            },
-            '6 - Mad styles': () => {
-                Object.assign(settings, defaultSettings, {
-                        startRadius: 0.1,
-                        startSpeed: 0.05
-                    });
-
-                controllers.restart();
-
-                controllers.cyclingColor = true;
-
-                updateGUI();
             }
-        };
 
-    for(let p in presetters) {
-        presetsGUI.add(presetters, p);
-    }
+            requestAnimationFrame(cycleColor);
+        }
+
+        cycleColor();
 
 
-    self.settings = settings;
-    self.gui = gui;
+        // Presets
+
+        let presetsGUI = gui.addFolder('presets');
+
+        let presetters = {
+                '0 - Intro': () => {
+                    Object.assign(settings, defaultSettings);
+
+                    controllers.restart();
+
+                    Object.assign(colorGUI, {
+                            opacity: 0.2,
+                            color: [255, 255, 255]
+                        });
+
+                    convertColor();
+
+                    controllers.cyclingColor = false;
+                    updateGUI();
+                },
+                '1 - Flow': () => {
+                    Object.assign(settings, defaultSettings, {
+                            showFlow: true
+                        });
+
+                    controllers.cyclingColor = false;
+                    updateGUI();
+                },
+                '2 - Fluid (kinda)': () => {
+                    Object.assign(settings, defaultSettings, {
+                            autoClearView: true,
+                            showFlow: false
+                        });
+
+                    controllers.restart();
+
+                    Object.assign(colorGUI, {
+                            opacity: 0.8,
+                            color: [255, 255, 255]
+                        });
+
+                    convertColor();
+
+                    controllers.cyclingColor = false;
+                    updateGUI();
+                },
+                '3 - Flow only': () => {
+                    Object.assign(settings, defaultSettings, {
+                            autoClearView: true,
+                            showFlow: false,
+
+                            flowWeight: 0.82,
+                            wanderWeight: 0,
+
+                            startRadius: 0.6,
+                            startSpeed: -0.06
+                        });
+
+                    controllers.restart();
+
+                    Object.assign(colorGUI, {
+                            opacity: 0.8,
+                            color: [100, 200, 255]
+                        });
+
+                    convertColor();
+
+                    controllers.cyclingColor = false;
+                    updateGUI();
+                },
+                '4 - Noise only': () => {
+                    Object.assign(settings, defaultSettings, {
+                            autoClearView: false,
+                            showFlow: false,
+
+                            flowWeight: 0,
+                            wanderWeight: 0.002,
+
+                            noiseSpeed: 0,
+
+                            startRadius: 0.5,
+                            startSpeed: 0
+                        });
+
+                    controllers.restart();
+
+                    Object.assign(colorGUI, {
+                            opacity: 0.1,
+                            color: [255, 150, 0]
+                        });
+
+                    convertColor();
+
+                    controllers.cyclingColor = false;
+                    updateGUI();
+                },
+                '5 - Styles': () => {
+                    Object.assign(settings, defaultSettings, {
+                            startRadius: 1.77,
+                            startSpeed: -0.0001,
+
+                            fadeOpacity: 0.6
+                        });
+
+                    controllers.restart();
+
+                    Object.assign(colorGUI, {
+                            opacity: 0.8,
+                            color: [55, 155, 255]
+                        });
+
+                    convertColor();
+
+                    controllers.cyclingColor = false;
+                    updateGUI();
+                },
+                '6 - Mad styles': () => {
+                    Object.assign(settings, defaultSettings, {
+                            startRadius: 0.1,
+                            startSpeed: 0.05
+                        });
+
+                    controllers.restart();
+
+                    controllers.cyclingColor = true;
+
+                    updateGUI();
+                }
+            };
+
+        for(let p in presetters) {
+            presetsGUI.add(presetters, p);
+        }
+
+
+        self.settings = settings;
+        self.gui = gui;
+    // }
 }
 
 export default tendrils;

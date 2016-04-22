@@ -98,7 +98,7 @@ Object.assign(Particles.prototype, {
             for(let y = 0; y < this.shape[1]; y++) {
                 vec4[0] = vec4[1] = vec4[2] = vec4[3] = 0;
 
-                map(x, y, vec4);
+                map(vec4, x, y);
 
                 data[i++] = vec4[0];
                 data[i++] = vec4[1];
@@ -114,9 +114,7 @@ Object.assign(Particles.prototype, {
 
 
     setupBuffers: function(num) {
-        let n = 0;
-
-        for(; n < num; ++n) {
+        for(let n = 0; n < num; ++n) {
             if(!this.buffers[n]) {
                 this.buffers[n] = FBO(this.gl, [this.shape[0], this.shape[1]],
                         { float: true });
