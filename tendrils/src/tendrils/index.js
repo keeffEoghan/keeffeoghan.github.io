@@ -20,6 +20,7 @@ const defaultSettings = {
         rootNum: Math.pow(2, 9),
 
         paused: false,
+        timeStep: 1000/60,
 
         autoClearView: true,
         showFlow: false,
@@ -252,8 +253,6 @@ function tendrils(canvas) {
 
         time = Date.now()-start;
 
-        let dt = time-t0;
-
 
         // Physics
 
@@ -263,8 +262,7 @@ function tendrils(canvas) {
             gl.disable(gl.BLEND);
 
             particles.step((uniforms) => Object.assign(uniforms, {
-                    dt,
-                    // dt: 1000/60,
+                    dt: (settings.timeStep || time-t0),
                     time,
                     start,
                     flow: flow.color[0].bind(1),
