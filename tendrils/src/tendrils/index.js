@@ -263,8 +263,8 @@ function tendrils(canvas) {
             gl.disable(gl.BLEND);
 
             particles.step((uniforms) => Object.assign(uniforms, {
-                    // dt,
-                    dt: 1000/60,
+                    dt,
+                    // dt: 1000/60,
                     time,
                     start,
                     flow: flow.color[0].bind(1),
