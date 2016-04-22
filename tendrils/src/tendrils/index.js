@@ -25,7 +25,7 @@ const defaultSettings = {
         showFlow: false,
 
         startRadius: 0.4,
-        startSpeed: 0.05,
+        startSpeed: 0.02,
 
         maxSpeed: 0.007,
         damping: 0.72,
@@ -42,7 +42,8 @@ const defaultSettings = {
         fadeOpacity: 1,
         color: [1, 1, 1, 0.4],
 
-        respawnRate: 0.001
+        respawnAmount: 0.005,
+        respawnRate: 100
     };
 
 let settings = Object.assign({}, defaultSettings);
@@ -92,10 +93,14 @@ function tendrils(canvas) {
                 render: renderShader
             });
 
+        setupSpawnData(rootNum);
+    }
 
-        const side = Math.ceil(rootNum*settings.respawnRate);
 
-        spawnData = ndarray(new Float32Array(rootNum*4), [side, side, 4]);
+    function setupSpawnData(rootNum) {
+        const side = Math.ceil(rootNum*settings.respawnAmount);
+
+        spawnData = ndarray(new Float32Array(side*side*4), [side, side, 4]);
     }
 
     setup(settings.rootNum);
@@ -149,48 +154,60 @@ function tendrils(canvas) {
     let spawnDataOffset = 0;
 
     function respawn() {
-        // Step the respawn shape horizontally and vertically within the FBO
-        
-        const maxOffset = [
-                shape[0]-spawnData.shape[0],
-                shape[1]-spawnData.shape[1]
-            ];
+        if(spawnData.shape[0]) {
+            // Step the respawn shape horizontally and vertically within the FBO
 
-        respawnOffset[0] += spawnData.shape[0];
+            // X
+            
+            respawnOffset[0] += spawnData.shape[0];
 
-        if(respawnOffset[0] >= shape[0]) {
-            respawnOffset[0] = 0;
-            respawnOffset[1] += spawnData.shape[1];
+            // Wrap
+            if(respawnOffset[0] >= shape[0]) {
+                respawnOffset[0] = 0;
+                // Step down Y - carriage return style
+                respawnOffset[1] += spawnData.shape[1];
+            }
 
+            // Check bounds
+            respawnOffset[0] = Math.min(respawnOffset[0],
+                shape[0]-spawnData.shape[0]);
+
+
+            // Y
+
+            // Wrap
             if(respawnOffset[1] >= shape[1]) {
                 respawnOffset[1] = 0;
             }
 
-            respawnOffset[1] = Math.min(respawnOffset[1], maxOffset[1]);
-        }
-
-        respawnOffset[0] = Math.min(respawnOffset[0], maxOffset[0]);
-
-
-        // Reset this part of the FBO
-
-        particles.buffers.forEach((buffer) =>
-            buffer.color[0].setPixels(spawnData, respawnOffset));
+            // Check bounds
+            respawnOffset[1] = Math.min(respawnOffset[1],
+                shape[1]-spawnData.shape[1]);
 
 
-        // Finally, change some of the spawn data values for next time too
-        
-        spawnDataOffset += spawnData.shape[0]*4;
+            // Reset this part of the FBO
+            particles.buffers.forEach((buffer) =>
+                buffer.color[0].setPixels(spawnData, respawnOffset));
 
-        if(spawnDataOffset >= spawnData.data.length) {
-            spawnDataOffset = 0;
-        }
 
-        spawnDataOffset = Math.min(spawnDataOffset,
-            spawnData.data.length-(spawnData.shape[1]*4));
+            // Finally, change some of the spawn data values for next time too,
+            // a line at a time
+            
+            // Linear data stepping, no need for 2D
+            spawnDataOffset += spawnData.shape[0]*4;
 
-        for(let s = 0; s < spawnData.shape[1]; s += 4) {
-            spawnData.data.set(spawn(tempData), spawnDataOffset+s);
+            // Wrap
+            if(spawnDataOffset >= spawnData.data.length) {
+                spawnDataOffset = 0;
+            }
+
+            // Check bounds
+            spawnDataOffset = Math.min(spawnDataOffset,
+                spawnData.data.length-(spawnData.shape[0]*4));
+
+            for(let s = 0; s < spawnData.shape[1]; s += 4) {
+                spawnData.data.set(spawn(tempData), spawnDataOffset+s);
+            }
         }
     }
 
@@ -369,6 +386,25 @@ function tendrils(canvas) {
     }
 
 
+    let respawnTick;
+
+    function respawnSweep() {
+        clearInterval(respawnTick);
+
+        if(settings.respawnRate) {
+            respawnTick = setInterval(respawn, settings.respawnRate);
+        }
+    }
+
+
+    // Go
+
+    self.addEventListener('resize',
+        throttle(resize, 100, { leading: true }), false);
+
+    resize();
+    respawnSweep();
+    restart();
 
 
     // DEBUG {
@@ -390,18 +426,32 @@ function tendrils(canvas) {
 
         // Generic settings; no need to do anything special here
 
+        let settingsKeys = [];
+
         for(let s in settings) {
             if(!(typeof settings[s]).match(/(object|array)/gi)) {
                 settingsGUI.add(settings, s);
+                settingsKeys.push(s);
             }
         }
 
 
-        // Changing rootNum triggers a reset
-        settingsGUI.__controllers[Object.keys(settings).indexOf('rootNum')]
+        // Some special cases
+        
+        settingsGUI.__controllers[settingsKeys.indexOf('rootNum')]
             .onFinishChange((n) => {
                 setup(n);
                 restart();
+            });
+
+        settingsGUI.__controllers[settingsKeys.indexOf('respawnAmount')]
+            .onFinishChange((n) => {
+                setupSpawnData(settings.rootNum);
+            });
+
+        settingsGUI.__controllers[settingsKeys.indexOf('respawnRate')]
+            .onFinishChange((n) => {
+                respawnSweep();
             });
 
 
@@ -601,17 +651,6 @@ function tendrils(canvas) {
         self.settings = settings;
         self.gui = gui;
     // }
-    
-
-
-    self.addEventListener('resize',
-        throttle(resize, 100, { leading: true }), false);
-
-    resize();
-
-    setInterval(respawn, 100);
-
-    restart();
 }
 
 export default tendrils;
