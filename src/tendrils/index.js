@@ -50,7 +50,7 @@ const defaultSettings = {
 let settings = Object.assign({}, defaultSettings);
 
 
-function tendrils(canvas) {
+function tendrils(canvas, debug = false) {
     const gl = glContext(canvas, {
                 preserveDrawingBuffer: true
             },
@@ -408,7 +408,8 @@ function tendrils(canvas) {
     restart();
 
 
-    // DEBUG {
+    // DEBUG
+    if(debug) {
         let gui = new dat.GUI();
 
         gui.close();
@@ -521,22 +522,15 @@ function tendrils(canvas) {
         let presetsGUI = gui.addFolder('presets');
 
         let presetters = {
-                '0 - Intro': () => {
+                'Default': () => {
                     Object.assign(settings, defaultSettings);
-
-                    controllers.restart();
-
-                    Object.assign(colorGUI, {
-                            opacity: 0.2,
-                            color: [255, 255, 255]
-                        });
-
-                    convertColor();
 
                     controllers.cyclingColor = false;
                     updateGUI();
+
+                    restart();
                 },
-                '1 - Flow': () => {
+                'Flow': () => {
                     Object.assign(settings, defaultSettings, {
                             showFlow: true
                         });
@@ -544,13 +538,13 @@ function tendrils(canvas) {
                     controllers.cyclingColor = false;
                     updateGUI();
                 },
-                '2 - Fluid (kinda)': () => {
+                'Fluid (kinda)': () => {
                     Object.assign(settings, defaultSettings, {
                             autoClearView: true,
                             showFlow: false
                         });
 
-                    controllers.restart();
+                    restart();
 
                     Object.assign(colorGUI, {
                             opacity: 0.8,
@@ -562,7 +556,7 @@ function tendrils(canvas) {
                     controllers.cyclingColor = false;
                     updateGUI();
                 },
-                '3 - Flow only': () => {
+                'Flow only': () => {
                     Object.assign(settings, defaultSettings, {
                             autoClearView: true,
                             showFlow: false,
@@ -574,7 +568,7 @@ function tendrils(canvas) {
                             startSpeed: -0.06
                         });
 
-                    controllers.restart();
+                    restart();
 
                     Object.assign(colorGUI, {
                             opacity: 0.8,
@@ -586,7 +580,7 @@ function tendrils(canvas) {
                     controllers.cyclingColor = false;
                     updateGUI();
                 },
-                '4 - Noise only': () => {
+                'Noise only': () => {
                     Object.assign(settings, defaultSettings, {
                             autoClearView: false,
                             showFlow: false,
@@ -600,7 +594,7 @@ function tendrils(canvas) {
                             startSpeed: 0
                         });
 
-                    controllers.restart();
+                    restart();
 
                     Object.assign(colorGUI, {
                             opacity: 0.1,
@@ -612,7 +606,7 @@ function tendrils(canvas) {
                     controllers.cyclingColor = false;
                     updateGUI();
                 },
-                '5 - Styles': () => {
+                'Sea': () => {
                     Object.assign(settings, defaultSettings, {
                             startRadius: 1.77,
                             startSpeed: -0.0001,
@@ -620,7 +614,7 @@ function tendrils(canvas) {
                             fadeOpacity: 0.6
                         });
 
-                    controllers.restart();
+                    restart();
 
                     Object.assign(colorGUI, {
                             opacity: 0.8,
@@ -632,15 +626,31 @@ function tendrils(canvas) {
                     controllers.cyclingColor = false;
                     updateGUI();
                 },
-                '6 - Mad styles': () => {
+                'Mad styles': () => {
                     Object.assign(settings, defaultSettings, {
                             startRadius: 0.1,
                             startSpeed: 0.05
                         });
 
-                    controllers.restart();
+                    restart();
 
                     controllers.cyclingColor = true;
+
+                    updateGUI();
+                },
+                'Ghostly': () => {
+                    Object.assign(settings, defaultSettings, {
+                            autoClearView: false
+                        });
+
+                    restart();
+
+                    Object.assign(colorGUI, {
+                            opacity: 0.006,
+                            color: [255, 255, 255]
+                        });
+
+                    convertColor();
 
                     updateGUI();
                 }
@@ -649,11 +659,7 @@ function tendrils(canvas) {
         for(let p in presetters) {
             presetsGUI.add(presetters, p);
         }
-
-
-        self.settings = settings;
-        self.gui = gui;
-    // }
+    }
 }
 
 export default tendrils;
