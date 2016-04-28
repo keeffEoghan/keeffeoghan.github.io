@@ -13,9 +13,8 @@ import Geom from 'gl-geometry';
 import Shader from 'gl-shader';
 import ndarray from 'ndarray';
 import FBO from 'gl-fbo';
-const glslify = require('glslify');
 
-const logicVert = glslify('./shaders/triangle.vert.glsl');
+import logicVert from './shaders/triangle.vert.glsl';
 
 function generateLUT(shape) {
     let size = shape[0]*shape[1]*2;
