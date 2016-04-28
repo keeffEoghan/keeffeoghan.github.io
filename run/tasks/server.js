@@ -10,14 +10,14 @@
 var gulp = require('gulp'),
     chalk = require('chalk'),
     fs = require('fs'),
-    globalSettings = require('../config'),
+    serverSettings = require('../config').taskConfiguration.server,
     webserver = require('gulp-webserver');
 
 gulp.task('server', function() {
     var distFolderExists = false;
 
     try {
-        distFolderExists = fs.statSync(globalSettings.destPath);
+        distFolderExists = fs.statSync(serverSettings.distFolder);
     }
     catch(e) {}
 
@@ -27,6 +27,6 @@ gulp.task('server', function() {
         return process.exit(1);
     }
 
-    return gulp.src(globalSettings.destPath)
-            .pipe(webserver(globalSettings.taskConfiguration.server.webserverSettings));
+    return gulp.src(serverSettings.distFolder)
+            .pipe(webserver(serverSettings.webserverSettings));
 });

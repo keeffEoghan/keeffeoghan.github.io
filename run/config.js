@@ -78,7 +78,8 @@ module.exports = {
                 port: (process.env.PORT || 3000),
                 https: false,
                 open: true
-            }
+            },
+            distFolder: './'
         },
         styles: {
             /**
