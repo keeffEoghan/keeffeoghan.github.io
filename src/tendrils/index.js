@@ -2,8 +2,6 @@
  * @todo Bake the noise field into a texture on every resize, if unchanging?
  */
 
-'use strict';
-
 import glContext from 'gl-context';
 import FBO from 'gl-fbo';
 import Shader from 'gl-shader';
@@ -11,9 +9,23 @@ import triangle from 'a-big-triangle';
 import ndarray from 'ndarray';
 import throttle from 'lodash.throttle';
 import dat from 'dat-gui';
-const glslify = require('glslify');
 
 import Particles from './particles';
+
+
+// Shaders
+
+import renderVert from './shaders/render.vert.glsl';
+import renderFrag from './shaders/render.frag.glsl';
+
+import flowVert from './shaders/flow.vert.glsl';
+import flowFrag from './shaders/flow.frag.glsl';
+
+import triangleVert from './shaders/triangle.vert.glsl';
+
+import fadeFrag from './shaders/fade.frag.glsl';
+
+import logicFrag from './shaders/logic.frag.glsl';
 
 
 const defaultSettings = {
@@ -65,14 +77,9 @@ function tendrils(canvas, debug = false) {
         ];
 
 
-    const renderShader = Shader(gl, glslify('./shaders/render.vert.glsl'),
-                glslify('./shaders/render.frag.glsl'));
-
-    const flowShader = Shader(gl, glslify('./shaders/flow.vert.glsl'),
-                glslify('./shaders/flow.frag.glsl'));
-
-    const fadeShader = Shader(gl, glslify('./shaders/triangle.vert.glsl'),
-                glslify('./shaders/fade.frag.glsl'));
+    const renderShader = Shader(gl, renderVert, renderFrag);
+    const flowShader = Shader(gl, flowVert, flowFrag);
+    const fadeShader = Shader(gl, triangleVert, fadeFrag);
 
 
     let shape;
@@ -90,7 +97,7 @@ function tendrils(canvas, debug = false) {
                 // (Vertical neighbours, because WebGL iterates column-major.)
                 geomShape: [shape[0], shape[1]*2],
 
-                logic: glslify('./shaders/logic.frag.glsl'),
+                logic: logicFrag,
                 render: renderShader
             });
 

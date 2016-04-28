@@ -1,6 +1,11 @@
 'use strict';
 
-// Adding promises to nodes global scope.
+/**
+ * @todo Modernizr and other custom-built dependencies.
+ * @todo GLSLify setup (build and watch).
+ */
+
+// Adding promises to Node's global scope.
 require('es6-promise').polyfill();
 
 /**
@@ -8,9 +13,9 @@ require('es6-promise').polyfill();
  *  need to load modules other than themselves to function.
  */
 var loadingOverrides = {
-    'watch': ['styles', 'scripts', 'images', 'assets', 'watch'],
-    'build': ['styles', 'scripts', 'images', 'assets', 'build'],
-    'default': ['styles', 'scripts', 'build', 'default']
+    'watch': ['assets', 'custom-deps', 'html', 'styles', 'scripts', 'watch'],
+    'build': ['assets', 'custom-deps', 'html', 'styles', 'scripts', 'build'],
+    'default': ['assets', 'custom-deps', 'html', 'styles', 'scripts', 'build', 'default']
 };
 
 /**
@@ -22,14 +27,10 @@ var loadingOverrides = {
 module.exports = function(runner) {
     var args = require('yargs').argv,
         desiredModule = (args._[0] || 'default'),                           // If no task specified, use `default`.
-        modulesToLoad = loadingOverrides[desiredModule] || [desiredModule]; // Check for module loading overrides.
-
-    if(args._[0] === 'build'){
-        args.production = true;
-    }
+        modulesToLoad = (loadingOverrides[desiredModule] || [desiredModule]); // Check for module loading overrides.
 
     modulesToLoad.forEach(function(module) {
-        console.log(' FE Skeleton: Loading module - ' + module);
-        require('./tasks/' + module + '/');
+        console.log(' FE Skeleton: Loading module - '+module);
+        require('./tasks/'+module);
     });
 };

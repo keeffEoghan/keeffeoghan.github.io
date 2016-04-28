@@ -3,8 +3,6 @@
  * @main Index
  */
 
-'use strict';
-
 import tendrils from './tendrils';
 
 
