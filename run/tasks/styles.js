@@ -73,19 +73,18 @@ function processBundle(resolve, reject) {
     // Compile SASS into CSS then prefix and save.
     var stream = gulp.src(bundle.sourcePaths)
         .pipe(plumber())
-        .pipe(sourcemaps.init())
-        .pipe(sass(styleSettings.sassSettings).on('error', sass.logError))
-        .pipe(prefix(styleSettings.autoPrefixSettings))
         .pipe(rename(function(path) {
             path.basename = (bundle.outputFileName ||
                 path.basename.replace(/\.main$/gi, ''));
         }))
+        .pipe(sourcemaps.init())
+        .pipe(sass(styleSettings.sassSettings).on('error', sass.logError))
+        .pipe(prefix(styleSettings.autoPrefixSettings))
         .pipe(sourcemaps.write('./', sourcemapOptions))
         .pipe(gulp.dest(outputDirectory));
 
     // Whenever the stream finishes, resolve or reject the deferred accordingly.
-    stream
-        .on('error', function() {
+    stream.on('error', function() {
             console.log(chalk.bgRed.white(' FE Skeleton: Stylesheet Failed.'));
             reject();
         })
