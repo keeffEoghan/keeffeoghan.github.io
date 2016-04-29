@@ -24,11 +24,11 @@ main { min-height: 100%; }
 
 body { margin: 0; }
 
-body { background: #042B2D; }
+body { background: #111; }
 
 canvas { display: block; position: fixed; top: 0; left: 0; bottom: 0; right: 0; }
 
 /* Quick fix for a broken DAT.GUI style */
 .hue-field { width: 13px !important; }
 
-/*# sourceMappingURL=index.css.map */
+/*# sourceMappingURL=../demos/tendrils.css.map */
