@@ -18,6 +18,10 @@ default: help
 assets build custom-deps html images jscs lint scripts server styles test watch: node_modules/.bin
 	npm run gulp -- $@ $(ARGS);
 
+# a full minified build
+dist:
+	make build ARGS=--is-production
+
 # just install node_modules, also callable as `make node_modules`
 setup: node_modules/.bin
 
