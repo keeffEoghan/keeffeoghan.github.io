@@ -1,26 +1,7 @@
-html {
-    box-sizing: border-box;
-}
-
-*,
-*:before,
-*:after {
-    box-sizing: inherit;
-}
-
-html,
-body {
-    width: 100%;
-    height: 100%;
-}
-
-main {
-    min-height: 100%;
-}
+@import './common';
 
 body {
-    margin: 0;
-    background: #222;
+    background: #042B2D;
 }
 
 @import './tendrils/index';

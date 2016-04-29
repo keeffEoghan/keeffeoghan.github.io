@@ -12,7 +12,6 @@ var gulp = require('gulp');
 var args = require('yargs').argv;
 var globalSettings = require('../config');
 var named = require('vinyl-named');
-var rename = require('gulp-rename');
 var webpackStream = require('webpack-stream');
 var webpack = webpackStream.webpack;
 
@@ -69,10 +68,9 @@ function runWebpack(taskOptions) {
     // Open a stream, trigger webpack-stream compilation and push output to file system.
     return gulp.src(scriptSettings.sourcePaths)
         // Pass a named file stream to webpack, for multiple entry points
-        .pipe(named())
-        .pipe(webpackStream(scriptSettings.webpackSettings))
-        .pipe(rename(function(path) {
-            path.basename = path.basename.replace(/\.main$/gi, '');
+        .pipe(named(function(file) {
+            return file.relative.replace(/\.main\.js$/gi, '');
         }))
+        .pipe(webpackStream(scriptSettings.webpackSettings))
         .pipe(gulp.dest(scriptSettings.destPath));
 }

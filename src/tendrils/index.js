@@ -59,10 +59,10 @@ const defaultSettings = {
         respawnTick: 100
     };
 
-let settings = Object.assign({}, defaultSettings);
 
+function tendrils(canvas, options, debug = false) {
+    const settings = Object.assign({}, options, defaultSettings);
 
-function tendrils(canvas, debug = false) {
     const gl = glContext(canvas, {
                 preserveDrawingBuffer: true
             },
