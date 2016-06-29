@@ -52,7 +52,7 @@ void main() {
     vel = (vel*damping*dt)+
         (forceWeight*
             ((flowForce*flowWeight*dt)+
-            (wanderForce*wanderWeight*dt)));
+                (wanderForce*wanderWeight*dt)));
     
     // Clamp the velocity
     float speed = length(vel);

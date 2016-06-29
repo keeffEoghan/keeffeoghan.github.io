@@ -15,17 +15,17 @@ import Particles from './particles';
 
 // Shaders
 
-import renderVert from './shaders/render.vert.glsl';
-import renderFrag from './shaders/render.frag.glsl';
+import logicFrag from './shaders/logic.frag.glsl';
 
 import flowVert from './shaders/flow.vert.glsl';
 import flowFrag from './shaders/flow.frag.glsl';
 
+import renderVert from './shaders/render.vert.glsl';
+import renderFrag from './shaders/render.frag.glsl';
+
 import triangleVert from './shaders/triangle.vert.glsl';
 
-import fadeFrag from './shaders/fade.frag.glsl';
-
-import logicFrag from './shaders/logic.frag.glsl';
+import copyFadeFrag from './shaders/copy-fade.frag.glsl';
 
 
 const defaultSettings = {
@@ -59,9 +59,8 @@ const defaultSettings = {
         respawnTick: 100
     };
 
-
-function tendrils(canvas, options, debug = false) {
-    const settings = Object.assign({}, options, defaultSettings);
+export default (canvas, options, debug = false) => {
+    const settings = Object.assign({}, defaultSettings, options);
 
     const gl = glContext(canvas, {
                 preserveDrawingBuffer: true
@@ -69,9 +68,9 @@ function tendrils(canvas, options, debug = false) {
             render);
 
 
-    let flow = FBO(gl, [1, 1], { float: true });
+    const flow = FBO(gl, [1, 1], { float: true });
 
-    let buffers = [
+    const buffers = [
             FBO(gl, [1, 1], { float: true }),
             FBO(gl, [1, 1], { float: true })
         ];
@@ -79,7 +78,7 @@ function tendrils(canvas, options, debug = false) {
 
     const renderShader = Shader(gl, renderVert, renderFrag);
     const flowShader = Shader(gl, flowVert, flowFrag);
-    const fadeShader = Shader(gl, triangleVert, fadeFrag);
+    const fadeShader = Shader(gl, triangleVert, copyFadeFrag);
 
 
     let shape;
@@ -667,6 +666,4 @@ function tendrils(canvas, options, debug = false) {
             presetsGUI.add(presetters, p);
         }
     }
-}
-
-export default tendrils;
+};
