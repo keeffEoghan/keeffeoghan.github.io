@@ -1,16 +1,10 @@
-/**
- * @todo Bake the noise field into a texture on every resize, if unchanging?
- */
-
-import glContext from 'gl-context';
-import FBO from 'gl-fbo';
 import Shader from 'gl-shader';
+import makeFBO from 'gl-fbo';
 import triangle from 'a-big-triangle';
 import ndarray from 'ndarray';
-import throttle from 'lodash.throttle';
-import dat from 'dat-gui';
 
 import Particles from './particles';
+import { step } from '../utils';
 
 
 // Shaders
@@ -28,96 +22,103 @@ import triangleVert from './shaders/triangle.vert.glsl';
 import copyFadeFrag from './shaders/copy-fade.frag.glsl';
 
 
-const defaultSettings = {
-        rootNum: Math.pow(2, 9),
+export class Tendrils {
+    constructor(gl, settings) {
+        this.gl = gl;
+        this.state = Object.assign({}, defaultSettings, settings);
 
-        paused: false,
-        timeStep: 1000/60,
+        this.flow = makeFBO(this.gl, [1, 1], { float: true });
 
-        autoClearView: true,
-        showFlow: false,
-
-        startRadius: 0.6,
-        startSpeed: 0.01,
-
-        maxSpeed: 0.01,
-        damping: 0.045,
-
-        flowDecay: 0.001,
-        flowWidth: 3,
-
-        noiseSpeed: 0.0005,
-
-        forceWeight: 0.014,
-        flowWeight: 1,
-        wanderWeight: 0.0016,
-
-        fadeOpacity: 1,
-        color: [1, 1, 1, 0.4],
-
-        respawnAmount: 0.007,
-        respawnTick: 100
-    };
-
-export default (canvas, options, debug = false) => {
-    const settings = Object.assign({}, defaultSettings, options);
-
-    const gl = glContext(canvas, {
-                preserveDrawingBuffer: true
-            },
-            render);
-
-
-    const flow = FBO(gl, [1, 1], { float: true });
-
-    const buffers = [
-            FBO(gl, [1, 1], { float: true }),
-            FBO(gl, [1, 1], { float: true })
+        // Multiple bufferring
+        /**
+         * @todo May need more buffers/passes later
+         */
+        this.buffers = [
+            makeFBO(this.gl, [1, 1], { float: true }),
+            makeFBO(this.gl, [1, 1], { float: true })
         ];
 
 
-    const renderShader = Shader(gl, renderVert, renderFrag);
-    const flowShader = Shader(gl, flowVert, flowFrag);
-    const fadeShader = Shader(gl, triangleVert, copyFadeFrag);
+        this.renderShader = Shader(this.gl, renderVert, renderFrag);
+        this.flowShader = Shader(this.gl, flowVert, flowFrag);
+        this.fadeShader = Shader(this.gl, triangleVert, copyFadeFrag);
 
 
-    let shape;
-    let particles;
-    let spawnData;
+        this.shape = null;
+        this.particles = null;
 
-    function setup(rootNum) {
-        shape = [rootNum, rootNum];
+        this.start = Date.now();
+        this.time = 0;
 
-        particles = Particles(gl, {
-                shape: shape,
+        this.spawnData = null;
+
+        this.tempData = [];
+
+        /**
+         * Set particles at a moving offset to their spawn positions.
+         * For now, this is just the center.
+         */
+
+        this.respawnOffset = [0, 0];
+        this.spawnDataOffset = 0;
+
+
+        this.setup();
+        this.reset();
+    }
+
+    setup(...rest) {
+        this.setupParticles(...rest);
+        // this.setupSpawnData(...rest);
+    }
+
+    reset(...rest) {
+        this.resetParticles(...rest);
+        // this.resetSpawnData(...rest);
+    }
+
+    // @todo
+    dispose() {
+        this.particles.dispose();
+
+        delete this.particles;
+        delete this.spawnData;
+    }
+
+
+    setupParticles(rootNum = this.state.rootNum) {
+        this.shape = [rootNum, rootNum];
+
+        this.particles = new Particles(this.gl, {
+                shape: this.shape,
 
                 // Double the rootNum of (vertical neighbour) vertices, to have
                 // pairs alternating between previous and current state.
                 // (Vertical neighbours, because WebGL iterates column-major.)
-                geomShape: [shape[0], shape[1]*2],
+                geomShape: [this.shape[0], this.shape[1]*2],
 
                 logic: logicFrag,
-                render: renderShader
+                render: this.renderShader
             });
 
-        setupSpawnData(rootNum);
+        this.particles.setup(this.state.numBuffers || 2);
+    }
+
+    // Populate the particles with the given spawn function
+    resetParticles(spawn = this.spawn.bind(this)) {
+        this.particles.spawn(spawn);
     }
 
 
-    function setupSpawnData(rootNum) {
-        const side = Math.ceil(rootNum*settings.respawnAmount);
+    // Setting particles
 
-        spawnData = ndarray(new Float32Array(side*side*4), [side, side, 4]);
-    }
-
-    setup(settings.rootNum);
-
-
-    const tempData = [];
-
-    function spawn(data, u, v) {
-        let radius = settings.startRadius;
-        let speed = settings.startSpeed;
+    /**
+     * Used in a big loop, so should be optimised.
+     */
+    
+    spawn(data, u, v) {
+        let radius = this.state.startRadius;
+        let speed = this.state.startSpeed;
 
         let angle = Math.random()*Math.PI*2;
         let scaled = Math.random()*radius;
@@ -138,532 +139,319 @@ export default (canvas, options, debug = false) => {
         return data;
     }
 
-    function reset() {
-        particles.populate(spawn);
+    inert(data, u, v) {
+        data[0] = data[1] = -10000;
+        data[2] = data[3] = 0;
 
-        for(let i = 0; i < spawnData.shape[0]; ++i) {
-            for(let j = 0; j < spawnData.shape[1]; ++j) {
-                let spawned = spawn(tempData);
-
-                spawnData.set(i, j, 0, spawned[0]);
-                spawnData.set(i, j, 1, spawned[1]);
-                spawnData.set(i, j, 2, spawned[2]);
-                spawnData.set(i, j, 3, spawned[3]);
-            }
-        }
+        return data;
     }
 
 
-    /**
-     * Set particles at a moving offset to their spawn positions.
-     * For now, this is just the center.
-     */
+    // Rendering and logic
 
-    let respawnOffset = [0, 0];
-    let spawnDataOffset = 0;
-
-    function respawn() {
-        if(spawnData.shape[0]) {
-            // Step the respawn shape horizontally and vertically within the FBO
-
-            // X
-            
-            respawnOffset[0] += spawnData.shape[0];
-
-            // Wrap
-            if(respawnOffset[0] >= shape[0]) {
-                respawnOffset[0] = 0;
-                // Step down Y - carriage return style
-                respawnOffset[1] += spawnData.shape[1];
-            }
-
-            // Check bounds
-            respawnOffset[0] = Math.min(respawnOffset[0],
-                shape[0]-spawnData.shape[0]);
-
-
-            // Y
-
-            // Wrap
-            if(respawnOffset[1] >= shape[1]) {
-                respawnOffset[1] = 0;
-            }
-
-            // Check bounds
-            respawnOffset[1] = Math.min(respawnOffset[1],
-                shape[1]-spawnData.shape[1]);
-
-
-            // Reset this part of the FBO
-            particles.buffers.forEach((buffer) =>
-                buffer.color[0].setPixels(spawnData, respawnOffset));
-
-
-            // Finally, change some of the spawn data values for next time too,
-            // a line at a time
-            
-            // Linear data stepping, no need for 2D
-            spawnDataOffset += spawnData.shape[0]*4;
-
-            // Wrap
-            if(spawnDataOffset >= spawnData.data.length) {
-                spawnDataOffset = 0;
-            }
-
-            // Check bounds
-            spawnDataOffset = Math.min(spawnDataOffset,
-                spawnData.data.length-(spawnData.shape[0]*4));
-
-            for(let s = 0; s < spawnData.shape[1]; s += 4) {
-                spawnData.data.set(spawn(tempData), spawnDataOffset+s);
-            }
-        }
-    }
-
-
-    function clearView() {
-        buffers.forEach((buffer) => {
+    clearView() {
+        this.buffers.forEach((buffer) => {
             buffer.bind();
-            gl.clear(gl.COLOR_BUFFER_BIT);
+            this.gl.clear(this.gl.COLOR_BUFFER_BIT);
         });
 
-        gl.bindFramebuffer(gl.FRAMEBUFFER, null);
-        gl.clear(gl.COLOR_BUFFER_BIT);
+        this.gl.bindFramebuffer(this.gl.FRAMEBUFFER, null);
+        this.gl.clear(this.gl.COLOR_BUFFER_BIT);
     }
 
-    function clearFlow() {
-        flow.bind();
-        gl.clear(gl.COLOR_BUFFER_BIT);
+    clearFlow() {
+        this.flow.bind();
+        this.gl.clear(this.gl.COLOR_BUFFER_BIT);
     }
 
-    function restart() {
-        clearView();
-        clearFlow();
-        reset(settings.startRadius, settings.startSpeed);
+    restart() {
+        this.clearView();
+        this.clearFlow();
+        this.reset();
     }
 
+    render() {
+        const directRender = this.directRender();
 
-    const start = Date.now();
-    let time = 0;
+        // Size
+        
+        const width = this.gl.drawingBufferWidth;
+        const height = this.gl.drawingBufferHeight;
+        const viewSize = [width, height];
 
-    function render() {
-        const width = gl.drawingBufferWidth;
-        const height = gl.drawingBufferHeight;
+        if(!directRender) {
+            this.buffers.forEach((buffer) => buffer.shape = viewSize);
+        }
 
-        let viewSize = [width, height];
+        this.flow.shape = viewSize;
 
 
         // Time
 
-        let t0 = time;
-
-        time = Date.now()-start;
+        const t0 = this.time;
+        this.time = Date.now()-this.start;
 
 
         // Physics
 
-        if(!settings.paused) {
-            // Disabling blending here is important – if it's still enabled your
-            // simulation will behave differently to what you'd expect.
-            gl.disable(gl.BLEND);
+        if(!this.state.paused) {
+            // Disabling blending here is important
+            this.gl.disable(this.gl.BLEND);
 
-            particles.step((uniforms) => Object.assign(uniforms, {
-                    dt: (settings.timeStep || time-t0),
-                    time,
-                    start,
-                    flow: flow.color[0].bind(1),
+            this.particles.step((uniforms) => Object.assign(uniforms, {
+                    dt: (this.state.timeStep || this.time-t0),
+                    time: this.time,
+                    start: this.start,
+                    flow: this.flow.color[0].bind(1),
                     viewSize
                 },
-                settings));
+                this.state));
 
-            gl.enable(gl.BLEND);
-            gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
+            this.gl.enable(this.gl.BLEND);
+            this.gl.blendFunc(this.gl.SRC_ALPHA, this.gl.ONE_MINUS_SRC_ALPHA);
         }
 
 
         // Flow FBO and view renders
 
-        gl.viewport(0, 0, width, height);
+        this.gl.viewport(0, 0, width, height);
 
-        let draw = (uniforms) => Object.assign(uniforms, {
-                previous: particles.buffers[1].color[0].bind(1),
-                resolution: shape,
-                viewSize
-            });
+        const drawUniforms = Object.assign({
+                previous: this.particles.buffers[1].color[0].bind(1),
+                resolution: this.shape,
+                viewSize,
+                time: this.time
+            },
+            this.state);
 
+        this.flow.bind();
 
         // Render to the flow FBO - after the logic render, so particles don't
         // respond to their own flow.
 
-        flow.bind();
-        particles.render = flowShader;
+        this.particles.render = this.flowShader;
 
-        gl.lineWidth(settings.flowWidth);
-
-        particles.draw((uniforms) => Object.assign(uniforms, draw(uniforms), {
-                    time,
-                    debug: false
-                },
-                settings),
-            gl.LINES);
+        this.gl.lineWidth(this.state.flowWidth);
+        this.particles.draw(drawUniforms, this.gl.LINES);
 
 
         // Render to the view.
 
-        if(settings.showFlow) {
-            gl.bindFramebuffer(gl.FRAMEBUFFER, null);
+        if(this.state.showFlow) {
+            // Render the flow directly to the screen
 
-            particles.draw((uniforms) => Object.assign(uniforms, draw(uniforms), {
-                        time,
-                        debug: true
-                    },
-                    settings),
-                gl.LINES);
+            this.gl.bindFramebuffer(this.gl.FRAMEBUFFER, null);
+
+            this.particles.draw((uniforms) =>
+                    Object.assign(uniforms, drawUniforms),
+                this.gl.LINES);
         }
         else {
-            if(settings.fadeOpacity < 1) {
-                buffers[0].bind();
+            // Set up the particles for rendering
+            this.particles.render = this.renderShader;
+            this.gl.lineWidth(1);
+
+            if(directRender) {
+                // Render the particles directly to the screen
+
+                this.gl.bindFramebuffer(this.gl.FRAMEBUFFER, null);
+
+                if(this.state.autoClearView) {
+                    this.gl.clear(this.gl.COLOR_BUFFER_BIT);
+                }
+
+                this.particles.draw(drawUniforms, this.gl.LINES);
             }
             else {
-                gl.bindFramebuffer(gl.FRAMEBUFFER, null);
-            }
+                // Multi-buffer passes
 
-            if(settings.autoClearView) {
-                gl.clear(gl.COLOR_BUFFER_BIT);
-            }
+                this.buffers[0].bind();
 
-            if(settings.fadeOpacity < 1) {
-                // Copy and fade the last view into the current view.
+                // Copy and fade the last buffer into the current buffer
 
-                fadeShader.bind();
+                this.fadeShader.bind();
 
-                Object.assign(fadeShader.uniforms, {
-                        opacity: settings.fadeOpacity,
-                        view: buffers[1].color[0].bind(0),
+                Object.assign(this.fadeShader.uniforms, {
+                        opacity: this.state.fadeOpacity,
+                        view: this.buffers[1].color[0].bind(0),
                         viewSize
                     });
 
-                triangle(gl);
-            }
-
-            particles.render = renderShader;
-
-            gl.lineWidth(1);
-
-            particles.draw((uniforms) => Object.assign(uniforms,
-                    draw(uniforms), {
-                        flow: flow.color[0].bind(2)
-                    },
-                    settings),
-                gl.LINES);
-        }
+                triangle(this.gl);
 
 
-        // Copy and fade the view to the screen.
-
-        if(settings.fadeOpacity < 1) {
-            gl.bindFramebuffer(gl.FRAMEBUFFER, null);
-            gl.clear(gl.COLOR_BUFFER_BIT);
-
-            fadeShader.bind();
-
-            Object.assign(fadeShader.uniforms, {
-                    opacity: 1,
-                    view: buffers[0].color[0].bind(0),
-                    viewSize
-                });
-
-            triangle(gl);
+                // Render the particles into the current buffer
+                this.particles.draw(drawUniforms, this.gl.LINES);
 
 
-            // Swap buffers.
-            stepBuffers();
-        }
-    }
+                // Copy and fade the current buffer to the screen
 
-    function stepBuffers() {
-        buffers.unshift(buffers.pop());
-    }
+                this.gl.bindFramebuffer(this.gl.FRAMEBUFFER, null);
+                this.gl.clear(this.gl.COLOR_BUFFER_BIT);
 
-    function resize() {
-        buffers[0].shape = buffers[1].shape = flow.shape = [
-                canvas.width = self.innerWidth,
-                canvas.height = self.innerHeight
-            ];
-    }
+                this.fadeShader.bind();
 
+                Object.assign(this.fadeShader.uniforms, {
+                        opacity: 1,
+                        view: this.buffers[0].color[0].bind(0),
+                        viewSize
+                    });
 
-    let respawnTick;
+                triangle(this.gl);
 
-    function respawnSweep() {
-        clearInterval(respawnTick);
-
-        if(settings.respawnTick) {
-            respawnTick = setInterval(respawn, settings.respawnTick);
-        }
-    }
-
-
-    // Go
-
-    self.addEventListener('resize',
-        throttle(resize, 100, { leading: true }), false);
-
-    resize();
-    respawnSweep();
-    restart();
-
-
-    // DEBUG
-    if(debug) {
-        let gui = new dat.GUI();
-
-        gui.close();
-
-        function updateGUI() {
-            for(let f in gui.__folders) {
-                gui.__folders[f].__controllers.forEach((controller) =>
-                        controller.updateDisplay());
+                // Step buffers
+                step(this.buffers);
             }
         }
+    }
 
 
-        // Settings
+    // @todo More specific, or derived from properties
+    directRender(state = this.state) {
+        return (state.autoClearView || state.fadeOpacity === 1);
+    }
 
 
-        let settingsGUI = gui.addFolder('settings');
+    // Respawn
+
+    /**
+     * @todo Is the old approach below approach needed? Could use a `spawn`
+     *       sweep across sub-regions of the particles buffers.
+     */
+    
+    respawn(spawn = this.spawn.bind(this)) {
+        this.offsetRespawn(this.respawnOffset, this.respawnShape, this.shape);
+
+        this.particles.spawn(spawn,
+            this.particles.pixels
+                .lo(...this.respawnOffset).hi(...this.respawnShape),
+            this.respawnOffset);
+    }
+
+    
+    // Cached respawn sweep
+
+    setupSpawnData(rootNum = this.state.rootNum,
+            respawnAmount = this.state.respawnAmount) {
+        const side = Math.ceil(rootNum*respawnAmount);
+
+        this.spawnData = ndarray(new Float32Array(side*side*4), [side, side, 4]);
+    }
+
+    respawnOld(spawn = this.spawn.bind(this)) {
+        this.offsetRespawn(this.respawnOffset, this.spawnData.shape,
+            this.shape);
+
+        // Reset this part of the FBO
+        this.particles.buffers.forEach((buffer) =>
+            buffer.color[0].setPixels(this.spawnData, this.respawnOffset));
 
 
-        // Generic settings; no need to do anything special here
-
-        let settingsKeys = [];
-
-        for(let s in settings) {
-            if(!(typeof settings[s]).match(/(object|array)/gi)) {
-                settingsGUI.add(settings, s);
-                settingsKeys.push(s);
-            }
-        }
-
-
-        // Some special cases
+        // Finally, change some of the spawn data values for next time too,
+        // a line at a time
         
-        settingsGUI.__controllers[settingsKeys.indexOf('rootNum')]
-            .onFinishChange((n) => {
-                setup(n);
-                restart();
-            });
+        // Linear data stepping, no need for 2D
+        this.spawnDataOffset += this.spawnData.shape[0]*4;
 
-        settingsGUI.__controllers[settingsKeys.indexOf('respawnAmount')]
-            .onFinishChange((n) => {
-                setupSpawnData(settings.rootNum);
-            });
-
-        settingsGUI.__controllers[settingsKeys.indexOf('respawnTick')]
-            .onFinishChange((n) => {
-                respawnSweep();
-            });
-
-
-        // DAT.GUI's color controllers are a bit fucked.
-
-        let colorGUI = {
-                color: settings.color.slice(0, 3).map((c) => c*255),
-                opacity: settings.color[3]
-            };
-
-        function convertColor() {
-            settings.color = [
-                    ...colorGUI.color.slice(0, 3).map((c) => c/255),
-                    colorGUI.opacity
-                ];
+        // Wrap
+        if(this.spawnDataOffset >= this.spawnData.data.length) {
+            this.spawnDataOffset = 0;
         }
 
-        settingsGUI.addColor(colorGUI, 'color').onChange(convertColor);
-        settingsGUI.add(colorGUI, 'opacity').onChange(convertColor);
-        convertColor();
+        // Check bounds
+        this.spawnDataOffset = Math.min(this.spawnDataOffset,
+            this.spawnData.data.length-(this.spawnData.shape[0]*4));
 
-
-        // Controls
-
-        let controllers = {
-                cyclingColor: false,
-
-                clearView,
-                clearFlow,
-                reset,
-                restart
-            };
-
-
-        let controlsGUI = gui.addFolder('controls');
-
-        for(let c in controllers) {
-            controlsGUI.add(controllers, c);
+        for(let s = 0; s < this.spawnData.shape[1]; s += 4) {
+            this.spawnData.data.set(spawn(tempData), this.spawnDataOffset+s);
         }
+    }
 
+    /**
+     * Populate the respawn data with the given spawn function
+     */
+    resetSpawnData(spawn = this.spawn.bind(this)) {
+        for(let i = 0; i < this.spawnData.shape[0]; ++i) {
+            for(let j = 0; j < this.spawnData.shape[1]; ++j) {
+                const spawned = spawn(this.tempData);
 
-        function cycleColor() {
-            if(controllers.cyclingColor) {
-                Object.assign(colorGUI, {
-                    opacity: 0.2,
-                    color: [
-                        Math.sin(Date.now()*0.009)*200,
-                        100+Math.sin(Date.now()*0.006)*155,
-                        200+Math.sin(Date.now()*0.003)*55
-                    ]
-                });
-
-                convertColor();
+                this.spawnData.set(i, j, 0, spawned[0]);
+                this.spawnData.set(i, j, 1, spawned[1]);
+                this.spawnData.set(i, j, 2, spawned[2]);
+                this.spawnData.set(i, j, 3, spawned[3]);
             }
+        }
+    }
 
-            requestAnimationFrame(cycleColor);
+    offsetRespawn(offset = this.respawnOffset, stride = this.respawnShape,
+            shape = this.shape) {
+        // Step the respawn shape horizontally and vertically within the FBO
+
+        // X
+
+        offset[0] += stride[0];
+
+        // Wrap
+        if(offset[0] >= shape[0]) {
+            offset[0] = 0;
+            // Step down Y - carriage return style
+            offset[1] += stride[1];
         }
 
-        cycleColor();
+        // Clamp
+        offset[0] = Math.min(offset[0],
+            shape[0]-stride[0]);
 
 
-        // Presets
+        // Y
 
-        let presetsGUI = gui.addFolder('presets');
-
-        let presetters = {
-                'Default': () => {
-                    Object.assign(settings, defaultSettings);
-
-                    controllers.cyclingColor = false;
-                    updateGUI();
-
-                    restart();
-                },
-                'Flow': () => {
-                    Object.assign(settings, defaultSettings, {
-                            showFlow: true
-                        });
-
-                    controllers.cyclingColor = false;
-                    updateGUI();
-                },
-                'Fluid (kinda)': () => {
-                    Object.assign(settings, defaultSettings, {
-                            autoClearView: true,
-                            showFlow: false
-                        });
-
-                    restart();
-
-                    Object.assign(colorGUI, {
-                            opacity: 0.8,
-                            color: [255, 255, 255]
-                        });
-
-                    convertColor();
-
-                    controllers.cyclingColor = false;
-                    updateGUI();
-                },
-                'Flow only': () => {
-                    Object.assign(settings, defaultSettings, {
-                            autoClearView: true,
-                            showFlow: false,
-
-                            flowWeight: 0.82,
-                            wanderWeight: 0,
-
-                            startRadius: 0.6,
-                            startSpeed: -0.06
-                        });
-
-                    restart();
-
-                    Object.assign(colorGUI, {
-                            opacity: 0.8,
-                            color: [100, 200, 255]
-                        });
-
-                    convertColor();
-
-                    controllers.cyclingColor = false;
-                    updateGUI();
-                },
-                'Noise only': () => {
-                    Object.assign(settings, defaultSettings, {
-                            autoClearView: false,
-                            showFlow: false,
-
-                            flowWeight: 0,
-                            wanderWeight: 0.002,
-
-                            noiseSpeed: 0,
-
-                            startRadius: 0.5,
-                            startSpeed: 0
-                        });
-
-                    restart();
-
-                    Object.assign(colorGUI, {
-                            opacity: 0.1,
-                            color: [255, 150, 0]
-                        });
-
-                    convertColor();
-
-                    controllers.cyclingColor = false;
-                    updateGUI();
-                },
-                'Sea': () => {
-                    Object.assign(settings, defaultSettings, {
-                            startRadius: 1.77,
-                            startSpeed: -0.0001,
-
-                            fadeOpacity: 0.6
-                        });
-
-                    restart();
-
-                    Object.assign(colorGUI, {
-                            opacity: 0.8,
-                            color: [55, 155, 255]
-                        });
-
-                    convertColor();
-
-                    controllers.cyclingColor = false;
-                    updateGUI();
-                },
-                'Mad styles': () => {
-                    Object.assign(settings, defaultSettings, {
-                            startRadius: 0.1,
-                            startSpeed: 0.05
-                        });
-
-                    restart();
-
-                    controllers.cyclingColor = true;
-
-                    updateGUI();
-                },
-                'Ghostly': () => {
-                    Object.assign(settings, defaultSettings, {
-                            autoClearView: false
-                        });
-
-                    restart();
-
-                    Object.assign(colorGUI, {
-                            opacity: 0.006,
-                            color: [255, 255, 255]
-                        });
-
-                    convertColor();
-
-                    updateGUI();
-                }
-            };
-
-        for(let p in presetters) {
-            presetsGUI.add(presetters, p);
+        // Wrap
+        if(offset[1] >= shape[1]) {
+            offset[1] = 0;
         }
+
+        // Clamp
+        offset[1] = Math.min(offset[1],
+            shape[1]-stride[1]);
+
+        return offset;
     }
 };
+
+export const defaultSettings = {
+    rootNum: Math.pow(2, 9),
+
+    paused: false,
+    timeStep: 1000/60,
+
+    autoClearView: true,
+    showFlow: false,
+
+    startRadius: 0.6,
+    startSpeed: 0.01,
+
+    maxSpeed: 0.01,
+    damping: 0.045,
+
+    flowDecay: 0.001,
+    flowWidth: 3,
+
+    noiseSpeed: 0.0005,
+
+    forceWeight: 0.014,
+    flowWeight: 1,
+    wanderWeight: 0.0016,
+
+    fadeOpacity: 1,
+    color: [1, 1, 1, 0.4],
+
+    respawnAmount: 0.007,
+    respawnTick: 100
+};
+
+export const glSettings = {
+    preserveDrawingBuffer: true
+};
+
+
+export default Tendrils;

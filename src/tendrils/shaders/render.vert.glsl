@@ -16,4 +16,5 @@ void main() {
     vec2 screenPos = screenPosition(state.xy, viewSize);
 
     gl_Position = vec4(screenPos, 1, 1);
+    // gl_PointSize = dot(state.zw, state.zw)*100.0;
 }

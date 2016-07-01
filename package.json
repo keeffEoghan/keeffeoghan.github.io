@@ -18,7 +18,7 @@
     "gl-shader": "^4.1.0",
     "glsl-fxaa": "^3.0.0",
     "glsl-noise": "0.0.0",
-    "lodash.throttle": "^3.0.4",
+    "lodash": "^4.13.1",
     "ndarray": "^1.0.18",
     "reset.css": "^2.0.2",
     "web-audio-analyser": "^2.0.1"
