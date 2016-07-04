@@ -97,13 +97,7 @@ export class Particles {
         this.logic.uniforms.resolution = this.shape;
         this.logic.uniforms.data = this.buffers[1].color[0].bind(0);
 
-        if(update && typeof update.call === 'function') {
-            update(this.logic.uniforms);
-        }
-        else {
-            // Convenience/DRY
-            Object.assign(this.logic.uniforms, update);
-        }
+        Particles.applyUpdate(this.logic.uniforms, update);
 
         triangle(this.gl);
         this.gl.bindFramebuffer(this.gl.FRAMEBUFFER, null);
@@ -113,13 +107,8 @@ export class Particles {
         this.geom.bind(this.render);
         this.render.uniforms.data = this.buffers[0].color[0].bind(0);
 
-        if(isFunction(update)) {
-            update(this.render.uniforms);
-        }
-        else {
-            // Convenience, just pass an object to extend the uniforms.
-            Object.assign(this.render.uniforms, update);
-        }
+        
+        Particles.applyUpdate(this.render.uniforms, update);
 
         this.geom.draw(mode);
     }
@@ -151,6 +140,12 @@ export class Particles {
         }
 
         return data;
+    }
+
+    static applyUpdate(state, update) {
+        return ((isFunction(update))?
+                update(state)
+            :   Object.assign(state, update));
     }
 };
 

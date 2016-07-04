@@ -21,6 +21,9 @@ import triangleVert from './shaders/triangle.vert.glsl';
 
 import copyFadeFrag from './shaders/copy-fade.frag.glsl';
 
+// See the definition in `./shaders/state/inert.glsl`
+const inert = -10000;
+
 
 export class Tendrils {
     constructor(gl, settings) {
@@ -44,7 +47,6 @@ export class Tendrils {
         this.fadeShader = Shader(this.gl, triangleVert, copyFadeFrag);
 
 
-        this.shape = null;
         this.particles = null;
 
         this.start = Date.now();
@@ -61,7 +63,6 @@ export class Tendrils {
 
         this.respawnOffset = [0, 0];
         this.spawnDataOffset = 0;
-
 
         this.setup();
         this.reset();
@@ -87,15 +88,15 @@ export class Tendrils {
 
 
     setupParticles(rootNum = this.state.rootNum) {
-        this.shape = [rootNum, rootNum];
+        const shape = [rootNum, rootNum];
 
         this.particles = new Particles(this.gl, {
-                shape: this.shape,
+                shape,
 
                 // Double the rootNum of (vertical neighbour) vertices, to have
                 // pairs alternating between previous and current state.
                 // (Vertical neighbours, because WebGL iterates column-major.)
-                geomShape: [this.shape[0], this.shape[1]*2],
+                geomShape: [shape[0], shape[1]*2],
 
                 logic: logicFrag,
                 render: this.renderShader
@@ -140,7 +141,7 @@ export class Tendrils {
     }
 
     inert(data, u, v) {
-        data[0] = data[1] = -10000;
+        data[0] = data[1] = inert;
         data[2] = data[3] = 0;
 
         return data;
@@ -185,6 +186,8 @@ export class Tendrils {
 
         this.flow.shape = viewSize;
 
+        this.gl.viewport(0, 0, 1, 1);
+
 
         // Time
 
@@ -198,14 +201,14 @@ export class Tendrils {
             // Disabling blending here is important
             this.gl.disable(this.gl.BLEND);
 
-            this.particles.step((uniforms) => Object.assign(uniforms, {
+            this.particles.step({
+                    ...this.state,
                     dt: (this.state.timeStep || this.time-t0),
                     time: this.time,
                     start: this.start,
                     flow: this.flow.color[0].bind(1),
                     viewSize
-                },
-                this.state));
+                });
 
             this.gl.enable(this.gl.BLEND);
             this.gl.blendFunc(this.gl.SRC_ALPHA, this.gl.ONE_MINUS_SRC_ALPHA);
@@ -214,15 +217,13 @@ export class Tendrils {
 
         // Flow FBO and view renders
 
-        this.gl.viewport(0, 0, width, height);
-
-        const drawUniforms = Object.assign({
-                previous: this.particles.buffers[1].color[0].bind(1),
-                resolution: this.shape,
-                viewSize,
-                time: this.time
-            },
-            this.state);
+        const drawUniforms = {
+            ...this.state,
+            previous: this.particles.buffers[1].color[0].bind(2),
+            resolution: this.particles.shape,
+            viewSize,
+            time: this.time
+        };
 
         this.flow.bind();
 
@@ -232,7 +233,11 @@ export class Tendrils {
         this.particles.render = this.flowShader;
 
         this.gl.lineWidth(this.state.flowWidth);
-        this.particles.draw(drawUniforms, this.gl.LINES);
+        this.particles.draw({
+                ...drawUniforms,
+                showFlow: false
+            },
+            this.gl.LINES);
 
 
         // Render to the view.
@@ -242,9 +247,7 @@ export class Tendrils {
 
             this.gl.bindFramebuffer(this.gl.FRAMEBUFFER, null);
 
-            this.particles.draw((uniforms) =>
-                    Object.assign(uniforms, drawUniforms),
-                this.gl.LINES);
+            this.particles.draw(drawUniforms, this.gl.LINES);
         }
         else {
             // Set up the particles for rendering
@@ -272,8 +275,8 @@ export class Tendrils {
                 this.fadeShader.bind();
 
                 Object.assign(this.fadeShader.uniforms, {
-                        opacity: this.state.fadeOpacity,
-                        view: this.buffers[1].color[0].bind(0),
+                        opacity: this.state.fadeAlpha,
+                        view: this.buffers[1].color[0].bind(1),
                         viewSize
                     });
 
@@ -293,7 +296,7 @@ export class Tendrils {
 
                 Object.assign(this.fadeShader.uniforms, {
                         opacity: 1,
-                        view: this.buffers[0].color[0].bind(0),
+                        view: this.buffers[0].color[0].bind(2),
                         viewSize
                     });
 
@@ -308,7 +311,7 @@ export class Tendrils {
 
     // @todo More specific, or derived from properties
     directRender(state = this.state) {
-        return (state.autoClearView || state.fadeOpacity === 1);
+        return (state.autoClearView || state.fadeAlpha === 1);
     }
 
 
@@ -320,7 +323,7 @@ export class Tendrils {
      */
     
     respawn(spawn = this.spawn.bind(this)) {
-        this.offsetRespawn(this.respawnOffset, this.respawnShape, this.shape);
+        this.offsetRespawn(this.respawnOffset, this.respawnShape, this.particles.shape);
 
         this.particles.spawn(spawn,
             this.particles.pixels
@@ -340,7 +343,7 @@ export class Tendrils {
 
     respawnOld(spawn = this.spawn.bind(this)) {
         this.offsetRespawn(this.respawnOffset, this.spawnData.shape,
-            this.shape);
+            this.particles.shape);
 
         // Reset this part of the FBO
         this.particles.buffers.forEach((buffer) =>
@@ -384,7 +387,7 @@ export class Tendrils {
     }
 
     offsetRespawn(offset = this.respawnOffset, stride = this.respawnShape,
-            shape = this.shape) {
+            shape = this.particles.shape) {
         // Step the respawn shape horizontally and vertically within the FBO
 
         // X
@@ -424,26 +427,28 @@ export const defaultSettings = {
     paused: false,
     timeStep: 1000/60,
 
-    autoClearView: true,
+    autoClearView: false,
     showFlow: false,
 
-    startRadius: 0.6,
+    startRadius: 0.3,
     startSpeed: 0.01,
 
+    minSpeed: 0.000001,
     maxSpeed: 0.01,
     damping: 0.045,
 
-    flowDecay: 0.001,
+    flowDecay: 0.0001,
     flowWidth: 3,
 
     noiseSpeed: 0.0005,
 
     forceWeight: 0.014,
     flowWeight: 1,
-    wanderWeight: 0.0016,
+    wanderWeight: 0.001,
 
-    fadeOpacity: 1,
-    color: [1, 1, 1, 0.4],
+    color: [1, 1, 1, 0.6],
+    fadeAlpha: 1,
+    speedAlpha: 0.000001,
 
     respawnAmount: 0.007,
     respawnTick: 100
