@@ -1,6 +1,8 @@
 precision highp float;
 
 #pragma glslify: noise = require('glsl-noise/simplex/3d')
+
+#pragma glslify: inert = require('./state/inert')
 #pragma glslify: screenPosition = require('./screen-position')
 #pragma glslify: flowAtScreenPosition = require('./flow-at-screen-position')
 #pragma glslify: pointInBox = require('./bounds/point-in-box')
@@ -14,6 +16,7 @@ uniform vec2 viewSize;
 uniform float time;
 uniform float dt;
 
+uniform float minSpeed;
 uniform float maxSpeed;
 uniform float damping;
 
@@ -24,9 +27,6 @@ uniform float noiseSpeed;
 uniform float forceWeight;
 uniform float flowWeight;
 uniform float wanderWeight;
-
-const vec2 inert = vec2(-10000.0);
-const vec2 zero = vec2(0.0);
 
 void main() {
     // Read particle data.
@@ -39,8 +39,7 @@ void main() {
     vec2 newPos = pos;
     vec2 newVel = vel;
 
-
-    // if(pos != inert || vel != zero) {
+    if(pos != inert) {
         // Wander force
         vec2 wanderForce = vec2(noise(vec3(pos*2.125, uv.x+(time*noiseSpeed))),
                 noise(vec3(pos*2.125, uv.y+(time*noiseSpeed)+1234.5)));
@@ -63,22 +62,27 @@ void main() {
                 ((flowForce*flowWeight*dt)+
                     (wanderForce*wanderWeight*dt)));
         
-        // Clamp the velocity
+        // Normalize and clamp the velocity
+        /**
+         * @todo This seems to cause some problems when dealing with larger max
+         *       speeds - the particles no longer follow flow forces somehow...
+         */
         float speed = length(newVel);
-        
-        newVel = (newVel/speed)*min(speed, maxSpeed);
+
+        newVel *= min(speed, maxSpeed)/speed;
 
         // Integrate motion
         newPos = pos+newVel;
 
-        // @todo When you get it up and running again, remember to check this!
-        /*if(!pointInBox(newPos, vec4(vec2(0.0), viewSize) ||
-                (speed < 0.0001 && length(vel) < 0.0001)) {
-            // Mark this particle inactive
-            newPos = inert;
-            newVel = zero;
-        }*/
-    // }
+
+        // Reset out-of-bounds particles - marking them inert if outside
+        // @todo Respawn instead/as well?
+
+        vec2 boundSize = viewSize/viewSize.y;
+
+        newPos = ((pointInBox(newPos, vec4(-boundSize, boundSize)) > 0.0)?
+            newPos : inert);
+    }
 
     gl_FragColor = vec4(newPos, newVel);
 }
