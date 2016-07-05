@@ -9,7 +9,7 @@ import { step } from '../utils';
 
 // Shaders
 
-import logicFrag from './shaders/logic/frag.glsl';
+import logicFrag from './shaders/logic.frag.glsl';
 
 import flowVert from './shaders/flow/vert.glsl';
 import flowFrag from './shaders/flow/frag.glsl';
