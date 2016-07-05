@@ -15,10 +15,7 @@ vec4 stateForFrame(in vec2 uv, in vec2 shape,
     float offset = fract(nearIndex);
     vec2 lookup = vec2(uv.x, floor(nearIndex)/shape.y);
 
-    // Look up both textures, because sampler2D can't really be used in
-    // expressions.
-    return ((offset > frameOffset)?
-        texture2D(current, lookup) : texture2D(previous, lookup));
+    return texture2D(((offset > frameOffset)? current : previous), lookup);
 }
 
 #pragma glslify: export(stateForFrame)
