@@ -21,8 +21,7 @@ void main() {
     if(state.xy != inert) {
         vec2 screenPos = screenPosition(state.xy, viewSize);
 
-        speedRate = ((speedAlpha < 0.0)? 1.0
-            :   min(dot(state.zw, state.zw)/speedAlpha, 1.0));
+        speedRate = min(dot(state.zw, state.zw)/speedAlpha, 1.0);
 
         gl_Position = vec4(screenPos, 1.0, 1.0);
     }
