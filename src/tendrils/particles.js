@@ -63,7 +63,7 @@ export class Particles {
     }
 
     spawn(map, pixels = this.pixels, offset = [0, 0]) {
-        const vec4 = new Float32Array(4);
+        const data = new Float32Array(4);
         
         const pixelsShape = pixels.shape;
         const pixelsData = pixels.data;
@@ -72,14 +72,14 @@ export class Particles {
 
         for(let x = 0; x < pixelsShape[0]; ++x) {
             for(let y = 0; y < pixelsShape[1]; ++y) {
-                vec4[0] = vec4[1] = vec4[2] = vec4[3] = 0;
+                data[0] = data[1] = data[2] = data[3] = 0;
 
-                map(vec4, x, y);
+                map(data, x, y);
 
-                pixelsData[i++] = vec4[0];
-                pixelsData[i++] = vec4[1];
-                pixelsData[i++] = vec4[2];
-                pixelsData[i++] = vec4[3];
+                pixelsData[i++] = data[0];
+                pixelsData[i++] = data[1];
+                pixelsData[i++] = data[2];
+                pixelsData[i++] = data[3];
             }
         }
 
