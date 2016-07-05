@@ -1,8 +1,8 @@
 precision highp float;
 
-#pragma glslify: inert = require('./state/inert')
-#pragma glslify: stateForFrame = require('./state/state-at-frame')
-#pragma glslify: screenPosition = require('./screen-position')
+#pragma glslify: inert = require('../state/inert')
+#pragma glslify: stateForFrame = require('../state/state-at-frame')
+#pragma glslify: screenPosition = require('../screen-position')
 
 uniform sampler2D previous;
 uniform sampler2D data;

@@ -2,10 +2,10 @@ precision highp float;
 
 #pragma glslify: noise = require('glsl-noise/simplex/3d')
 
-#pragma glslify: inert = require('./state/inert')
-#pragma glslify: screenPosition = require('./screen-position')
-#pragma glslify: flowAtScreenPosition = require('./flow-at-screen-position')
-#pragma glslify: pointInBox = require('./bounds/point-in-box')
+#pragma glslify: inert = require('../state/inert')
+#pragma glslify: screenPosition = require('../screen-position')
+#pragma glslify: flowAtScreenPosition = require('../flow-at-screen-position')
+#pragma glslify: pointInBox = require('../bounds/point-in-box')
 
 uniform sampler2D data;
 uniform sampler2D flow;
