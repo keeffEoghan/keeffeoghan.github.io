@@ -9,15 +9,15 @@ import { step } from '../utils';
 
 // Shaders
 
-import logicFrag from './shaders/logic.frag.glsl';
+import logicFrag from './shaders/logic/frag.glsl';
 
-import flowVert from './shaders/flow.vert.glsl';
-import flowFrag from './shaders/flow.frag.glsl';
+import flowVert from './shaders/flow/vert.glsl';
+import flowFrag from './shaders/flow/frag.glsl';
 
-import renderVert from './shaders/render.vert.glsl';
-import renderFrag from './shaders/render.frag.glsl';
+import renderVert from './shaders/render/vert.glsl';
+import renderFrag from './shaders/render/frag.glsl';
 
-import triangleVert from './shaders/triangle.vert.glsl';
+import triangleVert from './shaders/triangle/vert.glsl';
 
 import copyFadeFrag from './shaders/copy-fade.frag.glsl';
 

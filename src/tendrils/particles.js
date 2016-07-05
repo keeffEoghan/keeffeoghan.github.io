@@ -22,7 +22,7 @@ import isFunction from 'lodash/isFunction';
 
 import { step } from '../utils';
 
-import logicVert from './shaders/triangle.vert.glsl';
+import logicVert from './shaders/triangle/vert.glsl';
 
 
 export class Particles {
