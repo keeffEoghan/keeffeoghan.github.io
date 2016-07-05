@@ -52,16 +52,12 @@ export class Tendrils {
         this.start = Date.now();
         this.time = 0;
 
-        this.spawnData = null;
-
         this.tempData = [];
 
-        /**
-         * Set particles at a moving offset to their spawn positions.
-         * For now, this is just the center.
-         */
-
         this.respawnOffset = [0, 0];
+        this.respawnShape = [0, 0];
+
+        this.spawnData = null;
         this.spawnDataOffset = 0;
 
         this.setup();
@@ -70,11 +66,13 @@ export class Tendrils {
 
     setup(...rest) {
         this.setupParticles(...rest);
+        this.setupRespawn(...rest);
         // this.setupSpawnData(...rest);
     }
 
     reset(...rest) {
         this.resetParticles(...rest);
+        this.setupRespawn(...rest);
         // this.resetSpawnData(...rest);
     }
 
@@ -323,25 +321,19 @@ export class Tendrils {
      */
     
     respawn(spawn = this.spawn.bind(this)) {
-        this.offsetRespawn(this.respawnOffset, this.respawnShape, this.particles.shape);
+        this.offsetRespawn(this.respawnOffset, this.respawnShape,
+            this.particles.shape);
 
         this.particles.spawn(spawn,
-            this.particles.pixels
-                .lo(...this.respawnOffset).hi(...this.respawnShape),
+            this.particles.pixels.lo(...this.respawnOffset)
+                .hi(...this.respawnShape),
             this.respawnOffset);
     }
 
     
-    // Cached respawn sweep
+    // Cached respawn chunk sweep
 
-    setupSpawnData(rootNum = this.state.rootNum,
-            respawnAmount = this.state.respawnAmount) {
-        const side = Math.ceil(rootNum*respawnAmount);
-
-        this.spawnData = ndarray(new Float32Array(side*side*4), [side, side, 4]);
-    }
-
-    respawnOld(spawn = this.spawn.bind(this)) {
+    respawnDataChunk(spawn = this.spawn.bind(this)) {
         this.offsetRespawn(this.respawnOffset, this.spawnData.shape,
             this.particles.shape);
 
@@ -368,6 +360,19 @@ export class Tendrils {
         for(let s = 0; s < this.spawnData.shape[1]; s += 4) {
             this.spawnData.data.set(spawn(tempData), this.spawnDataOffset+s);
         }
+    }
+
+    setupRespawn(rootNum = this.state.rootNum,
+            respawnAmount = this.state.respawnAmount) {
+        const side = Math.ceil(rootNum*respawnAmount);
+
+        this.respawnShape.fill(side);
+        this.respawnOffset.fill(0);
+    }
+
+    setupSpawnData(dataShape = this.respawnShape) {
+        this.spawnData = ndarray(new Float32Array(dataShape[0]*dataShape[1]*4),
+            [dataShape[0], dataShape[1], 4]);
     }
 
     /**
@@ -402,8 +407,7 @@ export class Tendrils {
         }
 
         // Clamp
-        offset[0] = Math.min(offset[0],
-            shape[0]-stride[0]);
+        offset[0] = Math.min(offset[0], shape[0]-stride[0]);
 
 
         // Y
@@ -414,12 +418,12 @@ export class Tendrils {
         }
 
         // Clamp
-        offset[1] = Math.min(offset[1],
-            shape[1]-stride[1]);
+        offset[1] = Math.min(offset[1], shape[1]-stride[1]);
 
         return offset;
     }
 };
+
 
 export const defaultSettings = {
     rootNum: Math.pow(2, 9),

@@ -227,8 +227,12 @@ export default (canvas, settings, debug) => {
                     Object.assign(state, defaultSettings, {
                             startRadius: 1.77,
                             startSpeed: -0.0001,
-
-                            fadeOpacity: 0.6
+                            flowWidth: 5,
+                            forceWeight: 0.015,
+                            wanderWeight: 0.0014,
+                            flowDecay: 0.007,
+                            fadeAlpha: 0.6,
+                            speedAlpha: 0
                         });
 
                     tendrils.restart();
