@@ -164,7 +164,7 @@ export default (canvas, settings, debug) => {
                     tendrils.restart();
 
                     Object.assign(colorGUI, {
-                            opacity: 0.8,
+                            opacity: 0.6,
                             color: [255, 255, 255]
                         });
 
@@ -181,7 +181,8 @@ export default (canvas, settings, debug) => {
                             wanderWeight: 0,
                             startRadius: 0.6,
                             startSpeed: -0.06,
-                            fadeAlpha: 0.5
+                            speedAlpha: 0,
+                            fadeAlpha: (1000/60)-0.000001
                         });
 
                     tendrils.restart();
@@ -200,14 +201,12 @@ export default (canvas, settings, debug) => {
                     Object.assign(state, defaultSettings, {
                             autoClearView: false,
                             showFlow: false,
-
                             flowWeight: 0,
                             wanderWeight: 0.002,
-
                             noiseSpeed: 0,
-
                             startRadius: 0.5,
-                            startSpeed: 0
+                            startSpeed: 0,
+                            speedAlpha: 0
                         });
 
                     tendrils.restart();
@@ -230,7 +229,7 @@ export default (canvas, settings, debug) => {
                             forceWeight: 0.015,
                             wanderWeight: 0.0014,
                             flowDecay: 0.007,
-                            fadeAlpha: 0.6,
+                            fadeAlpha: (1000/60)-0.0001,
                             speedAlpha: 0
                         });
 
@@ -283,8 +282,8 @@ export default (canvas, settings, debug) => {
                             noiseScale: 18,
                             forceWeight: 0.014,
                             wanderWeight: 0.0021,
-                            fadeAlpha: 0.5,
-                            speedAlpha: 0.000005
+                            fadeAlpha: (1000/60)-0.001,
+                            speedAlpha: 0.000002
                         });
 
                     tendrils.restart();
@@ -309,7 +308,6 @@ export default (canvas, settings, debug) => {
                             noiseScale: 18,
                             forceWeight: 0.015,
                             wanderWeight: 0.0023,
-                            fadeAlpha: 1,
                             speedAlpha: 0.00005
                         });
 
@@ -318,6 +316,30 @@ export default (canvas, settings, debug) => {
                     Object.assign(colorGUI, {
                             opacity: 0.03,
                             color: [50, 255, 50]
+                        });
+
+                    convertColor();
+
+                    controllers.cyclingColor = false;
+                    updateGUI();
+                },
+                'Hairy': () => {
+                    Object.assign(state, defaultSettings, {
+                            autoClearView: false,
+                            timeStep: 1000/60,
+                            startRadius: 0.1,
+                            startSpeed: 0.01,
+                            flowDecay: 0.001,
+                            wanderWeight: 0.002,
+                            fadeAlpha: (1000/60)-0.000001,
+                            speedAlpha: 0
+                        });
+
+                    tendrils.restart();
+
+                    Object.assign(colorGUI, {
+                            opacity: 0.9,
+                            color: [255, 150, 255]
                         });
 
                     convertColor();
