@@ -27,11 +27,11 @@ export default (canvas, settings, debug) => {
 
 
     if(debug) {
-        let gui = new dat.GUI();
+        const gui = new dat.GUI();
 
         gui.close();
 
-        function updateGUI() {
+        const updateGUI = () => {
             for(let f in gui.__folders) {
                 gui.__folders[f].__controllers.forEach((controller) =>
                         controller.updateDisplay());
@@ -58,7 +58,7 @@ export default (canvas, settings, debug) => {
 
 
         // Some special cases
-        
+
         settingsGUI.__controllers[settingsKeys.indexOf('rootNum')]
             .onFinishChange((n) => {
                 tendrils.setup(n);
@@ -66,12 +66,12 @@ export default (canvas, settings, debug) => {
             });
 
         settingsGUI.__controllers[settingsKeys.indexOf('respawnAmount')]
-            .onFinishChange((n) => {
+            .onFinishChange(() => {
                 tendrils.setupSpawnData(state.rootNum);
             });
 
         settingsGUI.__controllers[settingsKeys.indexOf('respawnTick')]
-            .onFinishChange((n) => {
+            .onFinishChange(() => {
                 // respawnSweep();
             });
 
@@ -83,7 +83,7 @@ export default (canvas, settings, debug) => {
                 opacity: state.color[3]
             };
 
-        function convertColor() {
+        const convertColor = () => {
             state.color = [
                     ...colorGUI.color.slice(0, 3).map((c) => c/255),
                     colorGUI.opacity
@@ -114,7 +114,7 @@ export default (canvas, settings, debug) => {
         }
 
 
-        function cycleColor() {
+        const cycleColor = () => {
             if(controllers.cyclingColor) {
                 Object.assign(colorGUI, {
                     opacity: 0.2,
@@ -175,14 +175,13 @@ export default (canvas, settings, debug) => {
                 },
                 'Flow only': () => {
                     Object.assign(state, defaultSettings, {
-                            autoClearView: true,
-                            showFlow: false,
-
-                            flowWeight: 0.82,
+                            autoClearView: false,
+                            flowDecay: 0.004,
+                            forceWeight: 0.015,
                             wanderWeight: 0,
-
                             startRadius: 0.6,
-                            startSpeed: -0.06
+                            startSpeed: -0.06,
+                            fadeAlpha: 0.5
                         });
 
                     tendrils.restart();
@@ -274,6 +273,57 @@ export default (canvas, settings, debug) => {
 
                     controllers.cyclingColor = false;
                     updateGUI();
+                },
+                'Turbulent': () => {
+                    Object.assign(state, defaultSettings, {
+                            autoClearView: false,
+                            startRadius: 0.1,
+                            startSpeed: 0,
+                            noiseSpeed: 0.00001,
+                            noiseScale: 18,
+                            forceWeight: 0.014,
+                            wanderWeight: 0.0021,
+                            fadeAlpha: 0.5,
+                            speedAlpha: 0.000005
+                        });
+
+                    tendrils.restart();
+
+                    Object.assign(colorGUI, {
+                            opacity: 0.9,
+                            color: [255, 10, 10]
+                        });
+
+                    convertColor();
+
+                    controllers.cyclingColor = false;
+                    updateGUI();
+                },
+                'Roots': () => {
+                    Object.assign(state, defaultSettings, {
+                            autoClearView: false,
+                            startRadius: 0.1,
+                            startSpeed: 0,
+                            flowDecay: 0,
+                            noiseSpeed: 0,
+                            noiseScale: 18,
+                            forceWeight: 0.015,
+                            wanderWeight: 0.0023,
+                            fadeAlpha: 1,
+                            speedAlpha: 0.00005
+                        });
+
+                    tendrils.restart();
+
+                    Object.assign(colorGUI, {
+                            opacity: 0.03,
+                            color: [50, 255, 50]
+                        });
+
+                    convertColor();
+
+                    controllers.cyclingColor = false;
+                    updateGUI();
                 }
             };
 
@@ -282,9 +332,3 @@ export default (canvas, settings, debug) => {
         }
     }
 };
-
-
-
-
-
-

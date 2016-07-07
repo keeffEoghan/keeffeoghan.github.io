@@ -1,10 +1,12 @@
+/* global Float32Array */
+
 import Shader from 'gl-shader';
 import makeFBO from 'gl-fbo';
 import triangle from 'a-big-triangle';
 import ndarray from 'ndarray';
 
 import Particles from './particles';
-import { step } from '../utils';
+import { step/*, nextPow2*/ } from '../utils';
 
 
 // Shaders
@@ -17,7 +19,7 @@ import flowFrag from './shaders/flow/frag.glsl';
 import renderVert from './shaders/render/vert.glsl';
 import renderFrag from './shaders/render/frag.glsl';
 
-import triangleVert from './shaders/triangle/vert.glsl';
+import screenVert from './shaders/screen/vert.glsl';
 
 import copyFadeFrag from './shaders/copy-fade.frag.glsl';
 
@@ -44,10 +46,13 @@ export class Tendrils {
 
         this.renderShader = Shader(this.gl, renderVert, renderFrag);
         this.flowShader = Shader(this.gl, flowVert, flowFrag);
-        this.fadeShader = Shader(this.gl, triangleVert, copyFadeFrag);
+        this.fadeShader = Shader(this.gl, screenVert, copyFadeFrag);
 
 
         this.particles = null;
+
+        this.viewSize = [0, 0];
+        this.pow2Size = [0, 0];
 
         this.start = Date.now();
         this.time = 0;
@@ -57,8 +62,8 @@ export class Tendrils {
         this.respawnOffset = [0, 0];
         this.respawnShape = [0, 0];
 
-        this.spawnData = null;
-        this.spawnDataOffset = 0;
+        this.spawnCache = null;
+        this.spawnCacheOffset = 0;
 
         this.setup();
         this.reset();
@@ -67,13 +72,13 @@ export class Tendrils {
     setup(...rest) {
         this.setupParticles(...rest);
         this.setupRespawn(...rest);
-        // this.setupSpawnData(...rest);
+        // this.setupSpawnCache(...rest);
     }
 
     reset(...rest) {
         this.resetParticles(...rest);
         this.setupRespawn(...rest);
-        // this.resetSpawnData(...rest);
+        // this.resetSpawnCache(...rest);
     }
 
     // @todo
@@ -81,7 +86,7 @@ export class Tendrils {
         this.particles.dispose();
 
         delete this.particles;
-        delete this.spawnData;
+        delete this.spawnCache;
     }
 
 
@@ -114,8 +119,8 @@ export class Tendrils {
     /**
      * Used in a big loop, so should be optimised.
      */
-    
-    spawn(data, u, v) {
+
+    spawn(data) {
         let radius = this.state.startRadius;
         let speed = this.state.startSpeed;
 
@@ -138,7 +143,7 @@ export class Tendrils {
         return data;
     }
 
-    inert(data, u, v) {
+    inert(data) {
         data[0] = data[1] = inert;
         data[2] = data[3] = 0;
 
@@ -172,19 +177,7 @@ export class Tendrils {
     render() {
         const directRender = this.directRender();
 
-        // Size
-        
-        const width = this.gl.drawingBufferWidth;
-        const height = this.gl.drawingBufferHeight;
-        const viewSize = [width, height];
-
-        if(!directRender) {
-            this.buffers.forEach((buffer) => buffer.shape = viewSize);
-        }
-
-        this.flow.shape = viewSize;
-
-        this.gl.viewport(0, 0, 1, 1);
+        this.resize(directRender);
 
 
         // Time
@@ -205,7 +198,7 @@ export class Tendrils {
                     time: this.time,
                     start: this.start,
                     flow: this.flow.color[0].bind(1),
-                    viewSize
+                    viewSize: this.viewSize
                 });
 
             this.gl.enable(this.gl.BLEND);
@@ -218,17 +211,17 @@ export class Tendrils {
         const drawUniforms = {
             ...this.state,
             previous: this.particles.buffers[1].color[0].bind(2),
-            resolution: this.particles.shape,
-            viewSize,
+            dataSize: this.particles.shape,
+            viewSize: this.viewSize,
             time: this.time
         };
 
-        this.flow.bind();
+        this.particles.render = this.flowShader;
 
         // Render to the flow FBO - after the logic render, so particles don't
         // respond to their own flow.
 
-        this.particles.render = this.flowShader;
+        this.flow.bind();
 
         this.gl.lineWidth(this.state.flowWidth);
         this.particles.draw({
@@ -237,14 +230,15 @@ export class Tendrils {
             },
             this.gl.LINES);
 
+        // @todo Mipmaps for global flow sampling - not working at the moment.
+        // this.flow.color[0].generateMipmap();
+
 
         // Render to the view.
 
         if(this.state.showFlow) {
             // Render the flow directly to the screen
-
             this.gl.bindFramebuffer(this.gl.FRAMEBUFFER, null);
-
             this.particles.draw(drawUniforms, this.gl.LINES);
         }
         else {
@@ -267,6 +261,7 @@ export class Tendrils {
                 // Multi-buffer passes
 
                 this.buffers[0].bind();
+                this.gl.clear(this.gl.COLOR_BUFFER_BIT);
 
                 // Copy and fade the last buffer into the current buffer
 
@@ -275,7 +270,7 @@ export class Tendrils {
                 Object.assign(this.fadeShader.uniforms, {
                         opacity: this.state.fadeAlpha,
                         view: this.buffers[1].color[0].bind(1),
-                        viewSize
+                        viewSize: this.viewSize
                     });
 
                 triangle(this.gl);
@@ -295,7 +290,7 @@ export class Tendrils {
                 Object.assign(this.fadeShader.uniforms, {
                         opacity: 1,
                         view: this.buffers[0].color[0].bind(2),
-                        viewSize
+                        viewSize: this.viewSize
                     });
 
                 triangle(this.gl);
@@ -306,8 +301,24 @@ export class Tendrils {
         }
     }
 
+    resize(directRender = this.directRender()) {
+        this.viewSize[0] = this.gl.drawingBufferWidth;
+        this.viewSize[1] = this.gl.drawingBufferHeight;
 
-    // @todo More specific, or derived from properties
+        // this.pow2Size.fill(nextPow2(Math.max(...this.viewSize)));
+
+        if(!directRender) {
+            this.buffers.forEach((buffer) => buffer.shape = this.viewSize);
+        }
+
+        // this.flow.shape = this.pow2Size;
+        this.flow.shape = this.viewSize;
+
+        this.gl.viewport(0, 0, 1, 1);
+    }
+
+
+    // @todo More specific, or derived from properties?
     directRender(state = this.state) {
         return (state.autoClearView || state.fadeAlpha === 1);
     }
@@ -319,7 +330,7 @@ export class Tendrils {
      * @todo Is the old approach below approach needed? Could use a `spawn`
      *       sweep across sub-regions of the particles buffers.
      */
-    
+
     respawn(spawn = this.spawn.bind(this)) {
         this.offsetRespawn(this.respawnOffset, this.respawnShape,
             this.particles.shape);
@@ -330,35 +341,36 @@ export class Tendrils {
             this.respawnOffset);
     }
 
-    
+
     // Cached respawn chunk sweep
 
-    respawnDataChunk(spawn = this.spawn.bind(this)) {
-        this.offsetRespawn(this.respawnOffset, this.spawnData.shape,
+    respawnCached(spawn = this.spawn.bind(this)) {
+        this.offsetRespawn(this.respawnOffset, this.spawnCache.shape,
             this.particles.shape);
 
         // Reset this part of the FBO
         this.particles.buffers.forEach((buffer) =>
-            buffer.color[0].setPixels(this.spawnData, this.respawnOffset));
+            buffer.color[0].setPixels(this.spawnCache, this.respawnOffset));
 
 
         // Finally, change some of the spawn data values for next time too,
         // a line at a time
-        
+
         // Linear data stepping, no need for 2D
-        this.spawnDataOffset += this.spawnData.shape[0]*4;
+        this.spawnCacheOffset += this.spawnCache.shape[0]*4;
 
         // Wrap
-        if(this.spawnDataOffset >= this.spawnData.data.length) {
-            this.spawnDataOffset = 0;
+        if(this.spawnCacheOffset >= this.spawnCache.data.length) {
+            this.spawnCacheOffset = 0;
         }
 
         // Check bounds
-        this.spawnDataOffset = Math.min(this.spawnDataOffset,
-            this.spawnData.data.length-(this.spawnData.shape[0]*4));
+        this.spawnCacheOffset = Math.min(this.spawnCacheOffset,
+            this.spawnCache.data.length-(this.spawnCache.shape[0]*4));
 
-        for(let s = 0; s < this.spawnData.shape[1]; s += 4) {
-            this.spawnData.data.set(spawn(tempData), this.spawnDataOffset+s);
+        for(let s = 0; s < this.spawnCache.shape[1]; s += 4) {
+            this.spawnCache.data.set(spawn(this.tempData),
+                this.spawnCacheOffset+s);
         }
     }
 
@@ -370,23 +382,23 @@ export class Tendrils {
         this.respawnOffset.fill(0);
     }
 
-    setupSpawnData(dataShape = this.respawnShape) {
-        this.spawnData = ndarray(new Float32Array(dataShape[0]*dataShape[1]*4),
+    setupSpawnCache(dataShape = this.respawnShape) {
+        this.spawnCache = ndarray(new Float32Array(dataShape[0]*dataShape[1]*4),
             [dataShape[0], dataShape[1], 4]);
     }
 
     /**
      * Populate the respawn data with the given spawn function
      */
-    resetSpawnData(spawn = this.spawn.bind(this)) {
-        for(let i = 0; i < this.spawnData.shape[0]; ++i) {
-            for(let j = 0; j < this.spawnData.shape[1]; ++j) {
+    resetSpawnCache(spawn = this.spawn.bind(this)) {
+        for(let i = 0; i < this.spawnCache.shape[0]; ++i) {
+            for(let j = 0; j < this.spawnCache.shape[1]; ++j) {
                 const spawned = spawn(this.tempData);
 
-                this.spawnData.set(i, j, 0, spawned[0]);
-                this.spawnData.set(i, j, 1, spawned[1]);
-                this.spawnData.set(i, j, 2, spawned[2]);
-                this.spawnData.set(i, j, 3, spawned[3]);
+                this.spawnCache.set(i, j, 0, spawned[0]);
+                this.spawnCache.set(i, j, 1, spawned[1]);
+                this.spawnCache.set(i, j, 2, spawned[2]);
+                this.spawnCache.set(i, j, 3, spawned[3]);
             }
         }
     }
@@ -422,7 +434,7 @@ export class Tendrils {
 
         return offset;
     }
-};
+}
 
 
 export const defaultSettings = {
@@ -444,13 +456,14 @@ export const defaultSettings = {
     flowDecay: 0.0001,
     flowWidth: 3,
 
-    noiseSpeed: 0.0005,
+    noiseSpeed: 0.00025,
+    noiseScale: 2.125,
 
-    forceWeight: 0.014,
+    forceWeight: 0.015,
     flowWeight: 1,
     wanderWeight: 0.001,
 
-    color: [1, 1, 1, 0.6],
+    color: [1, 1, 1, 0.05],
     fadeAlpha: 1,
     speedAlpha: 0.000001,
 
