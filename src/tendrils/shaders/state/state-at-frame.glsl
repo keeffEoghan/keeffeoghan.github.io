@@ -9,7 +9,7 @@ const float frameOffset = 0.25;
  * @return State data for the vertex, either current or previous.
  */
 
-vec4 stateForFrame(in vec2 uv, in vec2 shape,
+vec4 stateAtFrame(in vec2 uv, in vec2 shape,
         in sampler2D previous, in sampler2D current) {
     float nearIndex = uv.y*shape.y;
     float offset = fract(nearIndex);
@@ -18,4 +18,4 @@ vec4 stateForFrame(in vec2 uv, in vec2 shape,
     return texture2D(((offset > frameOffset)? current : previous), lookup);
 }
 
-#pragma glslify: export(stateForFrame)
+#pragma glslify: export(stateAtFrame)

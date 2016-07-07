@@ -1,13 +1,9 @@
 precision highp float;
 
-#pragma glslify: inert = require('../state/inert')
-#pragma glslify: stateForFrame = require('../state/state-at-frame')
-#pragma glslify: screenPosition = require('../screen-position')
-
 uniform sampler2D previous;
-uniform sampler2D data;
+uniform sampler2D particles;
 
-uniform vec2 resolution;
+uniform vec2 dataSize;
 uniform vec2 viewSize;
 uniform float speedAlpha;
 
@@ -15,11 +11,15 @@ attribute vec2 uv;
 
 varying float speedRate;
 
+#pragma glslify: inert = require('../state/inert')
+#pragma glslify: stateAtFrame = require('../state/state-at-frame')
+#pragma glslify: posToScreen = require('../map/pos-to-screen')
+
 void main() {
-    vec4 state = stateForFrame(uv, resolution, previous, data);
+    vec4 state = stateAtFrame(uv, dataSize, previous, particles);
 
     if(state.xy != inert) {
-        vec2 screenPos = screenPosition(state.xy, viewSize);
+        vec2 screenPos = posToScreen(state.xy, viewSize);
 
         speedRate = min(dot(state.zw, state.zw)/speedAlpha, 1.0);
 
