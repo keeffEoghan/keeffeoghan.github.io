@@ -9,8 +9,6 @@ uniform vec2 viewSize;
 
 uniform float time;
 
-#pragma glslify: map = require('glsl-map')
-
 #pragma glslify: pick = require('./pick/velocity')
 #pragma glslify: bestSample = require('./best-sample',pick=pick,samples=3)
 #pragma glslify: uvToPos = require('../map/uv-to-pos')
@@ -23,6 +21,6 @@ void main() {
     vec2 spawnUV = bestSample(best, spawnData, uv*time);
 
     gl_FragColor = ((best === state)?
-            vec4(uvToPos(spawnUV), best.zw)
+            vec4(uvToPos(spawnUV*spawnSize/viewSize), best.zw)
         :   state);
 }

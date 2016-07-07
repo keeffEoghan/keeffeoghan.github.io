@@ -183,7 +183,10 @@ export class Tendrils {
         // Time
 
         const t0 = this.time;
+
         this.time = Date.now()-this.start;
+
+        const dt = (this.state.timeStep || this.time-t0);
 
 
         // Physics
@@ -194,7 +197,7 @@ export class Tendrils {
 
             this.particles.step({
                     ...this.state,
-                    dt: (this.state.timeStep || this.time-t0),
+                    dt,
                     time: this.time,
                     start: this.start,
                     flow: this.flow.color[0].bind(1),
@@ -268,7 +271,7 @@ export class Tendrils {
                 this.fadeShader.bind();
 
                 Object.assign(this.fadeShader.uniforms, {
-                        opacity: this.state.fadeAlpha,
+                        opacity: Math.min(1, this.state.fadeAlpha/dt),
                         view: this.buffers[1].color[0].bind(1),
                         viewSize: this.viewSize
                     });
@@ -320,7 +323,7 @@ export class Tendrils {
 
     // @todo More specific, or derived from properties?
     directRender(state = this.state) {
-        return (state.autoClearView || state.fadeAlpha === 1);
+        return (state.autoClearView || state.fadeAlpha < 0);
     }
 
 
@@ -464,7 +467,7 @@ export const defaultSettings = {
     wanderWeight: 0.001,
 
     color: [1, 1, 1, 0.05],
-    fadeAlpha: 1,
+    fadeAlpha: -1,
     speedAlpha: 0.000001,
 
     respawnAmount: 0.007,
