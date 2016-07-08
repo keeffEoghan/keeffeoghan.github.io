@@ -49,6 +49,10 @@ export default (canvas, settings, debug) => {
 
         let settingsKeys = [];
 
+        Object.assign(state, {
+            respawnTick: 0
+        });
+
         for(let s in state) {
             if(!(typeof state[s]).match(/(object|array)/gi)) {
                 settingsGUI.add(state, s);
@@ -66,14 +70,27 @@ export default (canvas, settings, debug) => {
             });
 
         settingsGUI.__controllers[settingsKeys.indexOf('respawnAmount')]
-            .onFinishChange(() => {
-                tendrils.setupSpawnData(state.rootNum);
+            .onFinishChange((n) => {
+                tendrils.setupRespawn(state.rootNum, n);
+                tendrils.setupSpawnCache();
             });
 
+        let respawnInterval;
+
+        const respawn = () => tendrils.respawn();
+
+        const respawnSweep = (n = state.respawnTick) => {
+            clearInterval(respawnInterval);
+
+            if(n > 0) {
+                respawnInterval = setInterval(respawn, n);
+            }
+        };
+
+        respawnSweep();
+
         settingsGUI.__controllers[settingsKeys.indexOf('respawnTick')]
-            .onFinishChange(() => {
-                // respawnSweep();
-            });
+            .onFinishChange(respawnSweep);
 
 
         // DAT.GUI's color controllers are a bit fucked.
@@ -102,6 +119,7 @@ export default (canvas, settings, debug) => {
 
                 clearView: () => tendrils.clearView(),
                 clearFlow: () => tendrils.clearFlow(),
+                respawn,
                 reset: () => tendrils.reset(),
                 restart: () => tendrils.restart()
             };
@@ -158,13 +176,15 @@ export default (canvas, settings, debug) => {
                 'Fluid (kinda)': () => {
                     Object.assign(state, defaultSettings, {
                             autoClearView: true,
-                            showFlow: false
+                            showFlow: false,
+                            respawnTick: 3000
                         });
 
                     tendrils.restart();
+                    respawnSweep();
 
                     Object.assign(colorGUI, {
-                            opacity: 0.6,
+                            opacity: 0.2,
                             color: [255, 255, 255]
                         });
 
@@ -182,10 +202,13 @@ export default (canvas, settings, debug) => {
                             startRadius: 0.6,
                             startSpeed: -0.06,
                             speedAlpha: 0,
-                            fadeAlpha: (1000/60)-0.000001
+                            fadeAlpha: (1000/60)-0.000001,
+                            respawnAmount: 0.3,
+                            respawnTick: 3000
                         });
 
                     tendrils.restart();
+                    respawnSweep();
 
                     Object.assign(colorGUI, {
                             opacity: 0.8,
@@ -332,10 +355,12 @@ export default (canvas, settings, debug) => {
                             flowDecay: 0.001,
                             wanderWeight: 0.002,
                             fadeAlpha: (1000/60)-0.000001,
-                            speedAlpha: 0
+                            speedAlpha: 0,
+                            respawnTick: 5000
                         });
 
                     tendrils.restart();
+                    respawnSweep();
 
                     Object.assign(colorGUI, {
                             opacity: 0.9,
