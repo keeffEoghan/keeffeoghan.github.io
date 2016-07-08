@@ -9,7 +9,7 @@ uniform vec2 viewSize;
 
 uniform vec2 randomSeed;
 
-#pragma glslify: apply = require('./brightest/apply')
+#pragma glslify: apply = require('./brightest/apply-color')
 #pragma glslify: pick = require('./brightest/pick')
 #pragma glslify: bestSample = require('./best-sample',pick=pick,samples=3)
 

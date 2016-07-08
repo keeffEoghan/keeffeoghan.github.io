@@ -1,6 +1,9 @@
 import glContext from 'gl-context';
+import getUserMedia from 'getusermedia';
 import throttle from 'lodash/throttle';
 import dat from 'dat-gui';
+
+import SpawnPixels from './spawn/pixels';
 
 import { Tendrils, defaultSettings, glSettings } from './';
 
@@ -14,12 +17,32 @@ export default (canvas, settings, debug) => {
 
     const state = tendrils.state;
 
+    getUserMedia((e, stream) => {
+        if(e) {
+            throw e;
+        }
+        else {
+            const video = document.createElement('video');
+
+            video.src = window.URL.createObjectURL(stream);
+            video.play();
+
+            const spawnPixels = new SpawnPixels(gl);
+
+            setInterval(() => {
+                    spawnPixels.setPixels(video);
+                    spawnPixels.respawn(tendrils);
+                },
+                500);
+        }
+    });
+
     function resize() {
         canvas.width = self.innerWidth;
         canvas.height = self.innerHeight;
     }
 
-    self.addEventListener('resize', throttle(resize, 100, { leading: true }),
+    self.addEventListener('resize', throttle(resize, 200, { leading: true }),
         false);
 
     resize();
@@ -177,7 +200,7 @@ export default (canvas, settings, debug) => {
                     Object.assign(state, defaultSettings, {
                             autoClearView: true,
                             showFlow: false,
-                            respawnTick: 3000
+                            respawnTick: 500
                         });
 
                     tendrils.restart();
@@ -203,8 +226,8 @@ export default (canvas, settings, debug) => {
                             startSpeed: -0.06,
                             speedAlpha: 0,
                             fadeAlpha: (1000/60)-0.000001,
-                            respawnAmount: 0.3,
-                            respawnTick: 3000
+                            respawnAmount: 0.03,
+                            respawnTick: 500
                         });
 
                     tendrils.restart();
@@ -356,7 +379,7 @@ export default (canvas, settings, debug) => {
                             wanderWeight: 0.002,
                             fadeAlpha: (1000/60)-0.000001,
                             speedAlpha: 0,
-                            respawnTick: 5000
+                            respawnTick: 300
                         });
 
                     tendrils.restart();

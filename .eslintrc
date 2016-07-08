@@ -20,6 +20,7 @@
         "curly": "error",
         "eqeqeq": "warn",
         "no-eq-null": "warn",
+        "no-console": "off",
         "arrow-parens": "error",
         "arrow-spacing": "error",
         "wrap-iife": "error",
