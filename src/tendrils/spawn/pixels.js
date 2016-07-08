@@ -7,21 +7,22 @@ import FBO from 'gl-fbo';
 import shader from 'gl-shader';
 import isPlainObject from 'lodash/isPlainObject';
 
-import spawnVert from './shaders/spawn/vert.glsl';
-import spawnFrag from './shaders/spawn/frag.glsl';
+import spawnVert from '../shaders/screen/vert.glsl';
+import spawnFrag from '../shaders/spawn/frag.glsl';
 
-export const defaultSpawn = {
-    spawnVert,
-    spawnFrag
+export const defaults = {
+    spawn: {
+        vert: spawnVert,
+        frag: spawnFrag
+    },
+    buffer: {
+        shape: [1, 1],
+        float: true
+    }
 };
 
-export const defaultBuffer = {
-    shape: [1, 1],
-    float: true
-};
-
-export default class {
-    constructor(gl, spawn = defaultSpawn, buffer = defaultBuffer) {
+export class SpawnPixels {
+    constructor(gl, spawn = defaults.spawn, buffer = defaults.buffer) {
         this.gl = gl;
 
         this.spawn = (isPlainObject(spawn)?
@@ -47,3 +48,5 @@ export default class {
         return this.buffer.color[0].setPixels(pixels);
     }
 }
+
+export default SpawnPixels;

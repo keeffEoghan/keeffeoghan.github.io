@@ -500,7 +500,7 @@ export const defaultSettings = {
     fadeAlpha: -1,
     speedAlpha: 0.000001,
 
-    respawnAmount: 0.1
+    respawnAmount: 0.02
 };
 
 export const glSettings = {
