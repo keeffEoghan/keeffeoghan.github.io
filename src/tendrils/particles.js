@@ -15,8 +15,8 @@
 
 /* global Float32Array */
 
-import Geom from 'gl-geometry';
-import Shader from 'gl-shader';
+import geom from 'gl-geometry';
+import shader from 'gl-shader';
 import FBO from 'gl-fbo';
 import triangle from 'a-big-triangle';
 import ndarray from 'ndarray';
@@ -36,12 +36,15 @@ export class Particles {
         this.shape = (options.shape || [64, 64]);
         this.geomShape = (options.geomShape || [...this.shape]);
 
-        this.logic = Shader(gl, logicVert, options.logic);
-        this.render = (options.render || Shader(gl, options.vert, options.frag));
+        this.logic = (options.logic ||
+            shader(gl, (options.logicVert || logicVert), options.logicFrag));
+
+        this.render = (options.render ||
+            shader(gl, options.renderVert, options.renderFrag));
 
         this.logicVertSource = logicVert;
 
-        this.geom = Geom(gl);
+        this.geom = geom(gl);
         this.geom.attr('uv', Particles.generateLUT(this.geomShape),
             { size: 2 });
 

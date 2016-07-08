@@ -11,5 +11,5 @@ void main() {
     // vec4 fragment = fxaa(view, gl_FragCoord.xy, viewSize);
 
     // gl_FragColor = mix(vec4(0.0), fragment, fragment.a*opacity);
-    gl_FragColor = vec4(fragment.rgb, fragment.a*opacity);
+    gl_FragColor = vec4(fragment.rgb, clamp(fragment.a*opacity, 0.0, 1.0));
 }

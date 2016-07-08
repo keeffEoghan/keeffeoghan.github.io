@@ -1,7 +1,7 @@
 /* global Float32Array */
 
-import Shader from 'gl-shader';
-import makeFBO from 'gl-fbo';
+import shader from 'gl-shader';
+import FBO from 'gl-fbo';
 import triangle from 'a-big-triangle';
 import ndarray from 'ndarray';
 
@@ -32,22 +32,19 @@ export class Tendrils {
         this.gl = gl;
         this.state = Object.assign({}, defaultSettings, settings);
 
-        this.flow = makeFBO(this.gl, [1, 1], { float: true });
+        this.flow = FBO(this.gl, [1, 1], { float: true });
 
         // Multiple bufferring
         /**
          * @todo May need more buffers/passes later
          */
-        this.buffers = [
-            makeFBO(this.gl, [1, 1], { float: true }),
-            makeFBO(this.gl, [1, 1], { float: true })
-        ];
+        this.buffers = [FBO(this.gl, [1, 1]), FBO(this.gl, [1, 1])];
 
-
-        this.renderShader = Shader(this.gl, renderVert, renderFrag);
-        this.flowShader = Shader(this.gl, flowVert, flowFrag);
-        this.fadeShader = Shader(this.gl, screenVert, copyFadeFrag);
-
+        this.logicShader = null;
+        this.renderShader = shader(this.gl, renderVert, renderFrag);
+        this.flowShader = shader(this.gl, flowVert, flowFrag);
+        this.fadeShader = shader(this.gl, screenVert, copyFadeFrag);
+        this.spawnShader = shader(this.gl, screenVert, copyFadeFrag);
 
         this.particles = null;
 
@@ -101,9 +98,11 @@ export class Tendrils {
                 // (Vertical neighbours, because WebGL iterates column-major.)
                 geomShape: [shape[0], shape[1]*2],
 
-                logic: logicFrag,
+                logicFrag: logicFrag,
                 render: this.renderShader
             });
+
+        this.logicShader = this.particles.logic;
 
         this.particles.setup(this.state.numBuffers || 2);
     }
@@ -192,6 +191,8 @@ export class Tendrils {
         // Physics
 
         if(!this.state.paused) {
+            this.particles.logic = this.logicShader;
+
             // Disabling blending here is important
             this.gl.disable(this.gl.BLEND);
 
@@ -233,7 +234,13 @@ export class Tendrils {
             },
             this.gl.LINES);
 
-        // @todo Mipmaps for global flow sampling - not working at the moment.
+        /**
+         * @todo Mipmaps for global flow sampling - not working at the moment.
+         * @todo Instead of auto-generating mipmaps, should we re-render at each
+         *       scale, with different opacities and line widths? This would
+         *       mean the influence is spread out when drawing, instead of when
+         *       sampling.
+         */
         // this.flow.color[0].generateMipmap();
 
 
@@ -342,6 +349,29 @@ export class Tendrils {
             this.particles.pixels.lo(...this.respawnOffset)
                 .hi(...this.respawnShape),
             this.respawnOffset);
+    }
+
+
+    // Respawn on the GPU using a given shader
+
+    respawnShader(spawnShader, update) {
+        this.resize(false);
+
+        this.particles.logic = spawnShader;
+
+        // Disabling blending here is important
+        this.gl.disable(this.gl.BLEND);
+
+        this.particles.step(Particles.applyUpdate({
+                ...this.state,
+                viewSize: this.viewSize
+            },
+            update));
+
+        this.particles.logic = this.logicShader;
+
+        this.gl.enable(this.gl.BLEND);
+        this.gl.blendFunc(this.gl.SRC_ALPHA, this.gl.ONE_MINUS_SRC_ALPHA);
     }
 
 
@@ -470,8 +500,7 @@ export const defaultSettings = {
     fadeAlpha: -1,
     speedAlpha: 0.000001,
 
-    respawnAmount: 0.007,
-    respawnTick: 100
+    respawnAmount: 0.1
 };
 
 export const glSettings = {

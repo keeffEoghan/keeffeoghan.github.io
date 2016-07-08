@@ -7,20 +7,20 @@ uniform vec2 dataSize;
 uniform vec2 spawnSize;
 uniform vec2 viewSize;
 
-uniform float time;
+uniform vec2 randomSeed;
 
-#pragma glslify: pick = require('./pick/velocity')
+#pragma glslify: apply = require('./brightest/apply')
+#pragma glslify: pick = require('./brightest/pick')
 #pragma glslify: bestSample = require('./best-sample',pick=pick,samples=3)
-#pragma glslify: uvToPos = require('../map/uv-to-pos')
 
 void main() {
     vec2 uv = gl_FragCoord.xy/dataSize;
     vec2 state = texture2D(particles, uv);
     vec2 best = state;
 
-    vec2 spawnUV = bestSample(best, spawnData, uv*time);
+    vec2 bestUV = bestSample(best, spawnData, uv*randomSeed);
 
     gl_FragColor = ((best === state)?
-            vec4(uvToPos(spawnUV*spawnSize/viewSize), best.zw)
+            apply(best, bestUV, spawnSize, viewSize)
         :   state);
 }
