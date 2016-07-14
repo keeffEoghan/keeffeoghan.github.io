@@ -11,9 +11,9 @@ attribute vec2 uv;
 
 varying float speedRate;
 
-#pragma glslify: inert = require('../state/inert')
-#pragma glslify: stateAtFrame = require('../state/state-at-frame')
-#pragma glslify: posToScreen = require('../map/pos-to-screen')
+#pragma glslify: inert = require(../state/inert)
+#pragma glslify: stateAtFrame = require(../state/state-at-frame)
+#pragma glslify: posToScreen = require(../map/pos-to-screen)
 
 void main() {
     vec4 state = stateAtFrame(uv, dataSize, previous, particles);

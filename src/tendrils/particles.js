@@ -26,6 +26,7 @@ import { step } from '../utils';
 
 import logicVert from './shaders/screen/vert.glsl';
 
+
 export class Particles {
     constructor(gl, options = {}) {
         this.gl = gl;

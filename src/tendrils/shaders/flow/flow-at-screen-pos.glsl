@@ -3,7 +3,7 @@
  * @requires {float} stride The step up to take between each LOD
  */
 
-#pragma glslify: posToUV = require('../map/pos-to-uv')
+#pragma glslify: posToUV = require(../map/pos-to-uv)
 
 /**
  * @return The flow velocity and age for a given screen position, sampling

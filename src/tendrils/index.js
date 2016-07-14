@@ -23,6 +23,7 @@ import screenVert from './shaders/screen/vert.glsl';
 
 import copyFadeFrag from './shaders/copy-fade.frag.glsl';
 
+
 // See the definition in `./shaders/state/inert.glsl`
 const inert = -10000;
 

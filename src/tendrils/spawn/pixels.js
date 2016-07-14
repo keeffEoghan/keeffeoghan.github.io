@@ -10,6 +10,8 @@ import isPlainObject from 'lodash/isPlainObject';
 import spawnVert from '../shaders/screen/vert.glsl';
 import spawnFrag from '../shaders/spawn/frag.glsl';
 
+console.log(spawnFrag);
+
 export const defaults = {
     spawn: {
         vert: spawnVert,
