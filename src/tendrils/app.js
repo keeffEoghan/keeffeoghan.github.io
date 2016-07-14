@@ -13,33 +13,84 @@ export default (canvas, settings, debug) => {
     const gl = glContext(canvas, glSettings,
             (...rest) => tendrils.render(...rest));
 
-    tendrils = new Tendrils(gl, settings);
+    tendrils = new Tendrils(gl, {
+            ...settings,
+            autoClearView: true,
+            showFlow: false
+        });
 
     const state = tendrils.state;
 
-    getUserMedia({
-            video: true,
-            audio: false
-        },
-        (e, stream) => {
-            if(e) {
-                throw e;
-            }
-            else {
-                const video = document.createElement('video');
 
-                video.src = self.URL.createObjectURL(stream);
-                video.play();
 
-                const spawnPixels = new SpawnPixels(gl);
 
-                setInterval(() => {
-                        spawnPixels.setPixels(video);
-                        spawnPixels.respawn(tendrils);
-                    },
-                    500);
-            }
-        });
+
+    const cnvs = document.createElement('canvas');
+    const ctx = cnvs.getContext('2d');
+
+    document.body.appendChild(cnvs);
+
+    ctx.fillStyle = '#fff';
+    ctx.fillRect(0, 0, cnvs.width, cnvs.height);
+
+    ctx.fillStyle = '#000';
+    ctx.fillRect(100, 100, cnvs.width-200, cnvs.height-200);
+
+    const spawnPixels = new SpawnPixels(gl, undefined, [cnvs]);
+
+    // const spawnPixels = new SpawnPixels(gl);
+
+    // spawnPixels.buffer.shape = [cnvs.width, cnvs.height];
+    // spawnPixels.setPixels(cnvs);
+
+    setInterval(() => spawnPixels.respawn(tendrils), 500);
+
+
+
+
+    /**
+     * @todo Seems like this has some issues that differ from the simpler canvas
+     *       demo above:
+     *       - `GL ERROR :GL_INVALID_VALUE : glTexSubImage2D: bad dimensions.`
+     *       - `RENDER WARNING: texture bound to texture unit 1 is not
+     *           renderable. It maybe non-power-of-2 and have incompatible
+     *           texture filtering.`
+     */
+    // function respawnVideo(video) {
+    //     // const spawnPixels = new SpawnPixels(gl, undefined, [video]);
+
+    //     const spawnPixels = new SpawnPixels(gl);
+
+    //     spawnPixels.buffer.shape = [video.width, video.height];
+
+    //     setInterval(() => {
+    //             spawnPixels.setPixels(video);
+    //             spawnPixels.respawn(tendrils);
+    //         },
+    //         500);
+    // }
+
+    // getUserMedia({
+    //         video: true,
+    //         audio: false
+    //     },
+    //     (e, stream) => {
+    //         if(e) {
+    //             throw e;
+    //         }
+    //         else {
+    //             const video = document.createElement('video');
+
+    //             video.src = self.URL.createObjectURL(stream);
+    //             video.play();
+    //             document.body.appendChild(video);
+
+    //             video.addEventListener('canplay', () => respawnVideo(video));
+    //         }
+    //     });
+
+
+
 
     function resize() {
         canvas.width = self.innerWidth;
