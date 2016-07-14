@@ -3,11 +3,11 @@
  * by the `rgba` channels.
  */
 
-#pragma glslify: luma = require('glsl-luma')
+#pragma glslify: luma = require(glsl-luma)
 
-#pragma glslify: uvToPos = require('../../map/uv-to-pos')
+#pragma glslify: uvToPos = require(../../map/uv-to-pos)
 
-const vec4 ratio = vec2(2.0, 1.0, 2.0)/3.0;
+const vec4 ratio = vec4(2.0, 1.0, 2.0, 0.0)/3.0;
 
 vec4 apply(in vec4 data, in vec2 uv, in vec2 dataSize, in vec2 viewSize) {
     return vec4(uvToPos(uv*dataSize/viewSize),

@@ -22,12 +22,12 @@ uniform float forceWeight;
 uniform float flowWeight;
 uniform float wanderWeight;
 
-#pragma glslify: noise = require('glsl-noise/simplex/3d')
+#pragma glslify: noise = require(glsl-noise/simplex/3d)
 
-#pragma glslify: inert = require('./state/inert')
-#pragma glslify: posToScreen = require('./map/pos-to-screen')
-#pragma glslify: pointInBox = require('./bounds/point-in-box')
-#pragma glslify: flowAtScreenPos = require('./flow/flow-at-screen-pos',levels=1.0,stride=1.0)
+#pragma glslify: inert = require(./state/inert)
+#pragma glslify: posToScreen = require(./map/pos-to-screen)
+#pragma glslify: pointInBox = require(./bounds/point-in-box)
+#pragma glslify: flowAtScreenPos = require(./flow/flow-at-screen-pos,levels=1.0,stride=1.0)
 
 
 void main() {

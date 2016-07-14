@@ -34,7 +34,7 @@ Tendrils:
         - Need to [resolve installation bug first](https://github.com/hughsk/glslify-optimize/issues/2)
 
 
-# Spatial spawn:
+# Spatial spawn
 
 - GPU: N-tries at randomly selecting a pixel that passes filter test
     - Spawn texture

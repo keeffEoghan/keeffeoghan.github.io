@@ -17,25 +17,29 @@ export default (canvas, settings, debug) => {
 
     const state = tendrils.state;
 
-    getUserMedia((e, stream) => {
-        if(e) {
-            throw e;
-        }
-        else {
-            const video = document.createElement('video');
+    getUserMedia({
+            video: true,
+            audio: false
+        },
+        (e, stream) => {
+            if(e) {
+                throw e;
+            }
+            else {
+                const video = document.createElement('video');
 
-            video.src = window.URL.createObjectURL(stream);
-            video.play();
+                video.src = self.URL.createObjectURL(stream);
+                video.play();
 
-            const spawnPixels = new SpawnPixels(gl);
+                const spawnPixels = new SpawnPixels(gl);
 
-            setInterval(() => {
-                    spawnPixels.setPixels(video);
-                    spawnPixels.respawn(tendrils);
-                },
-                500);
-        }
-    });
+                setInterval(() => {
+                        spawnPixels.setPixels(video);
+                        spawnPixels.respawn(tendrils);
+                    },
+                    500);
+            }
+        });
 
     function resize() {
         canvas.width = self.innerWidth;

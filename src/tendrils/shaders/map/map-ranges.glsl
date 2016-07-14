@@ -6,7 +6,7 @@
  *       import multiple versions of this function)
  */
 
-#pragma glslify: map = require('glsl-map')
+#pragma glslify: map = require(glsl-map)
 
 vec2 mapper(in vec2 value) {
     return map(value, from.xy, from.zw, to.xy, to.zw);

@@ -16,9 +16,9 @@ attribute vec2 uv;
 
 varying vec4 color;
 
-#pragma glslify: inert = require('../state/inert')
-#pragma glslify: stateForFrame = require('../state/state-at-frame')
-#pragma glslify: posToScreen = require('../map/pos-to-screen')
+#pragma glslify: inert = require(../state/inert)
+#pragma glslify: stateForFrame = require(../state/state-at-frame)
+#pragma glslify: posToScreen = require(../map/pos-to-screen)
 
 void main() {
     vec4 state = stateForFrame(uv, dataSize, previous, data);

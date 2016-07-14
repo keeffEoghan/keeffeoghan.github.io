@@ -3,7 +3,7 @@
  * @requires {const int} samples The number of samples to take
  */
 
-#pragma glslify: noise = require('glsl-noise/simplex/2d')
+#pragma glslify: noise = require(glsl-noise/simplex/2d)
 
 const vec2 noUV = vec2(-1.0);
 
@@ -20,7 +20,7 @@ vec2 bestSample(inout vec4 best, in sampler2D data, in vec2 seed) {
             1.0);
         vec4 value = pick(best, texture2D(data, uv));
 
-        bestUV = ((value === best)? bestUV : uv);
+        bestUV = ((value == best)? bestUV : uv);
         best = value;
     }
 
