@@ -3,40 +3,28 @@
  * Tendrils `respawnShader` function.
  */
 
-import FBO from 'gl-fbo';
+import texture from 'gl-texture2d';
 import shader from 'gl-shader';
-import isPlainObject from 'lodash/isPlainObject';
+import isArray from 'lodash/isArray';
 
 import spawnVert from '../shaders/screen/vert.glsl';
 import spawnFrag from '../shaders/spawn/frag.glsl';
 
-console.log(spawnFrag);
-
 export const defaults = {
-    spawn: {
-        vert: spawnVert,
-        frag: spawnFrag
-    },
-    buffer: {
-        shape: [1, 1],
-        float: true
-    }
+    spawn: [spawnVert, spawnFrag],
+    buffer: [[1, 1]]
 };
 
 export class SpawnPixels {
     constructor(gl, spawn = defaults.spawn, buffer = defaults.buffer) {
         this.gl = gl;
 
-        this.spawn = (isPlainObject(spawn)?
-                shader(this.gl, spawn.vert, spawn.frag)
-            :   spawn);
+        this.spawn = ((isArray(spawn))? shader(this.gl, ...spawn) : spawn);
 
-        this.buffer = ((isPlainObject(buffer))?
-                FBO(this.gl, buffer.shape, buffer)
-            :   buffer);
+        this.buffer = ((isArray(buffer))? texture(this.gl, ...buffer) : buffer);
 
         this.update = (uniforms) => Object.assign(uniforms, {
-                spawnData: this.buffer.color[0].bind(1),
+                spawnData: this.buffer.bind(1),
                 spawnSize: this.buffer.shape,
                 randomSeed: [Math.random(), Math.random()]
             });
@@ -47,7 +35,7 @@ export class SpawnPixels {
     }
 
     setPixels(pixels) {
-        return this.buffer.color[0].setPixels(pixels);
+        return this.buffer.setPixels(pixels);
     }
 }
 
