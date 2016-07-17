@@ -4,6 +4,7 @@
  */
 
 import texture from 'gl-texture2d';
+// import FBO from 'gl-fbo';
 import shader from 'gl-shader';
 import isArray from 'lodash/isArray';
 
@@ -13,6 +14,7 @@ import spawnFrag from '../shaders/spawn/frag.glsl';
 export const defaults = {
     spawn: [spawnVert, spawnFrag],
     buffer: [[1, 1]]
+    // buffer: [[1, 1], { float: true }]
 };
 
 export class SpawnPixels {
@@ -22,11 +24,12 @@ export class SpawnPixels {
         this.spawn = ((isArray(spawn))? shader(this.gl, ...spawn) : spawn);
 
         this.buffer = ((isArray(buffer))? texture(this.gl, ...buffer) : buffer);
+        // this.buffer = ((isArray(buffer))? FBO(this.gl, ...buffer) : buffer);
 
         this.update = (uniforms) => Object.assign(uniforms, {
                 spawnData: this.buffer.bind(1),
-                spawnSize: this.buffer.shape,
-                randomSeed: [Math.random(), Math.random()]
+                // spawnData: this.buffer.color[0].bind(1),
+                spawnSize: this.buffer.shape
             });
     }
 
@@ -36,6 +39,7 @@ export class SpawnPixels {
 
     setPixels(pixels) {
         return this.buffer.setPixels(pixels);
+        // return this.buffer.color[0].setPixels(pixels);
     }
 }
 

@@ -2,11 +2,8 @@
  * Use the pixel position, and the particle velocity.
  * Same data structure as the particles.
  */
-
-#pragma glslify: uvToPos = require(../../map/uv-to-pos)
-
-vec4 apply(in vec4 data, in vec2 uv, in vec2 dataSize, in vec2 viewSize) {
-    return vec4(uvToPos(uv*dataSize/viewSize), data.zw);
+vec4 apply(in vec2 pos, in vec4 state) {
+    return vec4(pos, state.zw);
 }
 
 #pragma glslify: export(apply)

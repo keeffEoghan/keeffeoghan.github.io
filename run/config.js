@@ -190,7 +190,6 @@ module.exports = {
                     postLoaders: [
                         {
                             test: /\.js$/,
-                            exclude: /node_modules/,
                             loader: 'ify'
                         }
                     ]

@@ -26,7 +26,6 @@ uniform float wanderWeight;
 
 #pragma glslify: inert = require(./state/inert)
 #pragma glslify: posToScreen = require(./map/pos-to-screen)
-#pragma glslify: pointInBox = require(./bounds/point-in-box)
 #pragma glslify: flowAtScreenPos = require(./flow/flow-at-screen-pos,levels=1.0,stride=1.0)
 
 
@@ -71,19 +70,6 @@ void main() {
 
         // Integrate motion
         newPos = pos+newVel;
-
-
-        // Reset out-of-bounds particles - marking them inert if outside
-        /**
-         * @todo Respawn instead/as well?
-         * @todo Move respawn logic to a separate shader, to be handled in its
-         *       own pass
-         */
-
-        // vec2 boundSize = viewSize/viewSize.y;
-
-        // newPos = ((pointInBox(newPos, vec4(-boundSize, boundSize)) > 0.0)?
-        //     newPos : inert);
     }
 
     gl_FragColor = vec4(newPos, newVel);

@@ -2,6 +2,7 @@ import glContext from 'gl-context';
 import getUserMedia from 'getusermedia';
 import throttle from 'lodash/throttle';
 import dat from 'dat-gui';
+import displayTexture from 'gl-texture2d-display';
 
 import SpawnPixels from './spawn/pixels';
 
@@ -28,13 +29,29 @@ export default (canvas, settings, debug) => {
     const cnvs = document.createElement('canvas');
     const ctx = cnvs.getContext('2d');
 
+    Object.assign(cnvs.style, {
+            'top': '50%',
+            'left': '50%',
+            'transform': 'translate(-50%, -50%)',
+            'opacity': 0.5
+        });
+
     document.body.appendChild(cnvs);
 
-    ctx.fillStyle = '#fff';
-    ctx.fillRect(0, 0, cnvs.width, cnvs.height);
+    const centre = [canvas.width*0.5, canvas.height*0.5];
 
     ctx.fillStyle = '#000';
-    ctx.fillRect(100, 100, cnvs.width-200, cnvs.height-200);
+    ctx.fillRect(0, 0, cnvs.width, cnvs.height);
+
+    ctx.fillStyle = '#fff';
+    ctx.beginPath();
+    ctx.arc(...centre, Math.min(...centre), 0, Math.PI*2);
+    ctx.fill();
+
+    ctx.fillStyle = '#000';
+    ctx.beginPath();
+    ctx.arc(...centre, 0.3*Math.min(...centre), 0, Math.PI*2);
+    ctx.fill();
 
     const spawnPixels = new SpawnPixels(gl, undefined, [cnvs]);
 
@@ -43,7 +60,12 @@ export default (canvas, settings, debug) => {
     // spawnPixels.buffer.shape = [cnvs.width, cnvs.height];
     // spawnPixels.setPixels(cnvs);
 
-    setInterval(() => spawnPixels.respawn(tendrils), 500);
+    setInterval(() => {
+            spawnPixels.respawn(tendrils);
+            // displayTexture(tendrils.particles.buffers[0].color[0]);
+            // displayTexture(spawnPixels.buffer);
+        },
+        1000);
 
 
 
