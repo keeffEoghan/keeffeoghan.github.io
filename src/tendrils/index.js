@@ -210,6 +210,8 @@ export class Tendrils {
             this.gl.blendFunc(this.gl.SRC_ALPHA, this.gl.ONE_MINUS_SRC_ALPHA);
         }
 
+        // return;
+
 
         // Flow FBO and view renders
 
