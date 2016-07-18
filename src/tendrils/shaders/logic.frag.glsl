@@ -24,9 +24,9 @@ uniform float wanderWeight;
 
 #pragma glslify: noise = require(glsl-noise/simplex/3d)
 
-#pragma glslify: inert = require(./state/inert)
+#pragma glslify: inert = require(./const/inert)
 #pragma glslify: posToScreen = require(./map/pos-to-screen)
-#pragma glslify: flowAtScreenPos = require(./flow/flow-at-screen-pos,levels=1.0,stride=1.0)
+#pragma glslify: flowAtScreenPos = require(./flow/flow-at-screen-pos, levels = 1.0, stride = 1.0)
 
 
 void main() {
@@ -41,8 +41,12 @@ void main() {
 
     if(pos != inert) {
         // Wander force
-        vec2 wanderForce = vec2(noise(vec3(pos*noiseScale, uv.x+(time*noiseSpeed))),
-                noise(vec3(pos*noiseScale, uv.y+(time*noiseSpeed)+1234.5)));
+
+        vec2 noisePos = pos*noiseScale;
+        float noiseTime = time*noiseSpeed;
+
+        vec2 wanderForce = vec2(noise(vec3(noisePos, uv.x+noiseTime)),
+                noise(vec3(noisePos, uv.y+noiseTime+1234.5)));
 
 
         // Flow force - left by preceeding particles

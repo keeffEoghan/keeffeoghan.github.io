@@ -5,7 +5,7 @@
 
 #pragma glslify: random = require(glsl-random)
 
-#pragma glslify: inert = require(../state/inert)
+#pragma glslify: inert = require(../const/inert)
 #pragma glslify: nilish = require(../utils/nilish)
 
 /**

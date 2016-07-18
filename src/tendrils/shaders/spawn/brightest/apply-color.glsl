@@ -5,11 +5,12 @@
 
 #pragma glslify: luma = require(glsl-luma)
 
-const vec4 ratio = vec4(2.0, 1.0, 2.0, 0.0)/3.0;
+#pragma glslify: tau = require(../../const/tau)
+#pragma glslify: angleToPos = require(../../utils/angle-to-pos)
 
 vec4 apply(in vec2 uv, in vec2 pos, in vec4 state) {
     return vec4(pos,
-        vec2(dot(state.rg, ratio.rg), dot(state.gb, ratio.gb))*
+        vec2(angleToPos((state.r+state.g+state.b)/3.0*tau))*
             luma(state)*state.a);
 }
 
