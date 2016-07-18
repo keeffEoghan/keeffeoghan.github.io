@@ -24,8 +24,8 @@ import screenVert from './shaders/screen/vert.glsl';
 import copyFadeFrag from './shaders/copy-fade.frag.glsl';
 
 
-// See the definition in `./shaders/state/inert.glsl`
-const inert = -10000;
+// See the definition in `./shaders/const/inert.glsl`
+const inert = -1000000;
 
 
 export class Tendrils {
@@ -62,9 +62,6 @@ export class Tendrils {
 
         this.spawnCache = null;
         this.spawnCacheOffset = 0;
-
-        this.setup();
-        this.reset();
     }
 
     setup(...rest) {
@@ -73,10 +70,10 @@ export class Tendrils {
         // this.setupSpawnCache(...rest);
     }
 
-    reset(...rest) {
-        this.resetParticles(...rest);
-        this.setupRespawn(...rest);
-        // this.resetSpawnCache(...rest);
+    reset() {
+        this.resetParticles();
+        this.setupRespawn();
+        // this.resetSpawnCache();
     }
 
     // @todo
@@ -336,6 +333,11 @@ export class Tendrils {
         return (state.autoClearView || state.fadeAlpha < 0);
     }
 
+
+    /**
+     * @todo Move all this respawn stuff to other modules - too many different
+     *       kinds to cater for in here.
+     */
 
     // Respawn
 

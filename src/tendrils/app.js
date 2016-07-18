@@ -30,21 +30,29 @@ export default (canvas, settings, debug) => {
     const cnvs = document.createElement('canvas');
     const ctx = cnvs.getContext('2d');
 
-    Object.assign(cnvs.style, {
-            top: '50%',
-            left: '50%',
-            transform: 'translate(-50%, -50%)',
-            opacity: 0.5,
-            backgroundColor: 'rgba(255, 0, 0, 0.2)'
-        });
+    cnvs.width = 500;
+    cnvs.height = 800;
 
-    document.body.appendChild(cnvs);
-
-    const centre = [canvas.width*0.5, canvas.height*0.5];
+    const centre = [cnvs.width*0.5, cnvs.height*0.5];
 
     ctx.fillStyle = '#fff';
     ctx.beginPath();
-    ctx.arc(...centre, Math.min(...centre), 0, Math.PI*2);
+    ctx.arc(...centre, Math.max(...centre), 0, Math.PI*2);
+    ctx.fill();
+
+    ctx.fillStyle = '#000';
+    ctx.beginPath();
+    ctx.arc(...centre, Math.max(...centre)*0.75, 0, Math.PI*2);
+    ctx.fill();
+
+    ctx.fillStyle = '#fff';
+    ctx.beginPath();
+    ctx.arc(...centre, Math.max(...centre)*0.5, 0, Math.PI*2);
+    ctx.fill();
+
+    ctx.fillStyle = '#000';
+    ctx.beginPath();
+    ctx.arc(...centre, Math.max(...centre)*0.25, 0, Math.PI*2);
     ctx.fill();
 
     const spawnPixels = new SpawnPixels(gl, undefined, [cnvs]);
@@ -55,6 +63,7 @@ export default (canvas, settings, debug) => {
     // spawnPixels.setPixels(cnvs);
 
     setInterval(() => {
+            console.log('spawning');
             spawnPixels.respawn(tendrils);
             // displayTexture(tendrils.particles.buffers[0].color[0]);
             // displayTexture(spawnPixels.buffer);
@@ -117,7 +126,9 @@ export default (canvas, settings, debug) => {
         false);
 
     resize();
-    tendrils.restart();
+    tendrils.setup();
+    tendrils.resetParticles(tendrils.inert);
+    // tendrils.restart();
 
 
     if(debug) {

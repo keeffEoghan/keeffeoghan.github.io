@@ -10,11 +10,11 @@ uniform vec2 viewSize;
 #pragma glslify: pick = require(./simple/pick)
 #pragma glslify: bestSample = require(./best-sample, pick = pick, samples = 3)
 
-#pragma glslify: apply = require(./brightest/apply-brightest)
+#pragma glslify: apply = require(./simple/apply)
 
 #pragma glslify: uvToPos = require(../map/uv-to-pos)
 #pragma glslify: screenToPos = require(../map/screen-to-pos)
-#pragma glslify: inert = require(../state/inert)
+#pragma glslify: inert = require(../const/inert)
 #pragma glslify: nilish = require(../utils/nilish)
 
 void main() {
@@ -26,7 +26,8 @@ void main() {
 
     vec2 bestUV = bestSample(best, spawnData);
 
-    gl_FragColor = ((nilish(bestUV-inert))? state
+    gl_FragColor = ((nilish(bestUV-inert))?
+            state
         :   apply(bestUV,
                 uvToPos(bestUV)*screenToPos(spawnSize/viewSize, viewSize),
                 best));
