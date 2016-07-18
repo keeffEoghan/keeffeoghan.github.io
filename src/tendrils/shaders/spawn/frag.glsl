@@ -8,22 +8,26 @@ uniform vec2 spawnSize;
 uniform vec2 viewSize;
 
 #pragma glslify: pick = require(./simple/pick)
-#pragma glslify: bestSample = require(./best-sample,pick=pick,samples=1)
-#pragma glslify: apply = require(./simple/apply)
-#pragma glslify: uvToPos = require(../map/uv-to-pos)
-#pragma glslify: length2 = require(../utils/length-2)
+#pragma glslify: bestSample = require(./best-sample, pick = pick, samples = 3)
 
-const float eps = 0.01;
+#pragma glslify: apply = require(./brightest/apply-brightest)
+
+#pragma glslify: uvToPos = require(../map/uv-to-pos)
+#pragma glslify: screenToPos = require(../map/screen-to-pos)
+#pragma glslify: inert = require(../state/inert)
+#pragma glslify: nilish = require(../utils/nilish)
 
 void main() {
     vec2 uv = gl_FragCoord.xy/dataSize;
     vec4 state = texture2D(particles, uv);
-    vec4 best = state;
-    // vec4 best = vec4(10000.0);
 
-    vec2 bestUV = bestSample(best, state.xy, spawnData);
+    vec4 start = state;
+    vec4 best = start;
 
-    gl_FragColor = ((length2(best-state) < eps)? state
-        // :   apply(uvToPos(bestUV*spawnSize/viewSize), best));
-        :   apply(bestUV*spawnSize/viewSize, best));
+    vec2 bestUV = bestSample(best, spawnData);
+
+    gl_FragColor = ((nilish(bestUV-inert))? state
+        :   apply(bestUV,
+                uvToPos(bestUV)*screenToPos(spawnSize/viewSize, viewSize),
+                best));
 }
