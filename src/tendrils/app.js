@@ -17,7 +17,8 @@ export default (canvas, settings, debug) => {
     tendrils = new Tendrils(gl, {
             ...settings,
             autoClearView: true,
-            showFlow: false
+            showFlow: false,
+            color: [1, 1, 1, 0.5]
         });
 
     const state = tendrils.state;
@@ -30,27 +31,20 @@ export default (canvas, settings, debug) => {
     const ctx = cnvs.getContext('2d');
 
     Object.assign(cnvs.style, {
-            'top': '50%',
-            'left': '50%',
-            'transform': 'translate(-50%, -50%)',
-            'opacity': 0.5
+            top: '50%',
+            left: '50%',
+            transform: 'translate(-50%, -50%)',
+            opacity: 0.5,
+            backgroundColor: 'rgba(255, 0, 0, 0.2)'
         });
 
     document.body.appendChild(cnvs);
 
     const centre = [canvas.width*0.5, canvas.height*0.5];
 
-    ctx.fillStyle = '#000';
-    ctx.fillRect(0, 0, cnvs.width, cnvs.height);
-
     ctx.fillStyle = '#fff';
     ctx.beginPath();
     ctx.arc(...centre, Math.min(...centre), 0, Math.PI*2);
-    ctx.fill();
-
-    ctx.fillStyle = '#000';
-    ctx.beginPath();
-    ctx.arc(...centre, 0.3*Math.min(...centre), 0, Math.PI*2);
     ctx.fill();
 
     const spawnPixels = new SpawnPixels(gl, undefined, [cnvs]);

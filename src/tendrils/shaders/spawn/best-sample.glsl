@@ -5,7 +5,8 @@
 
 #pragma glslify: random = require(glsl-random)
 
-const vec2 nullUV = vec2(-1.0);
+#pragma glslify: inert = require(../state/inert)
+#pragma glslify: nilish = require(../utils/nilish)
 
 /**
  * Tries a number of times to randomly select a pixel scored highest by a given
@@ -14,20 +15,19 @@ const vec2 nullUV = vec2(-1.0);
 
 vec2 bestSample(inout vec4 best, in vec2 bestUV, in sampler2D data) {
     for(int n = 0; n < samples; ++n) {
-        float f = float(n);
-        vec2 uv = mod(vec2(random(vec2(best.xy*f)), random(vec2(best.zw*f))),
-                1.0);
-        vec4 value = pick(best, texture2D(data, uv));
+        vec2 off = vec2(float(n));
+        vec2 uv = mod(vec2(random(best.xz+off), random(best.yw+off)), 1.0);
+        vec4 next = pick(best, texture2D(data, uv));
 
-        bestUV = ((value == best)? bestUV : uv);
-        best = value;
+        bestUV = ((nilish(next-best))? bestUV : uv);
+        best = next;
     }
 
     return bestUV;
 }
 
 vec2 bestSample(inout vec4 best, in sampler2D data) {
-    return bestSample(best, nullUV, data);
+    return bestSample(best, inert, data);
 }
 
 #pragma glslify: export(bestSample)
