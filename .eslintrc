@@ -33,13 +33,7 @@
             }
         ],
         "no-undef": "error",
-        "no-unused-vars": [
-            "error",
-            {
-                "vars": "all",
-                "args": "all"
-            }
-        ],
+        "no-unused-vars": "error",
         "no-unused-expressions": [
             "error",
             {

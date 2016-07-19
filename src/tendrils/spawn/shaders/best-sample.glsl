@@ -5,8 +5,8 @@
 
 #pragma glslify: random = require(glsl-random)
 
-#pragma glslify: inert = require(../const/inert)
-#pragma glslify: nilish = require(../utils/nilish)
+#pragma glslify: inert = require(../../shaders/const/inert)
+#pragma glslify: nilish = require(../../shaders/utils/nilish)
 
 /**
  * Tries a number of times to randomly select a pixel scored highest by a given

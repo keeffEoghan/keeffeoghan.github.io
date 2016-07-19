@@ -5,17 +5,19 @@
 
 const glslify = require('glslify');
 const path = require('path');
+const readJSON = require('read-package-json');
 
-module.exports = function(source) {
+let queue = [];
+let config = null;
+
+function load(source, callback) {
     const basedir = path.dirname(this.resourcePath);
-    const callback = this.async();
 
-    this.cacheable(true);
-
-    glslify.bundle(source, {
-            inline: true,
-            basedir
-        },
+    glslify.bundle(source, Object.assign({
+                inline: true,
+                basedir
+            },
+            config.glslify),
         (err, src, files) => {
             if(files) {
                 files.forEach((file) => this.addDependency(file));
@@ -23,4 +25,31 @@ module.exports = function(source) {
 
             return callback(err, src);
         });
+}
+
+readJSON('package.json', console.warn, (e, data) => {
+        if(e) {
+            console.error(e);
+        }
+        else {
+            config = data;
+
+            while(queue.length) {
+                queue.pop()();
+            }
+        }
+    });
+
+module.exports = function(source) {
+    const callback = this.async();
+    const go = load.bind(this, source, callback);
+
+    this.cacheable(true);
+
+    if(config) {
+        go();
+    }
+    else {
+        queue.push(go);
+    }
 };

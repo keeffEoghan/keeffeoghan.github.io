@@ -10,12 +10,12 @@ import mat3 from 'gl-matrix/src/gl-matrix/mat3';
 import isArray from 'lodash/isArray';
 
 import spawnVert from '../shaders/screen/vert.glsl';
-import spawnFrag from '../shaders/spawn/frag.glsl';
+import spawnFrag from './shaders/frag.glsl';
 
 export const defaults = {
     spawn: [spawnVert, spawnFrag],
-    buffer: [[1, 1]]
-    // buffer: [[1, 1], { float: true }]
+    // buffer: [[1, 1]]
+    buffer: [[1, 1], { float: true }]
 };
 
 export class SpawnPixels {
