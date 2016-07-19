@@ -3,6 +3,7 @@ import getUserMedia from 'getusermedia';
 import throttle from 'lodash/throttle';
 import dat from 'dat-gui';
 import displayTexture from 'gl-texture2d-display';
+import mat3 from 'gl-matrix/src/gl-matrix/mat3';
 
 import SpawnPixels from './spawn/pixels';
 
@@ -30,12 +31,12 @@ export default (canvas, settings, debug) => {
     const cnvs = document.createElement('canvas');
     const ctx = cnvs.getContext('2d');
 
-    cnvs.width = 500;
-    cnvs.height = 800;
+    cnvs.width = 300;
+    cnvs.height = 400;
 
     const centre = [cnvs.width*0.5, cnvs.height*0.5];
 
-    ctx.fillStyle = '#fff';
+    ctx.fillStyle = '#010';
     ctx.beginPath();
     ctx.arc(...centre, Math.max(...centre), 0, Math.PI*2);
     ctx.fill();
@@ -45,7 +46,7 @@ export default (canvas, settings, debug) => {
     ctx.arc(...centre, Math.max(...centre)*0.75, 0, Math.PI*2);
     ctx.fill();
 
-    ctx.fillStyle = '#fff';
+    ctx.fillStyle = '#010';
     ctx.beginPath();
     ctx.arc(...centre, Math.max(...centre)*0.5, 0, Math.PI*2);
     ctx.fill();
@@ -55,12 +56,16 @@ export default (canvas, settings, debug) => {
     ctx.arc(...centre, Math.max(...centre)*0.25, 0, Math.PI*2);
     ctx.fill();
 
-    const spawnPixels = new SpawnPixels(gl, undefined, [cnvs]);
+    // const spawnPixels = new SpawnPixels(gl, undefined, [cnvs]);
 
-    // const spawnPixels = new SpawnPixels(gl);
+    const spawnPixels = new SpawnPixels(gl);
 
-    // spawnPixels.buffer.shape = [cnvs.width, cnvs.height];
-    // spawnPixels.setPixels(cnvs);
+    spawnPixels.buffer.shape = [cnvs.width, cnvs.height];
+    spawnPixels.setPixels(cnvs);
+
+    // mat3.rotate(spawnPixels.spawnMatrix, spawnPixels.spawnMatrix, Math.PI/10);
+    mat3.scale(spawnPixels.spawnMatrix, spawnPixels.spawnMatrix, [1.5, 0.5]);
+    mat3.translate(spawnPixels.spawnMatrix, spawnPixels.spawnMatrix, [-0.3, 0.4]);
 
     setInterval(() => {
             console.log('spawning');

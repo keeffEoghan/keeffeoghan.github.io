@@ -13,7 +13,7 @@
  * function.
  */
 
-vec2 bestSample(inout vec4 best, in vec2 bestUV, in sampler2D data) {
+vec2 bestSample(in sampler2D data, inout vec4 best, in vec2 bestUV) {
     for(int n = 0; n < samples; ++n) {
         vec2 off = vec2(float(n));
         vec2 uv = mod(vec2(random(best.xz+off), random(best.yw+off)), 1.0);
@@ -26,8 +26,8 @@ vec2 bestSample(inout vec4 best, in vec2 bestUV, in sampler2D data) {
     return bestUV;
 }
 
-vec2 bestSample(inout vec4 best, in sampler2D data) {
-    return bestSample(best, inert, data);
+vec2 bestSample(in sampler2D data, inout vec4 best) {
+    return bestSample(data, best, inert);
 }
 
 #pragma glslify: export(bestSample)
