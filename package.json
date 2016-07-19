@@ -22,6 +22,7 @@
     "gl-context": "^0.1.1",
     "gl-fbo": "^2.0.5",
     "gl-geometry": "^1.3.0",
+    "gl-matrix": "^2.3.2",
     "gl-shader": "^4.2.0",
     "gl-texture2d": "^2.0.10",
     "gl-texture2d-display": "^1.0.0",
