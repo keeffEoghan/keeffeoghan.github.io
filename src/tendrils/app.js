@@ -25,59 +25,6 @@ export default (canvas, settings, debug) => {
     const state = tendrils.state;
 
 
-
-
-
-    const cnvs = document.createElement('canvas');
-    const ctx = cnvs.getContext('2d');
-
-    cnvs.width = 300;
-    cnvs.height = 400;
-
-    const centre = [cnvs.width*0.5, cnvs.height*0.5];
-
-    ctx.fillStyle = '#010';
-    ctx.beginPath();
-    ctx.arc(...centre, Math.max(...centre), 0, Math.PI*2);
-    ctx.fill();
-
-    ctx.fillStyle = '#000';
-    ctx.beginPath();
-    ctx.arc(...centre, Math.max(...centre)*0.75, 0, Math.PI*2);
-    ctx.fill();
-
-    ctx.fillStyle = '#010';
-    ctx.beginPath();
-    ctx.arc(...centre, Math.max(...centre)*0.5, 0, Math.PI*2);
-    ctx.fill();
-
-    ctx.fillStyle = '#000';
-    ctx.beginPath();
-    ctx.arc(...centre, Math.max(...centre)*0.25, 0, Math.PI*2);
-    ctx.fill();
-
-    // const spawnPixels = new SpawnPixels(gl, undefined, [cnvs]);
-
-    const spawnPixels = new SpawnPixels(gl);
-
-    spawnPixels.buffer.shape = [cnvs.width, cnvs.height];
-    spawnPixels.setPixels(cnvs);
-
-    // mat3.rotate(spawnPixels.spawnMatrix, spawnPixels.spawnMatrix, Math.PI/10);
-    mat3.scale(spawnPixels.spawnMatrix, spawnPixels.spawnMatrix, [1.5, 0.5]);
-    mat3.translate(spawnPixels.spawnMatrix, spawnPixels.spawnMatrix, [-0.3, 0.4]);
-
-    setInterval(() => {
-            console.log('spawning');
-            spawnPixels.respawn(tendrils);
-            // displayTexture(tendrils.particles.buffers[0].color[0]);
-            // displayTexture(spawnPixels.buffer);
-        },
-        1000);
-
-
-
-
     /**
      * @todo Seems like this has some issues that differ from the simpler canvas
      *       demo above:
@@ -86,38 +33,35 @@ export default (canvas, settings, debug) => {
      *           renderable. It maybe non-power-of-2 and have incompatible
      *           texture filtering.`
      */
-    // function respawnVideo(video) {
-    //     // const spawnPixels = new SpawnPixels(gl, undefined, [video]);
+    function respawnVideo(video) {
+        const spawnPixels = new SpawnPixels(gl);
 
-    //     const spawnPixels = new SpawnPixels(gl);
+        spawnPixels.buffer.shape = [video.videoWidth, video.videoHeight];
+        mat3.scale(spawnPixels.spawnMatrix, spawnPixels.spawnMatrix, [-1.5, 1.5])
 
-    //     spawnPixels.buffer.shape = [video.width, video.height];
+        setInterval(() => {
+                spawnPixels.setPixels(video);
+                spawnPixels.respawn(tendrils);
+            },
+            800);
+    }
 
-    //     setInterval(() => {
-    //             spawnPixels.setPixels(video);
-    //             spawnPixels.respawn(tendrils);
-    //         },
-    //         500);
-    // }
+    getUserMedia({
+            video: true,
+            audio: false
+        },
+        (e, stream) => {
+            if(e) {
+                throw e;
+            }
+            else {
+                const video = document.createElement('video');
 
-    // getUserMedia({
-    //         video: true,
-    //         audio: false
-    //     },
-    //     (e, stream) => {
-    //         if(e) {
-    //             throw e;
-    //         }
-    //         else {
-    //             const video = document.createElement('video');
-
-    //             video.src = self.URL.createObjectURL(stream);
-    //             video.play();
-    //             document.body.appendChild(video);
-
-    //             video.addEventListener('canplay', () => respawnVideo(video));
-    //         }
-    //     });
+                video.src = self.URL.createObjectURL(stream);
+                video.play();
+                video.addEventListener('canplay', () => respawnVideo(video));
+            }
+        });
 
 
 
@@ -133,7 +77,7 @@ export default (canvas, settings, debug) => {
     resize();
     tendrils.setup();
     tendrils.resetParticles(tendrils.inert);
-    // tendrils.restart();
+    tendrils.restart();
 
 
     if(debug) {
