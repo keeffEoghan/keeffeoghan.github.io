@@ -24,7 +24,7 @@ uniform float wanderWeight;
 
 #pragma glslify: noise = require(glsl-noise/simplex/3d)
 
-#pragma glslify: inert = require(./const/inert)
+#pragma glslify: inert = require(../utils/inert)
 #pragma glslify: posToScreen = require(./map/pos-to-screen)
 #pragma glslify: flowAtScreenPos = require(./flow/flow-at-screen-pos, levels = 1.0, stride = 1.0)
 

@@ -2,7 +2,6 @@ import glContext from 'gl-context';
 import getUserMedia from 'getusermedia';
 import throttle from 'lodash/throttle';
 import dat from 'dat-gui';
-import displayTexture from 'gl-texture2d-display';
 import mat3 from 'gl-matrix/src/gl-matrix/mat3';
 
 import SpawnPixels from './spawn/pixels';
@@ -70,7 +69,7 @@ export default (canvas, settings, debug) => {
 
     resize();
     tendrils.setup();
-    tendrils.resetParticles(tendrils.inert);
+    tendrils.resetParticles();
     // tendrils.restart();
 
 
@@ -248,8 +247,6 @@ export default (canvas, settings, debug) => {
                             flowDecay: 0.004,
                             forceWeight: 0.015,
                             wanderWeight: 0,
-                            startRadius: 0.6,
-                            startSpeed: -0.06,
                             speedAlpha: 0,
                             fadeAlpha: (1000/60)-0.000001,
                             respawnAmount: 0.03,
@@ -276,8 +273,6 @@ export default (canvas, settings, debug) => {
                             flowWeight: 0,
                             wanderWeight: 0.002,
                             noiseSpeed: 0,
-                            startRadius: 0.5,
-                            startSpeed: 0,
                             speedAlpha: 0
                         });
 
@@ -295,8 +290,6 @@ export default (canvas, settings, debug) => {
                 },
                 'Sea': () => {
                     Object.assign(state, defaultSettings, {
-                            startRadius: 1.77,
-                            startSpeed: -0.0001,
                             flowWidth: 5,
                             forceWeight: 0.015,
                             wanderWeight: 0.0014,
@@ -319,8 +312,6 @@ export default (canvas, settings, debug) => {
                 },
                 'Mad styles': () => {
                     Object.assign(state, defaultSettings, {
-                            startRadius: 0.1,
-                            startSpeed: 0.05
                         });
 
                     tendrils.restart();
@@ -348,8 +339,6 @@ export default (canvas, settings, debug) => {
                 'Turbulent': () => {
                     Object.assign(state, defaultSettings, {
                             autoClearView: false,
-                            startRadius: 0.1,
-                            startSpeed: 0,
                             noiseSpeed: 0.00001,
                             noiseScale: 18,
                             forceWeight: 0.014,
@@ -373,8 +362,6 @@ export default (canvas, settings, debug) => {
                 'Roots': () => {
                     Object.assign(state, defaultSettings, {
                             autoClearView: false,
-                            startRadius: 0.1,
-                            startSpeed: 0,
                             flowDecay: 0,
                             noiseSpeed: 0,
                             noiseScale: 18,
@@ -399,8 +386,6 @@ export default (canvas, settings, debug) => {
                     Object.assign(state, defaultSettings, {
                             autoClearView: false,
                             timeStep: 1000/60,
-                            startRadius: 0.1,
-                            startSpeed: 0.01,
                             flowDecay: 0.001,
                             wanderWeight: 0.002,
                             fadeAlpha: (1000/60)-0.000001,

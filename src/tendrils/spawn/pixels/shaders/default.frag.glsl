@@ -7,8 +7,8 @@
 
 precision highp float;
 
+#pragma glslify: apply = require(./particles/apply)
 #pragma glslify: pick = require(./particles/pick)
 #pragma glslify: bestSample = require(./best-sample, pick = pick, samples = 3)
-#pragma glslify: apply = require(./particles/apply)
 
 #pragma glslify: import(./main.frag)

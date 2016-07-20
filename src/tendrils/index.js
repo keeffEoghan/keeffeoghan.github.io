@@ -7,6 +7,7 @@ import ndarray from 'ndarray';
 
 import Particles from './particles';
 import { step/*, nextPow2*/ } from '../utils';
+import spawner from './spawn/inert';
 
 
 // Shaders
@@ -22,10 +23,6 @@ import renderFrag from './shaders/render/frag.glsl';
 import screenVert from './shaders/screen/vert.glsl';
 
 import copyFadeFrag from './shaders/copy-fade.frag.glsl';
-
-
-// See the definition in `./shaders/const/inert.glsl`
-const inert = -1000000;
 
 
 export class Tendrils {
@@ -106,45 +103,8 @@ export class Tendrils {
     }
 
     // Populate the particles with the given spawn function
-    resetParticles(spawn = this.spawn.bind(this)) {
+    resetParticles(spawn = spawner) {
         this.particles.spawn(spawn);
-    }
-
-
-    // Setting particles
-
-    /**
-     * Used in a big loop, so should be optimised.
-     */
-
-    spawn(data) {
-        let radius = this.state.startRadius;
-        let speed = this.state.startSpeed;
-
-        let angle = Math.random()*Math.PI*2;
-        let scaled = Math.random()*radius;
-
-        // Position
-        data[0] = Math.cos(angle)*scaled;
-        data[1] = Math.sin(angle)*scaled;
-
-
-        // Velocity
-
-        angle = Math.random()*Math.PI*2;
-        scaled = Math.random()*speed;
-
-        data[2] = Math.cos(angle)*scaled;
-        data[3] = Math.sin(angle)*scaled;
-
-        return data;
-    }
-
-    inert(data) {
-        data[0] = data[1] = inert;
-        data[2] = data[3] = 0;
-
-        return data;
     }
 
 
@@ -346,7 +306,7 @@ export class Tendrils {
      *       sweep across sub-regions of the particles buffers.
      */
 
-    respawn(spawn = this.spawn.bind(this)) {
+    respawn(spawn = spawner) {
         this.offsetRespawn(this.respawnOffset, this.respawnShape,
             this.particles.shape);
 
@@ -382,7 +342,7 @@ export class Tendrils {
 
     // Cached respawn chunk sweep
 
-    respawnCached(spawn = this.spawn.bind(this)) {
+    respawnCached(spawn = spawner) {
         this.offsetRespawn(this.respawnOffset, this.spawnCache.shape,
             this.particles.shape);
 
@@ -428,7 +388,7 @@ export class Tendrils {
     /**
      * Populate the respawn data with the given spawn function
      */
-    resetSpawnCache(spawn = this.spawn.bind(this)) {
+    resetSpawnCache(spawn = spawner) {
         for(let i = 0; i < this.spawnCache.shape[0]; ++i) {
             for(let j = 0; j < this.spawnCache.shape[1]; ++j) {
                 const spawned = spawn(this.tempData);
@@ -483,9 +443,6 @@ export const defaultSettings = {
 
     autoClearView: false,
     showFlow: false,
-
-    startRadius: 0.3,
-    startSpeed: 0.01,
 
     minSpeed: 0.000001,
     maxSpeed: 0.01,
