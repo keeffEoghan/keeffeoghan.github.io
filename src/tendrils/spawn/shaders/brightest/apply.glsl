@@ -10,7 +10,8 @@
 
 vec4 apply(in vec2 uv, in vec2 pos, in vec4 data) {
     return vec4(pos,
-        angleToPos(mod(random(data.xy), 1.0)*tau)*luma(data)*data.a);
+        angleToPos(mod(random(uv*dot(data.rg, data.ba)), 1.0)*tau)*
+            luma(data)*data.a);
 }
 
 #pragma glslify: export(apply)
