@@ -24,26 +24,20 @@ export default (canvas, settings, debug) => {
 
     const state = tendrils.state;
 
+    const spawner = new SpawnPixels(gl);
+    let video = null;
 
-    /**
-     * @todo Seems like this has some issues that differ from the simpler canvas
-     *       demo above:
-     *       - `GL ERROR :GL_INVALID_VALUE : glTexSubImage2D: bad dimensions.`
-     *       - `RENDER WARNING: texture bound to texture unit 1 is not
-     *           renderable. It maybe non-power-of-2 and have incompatible
-     *           texture filtering.`
-     */
-    function respawnVideo(video) {
-        const spawnPixels = new SpawnPixels(gl);
+    function respawnPixels() {
+        if(video) {
+            spawner.setPixels(video);
+            spawner.respawn(tendrils);
+        }
+    }
 
-        spawnPixels.buffer.shape = [video.videoWidth, video.videoHeight];
-        mat3.scale(spawnPixels.spawnMatrix, spawnPixels.spawnMatrix, [-1.5, 1.5])
-
-        setInterval(() => {
-                spawnPixels.setPixels(video);
-                spawnPixels.respawn(tendrils);
-            },
-            800);
+    function respawnVideo() {
+        spawner.buffer.shape = [video.videoWidth, video.videoHeight];
+        mat3.scale(spawner.spawnMatrix, spawner.spawnMatrix, [-1.5, 1.5]);
+        respawnPixels();
     }
 
     getUserMedia({
@@ -55,11 +49,11 @@ export default (canvas, settings, debug) => {
                 throw e;
             }
             else {
-                const video = document.createElement('video');
+                video = document.createElement('video');
 
                 video.src = self.URL.createObjectURL(stream);
                 video.play();
-                video.addEventListener('canplay', () => respawnVideo(video));
+                video.addEventListener('canplay', respawnVideo);
             }
         });
 
@@ -77,7 +71,7 @@ export default (canvas, settings, debug) => {
     resize();
     tendrils.setup();
     tendrils.resetParticles(tendrils.inert);
-    tendrils.restart();
+    // tendrils.restart();
 
 
     if(debug) {
@@ -174,6 +168,7 @@ export default (canvas, settings, debug) => {
                 clearView: () => tendrils.clearView(),
                 clearFlow: () => tendrils.clearFlow(),
                 respawn,
+                respawnPixels,
                 reset: () => tendrils.reset(),
                 restart: () => tendrils.restart()
             };
