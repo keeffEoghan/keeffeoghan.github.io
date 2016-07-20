@@ -16,12 +16,14 @@ uniform mat3 spawnMatrix;
 
 #pragma glslify: random = require(glsl-random)
 
-#pragma glslify: apply = require(./color/apply)
+#pragma glslify: apply-color = require(./color/apply)
+#pragma glslify: apply-vignette = require(./vignette/apply)
+#pragma glslify: apply = require(./compose-apply, a = apply-color, b = apply-vignette)
 #pragma glslify: pick = require(./particles/pick)
 
-#pragma glslify: uvToPos = require(../../shaders/map/uv-to-pos)
-#pragma glslify: screenToPos = require(../../shaders/map/screen-to-pos)
-#pragma glslify: transform = require(../../shaders/utils/transform)
+#pragma glslify: uvToPos = require(../../../shaders/map/uv-to-pos)
+#pragma glslify: screenToPos = require(../../../shaders/map/screen-to-pos)
+#pragma glslify: transform = require(../../../shaders/utils/transform)
 
 const float samples = 3.0;
 const vec2 flipUV = vec2(1.0, -1.0);
@@ -33,14 +35,15 @@ vec2 spawnToPos(in vec2 uv) {
 }
 
 void main() {
-    vec4 state = texture2D(particles, gl_FragCoord.xy/dataSize);
+    vec2 uv = gl_FragCoord.xy/dataSize;
+    vec4 state = texture2D(particles, uv);
 
     for(float n = 0.0; n < samples; n += 1.0) {
-        vec4 off = state+vec4(n);
-        vec2 uv = mod(vec2(random(off.xy), random(off.zw)), 1.0);
+        vec4 off = state+vec4(n+1.2345);
+        vec2 spawnUV = mod(vec2(random(off.xy+uv), random(off.zw+uv)), 1.0);
 
         state = pick(state,
-            apply(uv, spawnToPos(uv), texture2D(spawnData, uv)));
+            apply(spawnUV, spawnToPos(spawnUV), texture2D(spawnData, spawnUV)));
     }
 
     gl_FragColor = state;

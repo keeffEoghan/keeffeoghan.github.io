@@ -5,8 +5,8 @@
 #pragma glslify: luma = require(glsl-luma)
 #pragma glslify: random = require(glsl-random)
 
-#pragma glslify: tau = require(../../../shaders/const/tau)
-#pragma glslify: angleToPos = require(../../../shaders/utils/angle-to-pos)
+#pragma glslify: tau = require(../../../../shaders/const/tau)
+#pragma glslify: angleToPos = require(../../../../shaders/utils/angle-to-pos)
 
 vec4 apply(in vec2 uv, in vec2 pos, in vec4 data) {
     return vec4(pos,

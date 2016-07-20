@@ -9,7 +9,7 @@ import shader from 'gl-shader';
 import mat3 from 'gl-matrix/src/gl-matrix/mat3';
 import isArray from 'lodash/isArray';
 
-import spawnVert from '../shaders/screen/vert.glsl';
+import spawnVert from '../../shaders/screen/vert.glsl';
 import spawnFrag from './shaders/frag.glsl';
 
 export const defaults = {
