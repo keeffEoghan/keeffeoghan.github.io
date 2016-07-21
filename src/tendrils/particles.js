@@ -101,7 +101,7 @@ export class Particles {
         this.logic.bind();
 
         Particles.applyUpdate(Object.assign(this.logic.uniforms, {
-                dataSize: this.shape,
+                dataRes: this.shape,
                 particles: this.buffers[1].color[0].bind(0)
             }),
             update);

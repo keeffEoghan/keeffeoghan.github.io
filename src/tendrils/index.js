@@ -8,6 +8,7 @@ import ndarray from 'ndarray';
 import Particles from './particles';
 import { step/*, nextPow2*/ } from '../utils';
 import spawner from './spawn/inert';
+import { maxAspect } from './utils/aspect';
 
 
 // Shaders
@@ -46,8 +47,10 @@ export class Tendrils {
 
         this.particles = null;
 
+        this.viewRes = [0, 0];
+        // this.pow2Res = [0, 0];
+
         this.viewSize = [0, 0];
-        this.pow2Size = [0, 0];
 
         this.start = Date.now();
         this.time = 0;
@@ -160,7 +163,8 @@ export class Tendrils {
                     time: this.time,
                     start: this.start,
                     flow: this.flow.color[0].bind(1),
-                    viewSize: this.viewSize
+                    viewSize: this.viewSize,
+                    viewRes: this.viewRes
                 });
 
             this.gl.enable(this.gl.BLEND);
@@ -174,10 +178,11 @@ export class Tendrils {
 
         const drawUniforms = {
             ...this.state,
+            time: this.time,
             previous: this.particles.buffers[1].color[0].bind(2),
-            dataSize: this.particles.shape,
+            dataRes: this.particles.shape,
             viewSize: this.viewSize,
-            time: this.time
+            viewRes: this.viewRes
         };
 
         this.particles.render = this.flowShader;
@@ -238,9 +243,9 @@ export class Tendrils {
                 this.fadeShader.bind();
 
                 Object.assign(this.fadeShader.uniforms, {
-                        opacity: Math.min(1, this.state.fadeAlpha/dt),
+                        opacity: Math.min(0, this.state.fadeAlpha/dt),
                         view: this.buffers[1].color[0].bind(1),
-                        viewSize: this.viewSize
+                        viewRes: this.viewRes
                     });
 
                 triangle(this.gl);
@@ -260,7 +265,7 @@ export class Tendrils {
                 Object.assign(this.fadeShader.uniforms, {
                         opacity: 1,
                         view: this.buffers[0].color[0].bind(2),
-                        viewSize: this.viewSize
+                        viewRes: this.viewRes
                     });
 
                 triangle(this.gl);
@@ -272,17 +277,19 @@ export class Tendrils {
     }
 
     resize(directRender = this.directRender()) {
-        this.viewSize[0] = this.gl.drawingBufferWidth;
-        this.viewSize[1] = this.gl.drawingBufferHeight;
+        this.viewRes[0] = this.gl.drawingBufferWidth;
+        this.viewRes[1] = this.gl.drawingBufferHeight;
 
-        // this.pow2Size.fill(nextPow2(Math.max(...this.viewSize)));
+        maxAspect(this.viewSize, this.viewRes);
+
+        // this.pow2Res.fill(nextPow2(Math.max(...this.viewRes)));
 
         if(!directRender) {
-            this.buffers.forEach((buffer) => buffer.shape = this.viewSize);
+            this.buffers.forEach((buffer) => buffer.shape = this.viewRes);
         }
 
-        // this.flow.shape = this.pow2Size;
-        this.flow.shape = this.viewSize;
+        // this.flow.shape = this.pow2Res;
+        this.flow.shape = this.viewRes;
 
         this.gl.viewport(0, 0, 1, 1);
     }
@@ -329,7 +336,8 @@ export class Tendrils {
 
         this.particles.step(Particles.applyUpdate({
                 ...this.state,
-                viewSize: this.viewSize
+                viewSize: this.viewSize,
+                viewRes: this.viewRes
             },
             update));
 
