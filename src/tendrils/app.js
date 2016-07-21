@@ -5,6 +5,7 @@ import dat from 'dat-gui';
 import mat3 from 'gl-matrix/src/gl-matrix/mat3';
 
 import SpawnPixels from './spawn/pixels';
+import spawnInert from './spawn/inert';
 
 import { Tendrils, defaultSettings, glSettings } from './';
 
@@ -21,22 +22,24 @@ export default (canvas, settings, debug) => {
             color: [1, 1, 1, 0.5]
         });
 
+    const inertSpawner = spawnInert(gl);
+
     const state = tendrils.state;
 
-    const spawner = new SpawnPixels(gl);
+    const pixelSpawner = new SpawnPixels(gl);
     let video = null;
 
     function respawnPixels() {
         if(video) {
-            spawner.setPixels(video);
-            spawner.respawn(tendrils);
+            pixelSpawner.setPixels(video);
+            pixelSpawner.respawn(tendrils);
         }
     }
 
     function respawnVideo() {
-        spawner.buffer.shape = [video.videoWidth, video.videoHeight];
-        mat3.scale(spawner.spawnMatrix, spawner.spawnMatrix, [-1, 1]);
-        respawnPixels();
+        pixelSpawner.buffer.shape = [video.videoWidth, video.videoHeight];
+        mat3.scale(pixelSpawner.spawnMatrix, pixelSpawner.spawnMatrix, [-1, 1]);
+        // respawnPixels();
     }
 
     getUserMedia({
@@ -70,7 +73,7 @@ export default (canvas, settings, debug) => {
     resize();
     tendrils.setup();
     tendrils.resetParticles();
-    // tendrils.restart();
+    tendrils.respawnShader(inertSpawner.spawn);
 
 
     if(debug) {

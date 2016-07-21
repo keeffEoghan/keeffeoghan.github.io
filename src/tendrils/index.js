@@ -43,7 +43,6 @@ export class Tendrils {
         this.renderShader = shader(this.gl, renderVert, renderFrag);
         this.flowShader = shader(this.gl, flowVert, flowFrag);
         this.fadeShader = shader(this.gl, screenVert, copyFadeFrag);
-        this.spawnShader = shader(this.gl, screenVert, copyFadeFrag);
 
         this.particles = null;
 
