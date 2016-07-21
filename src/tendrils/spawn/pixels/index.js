@@ -7,7 +7,10 @@
 import FBO from 'gl-fbo';
 import shader from 'gl-shader';
 import mat3 from 'gl-matrix/src/gl-matrix/mat3';
+import vec2 from 'gl-matrix/src/gl-matrix/vec2';
 import isArray from 'lodash/isArray';
+
+import aspect from '../../utils/aspect';
 
 import spawnVert from '../../shaders/screen/vert.glsl';
 import spawnFrag from './shaders/frag.glsl';
@@ -27,14 +30,22 @@ export class SpawnPixels {
         // this.buffer = ((isArray(buffer))? texture(this.gl, ...buffer) : buffer);
         this.buffer = ((isArray(buffer))? FBO(this.gl, ...buffer) : buffer);
 
+        this.jitterRad = 1;
+
+        this.jitter = vec2.create();
+        this.spawnSize = vec2.create();
         this.spawnMatrix = mat3.create();
     }
 
     update(uniforms) {
+        // Fill the across the max dimension of the view.
+        this.spawnSize.fill(Math.min(...uniforms.viewSize));
+
         return Object.assign(uniforms, {
                 // spawnData: this.buffer.bind(1),
                 spawnData: this.buffer.color[0].bind(1),
-                spawnSize: this.buffer.shape,
+                spawnSize: this.spawnSize,
+                jitter: aspect(this.jitter, uniforms.viewRes, this.jitterRad),
                 spawnMatrix: this.spawnMatrix
             });
     }

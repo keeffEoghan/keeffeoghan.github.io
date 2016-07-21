@@ -1,0 +1,1 @@
+http://lolengine.net/blog/2013/07/27/rgb-to-hsv-in-glsl

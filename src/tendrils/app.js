@@ -35,7 +35,7 @@ export default (canvas, settings, debug) => {
 
     function respawnVideo() {
         spawner.buffer.shape = [video.videoWidth, video.videoHeight];
-        mat3.scale(spawner.spawnMatrix, spawner.spawnMatrix, [-1.5, 1.5]);
+        mat3.scale(spawner.spawnMatrix, spawner.spawnMatrix, [-1, 1]);
         respawnPixels();
     }
 
