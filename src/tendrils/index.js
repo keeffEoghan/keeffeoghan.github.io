@@ -7,23 +7,23 @@ import ndarray from 'ndarray';
 
 import Particles from './particles';
 import { step/*, nextPow2*/ } from '../utils';
-import spawner from './spawn/inert';
+import spawner from './spawn/inert/cpu';
 import { maxAspect } from './utils/aspect';
 
 
 // Shaders
 
-import logicFrag from './shaders/logic.frag.glsl';
+import logicFrag from './shaders/logic.frag';
 
-import flowVert from './shaders/flow/vert.glsl';
-import flowFrag from './shaders/flow/frag.glsl';
+import flowVert from './shaders/flow/index.vert';
+import flowFrag from './shaders/flow/index.frag';
 
-import renderVert from './shaders/render/vert.glsl';
-import renderFrag from './shaders/render/frag.glsl';
+import renderVert from './shaders/render/index.vert';
+import renderFrag from './shaders/render/index.frag';
 
-import screenVert from './shaders/screen/vert.glsl';
+import screenVert from './shaders/screen/index.vert';
 
-import copyFadeFrag from './shaders/copy-fade.frag.glsl';
+import copyFadeFrag from './shaders/copy-fade.frag';
 
 
 export class Tendrils {

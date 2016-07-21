@@ -8,10 +8,10 @@
 #pragma glslify: tau = require(../../../../shaders/const/tau)
 #pragma glslify: angleToPos = require(../../../../shaders/utils/angle-to-pos)
 
-vec4 apply(vec2 uv, vec2 pos, vec4 data) {
+vec4 apply(vec2 uv, vec2 pos, vec4 pixel) {
     return vec4(pos,
-        angleToPos(mod(random(uv*dot(data.rg, data.ba)), 1.0)*tau)*
-            luma(data)*data.a);
+        angleToPos(mod(random(uv*dot(pixel.rg, pixel.ba)), 1.0)*tau)*
+            luma(pixel)*pixel.a);
 }
 
 #pragma glslify: export(apply)
