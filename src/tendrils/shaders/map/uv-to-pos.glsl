@@ -3,7 +3,7 @@
 #pragma glslify: uvRange = require(./ranges/uv)
 #pragma glslify: posRange = require(./ranges/pos)
 
-vec2 uvToPos(in vec2 uv) {
+vec2 uvToPos(vec2 uv) {
     return map(uv, uvRange.xy, uvRange.zw, posRange.xy, posRange.zw);
 }
 

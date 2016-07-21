@@ -1,4 +1,4 @@
-vec2 angleToPos(in float rad) {
+vec2 angleToPos(float rad) {
     return vec2(cos(rad), sin(rad));
 }
 

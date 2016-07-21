@@ -9,8 +9,7 @@ const float frameOffset = 0.25;
  * @return State data for the vertex, either current or previous.
  */
 
-vec4 stateAtFrame(in vec2 uv, in vec2 shape,
-        in sampler2D previous, in sampler2D current) {
+vec4 stateAtFrame(vec2 uv, vec2 shape, sampler2D previous, sampler2D current) {
     float nearIndex = uv.y*shape.y;
     float offset = fract(nearIndex);
     vec2 lookup = vec2(uv.x, floor(nearIndex)/shape.y);

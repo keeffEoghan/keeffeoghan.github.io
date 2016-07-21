@@ -28,10 +28,10 @@ uniform mat3 spawnMatrix;
 const float samples = 3.0;
 const vec2 flipUV = vec2(1.0, -1.0);
 
-vec2 spawnToPos(in vec2 uv) {
-    // return transform(spawnMatrix,
-    //     uvToPos(uv)*screenToPos(spawnSize/viewSize, viewSize))*flipUV;
-    return transform(spawnMatrix, uvToPos(uv)*(spawnSize/viewSize.yy))*flipUV;
+vec2 spawnToPos(vec2 uv) {
+    return transform(spawnMatrix,
+        uvToPos(uv)*screenToPos(spawnSize/viewSize, viewSize))*flipUV;
+    // return transform(spawnMatrix, uvToPos(uv)*(spawnSize/viewSize.yy))*flipUV;
 }
 
 void main() {
