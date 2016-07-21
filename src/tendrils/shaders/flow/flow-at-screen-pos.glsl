@@ -9,8 +9,7 @@
  * @return The flow velocity and age for a given screen position, sampling
  *         several scales.
  */
-vec2 flowAtScreenPos(in vec2 pos, in sampler2D flow,
-        in float time, in float flowDecay) {
+vec2 flowAtScreenPos(vec2 pos, sampler2D flow, float time, float flowDecay) {
     vec2 uv = posToUV(pos);
     vec2 flowForce = vec2(0.0);
     float flowMax = 0.0;

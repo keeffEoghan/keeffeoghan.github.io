@@ -1,12 +1,12 @@
-float length2(in vec2 v) {
+float length2(vec2 v) {
     return dot(v, v);
 }
 
-float length2(in vec3 v) {
+float length2(vec3 v) {
     return dot(v, v);
 }
 
-float length2(in vec4 v) {
+float length2(vec4 v) {
     return dot(v, v);
 }
 

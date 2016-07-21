@@ -2,19 +2,19 @@
 #pragma glslify: eps = require(../const/epsilon)
 
 
-bool nilish(in float v) {
+bool nilish(float v) {
     return (v*v <= eps);
 }
 
-bool nilish(in vec2 v) {
+bool nilish(vec2 v) {
     return (length2(v) <= eps);
 }
 
-bool nilish(in vec3 v) {
+bool nilish(vec3 v) {
     return (length2(v) <= eps);
 }
 
-bool nilish(in vec4 v) {
+bool nilish(vec4 v) {
     return (length2(v) <= eps);
 }
 
