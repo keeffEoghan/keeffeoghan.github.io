@@ -12,11 +12,11 @@ import isArray from 'lodash/isArray';
 
 import aspect from '../../utils/aspect';
 
-import spawnVert from '../../shaders/screen/vert.glsl';
-import spawnFrag from './shaders/frag.glsl';
+import vert from '../../shaders/screen/index.vert';
+import frag from './shaders/index.frag';
 
 export const defaults = {
-    spawn: [spawnVert, spawnFrag],
+    spawn: [vert, frag],
     // buffer: [[1, 1]]
     buffer: [[1, 1], { float: true }]
 };
@@ -33,14 +33,12 @@ export class SpawnPixels {
         this.jitterRad = 1;
 
         this.jitter = vec2.create();
-        this.spawnSize = vec2.create();
+        // Fill the across the max dimension of the view.
+        this.spawnSize = [1, 1];
         this.spawnMatrix = mat3.create();
     }
 
     update(uniforms) {
-        // Fill the across the max dimension of the view.
-        this.spawnSize.fill(Math.min(...uniforms.viewSize));
-
         return Object.assign(uniforms, {
                 // spawnData: this.buffer.bind(1),
                 spawnData: this.buffer.color[0].bind(1),

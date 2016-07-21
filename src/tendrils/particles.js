@@ -24,7 +24,7 @@ import isFunction from 'lodash/isFunction';
 
 import { step } from '../utils';
 
-import logicVert from './shaders/screen/vert.glsl';
+import logicVert from './shaders/screen/index.vert';
 
 
 export class Particles {
