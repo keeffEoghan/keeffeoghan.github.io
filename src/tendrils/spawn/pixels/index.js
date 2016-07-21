@@ -30,7 +30,7 @@ export class SpawnPixels {
         // this.buffer = ((isArray(buffer))? texture(this.gl, ...buffer) : buffer);
         this.buffer = ((isArray(buffer))? FBO(this.gl, ...buffer) : buffer);
 
-        this.jitterRad = 1;
+        this.jitterRad = 2;
 
         this.jitter = vec2.create();
         // Fill the across the max dimension of the view.

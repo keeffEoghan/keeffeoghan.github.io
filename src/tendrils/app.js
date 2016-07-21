@@ -15,12 +15,7 @@ export default (canvas, settings, debug) => {
     const gl = glContext(canvas, glSettings,
             (...rest) => tendrils.render(...rest));
 
-    tendrils = new Tendrils(gl, {
-            ...settings,
-            autoClearView: true,
-            showFlow: false,
-            color: [1, 1, 1, 0.5]
-        });
+    tendrils = new Tendrils(gl);
 
     const inertSpawner = spawnInert(gl);
 
@@ -39,7 +34,7 @@ export default (canvas, settings, debug) => {
     function respawnVideo() {
         pixelSpawner.buffer.shape = [video.videoWidth, video.videoHeight];
         mat3.scale(pixelSpawner.spawnMatrix, pixelSpawner.spawnMatrix, [-1, 1]);
-        // respawnPixels();
+        respawnPixels();
     }
 
     getUserMedia({
@@ -127,13 +122,11 @@ export default (canvas, settings, debug) => {
 
         let respawnInterval;
 
-        const respawn = () => tendrils.respawn();
-
         const respawnSweep = (n = state.respawnTick) => {
             clearInterval(respawnInterval);
 
             if(n > 0) {
-                respawnInterval = setInterval(respawn, n);
+                respawnInterval = setInterval(respawnPixels, n);
             }
         };
 
@@ -169,10 +162,13 @@ export default (canvas, settings, debug) => {
 
                 clearView: () => tendrils.clearView(),
                 clearFlow: () => tendrils.clearFlow(),
-                respawn,
+                respawn: () => tendrils.respawn(),
                 respawnPixels,
                 reset: () => tendrils.reset(),
-                restart: () => tendrils.restart()
+                restart: () => {
+                    tendrils.restart();
+                    respawnPixels();
+                }
             };
 
 
@@ -214,7 +210,7 @@ export default (canvas, settings, debug) => {
                     controllers.cyclingColor = false;
                     updateGUI();
 
-                    tendrils.restart();
+                    controllers.restart();
                 },
                 'Flow': () => {
                     Object.assign(state, defaultSettings, {
@@ -231,7 +227,7 @@ export default (canvas, settings, debug) => {
                             respawnTick: 500
                         });
 
-                    tendrils.restart();
+                    controllers.restart();
                     respawnSweep();
 
                     Object.assign(colorGUI, {
@@ -256,7 +252,7 @@ export default (canvas, settings, debug) => {
                             respawnTick: 500
                         });
 
-                    tendrils.restart();
+                    controllers.restart();
                     respawnSweep();
 
                     Object.assign(colorGUI, {
@@ -279,7 +275,7 @@ export default (canvas, settings, debug) => {
                             speedAlpha: 0
                         });
 
-                    tendrils.restart();
+                    controllers.restart();
 
                     Object.assign(colorGUI, {
                             opacity: 0.1,
@@ -301,7 +297,7 @@ export default (canvas, settings, debug) => {
                             speedAlpha: 0
                         });
 
-                    tendrils.restart();
+                    controllers.restart();
 
                     Object.assign(colorGUI, {
                             opacity: 0.8,
@@ -317,7 +313,7 @@ export default (canvas, settings, debug) => {
                     Object.assign(state, defaultSettings, {
                         });
 
-                    tendrils.restart();
+                    controllers.restart();
                     controllers.cyclingColor = true;
                     updateGUI();
                 },
@@ -327,7 +323,7 @@ export default (canvas, settings, debug) => {
                             flowDecay: 0
                         });
 
-                    tendrils.restart();
+                    controllers.restart();
 
                     Object.assign(colorGUI, {
                             opacity: 0.006,
@@ -350,7 +346,7 @@ export default (canvas, settings, debug) => {
                             speedAlpha: 0.000002
                         });
 
-                    tendrils.restart();
+                    controllers.restart();
 
                     Object.assign(colorGUI, {
                             opacity: 0.9,
@@ -373,7 +369,7 @@ export default (canvas, settings, debug) => {
                             speedAlpha: 0.00005
                         });
 
-                    tendrils.restart();
+                    controllers.restart();
 
                     Object.assign(colorGUI, {
                             opacity: 0.03,
@@ -393,10 +389,10 @@ export default (canvas, settings, debug) => {
                             wanderWeight: 0.002,
                             fadeAlpha: (1000/60)-0.000001,
                             speedAlpha: 0,
-                            respawnTick: 300
+                            respawnTick: 800
                         });
 
-                    tendrils.restart();
+                    controllers.restart();
                     respawnSweep();
 
                     Object.assign(colorGUI, {
