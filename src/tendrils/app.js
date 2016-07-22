@@ -5,7 +5,7 @@ import dat from 'dat-gui';
 import mat3 from 'gl-matrix/src/gl-matrix/mat3';
 
 import SpawnPixels from './spawn/pixels';
-import spawnInert from './spawn/inert';
+import spawnInert from './spawn/ball';
 
 import { Tendrils, defaultSettings, glSettings } from './';
 
@@ -68,7 +68,7 @@ export default (canvas, settings, debug) => {
     resize();
     tendrils.setup();
     tendrils.resetParticles();
-    tendrils.respawnShader(inertSpawner.spawn);
+    inertSpawner.respawn(tendrils);
 
 
     if(debug) {
@@ -162,7 +162,7 @@ export default (canvas, settings, debug) => {
 
                 clearView: () => tendrils.clearView(),
                 clearFlow: () => tendrils.clearFlow(),
-                respawn: () => tendrils.respawn(),
+                respawn: () => inertSpawner.respawn(tendrils),
                 respawnPixels,
                 reset: () => tendrils.reset(),
                 restart: () => {
