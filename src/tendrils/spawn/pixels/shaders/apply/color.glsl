@@ -11,7 +11,7 @@
 vec4 apply(vec2 uv, vec2 pos, vec4 pixel) {
     vec3 hsv = rgb2hsv(pixel.rgb);
 
-    return vec4(pos, angleToPos(hsv.r*tau)*hsv.g*hsv.b*pixel.a);
+    return vec4(pos, angleToPos(hsv.r*hsv.g*hsv.b*tau)*hsv.g*hsv.b*pixel.a);
 }
 
 #pragma glslify: export(apply)

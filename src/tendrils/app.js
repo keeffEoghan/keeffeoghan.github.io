@@ -39,6 +39,7 @@ export default (canvas, settings, debug) => {
 
     getUserMedia({
             video: true,
+            // @todo Can we plug audio into an analyser node while muted?
             audio: false
         },
         (e, stream) => {

@@ -335,6 +335,7 @@ export class Tendrils {
 
         this.particles.step(Particles.applyUpdate({
                 ...this.state,
+                time: this.time,
                 viewSize: this.viewSize,
                 viewRes: this.viewRes
             },
