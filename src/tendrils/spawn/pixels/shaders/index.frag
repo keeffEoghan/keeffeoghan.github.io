@@ -21,10 +21,10 @@ uniform mat3 spawnMatrix;
 
 #pragma glslify: random = require(glsl-random)
 
-// #pragma glslify: applyColor = require(./apply/color)
-// #pragma glslify: vignette = require(../../../shaders/filter/pass/vignette)
-// #pragma glslify: apply = require(./apply/compose-filter, apply = applyColor, pass = vignette)
-#pragma glslify: apply = require(./apply/color)
+#pragma glslify: applyColor = require(./apply/color)
+#pragma glslify: vignette = require(../../../shaders/filter/pass/vignette)
+#pragma glslify: apply = require(./apply/compose-filter, apply = applyColor, pass = vignette)
+// #pragma glslify: apply = require(./apply/color)
 #pragma glslify: pick = require(./pick/particles)
 
 #pragma glslify: uvToPos = require(../../../shaders/map/uv-to-pos)

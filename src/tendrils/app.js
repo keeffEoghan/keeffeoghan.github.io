@@ -5,7 +5,7 @@ import dat from 'dat-gui';
 import mat3 from 'gl-matrix/src/gl-matrix/mat3';
 
 import SpawnPixels from './spawn/pixels';
-import spawnInert from './spawn/ball';
+import spawnReset from './spawn/ball';
 
 import { Tendrils, defaultSettings, glSettings } from './';
 
@@ -17,11 +17,12 @@ export default (canvas, settings, debug) => {
 
     tendrils = new Tendrils(gl);
 
-    const inertSpawner = spawnInert(gl);
+    const resetSpawner = spawnReset(gl);
 
     const state = tendrils.state;
 
     const pixelSpawner = new SpawnPixels(gl);
+
     let video = null;
 
     function respawnPixels() {
@@ -69,7 +70,7 @@ export default (canvas, settings, debug) => {
     resize();
     tendrils.setup();
     tendrils.resetParticles();
-    inertSpawner.respawn(tendrils);
+    resetSpawner.respawn(tendrils);
 
 
     if(debug) {
@@ -156,6 +157,17 @@ export default (canvas, settings, debug) => {
         convertColor();
 
 
+        // Respawn
+
+        let respawnGUI = gui.addFolder('respawn');
+
+        for(let s in resetSpawner.uniforms) {
+            if(!(typeof resetSpawner.uniforms[s]).match(/(object|array)/gi)) {
+                respawnGUI.add(resetSpawner.uniforms, s);
+            }
+        }
+
+
         // Controls
 
         let controllers = {
@@ -163,12 +175,12 @@ export default (canvas, settings, debug) => {
 
                 clearView: () => tendrils.clearView(),
                 clearFlow: () => tendrils.clearFlow(),
-                respawn: () => inertSpawner.respawn(tendrils),
+                respawn: () => resetSpawner.respawn(tendrils),
                 respawnPixels,
                 reset: () => tendrils.reset(),
                 restart: () => {
-                    tendrils.restart();
-                    respawnPixels();
+                    tendrils.clear();
+                    resetSpawner.respawn(tendrils)
                 }
             };
 

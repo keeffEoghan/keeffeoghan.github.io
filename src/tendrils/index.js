@@ -112,6 +112,11 @@ export class Tendrils {
 
     // Rendering and logic
 
+    clear() {
+        this.clearView();
+        this.clearFlow();
+    }
+
     clearView() {
         this.buffers.forEach((buffer) => {
             buffer.bind();
@@ -128,8 +133,7 @@ export class Tendrils {
     }
 
     restart() {
-        this.clearView();
-        this.clearFlow();
+        this.clear();
         this.reset();
     }
 
