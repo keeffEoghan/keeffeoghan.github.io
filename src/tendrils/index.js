@@ -16,6 +16,7 @@ import { maxAspect } from './utils/aspect';
 import logicFrag from './shaders/logic.frag';
 
 import flowVert from './shaders/flow/index.vert';
+import flowScreenVert from './shaders/flow/screen.vert';
 import flowFrag from './shaders/flow/index.frag';
 
 import renderVert from './shaders/render/index.vert';
@@ -42,6 +43,7 @@ export class Tendrils {
         this.logicShader = null;
         this.renderShader = shader(this.gl, renderVert, renderFrag);
         this.flowShader = shader(this.gl, flowVert, flowFrag);
+        this.flowScreenShader = shader(this.gl, flowScreenVert, flowFrag);
         this.fadeShader = shader(this.gl, screenVert, copyFadeFrag);
 
         this.particles = null;
@@ -196,11 +198,7 @@ export class Tendrils {
         this.flow.bind();
 
         this.gl.lineWidth(this.state.flowWidth);
-        this.particles.draw({
-                ...drawUniforms,
-                showFlow: false
-            },
-            this.gl.LINES);
+        this.particles.draw(drawUniforms, this.gl.LINES);
 
         /**
          * @todo Mipmaps for global flow sampling - not working at the moment.
@@ -215,6 +213,8 @@ export class Tendrils {
         // Render to the view.
 
         if(this.state.showFlow) {
+            this.particles.render = this.flowScreenShader;
+
             // Render the flow directly to the screen
             this.gl.bindFramebuffer(this.gl.FRAMEBUFFER, null);
             this.particles.draw(drawUniforms, this.gl.LINES);
