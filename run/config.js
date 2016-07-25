@@ -189,7 +189,7 @@ module.exports = {
                     ],
                     postLoaders: [
                         {
-                            test: /\.js$/,
+                            test: /\.(js|glsl|frag|vert)$/,
                             loader: 'ify'
                         }
                     ]
