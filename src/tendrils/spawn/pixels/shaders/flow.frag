@@ -1,0 +1,6 @@
+#pragma glslify: import(./frag/head)
+
+#pragma glslify: apply = require(./apply/flow)
+#pragma glslify: pick = require(./pick/particles)
+
+#pragma glslify: import(./frag/main)

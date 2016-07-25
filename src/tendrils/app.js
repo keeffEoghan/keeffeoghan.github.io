@@ -21,6 +21,17 @@ export default (canvas, settings, debug) => {
 
     const state = tendrils.state;
 
+    // Feedback loop! Looks jerky/glitchy/repeat; tends to converge on lines or
+    // shapes.
+
+    // const pixelSpawner = new SpawnPixels(gl,
+    //     [/* spawn/pixels/flow.frag etc */], tendrils.flow);
+
+    // function respawnPixels() {
+    //     pixelSpawner.spawnSize = tendrils.viewSize;
+    //     pixelSpawner.respawn(tendrils);
+    // }
+
     const pixelSpawner = new SpawnPixels(gl);
 
     let video = null;
