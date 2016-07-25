@@ -53,8 +53,7 @@ export class Tendrils {
 
         this.viewSize = [0, 0];
 
-        this.start = Date.now();
-        this.time = 0;
+        this.time = this.start = Date.now();
 
         this.tempData = [];
 
