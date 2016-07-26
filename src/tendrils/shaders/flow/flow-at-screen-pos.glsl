@@ -4,6 +4,7 @@
  */
 
 #pragma glslify: posToUV = require(../map/pos-to-uv)
+#pragma glslify: getFlow = require(./get)
 
 /**
  * @return The flow velocity and age for a given screen position, sampling
@@ -18,9 +19,7 @@ vec2 flowAtScreenPos(vec2 pos, sampler2D flow, float time, float flowDecay) {
         vec4 flowData = texture2D(flow, uv, level);
         float factor = 1.0/(level+1.0);
 
-        flowForce += flowData.xy*factor*
-            max(0.0, 1.0-((time-flowData.z)*flowDecay));
-
+        flowForce += getFlow(flowData, time, flowDecay)*factor;
         flowMax += factor;
     }
 

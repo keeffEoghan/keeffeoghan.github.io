@@ -4,7 +4,9 @@ import throttle from 'lodash/throttle';
 import dat from 'dat-gui';
 import mat3 from 'gl-matrix/src/gl-matrix/mat3';
 
-import SpawnPixels from './spawn/pixels';
+import { SpawnPixels, defaults } from './spawn/pixels';
+import spawnPixelsFlowFrag from './spawn/pixels/shaders/flow.frag';
+
 import spawnReset from './spawn/ball';
 
 import { Tendrils, defaultSettings, glSettings } from './';
@@ -21,32 +23,39 @@ export default (canvas, settings, debug) => {
 
     const state = tendrils.state;
 
-    // Feedback loop! Looks jerky/glitchy/repeat; tends to converge on lines or
-    // shapes.
 
-    // const pixelSpawner = new SpawnPixels(gl,
-    //     [/* spawn/pixels/flow.frag etc */], tendrils.flow);
+    // Feedback loop from flow
+    /**
+     * @todo The aspect ratio might be wrong here - always seems to converge on
+     *       horizontal/vertical lines, like it were stretched.
+     */
 
-    // function respawnPixels() {
-    //     pixelSpawner.spawnSize = tendrils.viewSize;
-    //     pixelSpawner.respawn(tendrils);
-    // }
+    const flowPixelSpawner = new SpawnPixels(gl,
+        [defaults.spawn[0], spawnPixelsFlowFrag], tendrils.flow);
 
-    const pixelSpawner = new SpawnPixels(gl);
+    function respawnFlowPixels() {
+        flowPixelSpawner.spawnSize = tendrils.viewSize;
+        flowPixelSpawner.respawn(tendrils);
+    }
+
+
+    // Cam
+
+    const camPixelSpawner = new SpawnPixels(gl);
 
     let video = null;
 
-    function respawnPixels() {
+    function respawnCamPixels() {
         if(video) {
-            pixelSpawner.setPixels(video);
-            pixelSpawner.respawn(tendrils);
+            camPixelSpawner.setPixels(video);
+            camPixelSpawner.respawn(tendrils);
         }
     }
 
     function respawnVideo() {
-        pixelSpawner.buffer.shape = [video.videoWidth, video.videoHeight];
-        mat3.scale(pixelSpawner.spawnMatrix, pixelSpawner.spawnMatrix, [-1, 1]);
-        respawnPixels();
+        camPixelSpawner.buffer.shape = [video.videoWidth, video.videoHeight];
+        mat3.scale(camPixelSpawner.spawnMatrix, camPixelSpawner.spawnMatrix, [-1, 1]);
+        respawnCamPixels();
     }
 
     getUserMedia({
@@ -66,8 +75,6 @@ export default (canvas, settings, debug) => {
                 video.addEventListener('canplay', respawnVideo);
             }
         });
-
-
 
 
     function resize() {
@@ -133,20 +140,21 @@ export default (canvas, settings, debug) => {
                 tendrils.setupSpawnCache();
             });
 
-        let respawnInterval;
+        let respawnCamInterval;
 
-        const respawnSweep = (n = state.respawnTick) => {
-            clearInterval(respawnInterval);
+        const respawnCamSweep = (n = state.respawnTick) => {
+            clearInterval(respawnCamInterval);
 
             if(n > 0) {
-                respawnInterval = setInterval(respawnPixels, n);
+                respawnCamInterval = setInterval(respawnCamPixels, n);
             }
         };
 
-        respawnSweep();
+        respawnCamSweep();
+
 
         settingsGUI.__controllers[settingsKeys.indexOf('respawnTick')]
-            .onFinishChange(respawnSweep);
+            .onFinishChange(respawnCamSweep);
 
 
         // DAT.GUI's color controllers are a bit fucked.
@@ -187,7 +195,8 @@ export default (canvas, settings, debug) => {
                 clearView: () => tendrils.clearView(),
                 clearFlow: () => tendrils.clearFlow(),
                 respawn: () => resetSpawner.respawn(tendrils),
-                respawnPixels,
+                respawnCamPixels,
+                respawnFlowPixels,
                 reset: () => tendrils.reset(),
                 restart: () => {
                     tendrils.clear();
@@ -252,7 +261,7 @@ export default (canvas, settings, debug) => {
                         });
 
                     controllers.restart();
-                    respawnSweep();
+                    respawnCamSweep();
 
                     Object.assign(colorGUI, {
                             opacity: 0.2,
@@ -277,7 +286,7 @@ export default (canvas, settings, debug) => {
                         });
 
                     controllers.restart();
-                    respawnSweep();
+                    respawnCamSweep();
 
                     Object.assign(colorGUI, {
                             opacity: 0.8,
@@ -417,7 +426,7 @@ export default (canvas, settings, debug) => {
                         });
 
                     controllers.restart();
-                    respawnSweep();
+                    respawnCamSweep();
 
                     Object.assign(colorGUI, {
                             opacity: 0.9,
