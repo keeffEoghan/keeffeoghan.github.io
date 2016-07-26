@@ -10,7 +10,6 @@
 #pragma glslify: uvToPos = require(../../../../shaders/map/uv-to-pos)
 #pragma glslify: transform = require(../../../../shaders/utils/transform)
 
-const float samples = 3.0;
 const vec2 flipUV = vec2(1.0, -1.0);
 
 vec2 spawnToPos(vec2 uv) {

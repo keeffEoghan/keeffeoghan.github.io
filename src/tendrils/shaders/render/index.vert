@@ -23,6 +23,6 @@ void main() {
     if(state.xy != inert) {
         speedRate = min(length2(state.zw)/speedAlpha, 1.0);
 
-        gl_Position = vec4(state.xy*viewSize, 1.0, 1.0);
+        gl_Position = vec4(state.xy*viewSize, 0.0, 1.0);
     }
 }

@@ -3,6 +3,7 @@ import getUserMedia from 'getusermedia';
 import throttle from 'lodash/throttle';
 import dat from 'dat-gui';
 import mat3 from 'gl-matrix/src/gl-matrix/mat3';
+import vec2 from 'gl-matrix/src/gl-matrix/vec2';
 
 import { SpawnPixels, defaults } from './spawn/pixels';
 import spawnPixelsFlowFrag from './spawn/pixels/shaders/flow.frag';
@@ -30,11 +31,17 @@ export default (canvas, settings, debug) => {
      *       horizontal/vertical lines, like it were stretched.
      */
 
-    const flowPixelSpawner = new SpawnPixels(gl,
-        [defaults.spawn[0], spawnPixelsFlowFrag], tendrils.flow);
+    const flowPixelSpawner = new SpawnPixels(gl, {
+            shader: [defaults.shader[0], spawnPixelsFlowFrag],
+            buffer: tendrils.flow
+        });
+
+    // This flips the lookup, which is interesting (kaleidoscope reflection)
+    // const flowPixelScale = [1, 1];
+    const flowPixelScale = [1, -1];
 
     function respawnFlowPixels() {
-        flowPixelSpawner.spawnSize = tendrils.viewSize;
+        vec2.div(flowPixelSpawner.spawnSize, flowPixelScale, tendrils.viewSize);
         flowPixelSpawner.respawn(tendrils);
     }
 
@@ -192,6 +199,7 @@ export default (canvas, settings, debug) => {
         let controllers = {
                 cyclingColor: false,
 
+                clear: () => tendrils.clear(),
                 clearView: () => tendrils.clearView(),
                 clearFlow: () => tendrils.clearFlow(),
                 respawn: () => resetSpawner.respawn(tendrils),
@@ -276,13 +284,18 @@ export default (canvas, settings, debug) => {
                 'Flow only': () => {
                     Object.assign(state, defaultSettings, {
                             autoClearView: false,
-                            flowDecay: 0.004,
+                            flowDecay: 0.0005,
                             forceWeight: 0.015,
                             wanderWeight: 0,
                             speedAlpha: 0,
                             fadeAlpha: (1000/60)-0.000001,
                             respawnAmount: 0.03,
-                            respawnTick: 500
+                            respawnTick: 0
+                        });
+
+                    Object.assign(resetSpawner.uniforms, {
+                            radius: 0.25,
+                            speed: 0.015
                         });
 
                     controllers.restart();
