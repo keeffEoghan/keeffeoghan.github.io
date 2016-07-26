@@ -3,7 +3,6 @@
  * Tendrils `respawnShader` function.
  */
 
-// import texture from 'gl-texture2d';
 import FBO from 'gl-fbo';
 import shader from 'gl-shader';
 import mat3 from 'gl-matrix/src/gl-matrix/mat3';
@@ -16,19 +15,27 @@ import vert from '../../shaders/screen/index.vert';
 import frag from './shaders/index.frag';
 
 export const defaults = {
-    spawn: [vert, frag],
+    shader: [vert, frag],
     // buffer: [[1, 1]]
     buffer: [[1, 1], { float: true }]
 };
 
 export class SpawnPixels {
-    constructor(gl, spawn = defaults.spawn, buffer = defaults.buffer) {
+    constructor(gl, options) {
         this.gl = gl;
 
-        this.spawn = ((isArray(spawn))? shader(this.gl, ...spawn) : spawn);
+        const params = {
+                ...defaults,
+                ...options
+            };
 
-        // this.buffer = ((isArray(buffer))? texture(this.gl, ...buffer) : buffer);
-        this.buffer = ((isArray(buffer))? FBO(this.gl, ...buffer) : buffer);
+        this.shader = ((isArray(params.shader))?
+                shader(this.gl, ...params.shader)
+            :   params.shader);
+
+        this.buffer = ((isArray(params.buffer))?
+                FBO(this.gl, ...params.buffer)
+            :   params.buffer);
 
         this.jitterRad = 4;
 
@@ -40,7 +47,6 @@ export class SpawnPixels {
 
     update(uniforms) {
         return Object.assign(uniforms, {
-                // spawnData: this.buffer.bind(1),
                 spawnData: this.buffer.color[0].bind(1),
                 spawnSize: this.spawnSize,
                 jitter: aspect(this.jitter, uniforms.viewRes, this.jitterRad),
@@ -49,11 +55,10 @@ export class SpawnPixels {
     }
 
     respawn(tendrils, update = this.update.bind(this)) {
-        return tendrils.respawnShader(this.spawn, update);
+        return tendrils.respawnShader(this.shader, update);
     }
 
     setPixels(pixels) {
-        // return this.buffer.setPixels(pixels);
         return this.buffer.color[0].setPixels(pixels);
     }
 }

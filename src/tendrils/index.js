@@ -7,7 +7,7 @@ import ndarray from 'ndarray';
 
 import Particles from './particles';
 import { step/*, nextPow2*/ } from '../utils';
-import spawner from './spawn/inert/cpu';
+import spawner from './spawn/init/cpu';
 import { maxAspect } from './utils/aspect';
 
 
