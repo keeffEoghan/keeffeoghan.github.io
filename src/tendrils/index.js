@@ -4,6 +4,7 @@ import shader from 'gl-shader';
 import FBO from 'gl-fbo';
 import triangle from 'a-big-triangle';
 import ndarray from 'ndarray';
+import isArray from 'lodash/isArray';
 
 import Particles from './particles';
 import { step/*, nextPow2*/ } from '../utils';
@@ -15,36 +16,96 @@ import { maxAspect } from './utils/aspect';
 
 import logicFrag from './shaders/logic.frag';
 
+import renderVert from './shaders/render/index.vert';
+import renderFrag from './shaders/render/index.frag';
+
 import flowVert from './shaders/flow/index.vert';
 import flowScreenVert from './shaders/flow/screen.vert';
 import flowFrag from './shaders/flow/index.frag';
-
-import renderVert from './shaders/render/index.vert';
-import renderFrag from './shaders/render/index.frag';
 
 import screenVert from './shaders/screen/index.vert';
 
 import copyFadeFrag from './shaders/copy-fade.frag';
 
 
+export const defaults = () => ({
+    state: {
+        rootNum: Math.pow(2, 9),
+
+        paused: false,
+        timeStep: 1000/60,
+
+        autoClearView: false,
+        showFlow: false,
+
+        minSpeed: 0.000001,
+        maxSpeed: 0.01,
+        damping: 0.045,
+
+        flowDecay: 0.0001,
+        flowWidth: 3,
+
+        noiseSpeed: 0.00025,
+        noiseScale: 2.125,
+
+        forceWeight: 0.015,
+        flowWeight: 1,
+        wanderWeight: 0.001,
+
+        color: [1, 1, 1, 0.05],
+        fadeAlpha: -1,
+        speedAlpha: 0.000001,
+
+        respawnAmount: 0.02
+    },
+    logicShader: null,
+    renderShader: [renderVert, renderFrag],
+    flowShader: [flowVert, flowFrag],
+    flowScreenShader: [flowScreenVert, flowFrag],
+    fadeShader: [screenVert, copyFadeFrag]
+});
+
+export const glSettings = {
+    preserveDrawingBuffer: true
+};
+
+
 export class Tendrils {
-    constructor(gl, settings) {
+    constructor(gl, options) {
+        const params = {
+            ...defaults(),
+            ...options
+        };
+
         this.gl = gl;
-        this.state = Object.assign({}, defaultSettings, settings);
+        this.state = params.state;
 
         this.flow = FBO(this.gl, [1, 1], { float: true });
 
         // Multiple bufferring
         /**
-         * @todo May need more buffers/passes later
+         * @todo May need more buffers/passes later?
          */
         this.buffers = [FBO(this.gl, [1, 1]), FBO(this.gl, [1, 1])];
 
         this.logicShader = null;
-        this.renderShader = shader(this.gl, renderVert, renderFrag);
-        this.flowShader = shader(this.gl, flowVert, flowFrag);
-        this.flowScreenShader = shader(this.gl, flowScreenVert, flowFrag);
-        this.fadeShader = shader(this.gl, screenVert, copyFadeFrag);
+
+        this.renderShader = ((isArray(params.renderShader))?
+                shader(this.gl, ...params.renderShader)
+            :   params.renderShader);
+
+        this.flowShader = ((isArray(params.flowShader))?
+                shader(this.gl, ...params.flowShader)
+            :   params.flowShader);
+
+        this.flowScreenShader = ((isArray(params.flowScreenShader))?
+                shader(this.gl, ...params.flowScreenShader)
+            :   params.flowScreenShader);
+
+        this.fadeShader = ((isArray(params.fadeShader))?
+                shader(this.gl, ...params.fadeShader)
+            :   params.fadeShader);
+
 
         this.particles = null;
 
@@ -138,10 +199,10 @@ export class Tendrils {
         this.reset();
     }
 
-    render() {
-        const directRender = this.directRender();
+    draw() {
+        const directDraw = this.directDraw();
 
-        this.resize(directRender);
+        this.resize(directDraw);
 
 
         // Time
@@ -223,7 +284,7 @@ export class Tendrils {
             this.particles.render = this.renderShader;
             this.gl.lineWidth(1);
 
-            if(directRender) {
+            if(directDraw) {
                 // Render the particles directly to the screen
 
                 this.gl.bindFramebuffer(this.gl.FRAMEBUFFER, null);
@@ -278,7 +339,7 @@ export class Tendrils {
         }
     }
 
-    resize(directRender = this.directRender()) {
+    resize(directDraw = this.directDraw()) {
         this.viewRes[0] = this.gl.drawingBufferWidth;
         this.viewRes[1] = this.gl.drawingBufferHeight;
 
@@ -286,19 +347,24 @@ export class Tendrils {
 
         // this.pow2Res.fill(nextPow2(Math.max(...this.viewRes)));
 
-        if(!directRender) {
+        if(!directDraw) {
             this.buffers.forEach((buffer) => buffer.shape = this.viewRes);
         }
 
         // this.flow.shape = this.pow2Res;
         this.flow.shape = this.viewRes;
 
-        this.gl.viewport(0, 0, 1, 1);
+        /**
+         * @todo Why do these 2 lines seem to be equivalent? Something to do
+         *       with how `a-big-triangle` scales its geometry over the screen?
+         */
+        // this.gl.viewport(0, 0, 1, 1);
+        this.gl.viewport(0, 0, this.viewRes[0], this.viewRes[1]);
     }
 
 
     // @todo More specific, or derived from properties?
-    directRender(state = this.state) {
+    directDraw(state = this.state) {
         return (state.autoClearView || state.fadeAlpha < 0);
     }
 
@@ -444,41 +510,6 @@ export class Tendrils {
         return offset;
     }
 }
-
-
-export const defaultSettings = {
-    rootNum: Math.pow(2, 9),
-
-    paused: false,
-    timeStep: 1000/60,
-
-    autoClearView: false,
-    showFlow: false,
-
-    minSpeed: 0.000001,
-    maxSpeed: 0.01,
-    damping: 0.045,
-
-    flowDecay: 0.0001,
-    flowWidth: 3,
-
-    noiseSpeed: 0.00025,
-    noiseScale: 2.125,
-
-    forceWeight: 0.015,
-    flowWeight: 1,
-    wanderWeight: 0.001,
-
-    color: [1, 1, 1, 0.05],
-    fadeAlpha: -1,
-    speedAlpha: 0.000001,
-
-    respawnAmount: 0.02
-};
-
-export const glSettings = {
-    preserveDrawingBuffer: true
-};
 
 
 export default Tendrils;

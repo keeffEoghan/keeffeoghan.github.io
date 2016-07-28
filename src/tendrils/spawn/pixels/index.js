@@ -14,18 +14,18 @@ import aspect from '../../utils/aspect';
 import vert from '../../shaders/screen/index.vert';
 import frag from './shaders/index.frag';
 
-export const defaults = {
+export const defaults = () => ({
     shader: [vert, frag],
     // buffer: [[1, 1]]
     buffer: [[1, 1], { float: true }]
-};
+});
 
 export class SpawnPixels {
     constructor(gl, options) {
         this.gl = gl;
 
         const params = {
-                ...defaults,
+                ...defaults(),
                 ...options
             };
 
