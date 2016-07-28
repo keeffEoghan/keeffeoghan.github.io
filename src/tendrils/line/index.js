@@ -7,20 +7,20 @@
 import geom from 'gl-geometry';
 import lineNormals from 'polyline-normals';
 import shader from 'gl-shader';
-import triangle from 'a-big-triangle';
 import isArray from 'lodash/isArray';
 
 import vert from './index.vert';
 import frag from './index.frag';
 
-// @todo Do this for all the defaults and similar static objects!
+
 export const defaults = () => ({
     shader: [vert, frag],
     uniforms: {
-        color: [0, 0, 0, 1],
-        weight: 0.1
+        color: [1, 1, 1, 1],
+        rad: 0.1,
+        viewSize: [1, 1]
     },
-    vertsPerPoint: 2,
+    vertNum: 2,
     path: [],
     closed: false
 });
@@ -28,9 +28,9 @@ export const defaults = () => ({
 export class Line {
     constructor(gl, options) {
         const params = {
-                ...defaults,
-                ...options
-            };
+            ...defaults(),
+            ...options
+        };
 
         this.gl = gl;
         this.uniforms = params.uniforms;
@@ -39,7 +39,7 @@ export class Line {
                 shader(gl, ...params.shader)
             :   params.shader);
 
-        this.vertsPerPoint = params.vertsPerPoint;
+        this.vertNum = params.vertNum;
         this.path = [...params.path];
         this.closed = params.closed;
 
@@ -64,40 +64,44 @@ export class Line {
             this.lineNormals.push(this.lineNormals[0]);
         }
 
-        const num = this.path.length*this.vertsPerPoint;
+        const num = this.path.length*this.vertNum;
+        const size = ((this.path[0])? this.path[0].length : 0);
         const attr = this.attributes;
 
         // Initialise new data if needed.
-        if(!attr.position || attr.position.length !== num*2) {
+        if(!attr.position || attr.position.length !== num*size) {
             Object.assign(attr, {
-                    position: new Float32Array(num*2),
-                    normal: new Float32Array(num*2),
+                    position: new Float32Array(num*size),
+                    normal: new Float32Array(num*size),
                     miter: new Float32Array(num)
                 });
         }
 
         for(let p = 0, pL = this.path.length; p < pL; ++p) {
             const point = this.path[p];
-            const lineNormals = this.lineNormals[p];
-            const normal = lineNormals[0];
-            const miter = lineNormals[1];
+            const [normal, miter] = this.lineNormals[p];
 
-            for(let v = 0, vL = this.vertsPerPoint; v < vL; ++v) {
-                const i = p+v;
-                const flipOdd = (i*2)-1;
+            for(let v = 0, vL = this.vertNum, odd = 1; v < vL; ++v, odd *= -1) {
+                const i = (p*vL)+v;
 
-                attr.position.set(point, i*2);
-                attr.normal.set(normal, i*2);
-                attr.miter.set(miter*flipOdd, i);
+                attr.position.set(point, i*size);
+                attr.normal.set(normal, i*size);
+
+                // Flip odd miters
+                attr.miter[i] = miter*odd;
             }
         }
 
-        this.geom.attr('position', attr.position, { size: 2 });
-        this.geom.attr('normal', attr.normal, { size: 2 });
+        this.geom.attr('position', attr.position, { size });
+        this.geom.attr('normal', attr.normal, { size });
         this.geom.attr('miter', attr.miter, { size: 1 });
     }
 
-    draw() {}
+    draw(mode = this.gl.TRIANGLE_STRIP, ...rest) {
+        this.geom.bind(this.shader);
+        Object.assign(this.shader.uniforms, this.uniforms);
+        this.geom.draw(mode, ...rest);
+    }
 }
 
 export default Line;

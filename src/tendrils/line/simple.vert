@@ -10,16 +10,9 @@ attribute vec2 normal;
 attribute float miter;
 
 uniform float rad;
-uniform vec2 viewSize;
-
-varying vec2 fragPos;
-varying vec2 linePos;
 
 #pragma glslify: expand = require(./expand)
 
 void main() {
-    fragPos = expand(position, normal, rad, miter);
-    linePos = position;
-
-    gl_Position = vec4(fragPos*viewSize, 0.0, 1.0);
+    gl_Position = vec4(expand(position, normal, rad, miter), 0.0, 1.0);
 }

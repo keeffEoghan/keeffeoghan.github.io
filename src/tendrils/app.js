@@ -5,20 +5,40 @@ import dat from 'dat-gui';
 import mat3 from 'gl-matrix/src/gl-matrix/mat3';
 import vec2 from 'gl-matrix/src/gl-matrix/vec2';
 
-import { SpawnPixels, defaults } from './spawn/pixels';
+import * as spawnPixels from './spawn/pixels';
 import spawnPixelsFlowFrag from './spawn/pixels/shaders/flow.frag';
 
 import spawnReset from './spawn/ball';
 
-import { Tendrils, defaultSettings, glSettings } from './';
+import * as iLine from './line';
+
+import { Tendrils, defaults, glSettings } from './';
+
+const defaultSettings = defaults();
 
 
 export default (canvas, settings, debug) => {
     let tendrils;
-    const gl = glContext(canvas, glSettings,
-            (...rest) => tendrils.render(...rest));
+    let line;
+
+    const gl = glContext(canvas, glSettings, () => {
+                tendrils.draw();
+
+                gl.viewport(0, 0,
+                    gl.drawingBufferWidth, gl.drawingBufferHeight);
+
+                gl.bindFramebuffer(gl.FRAMEBUFFER, null);
+                line.draw();
+            });
 
     tendrils = new Tendrils(gl);
+    line = new iLine.Line(gl, {
+            path: [[-1, 0.5], [1, -0.5]],
+            uniforms: {
+                ...iLine.defaults().uniforms,
+                rad: 0.1
+            }
+        });
 
     const resetSpawner = spawnReset(gl);
 
@@ -31,8 +51,8 @@ export default (canvas, settings, debug) => {
      *       horizontal/vertical lines, like it were stretched.
      */
 
-    const flowPixelSpawner = new SpawnPixels(gl, {
-            shader: [defaults.shader[0], spawnPixelsFlowFrag],
+    const flowPixelSpawner = new spawnPixels.SpawnPixels(gl, {
+            shader: [spawnPixels.defaults().shader[0], spawnPixelsFlowFrag],
             buffer: tendrils.flow
         });
 
@@ -48,7 +68,7 @@ export default (canvas, settings, debug) => {
 
     // Cam
 
-    const camPixelSpawner = new SpawnPixels(gl);
+    const camPixelSpawner = new spawnPixels.SpawnPixels(gl);
 
     let video = null;
 
@@ -324,7 +344,7 @@ export default (canvas, settings, debug) => {
                     controllers.restart();
 
                     Object.assign(colorGUI, {
-                            opacity: 0.1,
+                            opacity: 0.01,
                             color: [255, 150, 0]
                         });
 
