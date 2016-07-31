@@ -10,12 +10,14 @@ import spawnPixelsFlowFrag from './spawn/pixels/shaders/flow.frag';
 
 import spawnReset from './spawn/ball';
 
-import * as iLine from './line';
+import * as Line from './line';
 
-import { Tendrils, defaults, glSettings } from './';
+import { Tendrils, defaults/*, glSettings*/ } from './';
 
-const defaultSettings = defaults();
-
+const defaultSettings = Object.assign(defaults().state, {
+        respawnAmount: 0.03,
+        respawnTick: 0
+    });
 
 export default (canvas, settings, debug) => {
     let tendrils;
@@ -32,11 +34,11 @@ export default (canvas, settings, debug) => {
             });
 
     tendrils = new Tendrils(gl);
-    line = new iLine.Line(gl, {
+    line = new Line.Line(gl, {
             path: [[-0.8, 0.5], [0.8, -0.5], [0.7, 0.5], [0.3, -0.7]],
             closed: true,
             uniforms: {
-                ...iLine.defaults().uniforms,
+                ...Line.defaults().uniforms,
                 rad: 0.1
             }
         });
@@ -265,14 +267,20 @@ export default (canvas, settings, debug) => {
 
         let presetsGUI = gui.addFolder('presets');
 
+        const restartState = () => {
+            controllers.restart();
+            updateGUI();
+            convertColor();
+            respawnCamSweep();
+        };
+
         let presetters = {
                 'Default': () => {
                     Object.assign(state, defaultSettings);
 
                     controllers.cyclingColor = false;
-                    updateGUI();
 
-                    controllers.restart();
+                    restartState();
                 },
                 'Flow': () => {
                     Object.assign(state, defaultSettings, {
@@ -280,7 +288,8 @@ export default (canvas, settings, debug) => {
                         });
 
                     controllers.cyclingColor = false;
-                    updateGUI();
+
+                    restartState();
                 },
                 'Fluid (kinda)': () => {
                     Object.assign(state, defaultSettings, {
@@ -289,18 +298,14 @@ export default (canvas, settings, debug) => {
                             respawnTick: 500
                         });
 
-                    controllers.restart();
-                    respawnCamSweep();
-
                     Object.assign(colorGUI, {
                             opacity: 0.2,
                             color: [255, 255, 255]
                         });
 
-                    convertColor();
-
                     controllers.cyclingColor = false;
-                    updateGUI();
+
+                    restartState();
                 },
                 'Flow only': () => {
                     Object.assign(state, defaultSettings, {
@@ -319,18 +324,14 @@ export default (canvas, settings, debug) => {
                             speed: 0.015
                         });
 
-                    controllers.restart();
-                    respawnCamSweep();
-
                     Object.assign(colorGUI, {
                             opacity: 0.8,
                             color: [100, 200, 255]
                         });
 
-                    convertColor();
-
                     controllers.cyclingColor = false;
-                    updateGUI();
+
+                    restartState();
                 },
                 'Noise only': () => {
                     Object.assign(state, defaultSettings, {
@@ -342,17 +343,14 @@ export default (canvas, settings, debug) => {
                             speedAlpha: 0
                         });
 
-                    controllers.restart();
-
                     Object.assign(colorGUI, {
                             opacity: 0.01,
                             color: [255, 150, 0]
                         });
 
-                    convertColor();
-
                     controllers.cyclingColor = false;
-                    updateGUI();
+
+                    restartState();
                 },
                 'Sea': () => {
                     Object.assign(state, defaultSettings, {
@@ -364,25 +362,21 @@ export default (canvas, settings, debug) => {
                             speedAlpha: 0
                         });
 
-                    controllers.restart();
-
                     Object.assign(colorGUI, {
                             opacity: 0.8,
                             color: [55, 155, 255]
                         });
 
-                    convertColor();
-
                     controllers.cyclingColor = false;
-                    updateGUI();
+
+                    restartState();
                 },
                 'Mad styles': () => {
-                    Object.assign(state, defaultSettings, {
-                        });
+                    Object.assign(state, defaultSettings);
 
-                    controllers.restart();
                     controllers.cyclingColor = true;
-                    updateGUI();
+
+                    restartState();
                 },
                 'Ghostly': () => {
                     Object.assign(state, defaultSettings, {
@@ -390,17 +384,14 @@ export default (canvas, settings, debug) => {
                             flowDecay: 0
                         });
 
-                    controllers.restart();
-
                     Object.assign(colorGUI, {
                             opacity: 0.006,
                             color: [255, 255, 255]
                         });
 
-                    convertColor();
-
                     controllers.cyclingColor = false;
-                    updateGUI();
+
+                    restartState();
                 },
                 'Turbulent': () => {
                     Object.assign(state, defaultSettings, {
@@ -413,17 +404,14 @@ export default (canvas, settings, debug) => {
                             speedAlpha: 0.000002
                         });
 
-                    controllers.restart();
-
                     Object.assign(colorGUI, {
                             opacity: 0.9,
                             color: [255, 10, 10]
                         });
 
-                    convertColor();
-
                     controllers.cyclingColor = false;
-                    updateGUI();
+
+                    restartState();
                 },
                 'Roots': () => {
                     Object.assign(state, defaultSettings, {
@@ -436,17 +424,14 @@ export default (canvas, settings, debug) => {
                             speedAlpha: 0.00005
                         });
 
-                    controllers.restart();
-
                     Object.assign(colorGUI, {
                             opacity: 0.03,
                             color: [50, 255, 50]
                         });
 
-                    convertColor();
-
                     controllers.cyclingColor = false;
-                    updateGUI();
+
+                    restartState();
                 },
                 'Hairy': () => {
                     Object.assign(state, defaultSettings, {
@@ -459,18 +444,14 @@ export default (canvas, settings, debug) => {
                             respawnTick: 800
                         });
 
-                    controllers.restart();
-                    respawnCamSweep();
-
                     Object.assign(colorGUI, {
                             opacity: 0.9,
                             color: [255, 150, 255]
                         });
 
-                    convertColor();
-
                     controllers.cyclingColor = false;
-                    updateGUI();
+
+                    restartState();
                 }
             };
 

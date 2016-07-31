@@ -65,14 +65,14 @@ export class Line {
         }
 
         const num = this.path.length*this.vertNum;
-        const size = ((this.path[0])? this.path[0].length : 0);
+        const vertSize = ((this.path[0])? this.path[0].length : 0);
         const attr = this.attributes;
 
         // Initialise new data if needed.
-        if(!attr.position || attr.position.length !== num*size) {
+        if(!attr.position || attr.position.length !== num*vertSize) {
             Object.assign(attr, {
-                    position: new Float32Array(num*size),
-                    normal: new Float32Array(num*size),
+                    position: new Float32Array(num*vertSize),
+                    normal: new Float32Array(num*vertSize),
                     miter: new Float32Array(num)
                 });
         }
@@ -84,16 +84,16 @@ export class Line {
             for(let v = 0, vL = this.vertNum, odd = 1; v < vL; ++v, odd *= -1) {
                 const i = (p*vL)+v;
 
-                attr.position.set(point, i*size);
-                attr.normal.set(normal, i*size);
+                attr.position.set(point, i*vertSize);
+                attr.normal.set(normal, i*vertSize);
 
                 // Flip odd miters
                 attr.miter[i] = miter*odd;
             }
         }
 
-        this.geom.attr('position', attr.position, { size });
-        this.geom.attr('normal', attr.normal, { size });
+        this.geom.attr('position', attr.position, { size: vertSize });
+        this.geom.attr('normal', attr.normal, { size: vertSize });
         this.geom.attr('miter', attr.miter, { size: 1 });
     }
 
