@@ -21,7 +21,7 @@ export default (canvas, settings, debug) => {
     let tendrils;
     let line;
 
-    const gl = glContext(canvas, glSettings, () => {
+    const gl = glContext(canvas/*, glSettings*/, () => {
                 tendrils.draw();
 
                 gl.viewport(0, 0,
@@ -33,7 +33,8 @@ export default (canvas, settings, debug) => {
 
     tendrils = new Tendrils(gl);
     line = new iLine.Line(gl, {
-            path: [[-1, 0.5], [1, -0.5]],
+            path: [[-0.8, 0.5], [0.8, -0.5], [0.7, 0.5], [0.3, -0.7]],
+            closed: true,
             uniforms: {
                 ...iLine.defaults().uniforms,
                 rad: 0.1
@@ -56,7 +57,7 @@ export default (canvas, settings, debug) => {
             buffer: tendrils.flow
         });
 
-    // This flips the lookup, which is interesting (kaleidoscope reflection)
+    // This flips the lookup, which is interesting (reflection)
     // const flowPixelScale = [1, 1];
     const flowPixelScale = [1, -1];
 
