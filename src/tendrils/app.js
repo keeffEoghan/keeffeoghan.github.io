@@ -29,13 +29,20 @@ export default (canvas, settings, debug) => {
                 gl.viewport(0, 0,
                     gl.drawingBufferWidth, gl.drawingBufferHeight);
 
-                gl.bindFramebuffer(gl.FRAMEBUFFER, null);
+                // gl.bindFramebuffer(gl.FRAMEBUFFER, null);
+                tendrils.flow.bind();
                 line.draw();
             });
 
     tendrils = new Tendrils(gl);
     line = new Line.Line(gl, {
-            path: [[-0.8, 0.5], [0.8, -0.5], [0.7, 0.5], [0.3, -0.7]],
+            // path: [[-0.8, 0.5], [0.8, -0.5], [0.7, 0.5], [0.3, -0.7]],
+            path: Array(20).fill(0).map((v, i, array) => {
+                const a = i/array.length*Math.PI*2;
+                const vec = vec2.fromValues(Math.cos(a), Math.sin(a));
+
+                return vec2.scale(vec, vec, 0.5);
+            }),
             closed: true,
             uniforms: {
                 ...Line.defaults().uniforms,

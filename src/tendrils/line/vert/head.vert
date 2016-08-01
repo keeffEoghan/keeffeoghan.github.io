@@ -10,9 +10,4 @@ attribute vec2 normal;
 attribute float miter;
 
 uniform float rad;
-
-#pragma glslify: expand = require(./expand)
-
-void main() {
-    gl_Position = vec4(expand(position, normal, rad, miter), 0.0, 1.0);
-}
+uniform vec2 viewSize;

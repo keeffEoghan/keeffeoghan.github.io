@@ -1,10 +1,14 @@
 /**
  * @requires {float} time The current time in ms
- * @requires {float} flowDecay The amount the flow decays over time
  */
 
-vec3 apply(vec4 state) {
-    return vec3(state.zw, time);
+#pragma glslify: length2 = require(../../utils/length-2)
+
+vec4 flow(vec2 vel, float maxSpeed) {
+    // Faster particles leave a greater influence (opacity).
+    // Linear interpolation - inaccurate for vectors, will it be OK without
+    // sudden turns, or do we need a per-fragment lookup?
+    return vec4(vel, time, length2(vel)/(maxSpeed*maxSpeed));
 }
 
-#pragma glslify: export(apply)
+#pragma glslify: export(flow)
