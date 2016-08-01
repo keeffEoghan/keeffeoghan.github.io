@@ -8,10 +8,13 @@ import geom from 'gl-geometry';
 import lineNormals from 'polyline-normals';
 import shader from 'gl-shader';
 import isArray from 'lodash/isArray';
+import isFunction from 'lodash/isFunction';
 
-import vert from './index.vert';
-import frag from './index.frag';
+import vert from './vert/index.vert';
+import frag from './frag/index.frag';
 
+
+const result = (value) => ((isFunction(value))? value() : value);
 
 export const defaults = () => ({
     shader: [vert, frag],
@@ -21,6 +24,7 @@ export const defaults = () => ({
         viewSize: [1, 1]
     },
     vertNum: 2,
+    vertSize: 2,
     path: [],
     closed: false
 });
@@ -40,13 +44,26 @@ export class Line {
             :   params.shader);
 
         this.vertNum = params.vertNum;
+        this.vertSize = params.vertSize;
+
         this.path = [...params.path];
         this.closed = params.closed;
 
+        // Add any new attributes you like according to this structure.
+        // See `update`, `initAttributes`, `setAttributes`.
         this.attributes = {
-            position: null,
-            normal: null,
-            miter: null
+            position: {
+                data: null,
+                size: () => this.vertSize
+            },
+            normal: {
+                data: null,
+                size: () => this.vertSize
+            },
+            miter: {
+                data: null,
+                size: 1
+            }
         };
 
         this.geom = geom(gl);
@@ -54,7 +71,7 @@ export class Line {
         this.update();
     }
 
-    update(path = this.path, closed = this.closed) {
+    update(path = this.path, closed = this.closed, each = this.setAttributes) {
         this.path = path;
         this.closed = closed;
         this.lineNormals = lineNormals(this.path, this.closed);
@@ -64,43 +81,67 @@ export class Line {
             this.lineNormals.push(this.lineNormals[0]);
         }
 
-        const num = this.path.length*this.vertNum;
-        const vertSize = ((this.path[0])? this.path[0].length : 0);
-        const attr = this.attributes;
+        this.initAttributes();
 
-        // Initialise new data if needed.
-        if(!attr.position || attr.position.length !== num*vertSize) {
-            Object.assign(attr, {
-                    position: new Float32Array(num*vertSize),
-                    normal: new Float32Array(num*vertSize),
-                    miter: new Float32Array(num)
-                });
-        }
+        const values = {};
+        const attributes = this.attributes;
+        const vertNum = this.vertNum;
 
-        for(let p = 0, pL = this.path.length; p < pL; ++p) {
-            const point = this.path[p];
-            const [normal, miter] = this.lineNormals[p];
+        // Set up attribute data
+        for(let p = 0, pL = path.length; p < pL; ++p) {
+            const lineNormal = this.lineNormals[p];
 
-            for(let v = 0, vL = this.vertNum, odd = 1; v < vL; ++v, odd *= -1) {
-                const i = (p*vL)+v;
+            values.point = path[p];
+            values.normal = lineNormal[0];
+            values.miter = lineNormal[1];
 
-                attr.position.set(point, i*vertSize);
-                attr.normal.set(normal, i*vertSize);
+            const pointIndex = p*vertNum;
 
-                // Flip odd miters
-                attr.miter[i] = miter*odd;
+            for(let v = 0; v < vertNum; ++v) {
+                each(values, pointIndex+v, attributes);
             }
         }
 
-        this.geom.attr('position', attr.position, { size: vertSize });
-        this.geom.attr('normal', attr.normal, { size: vertSize });
-        this.geom.attr('miter', attr.miter, { size: 1 });
+        // Bind to geometry attributes
+        for(let name in attributes) {
+            const attribute = attributes[name];
+
+            this.geom.attr(name, attribute.data, {
+                    size: result(attribute.size)
+                });
+        }
     }
 
     draw(mode = this.gl.TRIANGLE_STRIP, ...rest) {
         this.geom.bind(this.shader);
         Object.assign(this.shader.uniforms, this.uniforms);
         this.geom.draw(mode, ...rest);
+    }
+
+    initAttributes(path = this.path) {
+        const num = path.length*this.vertNum;
+        const attributes = this.attributes;
+
+        // Initialise new data if needed.
+        for(var name in attributes) {
+            const attribute = attributes[name];
+            const length = num*result(attribute.size);
+
+            if(!attribute.data || attribute.data.length !== length) {
+                attribute.data = new Float32Array(length);
+            }
+        }
+    }
+
+    setAttributes(values, index, attributes) {
+        attributes.position.data.set(values.point,
+            index*result(attributes.position.size));
+
+        attributes.normal.data.set(values.normal,
+            index*result(attributes.normal.size));
+
+        // Flip odd miters
+        attributes.miter.data[index] = values.miter*(((index%2)*2)-1);
     }
 }
 
