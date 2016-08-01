@@ -1,4 +1,4 @@
-import inert from '../../utils/inert';
+import inert from '../../const/inert';
 
 export default (data) => {
     data[0] = data[1] = inert;

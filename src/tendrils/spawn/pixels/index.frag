@@ -11,7 +11,7 @@
 #pragma glslify: import(./frag/head)
 
 #pragma glslify: applyColor = require(./apply/color)
-#pragma glslify: vignette = require(../../../shaders/filter/pass/vignette)
+#pragma glslify: vignette = require(../../filter/pass/vignette)
 #pragma glslify: apply = require(./apply/compose-filter, apply = applyColor, pass = vignette)
 
 #pragma glslify: pick = require(./pick/particles)

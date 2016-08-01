@@ -5,10 +5,11 @@
  * @todo Some bug with `glslify-import` & sons breaks `node_mosules` aliased
  *       `require`s in `import`ed files, so we need to do it the looooooong way.
  */
-#pragma glslify: random = require(../../../../../../node_modules/glsl-random)
+// #pragma glslify: random = require(glsl-random)
+#pragma glslify: random = require(../../../../../node_modules/glsl-random)
 
-#pragma glslify: uvToPos = require(../../../../shaders/map/uv-to-pos)
-#pragma glslify: transform = require(../../../../shaders/utils/transform)
+#pragma glslify: uvToPos = require(../../../map/uv-to-pos)
+#pragma glslify: transform = require(../../../utils/transform)
 
 const vec2 flipUV = vec2(1.0, -1.0);
 

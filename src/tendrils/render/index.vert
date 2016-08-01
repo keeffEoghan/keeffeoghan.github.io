@@ -13,7 +13,7 @@ attribute vec2 uv;
 
 varying float speedRate;
 
-#pragma glslify: inert = require(../../utils/inert)
+#pragma glslify: inert = require(../const/inert)
 #pragma glslify: length2 = require(../utils/length-2)
 #pragma glslify: stateAtFrame = require(../state/state-at-frame)
 

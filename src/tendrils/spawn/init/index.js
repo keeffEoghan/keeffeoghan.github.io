@@ -1,7 +1,7 @@
 import shader from 'gl-shader';
 import isArray from 'lodash/isArray';
 
-import vert from '../../shaders/screen/index.vert';
+import vert from '../../screen/index.vert';
 import frag from './index.frag';
 
 export const defaults = () => ({

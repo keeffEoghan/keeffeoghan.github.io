@@ -6,11 +6,11 @@ import mat3 from 'gl-matrix/src/gl-matrix/mat3';
 import vec2 from 'gl-matrix/src/gl-matrix/vec2';
 
 import * as spawnPixels from './spawn/pixels';
-import spawnPixelsFlowFrag from './spawn/pixels/shaders/flow.frag';
+import spawnPixelsFlowFrag from './spawn/pixels/flow.frag';
 
 import spawnReset from './spawn/ball';
 
-import * as Line from './line';
+import * as Line from './geom/line';
 
 import { Tendrils, defaults/*, glSettings*/ } from './';
 
