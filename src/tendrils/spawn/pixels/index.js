@@ -11,8 +11,8 @@ import isArray from 'lodash/isArray';
 
 import aspect from '../../utils/aspect';
 
-import vert from '../../shaders/screen/index.vert';
-import frag from './shaders/index.frag';
+import vert from '../../screen/index.vert';
+import frag from './index.frag';
 
 export const defaults = () => ({
     shader: [vert, frag],

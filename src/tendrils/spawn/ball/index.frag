@@ -5,8 +5,8 @@ uniform float speed;
 
 #pragma glslify: random = require(glsl-random)
 
-#pragma glslify: angleToPos = require(../../shaders/utils/angle-to-pos)
-#pragma glslify: tau = require(../../shaders/const/tau)
+#pragma glslify: angleToPos = require(../../utils/angle-to-pos)
+#pragma glslify: tau = require(../../const/tau)
 
 void main() {
     vec4 randoms = vec4(random(gl_FragCoord.xy*1.7654+2.3675),

@@ -3,10 +3,10 @@
  * by the `rgba` channels.
  */
 
-#pragma glslify: rgb2hsv = require(../../../../../../libs/glsl-hsv/rgb-hsv)
+#pragma glslify: rgb2hsv = require(../../../../../libs/glsl-hsv/rgb-hsv)
 
-#pragma glslify: tau = require(../../../../shaders/const/tau)
-#pragma glslify: angleToPos = require(../../../../shaders/utils/angle-to-pos)
+#pragma glslify: tau = require(../../../const/tau)
+#pragma glslify: angleToPos = require(../../../utils/angle-to-pos)
 
 vec4 apply(vec2 uv, vec2 pos, vec4 pixel) {
     vec3 hsv = rgb2hsv(pixel.rgb);

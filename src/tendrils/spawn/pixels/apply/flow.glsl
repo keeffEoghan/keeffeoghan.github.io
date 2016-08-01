@@ -6,7 +6,7 @@
  * @requires {float} decay The rate of decay of the flow over time
  */
 
-#pragma glslify: getFlow = require(../../../../shaders/flow/get)
+#pragma glslify: getFlow = require(../../../flow/get)
 
 vec4 apply(vec2 uv, vec2 pos, vec4 pixel) {
     return vec4(pos, getFlow(pixel, time, decay));

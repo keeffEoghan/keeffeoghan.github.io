@@ -4,7 +4,7 @@
  *                            color to be drawn.
  */
 
-#pragma glslify: inert = require(../../../utils/inert)
+#pragma glslify: inert = require(../../const/inert)
 #pragma glslify: stateForFrame = require(../../state/state-at-frame)
 
 void main() {

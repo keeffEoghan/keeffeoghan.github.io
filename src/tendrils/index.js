@@ -14,18 +14,17 @@ import { maxAspect } from './utils/aspect';
 
 // Shaders
 
-import logicFrag from './shaders/logic.frag';
+import logicFrag from './logic.frag';
 
-import renderVert from './shaders/render/index.vert';
-import renderFrag from './shaders/render/index.frag';
+import renderVert from './render/index.vert';
+import renderFrag from './render/index.frag';
 
-import flowVert from './shaders/flow/index.vert';
-import flowScreenVert from './shaders/flow/screen.vert';
-import flowFrag from './shaders/flow/index.frag';
+import flowVert from './flow/index.vert';
+import flowScreenVert from './flow/screen.vert';
+import flowFrag from './flow/index.frag';
 
-import screenVert from './shaders/screen/index.vert';
-
-import copyFadeFrag from './shaders/copy-fade.frag';
+import screenVert from './screen/index.vert';
+import copyFadeFrag from './screen/copy-fade.frag';
 
 
 export const defaults = () => ({

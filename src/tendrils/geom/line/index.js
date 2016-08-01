@@ -23,6 +23,7 @@ export const defaults = () => ({
         rad: 0.1,
         viewSize: [1, 1]
     },
+    attributes: null,
     vertNum: 2,
     vertSize: 2,
     path: [],
@@ -63,7 +64,8 @@ export class Line {
             miter: {
                 data: null,
                 size: 1
-            }
+            },
+            ...params.attributes
         };
 
         this.geom = geom(gl);
@@ -84,6 +86,7 @@ export class Line {
         this.initAttributes();
 
         const values = {};
+        const index = {};
         const attributes = this.attributes;
         const vertNum = this.vertNum;
 
@@ -95,10 +98,14 @@ export class Line {
             values.normal = lineNormal[0];
             values.miter = lineNormal[1];
 
-            const pointIndex = p*vertNum;
+            index.path = p;
+            index.point = p*vertNum;
 
             for(let v = 0; v < vertNum; ++v) {
-                each(values, pointIndex+v, attributes);
+                index.vert = v;
+                index.data = index.point+v;
+
+                each(values, index, attributes);
             }
         }
 
@@ -135,13 +142,13 @@ export class Line {
 
     setAttributes(values, index, attributes) {
         attributes.position.data.set(values.point,
-            index*result(attributes.position.size));
+            index.data*result(attributes.position.size));
 
         attributes.normal.data.set(values.normal,
-            index*result(attributes.normal.size));
+            index.data*result(attributes.normal.size));
 
         // Flip odd miters
-        attributes.miter.data[index] = values.miter*(((index%2)*2)-1);
+        attributes.miter.data[index.data] = values.miter*(((index.data%2)*2)-1);
     }
 }
 

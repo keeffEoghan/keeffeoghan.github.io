@@ -25,7 +25,7 @@ import isFunction from 'lodash/isFunction';
 
 import { step } from '../utils';
 
-import logicVert from './shaders/screen/index.vert';
+import logicVert from './screen/index.vert';
 
 
 export const defaults = () => ({
