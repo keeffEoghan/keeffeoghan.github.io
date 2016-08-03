@@ -30,6 +30,7 @@ export default (canvas, settings, debug) => {
                     gl.drawingBufferWidth, gl.drawingBufferHeight);
 
                 tendrils.flow.bind();
+                Object.assign(flowInput.line.uniforms, tendrils.state);
                 flowInput.update().draw();
 
                 // gl.bindFramebuffer(gl.FRAMEBUFFER, null);

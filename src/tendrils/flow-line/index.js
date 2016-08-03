@@ -16,11 +16,9 @@ export class FlowLine {
                 uniforms: {
                     ...defaults().uniforms,
                     time: 0,
-                    // speed: 10000000000,
-                    // maxSpeed: 1,
                     speed: 0.05,
                     maxSpeed: 0.01,
-                    rad: 0.1
+                    rad: 0.3
                 },
                 attributes: {
                     ...defaults().attributes,
@@ -39,8 +37,6 @@ export class FlowLine {
     }
 
     draw(...rest) {
-        this.line.uniforms.time = Date.now();
-
         this.line.draw(...rest);
 
         return this;
