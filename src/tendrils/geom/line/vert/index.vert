@@ -7,7 +7,7 @@ varying float sdf;
 void main() {
     vec2 pos = expand(position, normal, rad, miter);
 
-    sdf = sign(miter)*0.5;
+    sdf = sign(miter);
 
     gl_Position = vec4(pos*viewSize, 0.0, 1.0);
 }

@@ -16,6 +16,6 @@
 
 #pragma glslify: pick = require(./pick/particles)
 
-const float samples = 3.0;
+const float samples = 6.0;
 
 #pragma glslify: import(./frag/main)

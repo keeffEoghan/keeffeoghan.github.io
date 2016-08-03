@@ -6,7 +6,7 @@ export const defaults = () => ({
     shader: [init.defaults().shader[0], frag],
     uniforms: {
         radius: 1,
-        speed: 0.01
+        speed: 0
     }
 });
 

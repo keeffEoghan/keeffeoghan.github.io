@@ -1,20 +1,30 @@
-#pragma glslify: import(../frag/head)
+#pragma glslify: import(../geom/line/vert/head)
+
+uniform float time;
+uniform float speed;
+uniform float maxSpeed;
 
 attribute vec2 previous;
 
-varying vec2 path;
-// varying vec2 perp;
+varying vec4 values;
 varying float sdf;
 
-#pragma glslify: length2 = require(../../../utils/length-2)
-#pragma glslify: expand = require(../expand)
+#pragma glslify: flow = require(../flow/apply/state, time = time)
+// #pragma glslify: flow = require(../flow/apply/screen, time = time, flowDecay = 0.001)
+
+#pragma glslify: perp = require(../utils/perp)
+#pragma glslify: expand = require(../geom/line/expand)
 
 void main() {
-    path = position-previous;
-    // perp = normal*miter*length(path);
     sdf = sign(miter);
 
-    vec2 pos = expand(position, normal, rad*length2(path), miter);
+    // @note For some reason, using the 2nd one has different results.
+    vec2 path = (position-previous)*speed;
+    // vec2 path = perp(normal, true)*length(position-previous)*speed;
 
-    gl_Position = vec4(pos*viewSize, 0.0, 1.0);
+    values = flow(path, maxSpeed);
+
+    vec2 vert = expand(position, normal, rad*values.a, miter);
+
+    gl_Position = vec4(vert*viewSize, 0.0, 1.0);
 }
