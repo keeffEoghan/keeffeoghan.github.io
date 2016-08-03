@@ -109,6 +109,11 @@ export class Tendrils {
                 shader(this.gl, ...params.fadeShader)
             :   params.fadeShader);
 
+        this.uniforms = {
+                render: {},
+                update: {}
+            };
+
 
         this.particles = null;
 
@@ -225,8 +230,7 @@ export class Tendrils {
             // Disabling blending here is important
             this.gl.disable(this.gl.BLEND);
 
-            this.particles.step({
-                    ...this.state,
+            Object.assign(this.uniforms.update, this.state, {
                     dt,
                     time: this.time,
                     start: this.start,
@@ -234,6 +238,8 @@ export class Tendrils {
                     viewSize: this.viewSize,
                     viewRes: this.viewRes
                 });
+
+            this.particles.step(this.uniforms.update);
 
             this.gl.enable(this.gl.BLEND);
             this.gl.blendFunc(this.gl.SRC_ALPHA, this.gl.ONE_MINUS_SRC_ALPHA);
@@ -244,14 +250,13 @@ export class Tendrils {
 
         // Flow FBO and view renders
 
-        const drawUniforms = {
-            ...this.state,
-            time: this.time,
-            previous: this.particles.buffers[1].color[0].bind(2),
-            dataRes: this.particles.shape,
-            viewSize: this.viewSize,
-            viewRes: this.viewRes
-        };
+        Object.assign(this.uniforms.render, this.state, {
+                time: this.time,
+                previous: this.particles.buffers[1].color[0].bind(2),
+                dataRes: this.particles.shape,
+                viewSize: this.viewSize,
+                viewRes: this.viewRes
+            });
 
         this.particles.render = this.flowShader;
 
@@ -261,7 +266,7 @@ export class Tendrils {
         this.flow.bind();
 
         this.gl.lineWidth(this.state.flowWidth);
-        this.particles.draw(drawUniforms, this.gl.LINES);
+        this.particles.draw(this.uniforms.render, this.gl.LINES);
 
         /**
          * @todo Mipmaps for global flow sampling - not working at the moment.
@@ -280,7 +285,7 @@ export class Tendrils {
 
             // Render the flow directly to the screen
             this.gl.bindFramebuffer(this.gl.FRAMEBUFFER, null);
-            this.particles.draw(drawUniforms, this.gl.LINES);
+            this.particles.draw(this.uniforms.render, this.gl.LINES);
         }
 
         // Set up the particles for rendering
@@ -296,7 +301,7 @@ export class Tendrils {
                 this.gl.clear(this.gl.COLOR_BUFFER_BIT);
             }
 
-            this.particles.draw(drawUniforms, this.gl.LINES);
+            this.particles.draw(this.uniforms.render, this.gl.LINES);
         }
         else {
             // Multi-buffer passes
@@ -318,7 +323,7 @@ export class Tendrils {
 
 
             // Render the particles into the current buffer
-            this.particles.draw(drawUniforms, this.gl.LINES);
+            this.particles.draw(this.uniforms.render, this.gl.LINES);
 
 
             // Copy and fade the current buffer to the screen

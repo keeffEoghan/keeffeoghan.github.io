@@ -18,7 +18,7 @@ varying float sdf;
 void main() {
     sdf = sign(miter);
 
-    // @note For some reason, using the 2nd one has different results.
+    // @note For some reason, using these have different effects.
     vec2 path = (position-previous)*speed;
     // vec2 path = perp(normal, true)*length(position-previous)*speed;
 
