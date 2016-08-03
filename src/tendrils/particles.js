@@ -20,7 +20,6 @@ import shader from 'gl-shader';
 import FBO from 'gl-fbo';
 import triangle from 'a-big-triangle';
 import ndarray from 'ndarray';
-import isArray from 'lodash/isArray';
 import isFunction from 'lodash/isFunction';
 
 import { step } from '../utils';
@@ -58,13 +57,13 @@ export class Particles {
 
         const logic = (params.logic || [params.logicVert, params.logicFrag]);
 
-        this.logic = ((isArray(logic))? shader(gl, ...logic) : logic);
+        this.logic = ((Array.isArray(logic))? shader(gl, ...logic) : logic);
 
 
         const render = (params.render ||
                 [params.renderVert, params.renderFrag]);
 
-        this.render = ((isArray(render))? shader(gl, ...render) : render);
+        this.render = ((Array.isArray(render))? shader(gl, ...render) : render);
 
 
         this.geom = geom(gl);

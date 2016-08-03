@@ -7,7 +7,6 @@ import FBO from 'gl-fbo';
 import shader from 'gl-shader';
 import mat3 from 'gl-matrix/src/gl-matrix/mat3';
 import vec2 from 'gl-matrix/src/gl-matrix/vec2';
-import isArray from 'lodash/isArray';
 
 import aspect from '../../utils/aspect';
 
@@ -29,11 +28,11 @@ export class SpawnPixels {
                 ...options
             };
 
-        this.shader = ((isArray(params.shader))?
+        this.shader = ((Array.isArray(params.shader))?
                 shader(this.gl, ...params.shader)
             :   params.shader);
 
-        this.buffer = ((isArray(params.buffer))?
+        this.buffer = ((Array.isArray(params.buffer))?
                 FBO(this.gl, ...params.buffer)
             :   params.buffer);
 

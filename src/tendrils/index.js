@@ -4,7 +4,6 @@ import shader from 'gl-shader';
 import FBO from 'gl-fbo';
 import triangle from 'a-big-triangle';
 import ndarray from 'ndarray';
-import isArray from 'lodash/isArray';
 
 import Particles from './particles';
 import { step/*, nextPow2*/ } from '../utils';
@@ -24,6 +23,8 @@ import flowScreenVert from './flow/screen.vert';
 import flowFrag from './flow/index.frag';
 
 import screenVert from './screen/index.vert';
+
+// @todo Try drawing a semi-transparent block over the last frame?
 import copyFadeFrag from './screen/copy-fade.frag';
 
 
@@ -42,7 +43,7 @@ export const defaults = () => ({
         damping: 0.045,
 
         flowDecay: 0.0001,
-        flowWidth: 3,
+        flowWidth: 5,
 
         noiseSpeed: 0.00025,
         noiseScale: 2.125,
@@ -85,23 +86,26 @@ export class Tendrils {
         /**
          * @todo May need more buffers/passes later?
          */
-        this.buffers = [FBO(this.gl, [1, 1]), FBO(this.gl, [1, 1])];
+        this.buffers = [
+            FBO(this.gl, [1, 1]),
+            FBO(this.gl, [1, 1])
+        ];
 
         this.logicShader = null;
 
-        this.renderShader = ((isArray(params.renderShader))?
+        this.renderShader = ((Array.isArray(params.renderShader))?
                 shader(this.gl, ...params.renderShader)
             :   params.renderShader);
 
-        this.flowShader = ((isArray(params.flowShader))?
+        this.flowShader = ((Array.isArray(params.flowShader))?
                 shader(this.gl, ...params.flowShader)
             :   params.flowShader);
 
-        this.flowScreenShader = ((isArray(params.flowScreenShader))?
+        this.flowScreenShader = ((Array.isArray(params.flowScreenShader))?
                 shader(this.gl, ...params.flowScreenShader)
             :   params.flowScreenShader);
 
-        this.fadeShader = ((isArray(params.fadeShader))?
+        this.fadeShader = ((Array.isArray(params.fadeShader))?
                 shader(this.gl, ...params.fadeShader)
             :   params.fadeShader);
 
@@ -278,63 +282,62 @@ export class Tendrils {
             this.gl.bindFramebuffer(this.gl.FRAMEBUFFER, null);
             this.particles.draw(drawUniforms, this.gl.LINES);
         }
+
+        // Set up the particles for rendering
+        this.particles.render = this.renderShader;
+        this.gl.lineWidth(1);
+
+        if(directDraw) {
+            // Render the particles directly to the screen
+
+            this.gl.bindFramebuffer(this.gl.FRAMEBUFFER, null);
+
+            if(this.state.autoClearView) {
+                this.gl.clear(this.gl.COLOR_BUFFER_BIT);
+            }
+
+            this.particles.draw(drawUniforms, this.gl.LINES);
+        }
         else {
-            // Set up the particles for rendering
-            this.particles.render = this.renderShader;
-            this.gl.lineWidth(1);
+            // Multi-buffer passes
 
-            if(directDraw) {
-                // Render the particles directly to the screen
+            this.buffers[0].bind();
+            this.gl.clear(this.gl.COLOR_BUFFER_BIT);
 
-                this.gl.bindFramebuffer(this.gl.FRAMEBUFFER, null);
+            // Copy and fade the last buffer into the current buffer
 
-                if(this.state.autoClearView) {
-                    this.gl.clear(this.gl.COLOR_BUFFER_BIT);
-                }
+            this.fadeShader.bind();
 
-                this.particles.draw(drawUniforms, this.gl.LINES);
-            }
-            else {
-                // Multi-buffer passes
+            Object.assign(this.fadeShader.uniforms, {
+                    opacity: Math.min(0, this.state.fadeAlpha/dt),
+                    view: this.buffers[1].color[0].bind(1),
+                    viewRes: this.viewRes
+                });
 
-                this.buffers[0].bind();
-                this.gl.clear(this.gl.COLOR_BUFFER_BIT);
-
-                // Copy and fade the last buffer into the current buffer
-
-                this.fadeShader.bind();
-
-                Object.assign(this.fadeShader.uniforms, {
-                        opacity: Math.min(0, this.state.fadeAlpha/dt),
-                        view: this.buffers[1].color[0].bind(1),
-                        viewRes: this.viewRes
-                    });
-
-                triangle(this.gl);
+            triangle(this.gl);
 
 
-                // Render the particles into the current buffer
-                this.particles.draw(drawUniforms, this.gl.LINES);
+            // Render the particles into the current buffer
+            this.particles.draw(drawUniforms, this.gl.LINES);
 
 
-                // Copy and fade the current buffer to the screen
+            // Copy and fade the current buffer to the screen
 
-                this.gl.bindFramebuffer(this.gl.FRAMEBUFFER, null);
-                this.gl.clear(this.gl.COLOR_BUFFER_BIT);
+            this.gl.bindFramebuffer(this.gl.FRAMEBUFFER, null);
+            this.gl.clear(this.gl.COLOR_BUFFER_BIT);
 
-                this.fadeShader.bind();
+            this.fadeShader.bind();
 
-                Object.assign(this.fadeShader.uniforms, {
-                        opacity: 1,
-                        view: this.buffers[0].color[0].bind(2),
-                        viewRes: this.viewRes
-                    });
+            Object.assign(this.fadeShader.uniforms, {
+                    opacity: 1,
+                    view: this.buffers[0].color[0].bind(2),
+                    viewRes: this.viewRes
+                });
 
-                triangle(this.gl);
+            triangle(this.gl);
 
-                // Step buffers
-                step(this.buffers);
-            }
+            // Step buffers
+            step(this.buffers);
         }
     }
 

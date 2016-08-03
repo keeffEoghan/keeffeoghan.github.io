@@ -10,9 +10,9 @@ import spawnPixelsFlowFrag from './spawn/pixels/flow.frag';
 
 import spawnReset from './spawn/ball';
 
-import * as Line from './geom/line';
+import FlowLine from './flow-line/';
 
-import { Tendrils, defaults/*, glSettings*/ } from './';
+import { Tendrils, defaults, glSettings } from './';
 
 const defaultSettings = Object.assign(defaults().state, {
         respawnAmount: 0.03,
@@ -21,33 +21,45 @@ const defaultSettings = Object.assign(defaults().state, {
 
 export default (canvas, settings, debug) => {
     let tendrils;
-    let line;
+    let flowInput;
 
-    const gl = glContext(canvas/*, glSettings*/, () => {
+    const gl = glContext(canvas, glSettings, () => {
                 tendrils.draw();
 
                 gl.viewport(0, 0,
                     gl.drawingBufferWidth, gl.drawingBufferHeight);
 
-                // gl.bindFramebuffer(gl.FRAMEBUFFER, null);
                 tendrils.flow.bind();
-                line.draw();
+                flowInput.update().draw();
+
+                // gl.bindFramebuffer(gl.FRAMEBUFFER, null);
+                // flowInput.update().draw();
             });
 
     tendrils = new Tendrils(gl);
-    line = new Line.Line(gl, {
-            // path: [[-0.8, 0.5], [0.8, -0.5], [0.7, 0.5], [0.3, -0.7]],
-            path: Array(20).fill(0).map((v, i, array) => {
+    flowInput = new FlowLine(gl, {
+            // path: [[-0.8, 0], [0.8, 0]],
+            // path: [
+            //     [-0.8, -0.8],
+            //     [0.8, -0.8],
+            //     [0.8, 0.8],
+            //     [-0.8, 0.8],
+
+            //     [-0.8, -0.4],
+
+            //     [-0.4, -0.4],
+            //     [-0.4, 0.4],
+            //     [0.4, 0.4],
+            //     [0.4, -0.4],
+            //     [-0.1, -0.4]
+            // ],
+            path: Array(30).fill(0).map((v, i, array) => {
                 const a = i/array.length*Math.PI*2;
                 const vec = vec2.fromValues(Math.cos(a), Math.sin(a));
 
                 return vec2.scale(vec, vec, 0.5);
             }),
-            closed: true,
-            uniforms: {
-                ...Line.defaults().uniforms,
-                rad: 0.1
-            }
+            closed: true
         });
 
     const resetSpawner = spawnReset(gl);
@@ -287,7 +299,9 @@ export default (canvas, settings, debug) => {
 
                     controllers.cyclingColor = false;
 
-                    restartState();
+                    controllers.restart();
+                    updateGUI();
+                    respawnCamSweep();
                 },
                 'Flow': () => {
                     Object.assign(state, defaultSettings, {
@@ -298,7 +312,7 @@ export default (canvas, settings, debug) => {
 
                     restartState();
                 },
-                'Fluid (kinda)': () => {
+                'Fluid': () => {
                     Object.assign(state, defaultSettings, {
                             autoClearView: true,
                             showFlow: false,
@@ -465,5 +479,7 @@ export default (canvas, settings, debug) => {
         for(let p in presetters) {
             presetsGUI.add(presetters, p);
         }
+
+        presetters['Fluid']();
     }
 };

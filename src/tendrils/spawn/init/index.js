@@ -1,5 +1,4 @@
 import shader from 'gl-shader';
-import isArray from 'lodash/isArray';
 
 import vert from '../../screen/index.vert';
 import frag from './index.frag';
@@ -19,7 +18,7 @@ export const spawner = (gl, options) => {
         gl,
         uniforms: params.uniforms,
 
-        shader: ((isArray(params.shader))?
+        shader: ((Array.isArray(params.shader))?
                 shader(gl, ...params.shader)
             :   params.shader),
 

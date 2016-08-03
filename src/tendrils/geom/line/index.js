@@ -7,14 +7,10 @@
 import geom from 'gl-geometry';
 import lineNormals from 'polyline-normals';
 import shader from 'gl-shader';
-import isArray from 'lodash/isArray';
-import isFunction from 'lodash/isFunction';
+import forOwn from 'lodash/forOwn';
 
 import vert from './vert/index.vert';
 import frag from './frag/index.frag';
-
-
-const result = (value) => ((isFunction(value))? value() : value);
 
 export const defaults = () => ({
     shader: [vert, frag],
@@ -40,7 +36,7 @@ export class Line {
         this.gl = gl;
         this.uniforms = params.uniforms;
 
-        this.shader = ((isArray(params.shader))?
+        this.shader = ((Array.isArray(params.shader))?
                 shader(gl, ...params.shader)
             :   params.shader);
 
@@ -55,11 +51,11 @@ export class Line {
         this.attributes = {
             position: {
                 data: null,
-                size: () => this.vertSize
+                getSize: () => this.vertSize
             },
             normal: {
                 data: null,
-                size: () => this.vertSize
+                getSize: () => this.vertSize
             },
             miter: {
                 data: null,
@@ -69,8 +65,6 @@ export class Line {
         };
 
         this.geom = geom(gl);
-
-        this.update();
     }
 
     update(path = this.path, closed = this.closed, each = this.setAttributes) {
@@ -83,11 +77,12 @@ export class Line {
             this.lineNormals.push(this.lineNormals[0]);
         }
 
+
         this.initAttributes();
 
+        const attributes = this.attributes;
         const values = {};
         const index = {};
-        const attributes = this.attributes;
         const vertNum = this.vertNum;
 
         // Set up attribute data
@@ -105,47 +100,52 @@ export class Line {
                 index.vert = v;
                 index.data = index.point+v;
 
-                each(values, index, attributes);
+                each(values, index, attributes, this);
             }
         }
 
         // Bind to geometry attributes
-        for(let name in attributes) {
-            const attribute = attributes[name];
+        forOwn(attributes, (attribute, name) =>
+            this.geom.attr(name, attribute.data, { size: attribute.size }));
 
-            this.geom.attr(name, attribute.data, {
-                    size: result(attribute.size)
-                });
-        }
+        return this;
     }
 
     draw(mode = this.gl.TRIANGLE_STRIP, ...rest) {
         this.geom.bind(this.shader);
         Object.assign(this.shader.uniforms, this.uniforms);
         this.geom.draw(mode, ...rest);
+
+        return this;
     }
 
     initAttributes(path = this.path) {
         const num = path.length*this.vertNum;
         const attributes = this.attributes;
 
-        // Initialise new data if needed.
-        for(var name in attributes) {
-            const attribute = attributes[name];
-            const length = num*result(attribute.size);
+        forOwn(attributes, (attribute) => {
+            // Cache any computed sizes.
+            if(attribute.getSize) {
+                attribute.size = attribute.getSize(this);
+            }
+
+            // Initialise new data if needed.
+            const length = num*attribute.size;
 
             if(!attribute.data || attribute.data.length !== length) {
                 attribute.data = new Float32Array(length);
             }
-        }
+        });
+
+        return this;
     }
 
     setAttributes(values, index, attributes) {
         attributes.position.data.set(values.point,
-            index.data*result(attributes.position.size));
+            index.data*attributes.position.size);
 
         attributes.normal.data.set(values.normal,
-            index.data*result(attributes.normal.size));
+            index.data*attributes.normal.size);
 
         // Flip odd miters
         attributes.miter.data[index.data] = values.miter*(((index.data%2)*2)-1);
