@@ -39,8 +39,11 @@
     "glslify": "^5.1.0",
     "glslify-import": "^3.0.0",
     "lodash": "^4.13.1",
+    "mouse-event-offset": "^3.0.2",
     "ndarray": "^1.0.18",
+    "pepjs": "^0.4.1",
     "polyline-normals": "^2.0.2",
+    "range-fit": "^0.1.1",
     "reset.css": "^2.0.2",
     "web-audio-analyser": "^2.0.1"
   },

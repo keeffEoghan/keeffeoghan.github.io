@@ -67,26 +67,24 @@ export class Line {
         this.geom = geom(gl);
     }
 
-    update(path = this.path, closed = this.closed, each = this.setAttributes) {
-        this.path = path;
-        this.closed = closed;
+    update(each = this.setAttributes) {
         this.lineNormals = lineNormals(this.path, this.closed);
 
-        if(this.closed) {
+        if(this.closed && this.path[0] !== this.path[this.path.length-1]) {
             this.path.push(this.path[0]);
             this.lineNormals.push(this.lineNormals[0]);
         }
 
-
         this.initAttributes();
 
+        const path = this.path;
         const attributes = this.attributes;
         const values = {};
         const index = {};
         const vertNum = this.vertNum;
 
         // Set up attribute data
-        for(let p = 0, pL = path.length; p < pL; ++p) {
+        for(let p = 1, pL = path.length; p < pL; ++p) {
             const lineNormal = this.lineNormals[p];
 
             values.point = path[p];
@@ -112,9 +110,11 @@ export class Line {
     }
 
     draw(mode = this.gl.TRIANGLE_STRIP, ...rest) {
-        this.geom.bind(this.shader);
-        Object.assign(this.shader.uniforms, this.uniforms);
-        this.geom.draw(mode, ...rest);
+        if(this.path.length >= 2) {
+            this.geom.bind(this.shader);
+            Object.assign(this.shader.uniforms, this.uniforms);
+            this.geom.draw(mode, ...rest);
+        }
 
         return this;
     }

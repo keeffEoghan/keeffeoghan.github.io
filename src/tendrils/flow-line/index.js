@@ -10,28 +10,33 @@ import frag from './index.frag';
 const wrapIndex = (i, l) => ((i < 0)? l+i : i%l);
 
 export class FlowLine {
-    constructor(gl, options) {
+    constructor(gl, options = {}) {
         this.line = new Line(gl, {
                 shader: [vert, frag],
                 uniforms: {
                     ...defaults().uniforms,
-                    time: 0,
                     speed: 0.05,
                     maxSpeed: 0.01,
-                    rad: 0.3
+                    rad: 0.1
                 },
                 attributes: {
                     ...defaults().attributes,
-                    previous: {
-                        getSize: (line) => line.vertSize
-                    }
+                    previous: { getSize: (line) => line.vertSize },
+                    // time: { size: 1 },
+                    // dt: { size: 1 }
                 },
                 ...options
             });
+
+        /**
+         * An array of times matching each point in the line path.
+         * @type {Array}
+         */
+        this.times = (options.times || []);
     }
 
-    update(path, closed, each = this.setAttributes) {
-        this.line.update(path, closed, each);
+    update(each = this.setAttributes.bind(this)) {
+        this.line.update(each);
 
         return this;
     }
@@ -51,6 +56,28 @@ export class FlowLine {
 
         attributes.previous.data.set(line.path[prev],
             index.data*attributes.previous.size);
+
+        // const time = this.times[index.path];
+
+        // attributes.time.data.set(time, index.data*attributes.time.size);
+
+        // attributes.dt.data.set(time-this.times[prev],
+        //     index.data*attributes.dt.size);
+    }
+
+    trimOld(ago, now = Date.now()) {
+        const oldest = now-ago;
+        const times = this.times;
+        let t = times.length-1;
+
+        for(let time = now; t >= 0 && time > oldest; --t) {
+            time = times[t];
+        }
+
+        this.times.splice(0, t);
+        this.line.path.splice(0, t);
+
+        return this;
     }
 }
 

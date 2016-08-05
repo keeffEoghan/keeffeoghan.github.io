@@ -217,7 +217,7 @@ export class Tendrils {
 
         const t0 = this.time;
 
-        this.time = Date.now()-this.start;
+        this.time = this.getTime();
 
         const dt = (this.state.timeStep || this.time-t0);
 
@@ -515,6 +515,10 @@ export class Tendrils {
         offset[1] = Math.min(offset[1], shape[1]-stride[1]);
 
         return offset;
+    }
+
+    getTime(time = Date.now()) {
+        return time-this.start;
     }
 }
 
