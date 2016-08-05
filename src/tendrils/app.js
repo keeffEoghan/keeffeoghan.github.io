@@ -1,6 +1,9 @@
+import 'pepjs';
 import glContext from 'gl-context';
 import getUserMedia from 'getusermedia';
+import offset from 'mouse-event-offset';
 import throttle from 'lodash/throttle';
+import mapRange from 'range-fit';
 import dat from 'dat-gui';
 import mat3 from 'gl-matrix/src/gl-matrix/mat3';
 import vec2 from 'gl-matrix/src/gl-matrix/vec2';
@@ -23,21 +26,10 @@ export default (canvas, settings, debug) => {
     let tendrils;
     let flowInput;
 
-    const gl = glContext(canvas, glSettings, () => {
-                tendrils.draw();
-
-                gl.viewport(0, 0,
-                    gl.drawingBufferWidth, gl.drawingBufferHeight);
-
-                tendrils.flow.bind();
-                Object.assign(flowInput.line.uniforms, tendrils.state);
-                flowInput.update().draw();
-
-                // gl.bindFramebuffer(gl.FRAMEBUFFER, null);
-                // flowInput.update().draw();
-            });
+    const gl = glContext(canvas, glSettings, () => tendrils.draw());
 
     tendrils = new Tendrils(gl);
+
     flowInput = new FlowLine(gl, {
             // path: [[-0.8, 0], [0.8, 0]],
             // path: [
@@ -54,14 +46,60 @@ export default (canvas, settings, debug) => {
             //     [0.4, -0.4],
             //     [-0.1, -0.4]
             // ],
-            path: Array(30).fill(0).map((v, i, array) => {
-                const a = i/array.length*Math.PI*2;
-                const vec = vec2.fromValues(Math.cos(a), Math.sin(a));
+            // path: Array(30).fill(0).map((v, i, array) => {
+            //     const a = i/array.length*Math.PI*2;
+            //     const vec = vec2.fromValues(Math.cos(a), Math.sin(a));
 
-                return vec2.scale(vec, vec, 0.5);
-            }),
-            closed: true
-        });
+            //     return vec2.scale(vec, vec, 0.5);
+            // }),
+            // closed: true
+            // path: [
+            //     [-0.053901850362027326, 0.6563636363636363],
+            //     [-0.6057924376508448, -0.39636363636363636],
+            //     [-0.7860016090104586, -0.9272727272727272],
+            //     [-0.7843925985518906, -0.9327272727272727],
+            //     [-0.757039420756235, -0.9709090909090909],
+            //     [0.9758648431214803, -0.9672727272727273],
+            //     [0.9758648431214803, -0.9672727272727273]
+            // ],
+            // times: [
+            //     2557,
+            //     2658,
+            //     2772,
+            //     3710,
+            //     3811,
+            //     3864,
+            //     3967
+            // ]
+        })
+        .update();
+
+    const screenToFlow = (e) => {
+        const flow = [];
+
+        offset(e, canvas, flow);
+
+        flow[0] = mapRange(flow[0], 0, tendrils.viewRes[0], -1, 1);
+        flow[1] = mapRange(flow[1], 0, tendrils.viewRes[1], 1, -1);
+
+        return flow;
+    };
+
+    const pointerFlow = (e) => {
+        const time = tendrils.getTime();
+
+        flowInput.times.push(time);
+        flowInput.line.path.push(screenToFlow(e));
+
+        gl.viewport(0, 0,
+            gl.drawingBufferWidth, gl.drawingBufferHeight);
+
+        tendrils.flow.bind();
+        Object.assign(flowInput.line.uniforms, tendrils.state);
+        flowInput.trimOld(1/tendrils.state.flowDecay, time).update().draw();
+    };
+
+    canvas.addEventListener('pointermove', throttle(pointerFlow, 100), false);
 
     const resetSpawner = spawnReset(gl);
 
@@ -132,8 +170,7 @@ export default (canvas, settings, debug) => {
         canvas.height = self.innerHeight;
     }
 
-    self.addEventListener('resize', throttle(resize, 200, { leading: true }),
-        false);
+    self.addEventListener('resize', throttle(resize, 200), false);
 
     resize();
     tendrils.setup();
@@ -309,6 +346,11 @@ export default (canvas, settings, debug) => {
                             showFlow: true
                         });
 
+                    Object.assign(resetSpawner.uniforms, {
+                            radius: 0.25,
+                            speed: 0.01
+                        });
+
                     controllers.cyclingColor = false;
 
                     restartState();
@@ -382,6 +424,11 @@ export default (canvas, settings, debug) => {
                             flowDecay: 0.007,
                             fadeAlpha: (1000/60)-0.0001,
                             speedAlpha: 0
+                        });
+
+                    Object.assign(resetSpawner.uniforms, {
+                            radius: 1,
+                            speed: 0
                         });
 
                     Object.assign(colorGUI, {
@@ -481,6 +528,6 @@ export default (canvas, settings, debug) => {
             presetsGUI.add(presetters, p);
         }
 
-        presetters['Fluid']();
+        presetters['Sea']();
     }
 };
