@@ -2,13 +2,14 @@
 
 uniform float speed;
 uniform float maxSpeed;
-uniform float time;
+// uniform float time;
 
 attribute vec2 previous;
-// attribute float time;
-// attribute float dt;
+attribute float time;
+attribute float dt;
 
 varying vec4 values;
+varying vec2 crest;
 varying float sdf;
 
 #pragma glslify: flow = require(../flow/apply/state, time = time)
@@ -20,16 +21,17 @@ varying float sdf;
 void main() {
     sdf = sign(miter);
 
+    float rate = speed/max(dt, 1.0);
+
     // @note For some reason, using these have different effects.
-    vec2 path = (position-previous)*speed;
-    // vec2 path = (position-previous)*speed*dt;
-    // vec2 path = perp(normal, true)*length(position-previous)*speed*dt;
+    vec2 vel = (position-previous)*rate;
+    // vec2 vel = perp(normal, true)*length(position-previous)*rate;
 
-    values = flow(path, maxSpeed);
+    values = flow(vel, maxSpeed);
 
-    vec2 vert = expand(position, normal, rad, miter);
-    // vec2 vert = expand(position, normal, rad*values.a, miter);
+    crest = normal*miter;
+
+    vec2 vert = expand(position, normal, rad*values.a, miter);
 
     gl_Position = vec4(vert*viewSize, 0.0, 1.0);
-    // gl_Position = vec4(vert, 0.0, 1.0);
 }
