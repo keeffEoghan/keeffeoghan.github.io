@@ -24,25 +24,47 @@ import isFunction from 'lodash/isFunction';
 
 import { step } from '../utils';
 
-import logicVert from './shaders/screen/index.vert';
+import logicVert from './screen/index.vert';
 
+
+export const defaults = () => ({
+    shape: [64, 64],
+    geomShape: null,
+
+    logic: null,
+    logicVert,
+    logicFrag: null,
+
+    render: null,
+    renderVert: null,
+    renderFrag: null
+});
 
 export class Particles {
-    constructor(gl, options = {}) {
+    constructor(gl, options) {
+        const params = {
+            ...defaults(),
+            ...options
+        };
+
         this.gl = gl;
 
         // The dimensions of the state data FBOs. Can be 1:1 with the number of
         // particle vertices, or
-        this.shape = (options.shape || [64, 64]);
-        this.geomShape = (options.geomShape || [...this.shape]);
+        this.shape = params.shape;
+        this.geomShape = (params.geomShape || [...this.shape]);
 
-        this.logic = (options.logic ||
-            shader(gl, (options.logicVert || logicVert), options.logicFrag));
 
-        this.render = (options.render ||
-            shader(gl, options.renderVert, options.renderFrag));
+        const logic = (params.logic || [params.logicVert, params.logicFrag]);
 
-        this.logicVertSource = logicVert;
+        this.logic = ((Array.isArray(logic))? shader(gl, ...logic) : logic);
+
+
+        const render = (params.render ||
+                [params.renderVert, params.renderFrag]);
+
+        this.render = ((Array.isArray(render))? shader(gl, ...render) : render);
+
 
         this.geom = geom(gl);
         this.geom.attr('uv', Particles.generateLUT(this.geomShape),
