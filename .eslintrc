@@ -1,5 +1,6 @@
 {
     "parser": "babel-eslint",
+    "extends": "eslint:recommended",
     "env": {
         "browser": true,
         "node": true
@@ -7,34 +8,40 @@
     "ecmaFeatures": {
         "modules": true
     },
+    "globals": {
+        "self": false,
+        "window": false,
+        "document": false,
+        "alert": false,
+        "console": false,
+        "require": false
+    },
     "rules": {
-        "globals": {
-            "window": false,
-            "self": false,
-            "alert": false,
-            "console": false,
-            "define": false,
-            "require": false,
-            "Modernizr": false,
-            "Phaser": false,
-            "PIXI": false
-        },
-        "browser": true,
-        "curly": true,
-        "eqeqeq": true,
-        "eqnull": true,
-        "esnext": true,
-        "immed": true,
-        "newcap": true,
-        "noarg": true,
-        "node": true,
-        "quotmark": "single",
-        "strict": true,
-        "undef": true,
-        "unused": true,
-        "latedef": true,
-        "undef": true,
-        "unused": true,
-        "trailing": true
+        "curly": "error",
+        "eqeqeq": "warn",
+        "no-eq-null": "warn",
+        "no-console": "off",
+        "arrow-parens": "error",
+        "arrow-spacing": "error",
+        "wrap-iife": "error",
+        "quotes": [
+            "error",
+            "single",
+            {
+                "avoidEscape": true,
+                "allowTemplateLiterals": true
+            }
+        ],
+        "no-undef": "error",
+        "no-unused-vars": "error",
+        "no-unused-expressions": [
+            "error",
+            {
+                "allowShortCircuit": true,
+                "allowTernary": true
+            }
+        ],
+        "no-trailing-spaces": "warn",
+        "no-floating-decimal": "warn"
     }
 }

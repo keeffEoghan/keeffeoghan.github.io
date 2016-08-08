@@ -13,8 +13,10 @@
  *       encoding/packing more info into each fragment).
  */
 
-import Geom from 'gl-geometry';
-import Shader from 'gl-shader';
+/* global Float32Array */
+
+import geom from 'gl-geometry';
+import shader from 'gl-shader';
 import FBO from 'gl-fbo';
 import triangle from 'a-big-triangle';
 import ndarray from 'ndarray';
@@ -22,24 +24,49 @@ import isFunction from 'lodash/isFunction';
 
 import { step } from '../utils';
 
-import logicVert from './shaders/triangle/vert.glsl';
+import logicVert from './screen/index.vert';
 
+
+export const defaults = () => ({
+    shape: [64, 64],
+    geomShape: null,
+
+    logic: null,
+    logicVert,
+    logicFrag: null,
+
+    render: null,
+    renderVert: null,
+    renderFrag: null
+});
 
 export class Particles {
-    constructor(gl, options = {}) {
+    constructor(gl, options) {
+        const params = {
+            ...defaults(),
+            ...options
+        };
+
         this.gl = gl;
 
         // The dimensions of the state data FBOs. Can be 1:1 with the number of
         // particle vertices, or
-        this.shape = (options.shape || [64, 64]);
-        this.geomShape = (options.geomShape || [...this.shape]);
+        this.shape = params.shape;
+        this.geomShape = (params.geomShape || [...this.shape]);
 
-        this.logic = Shader(gl, logicVert, options.logic);
-        this.render = (options.render || Shader(gl, options.vert, options.frag));
 
-        this.logicVertSource = logicVert;
+        const logic = (params.logic || [params.logicVert, params.logicFrag]);
 
-        this.geom = Geom(gl);
+        this.logic = ((Array.isArray(logic))? shader(gl, ...logic) : logic);
+
+
+        const render = (params.render ||
+                [params.renderVert, params.renderFrag]);
+
+        this.render = ((Array.isArray(render))? shader(gl, ...render) : render);
+
+
+        this.geom = geom(gl);
         this.geom.attr('uv', Particles.generateLUT(this.geomShape),
             { size: 2 });
 
@@ -64,7 +91,7 @@ export class Particles {
 
     spawn(map, pixels = this.pixels, offset = [0, 0]) {
         const data = new Float32Array(4);
-        
+
         const pixelsShape = pixels.shape;
         const pixelsData = pixels.data;
 
@@ -94,10 +121,12 @@ export class Particles {
         this.gl.viewport(0, 0, this.shape[0], this.shape[1]);
 
         this.logic.bind();
-        this.logic.uniforms.resolution = this.shape;
-        this.logic.uniforms.data = this.buffers[1].color[0].bind(0);
 
-        Particles.applyUpdate(this.logic.uniforms, update);
+        Particles.applyUpdate(Object.assign(this.logic.uniforms, {
+                dataRes: this.shape,
+                particles: this.buffers[1].color[0].bind(0)
+            }),
+            update);
 
         triangle(this.gl);
         this.gl.bindFramebuffer(this.gl.FRAMEBUFFER, null);
@@ -105,9 +134,8 @@ export class Particles {
 
     draw(update, mode = this.gl.POINTS) {
         this.geom.bind(this.render);
-        this.render.uniforms.data = this.buffers[0].color[0].bind(0);
+        this.render.uniforms.particles = this.buffers[0].color[0].bind(0);
 
-        
         Particles.applyUpdate(this.render.uniforms, update);
 
         this.geom.draw(mode);
@@ -132,10 +160,13 @@ export class Particles {
         const w = Math.max(shape[0], 2);
         const h = Math.max(shape[1], 2);
 
+        const invX = 1/(w-1);
+        const invY = 1/(h-1);
+
         for(let i = 0; i < w; ++i) {
             for(let j = 0; j < h; ++j) {
-                data[k++] = i/(w-1);
-                data[k++] = j/(h-1);
+                data[k++] = i*invX;
+                data[k++] = j*invY;
             }
         }
 
@@ -147,7 +178,6 @@ export class Particles {
                 update(state)
             :   Object.assign(state, update));
     }
-};
-
+}
 
 export default Particles;
