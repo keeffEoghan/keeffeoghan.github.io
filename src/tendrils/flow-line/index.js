@@ -15,15 +15,16 @@ export class FlowLine {
                 shader: [vert, frag],
                 uniforms: {
                     ...defaults().uniforms,
-                    speed: 0.05,
+                    speed: 3,
                     maxSpeed: 0.01,
-                    rad: 0.1
+                    rad: 0.25,
+                    crestShape: 0.6
                 },
                 attributes: {
                     ...defaults().attributes,
                     previous: { getSize: (line) => line.vertSize },
-                    // time: { size: 1 },
-                    // dt: { size: 1 }
+                    time: { size: 1 },
+                    dt: { size: 1 }
                 },
                 ...options
             });
@@ -33,9 +34,16 @@ export class FlowLine {
          * @type {Array}
          */
         this.times = (options.times || []);
+
+        // Drawn properties, derived from the above on `update`.
+        this.drawnTimes = null;
     }
 
     update(each = this.setAttributes.bind(this)) {
+        // @todo Unsure if this makes sense - reconsider closed loop times.
+        this.drawnTimes = ((this.line.closed && this.line.path.length)?
+            this.times.concat(this.times[0]) : this.times);
+
         this.line.update(each);
 
         return this;
@@ -57,28 +65,59 @@ export class FlowLine {
         attributes.previous.data.set(line.path[prev],
             index.data*attributes.previous.size);
 
-        // const time = this.times[index.path];
+        const time = this.drawnTimes[index.path];
 
-        // attributes.time.data.set(time, index.data*attributes.time.size);
-
-        // attributes.dt.data.set(time-this.times[prev],
-        //     index.data*attributes.dt.size);
+        attributes.time.data[index.data] = time;
+        attributes.dt.data[index.data] = time-this.drawnTimes[prev];
     }
 
+    /**
+     * Remove any path segments older than the given amunt of time ago.
+     * Oldest times start at the back (from 0 up) of the path.
+     *
+     * @param  {Number} ago The amount of time ago (in ms) before which to trim.
+     * @param  {Number} now The current time.
+     */
     trimOld(ago, now = Date.now()) {
-        const oldest = now-ago;
         const times = this.times;
-        let t = times.length-1;
+        const path = this.line.path;
 
-        for(let time = now; t >= 0 && time > oldest; --t) {
-            time = times[t];
+        const oldest = now-ago;
+
+        while(times[0] < oldest) {
+            times.shift();
+            path.shift();
         }
-
-        this.times.splice(0, t);
-        this.line.path.splice(0, t);
 
         return this;
     }
 }
 
 export default FlowLine;
+
+// Test stuff:
+/*
+    // path: [[-0.8, 0], [0.8, 0]],
+    // path: [
+    //     [-0.8, -0.8],
+    //     [0.8, -0.8],
+    //     [0.8, 0.8],
+    //     [-0.8, 0.8],
+
+    //     [-0.8, -0.4],
+
+    //     [-0.4, -0.4],
+    //     [-0.4, 0.4],
+    //     [0.4, 0.4],
+    //     [0.4, -0.4],
+    //     [-0.1, -0.4]
+    // ],
+    // path: Array(20).fill(0).map((v, i, array) => {
+    //     const a = i/array.length*Math.PI*2;
+    //     const vec = vec2.fromValues(Math.cos(a), Math.sin(a));
+
+    //     return vec2.scale(vec, vec, 0.5);
+    // }),
+    // closed: true,
+    // times: Array(20).fill(0).map((v, i) => 1000+i*500)
+*/

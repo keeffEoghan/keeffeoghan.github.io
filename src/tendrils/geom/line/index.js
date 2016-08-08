@@ -43,7 +43,7 @@ export class Line {
         this.vertNum = params.vertNum;
         this.vertSize = params.vertSize;
 
-        this.path = [...params.path];
+        this.path = (params.path || []);
         this.closed = params.closed;
 
         // Add any new attributes you like according to this structure.
@@ -64,32 +64,38 @@ export class Line {
             ...params.attributes
         };
 
+        // Drawn properties, derived from the above on `update`.
+        this.drawnPath = this.drawnNormals = null;
+
         this.geom = geom(gl);
     }
 
     update(each = this.setAttributes) {
-        this.lineNormals = lineNormals(this.path, this.closed);
+        this.drawnPath = this.path;
+        this.drawnNormals = lineNormals(this.drawnPath, this.closed);
 
-        if(this.closed && this.path[0] !== this.path[this.path.length-1]) {
-            this.path.push(this.path[0]);
-            this.lineNormals.push(this.lineNormals[0]);
+        if(this.closed && this.path.length) {
+            this.drawnPath = this.drawnPath.concat(this.drawnPath[0]);
+            this.drawnNormals.push(this.drawnNormals[0]);
         }
 
         this.initAttributes();
 
-        const path = this.path;
+        // Caches
+        const drawnPath = this.drawnPath;
+        const drawnNormals = this.drawnNormals;
         const attributes = this.attributes;
+        const vertNum = this.vertNum;
         const values = {};
         const index = {};
-        const vertNum = this.vertNum;
 
         // Set up attribute data
-        for(let p = 1, pL = path.length; p < pL; ++p) {
-            const lineNormal = this.lineNormals[p];
+        for(let p = 0, pL = drawnNormals.length; p < pL; ++p) {
+            const pointNormal = drawnNormals[p];
 
-            values.point = path[p];
-            values.normal = lineNormal[0];
-            values.miter = lineNormal[1];
+            values.point = drawnPath[p];
+            values.normal = pointNormal[0];
+            values.miter = pointNormal[1];
 
             index.path = p;
             index.point = p*vertNum;
@@ -110,7 +116,7 @@ export class Line {
     }
 
     draw(mode = this.gl.TRIANGLE_STRIP, ...rest) {
-        if(this.path.length >= 2) {
+        if(this.path.length > 0) {
             this.geom.bind(this.shader);
             Object.assign(this.shader.uniforms, this.uniforms);
             this.geom.draw(mode, ...rest);
@@ -119,8 +125,8 @@ export class Line {
         return this;
     }
 
-    initAttributes(path = this.path) {
-        const num = path.length*this.vertNum;
+    initAttributes() {
+        const num = this.drawnPath.length*this.vertNum;
         const attributes = this.attributes;
 
         forOwn(attributes, (attribute) => {

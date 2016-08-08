@@ -5,6 +5,7 @@ vec2 get(vec3 data, float time, float decay) {
 }
 
 vec2 get(vec4 data, float time, float decay) {
+    // return get(data.xyz, time, decay)*data.a;
     return get(data.xyz, time, decay);
 }
 
