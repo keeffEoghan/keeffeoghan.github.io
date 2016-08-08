@@ -194,8 +194,6 @@ export default (canvas, settings, debug) => {
             }
         };
 
-        respawnCamSweep();
-
 
         settingsGUI.__controllers[settingsKeys.indexOf('respawnTick')]
             .onFinishChange(respawnCamSweep);
