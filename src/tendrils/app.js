@@ -100,7 +100,6 @@ export default (canvas, settings, debug) => {
     function respawnVideo() {
         camPixelSpawner.buffer.shape = [video.videoWidth, video.videoHeight];
         mat3.scale(camPixelSpawner.spawnMatrix, camPixelSpawner.spawnMatrix, [-1, 1]);
-        respawnCamPixels();
     }
 
     getUserMedia({
