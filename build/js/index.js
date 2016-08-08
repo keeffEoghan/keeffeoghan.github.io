@@ -197,7 +197,6 @@
 	    function respawnVideo() {
 	        camPixelSpawner.buffer.shape = [video.videoWidth, video.videoHeight];
 	        _mat2.default.scale(camPixelSpawner.spawnMatrix, camPixelSpawner.spawnMatrix, [-1, 1]);
-	        respawnCamPixels();
 	    }
 	
 	    (0, _getusermedia2.default)({
@@ -284,8 +283,6 @@
 	                    respawnCamInterval = setInterval(respawnCamPixels, n);
 	                }
 	            };
-	
-	            respawnCamSweep();
 	
 	            settingsGUI.__controllers[settingsKeys.indexOf('respawnTick')].onFinishChange(respawnCamSweep);
 	
