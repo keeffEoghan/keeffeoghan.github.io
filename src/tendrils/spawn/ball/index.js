@@ -1,16 +1,18 @@
-import shader from 'gl-shader';
+import * as init from '../init';
 
-import vert from '../../shaders/screen/index.vert';
 import frag from './index.frag';
 
-export default (gl) => ({
+export const defaults = () => ({
+    shader: [init.defaults().shader[0], frag],
     uniforms: {
         radius: 1,
-        speed: 0.01
-    },
-
-    spawn: shader(gl, vert, frag),
-    respawn(tendrils) {
-        tendrils.respawnShader(this.spawn, this.uniforms);
+        speed: 0
     }
 });
+
+export const spawnBall = (gl, options) => init.spawner(gl, {
+    ...defaults(),
+    ...options
+});
+
+export default spawnBall;

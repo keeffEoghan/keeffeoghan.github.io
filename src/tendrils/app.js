@@ -1,41 +1,106 @@
+import 'pepjs';
 import glContext from 'gl-context';
 import getUserMedia from 'getusermedia';
+import offset from 'mouse-event-offset';
 import throttle from 'lodash/throttle';
+import mapRange from 'range-fit';
 import dat from 'dat-gui';
 import mat3 from 'gl-matrix/src/gl-matrix/mat3';
+import vec2 from 'gl-matrix/src/gl-matrix/vec2';
 
-import SpawnPixels from './spawn/pixels';
+import * as spawnPixels from './spawn/pixels';
+import spawnPixelsFlowFrag from './spawn/pixels/flow.frag';
+
 import spawnReset from './spawn/ball';
 
-import { Tendrils, defaultSettings, glSettings } from './';
+import FlowLine from './flow-line/';
 
+import { Tendrils, defaults, glSettings } from './';
+
+const defaultSettings = Object.assign(defaults().state, {
+        respawnAmount: 0.03,
+        respawnTick: 0
+    });
 
 export default (canvas, settings, debug) => {
     let tendrils;
-    const gl = glContext(canvas, glSettings,
-            (...rest) => tendrils.render(...rest));
+    let flowInput;
+
+    // const gl = glContext(canvas, glSettings, () => tendrils.draw());
+    const gl = glContext(canvas, glSettings, () => {
+            tendrils.draw();
+
+            gl.viewport(0, 0, ...tendrils.flow.shape);
+
+            tendrils.flow.bind();
+            // gl.bindFramebuffer(gl.FRAMEBUFFER, null);
+            Object.assign(flowInput.line.uniforms, tendrils.state);
+
+            flowInput
+                .trimOld((1/tendrils.state.flowDecay)+100, tendrils.getTime())
+                .update().draw();
+        });
 
     tendrils = new Tendrils(gl);
+
+    flowInput = new FlowLine(gl);
+
+    const pointerFlow = (e) => {
+        flowInput.times.push(tendrils.getTime());
+
+        const flow = offset(e, canvas, vec2.create());
+
+        flow[0] = mapRange(flow[0], 0, tendrils.viewRes[0], -1, 1);
+        flow[1] = mapRange(flow[1], 0, tendrils.viewRes[1], 1, -1);
+
+        flowInput.line.path.push(flow);
+    };
+
+    canvas.addEventListener('pointermove', pointerFlow, false);
 
     const resetSpawner = spawnReset(gl);
 
     const state = tendrils.state;
 
-    const pixelSpawner = new SpawnPixels(gl);
+
+    // Feedback loop from flow
+    /**
+     * @todo The aspect ratio might be wrong here - always seems to converge on
+     *       horizontal/vertical lines, like it were stretched.
+     */
+
+    const flowPixelSpawner = new spawnPixels.SpawnPixels(gl, {
+            shader: [spawnPixels.defaults().shader[0], spawnPixelsFlowFrag],
+            buffer: tendrils.flow
+        });
+
+    // This flips the lookup, which is interesting (reflection)
+    // const flowPixelScale = [1, 1];
+    const flowPixelScale = [1, -1];
+
+    function respawnFlowPixels() {
+        vec2.div(flowPixelSpawner.spawnSize, flowPixelScale, tendrils.viewSize);
+        flowPixelSpawner.respawn(tendrils);
+    }
+
+
+    // Cam
+
+    const camPixelSpawner = new spawnPixels.SpawnPixels(gl);
 
     let video = null;
 
-    function respawnPixels() {
+    function respawnCamPixels() {
         if(video) {
-            pixelSpawner.setPixels(video);
-            pixelSpawner.respawn(tendrils);
+            camPixelSpawner.setPixels(video);
+            camPixelSpawner.respawn(tendrils);
         }
     }
 
     function respawnVideo() {
-        pixelSpawner.buffer.shape = [video.videoWidth, video.videoHeight];
-        mat3.scale(pixelSpawner.spawnMatrix, pixelSpawner.spawnMatrix, [-1, 1]);
-        respawnPixels();
+        camPixelSpawner.buffer.shape = [video.videoWidth, video.videoHeight];
+        mat3.scale(camPixelSpawner.spawnMatrix, camPixelSpawner.spawnMatrix, [-1, 1]);
+        respawnCamPixels();
     }
 
     getUserMedia({
@@ -57,15 +122,12 @@ export default (canvas, settings, debug) => {
         });
 
 
-
-
     function resize() {
         canvas.width = self.innerWidth;
         canvas.height = self.innerHeight;
     }
 
-    self.addEventListener('resize', throttle(resize, 200, { leading: true }),
-        false);
+    self.addEventListener('resize', throttle(resize, 200), false);
 
     resize();
     tendrils.setup();
@@ -122,20 +184,21 @@ export default (canvas, settings, debug) => {
                 tendrils.setupSpawnCache();
             });
 
-        let respawnInterval;
+        let respawnCamInterval;
 
-        const respawnSweep = (n = state.respawnTick) => {
-            clearInterval(respawnInterval);
+        const respawnCamSweep = (n = state.respawnTick) => {
+            clearInterval(respawnCamInterval);
 
             if(n > 0) {
-                respawnInterval = setInterval(respawnPixels, n);
+                respawnCamInterval = setInterval(respawnCamPixels, n);
             }
         };
 
-        respawnSweep();
+        respawnCamSweep();
+
 
         settingsGUI.__controllers[settingsKeys.indexOf('respawnTick')]
-            .onFinishChange(respawnSweep);
+            .onFinishChange(respawnCamSweep);
 
 
         // DAT.GUI's color controllers are a bit fucked.
@@ -173,10 +236,12 @@ export default (canvas, settings, debug) => {
         let controllers = {
                 cyclingColor: false,
 
+                clear: () => tendrils.clear(),
                 clearView: () => tendrils.clearView(),
                 clearFlow: () => tendrils.clearFlow(),
                 respawn: () => resetSpawner.respawn(tendrils),
-                respawnPixels,
+                respawnCamPixels,
+                respawnFlowPixels,
                 reset: () => tendrils.reset(),
                 restart: () => {
                     tendrils.clear();
@@ -216,67 +281,78 @@ export default (canvas, settings, debug) => {
 
         let presetsGUI = gui.addFolder('presets');
 
+        const restartState = () => {
+            controllers.restart();
+            updateGUI();
+            convertColor();
+            respawnCamSweep();
+        };
+
         let presetters = {
                 'Default': () => {
                     Object.assign(state, defaultSettings);
 
                     controllers.cyclingColor = false;
-                    updateGUI();
 
                     controllers.restart();
+                    updateGUI();
+                    respawnCamSweep();
                 },
                 'Flow': () => {
                     Object.assign(state, defaultSettings, {
                             showFlow: true
                         });
 
+                    Object.assign(resetSpawner.uniforms, {
+                            radius: 0.25,
+                            speed: 0.01
+                        });
+
                     controllers.cyclingColor = false;
-                    updateGUI();
+
+                    restartState();
                 },
-                'Fluid (kinda)': () => {
+                'Fluid': () => {
                     Object.assign(state, defaultSettings, {
                             autoClearView: true,
                             showFlow: false,
                             respawnTick: 500
                         });
 
-                    controllers.restart();
-                    respawnSweep();
-
                     Object.assign(colorGUI, {
                             opacity: 0.2,
                             color: [255, 255, 255]
                         });
 
-                    convertColor();
-
                     controllers.cyclingColor = false;
-                    updateGUI();
+
+                    restartState();
                 },
                 'Flow only': () => {
                     Object.assign(state, defaultSettings, {
                             autoClearView: false,
-                            flowDecay: 0.004,
+                            flowDecay: 0.0005,
                             forceWeight: 0.015,
                             wanderWeight: 0,
                             speedAlpha: 0,
                             fadeAlpha: (1000/60)-0.000001,
                             respawnAmount: 0.03,
-                            respawnTick: 500
+                            respawnTick: 0
                         });
 
-                    controllers.restart();
-                    respawnSweep();
+                    Object.assign(resetSpawner.uniforms, {
+                            radius: 0.25,
+                            speed: 0.015
+                        });
 
                     Object.assign(colorGUI, {
                             opacity: 0.8,
                             color: [100, 200, 255]
                         });
 
-                    convertColor();
-
                     controllers.cyclingColor = false;
-                    updateGUI();
+
+                    restartState();
                 },
                 'Noise only': () => {
                     Object.assign(state, defaultSettings, {
@@ -288,47 +364,45 @@ export default (canvas, settings, debug) => {
                             speedAlpha: 0
                         });
 
-                    controllers.restart();
-
                     Object.assign(colorGUI, {
-                            opacity: 0.1,
+                            opacity: 0.01,
                             color: [255, 150, 0]
                         });
 
-                    convertColor();
-
                     controllers.cyclingColor = false;
-                    updateGUI();
+
+                    restartState();
                 },
                 'Sea': () => {
                     Object.assign(state, defaultSettings, {
                             flowWidth: 5,
                             forceWeight: 0.015,
                             wanderWeight: 0.0014,
-                            flowDecay: 0.007,
+                            flowDecay: 0.001,
                             fadeAlpha: (1000/60)-0.0001,
                             speedAlpha: 0
                         });
 
-                    controllers.restart();
+                    Object.assign(resetSpawner.uniforms, {
+                            radius: 1,
+                            speed: 0
+                        });
 
                     Object.assign(colorGUI, {
                             opacity: 0.8,
                             color: [55, 155, 255]
                         });
 
-                    convertColor();
-
                     controllers.cyclingColor = false;
-                    updateGUI();
+
+                    restartState();
                 },
                 'Mad styles': () => {
-                    Object.assign(state, defaultSettings, {
-                        });
+                    Object.assign(state, defaultSettings);
 
-                    controllers.restart();
                     controllers.cyclingColor = true;
-                    updateGUI();
+
+                    restartState();
                 },
                 'Ghostly': () => {
                     Object.assign(state, defaultSettings, {
@@ -336,17 +410,14 @@ export default (canvas, settings, debug) => {
                             flowDecay: 0
                         });
 
-                    controllers.restart();
-
                     Object.assign(colorGUI, {
                             opacity: 0.006,
                             color: [255, 255, 255]
                         });
 
-                    convertColor();
-
                     controllers.cyclingColor = false;
-                    updateGUI();
+
+                    restartState();
                 },
                 'Turbulent': () => {
                     Object.assign(state, defaultSettings, {
@@ -359,17 +430,14 @@ export default (canvas, settings, debug) => {
                             speedAlpha: 0.000002
                         });
 
-                    controllers.restart();
-
                     Object.assign(colorGUI, {
                             opacity: 0.9,
                             color: [255, 10, 10]
                         });
 
-                    convertColor();
-
                     controllers.cyclingColor = false;
-                    updateGUI();
+
+                    restartState();
                 },
                 'Roots': () => {
                     Object.assign(state, defaultSettings, {
@@ -382,17 +450,14 @@ export default (canvas, settings, debug) => {
                             speedAlpha: 0.00005
                         });
 
-                    controllers.restart();
-
                     Object.assign(colorGUI, {
                             opacity: 0.03,
                             color: [50, 255, 50]
                         });
 
-                    convertColor();
-
                     controllers.cyclingColor = false;
-                    updateGUI();
+
+                    restartState();
                 },
                 'Hairy': () => {
                     Object.assign(state, defaultSettings, {
@@ -405,23 +470,21 @@ export default (canvas, settings, debug) => {
                             respawnTick: 800
                         });
 
-                    controllers.restart();
-                    respawnSweep();
-
                     Object.assign(colorGUI, {
                             opacity: 0.9,
                             color: [255, 150, 255]
                         });
 
-                    convertColor();
-
                     controllers.cyclingColor = false;
-                    updateGUI();
+
+                    restartState();
                 }
             };
 
         for(let p in presetters) {
             presetsGUI.add(presetters, p);
         }
+
+        presetters['Flow']();
     }
 };
