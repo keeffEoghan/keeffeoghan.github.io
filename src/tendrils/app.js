@@ -485,6 +485,6 @@ export default (canvas, settings, debug) => {
             presetsGUI.add(presetters, p);
         }
 
-        presetters['Sea']();
+        presetters['Flow']();
     }
 };
