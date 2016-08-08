@@ -8,7 +8,7 @@
  * @param dt Time elapsed since the last frame.
  * @return The new position.
  */
-vec2 verlet(in vec2 acc, in vec2 pos, in vec2 lastPos, in float dt) {
+vec2 verlet(vec2 acc, vec2 pos, vec2 lastPos, float dt) {
     return (2.0*pos)-lastPos+(acc*dt*dt);
 }
 

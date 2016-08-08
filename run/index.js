@@ -12,22 +12,19 @@ require('es6-promise').polyfill();
  *  Acts as an override for module loading. Certain modules
  *  need to load modules other than themselves to function.
  */
-var loadingOverrides = {
+const loadingOverrides = {
     'watch': ['assets', 'custom-deps', 'html', 'styles', 'scripts', 'watch'],
     'build': ['assets', 'custom-deps', 'html', 'styles', 'scripts', 'build'],
     'default': ['assets', 'custom-deps', 'html', 'styles', 'scripts', 'build', 'default']
 };
 
 /**
- *  Acts as a module loader to require the necessary tasks for a
- *  particular task runner.
- *
- *  @param string runner - The name of the task runner.
+ *  Acts as a module loader to require the necessary tasks
  */
-module.exports = function(runner) {
-    var args = require('yargs').argv,
-        desiredModule = (args._[0] || 'default'),                           // If no task specified, use `default`.
-        modulesToLoad = (loadingOverrides[desiredModule] || [desiredModule]); // Check for module loading overrides.
+module.exports = function() {
+    const args = require('yargs').argv;
+    const desiredModule = (args._[0] || 'default');
+    const modulesToLoad = (loadingOverrides[desiredModule] || [desiredModule]);
 
     modulesToLoad.forEach(function(module) {
         console.log(' FE Skeleton: Loading module - '+module);

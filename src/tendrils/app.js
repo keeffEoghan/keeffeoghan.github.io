@@ -1,6 +1,11 @@
 import glContext from 'gl-context';
+import getUserMedia from 'getusermedia';
 import throttle from 'lodash/throttle';
 import dat from 'dat-gui';
+import mat3 from 'gl-matrix/src/gl-matrix/mat3';
+
+import SpawnPixels from './spawn/pixels';
+import spawnReset from './spawn/ball';
 
 import { Tendrils, defaultSettings, glSettings } from './';
 
@@ -10,28 +15,70 @@ export default (canvas, settings, debug) => {
     const gl = glContext(canvas, glSettings,
             (...rest) => tendrils.render(...rest));
 
-    tendrils = new Tendrils(gl, settings);
+    tendrils = new Tendrils(gl);
+
+    const resetSpawner = spawnReset(gl);
 
     const state = tendrils.state;
+
+    const pixelSpawner = new SpawnPixels(gl);
+
+    let video = null;
+
+    function respawnPixels() {
+        if(video) {
+            pixelSpawner.setPixels(video);
+            pixelSpawner.respawn(tendrils);
+        }
+    }
+
+    function respawnVideo() {
+        pixelSpawner.buffer.shape = [video.videoWidth, video.videoHeight];
+        mat3.scale(pixelSpawner.spawnMatrix, pixelSpawner.spawnMatrix, [-1, 1]);
+        respawnPixels();
+    }
+
+    getUserMedia({
+            video: true,
+            // @todo Can we plug audio into an analyser node while muted?
+            audio: false
+        },
+        (e, stream) => {
+            if(e) {
+                throw e;
+            }
+            else {
+                video = document.createElement('video');
+
+                video.src = self.URL.createObjectURL(stream);
+                video.play();
+                video.addEventListener('canplay', respawnVideo);
+            }
+        });
+
+
+
 
     function resize() {
         canvas.width = self.innerWidth;
         canvas.height = self.innerHeight;
     }
 
-    self.addEventListener('resize', throttle(resize, 100, { leading: true }),
+    self.addEventListener('resize', throttle(resize, 200, { leading: true }),
         false);
 
     resize();
-    tendrils.restart();
+    tendrils.setup();
+    tendrils.resetParticles();
+    resetSpawner.respawn(tendrils);
 
 
     if(debug) {
-        let gui = new dat.GUI();
+        const gui = new dat.GUI();
 
         gui.close();
 
-        function updateGUI() {
+        const updateGUI = () => {
             for(let f in gui.__folders) {
                 gui.__folders[f].__controllers.forEach((controller) =>
                         controller.updateDisplay());
@@ -49,6 +96,10 @@ export default (canvas, settings, debug) => {
 
         let settingsKeys = [];
 
+        Object.assign(state, {
+            respawnTick: 0
+        });
+
         for(let s in state) {
             if(!(typeof state[s]).match(/(object|array)/gi)) {
                 settingsGUI.add(state, s);
@@ -58,7 +109,7 @@ export default (canvas, settings, debug) => {
 
 
         // Some special cases
-        
+
         settingsGUI.__controllers[settingsKeys.indexOf('rootNum')]
             .onFinishChange((n) => {
                 tendrils.setup(n);
@@ -67,13 +118,24 @@ export default (canvas, settings, debug) => {
 
         settingsGUI.__controllers[settingsKeys.indexOf('respawnAmount')]
             .onFinishChange((n) => {
-                tendrils.setupSpawnData(state.rootNum);
+                tendrils.setupRespawn(state.rootNum, n);
+                tendrils.setupSpawnCache();
             });
 
+        let respawnInterval;
+
+        const respawnSweep = (n = state.respawnTick) => {
+            clearInterval(respawnInterval);
+
+            if(n > 0) {
+                respawnInterval = setInterval(respawnPixels, n);
+            }
+        };
+
+        respawnSweep();
+
         settingsGUI.__controllers[settingsKeys.indexOf('respawnTick')]
-            .onFinishChange((n) => {
-                // respawnSweep();
-            });
+            .onFinishChange(respawnSweep);
 
 
         // DAT.GUI's color controllers are a bit fucked.
@@ -83,7 +145,7 @@ export default (canvas, settings, debug) => {
                 opacity: state.color[3]
             };
 
-        function convertColor() {
+        const convertColor = () => {
             state.color = [
                     ...colorGUI.color.slice(0, 3).map((c) => c/255),
                     colorGUI.opacity
@@ -95,6 +157,17 @@ export default (canvas, settings, debug) => {
         convertColor();
 
 
+        // Respawn
+
+        let respawnGUI = gui.addFolder('respawn');
+
+        for(let s in resetSpawner.uniforms) {
+            if(!(typeof resetSpawner.uniforms[s]).match(/(object|array)/gi)) {
+                respawnGUI.add(resetSpawner.uniforms, s);
+            }
+        }
+
+
         // Controls
 
         let controllers = {
@@ -102,8 +175,13 @@ export default (canvas, settings, debug) => {
 
                 clearView: () => tendrils.clearView(),
                 clearFlow: () => tendrils.clearFlow(),
+                respawn: () => resetSpawner.respawn(tendrils),
+                respawnPixels,
                 reset: () => tendrils.reset(),
-                restart: () => tendrils.restart()
+                restart: () => {
+                    tendrils.clear();
+                    resetSpawner.respawn(tendrils)
+                }
             };
 
 
@@ -114,7 +192,7 @@ export default (canvas, settings, debug) => {
         }
 
 
-        function cycleColor() {
+        const cycleColor = () => {
             if(controllers.cyclingColor) {
                 Object.assign(colorGUI, {
                     opacity: 0.2,
@@ -145,7 +223,7 @@ export default (canvas, settings, debug) => {
                     controllers.cyclingColor = false;
                     updateGUI();
 
-                    tendrils.restart();
+                    controllers.restart();
                 },
                 'Flow': () => {
                     Object.assign(state, defaultSettings, {
@@ -158,13 +236,15 @@ export default (canvas, settings, debug) => {
                 'Fluid (kinda)': () => {
                     Object.assign(state, defaultSettings, {
                             autoClearView: true,
-                            showFlow: false
+                            showFlow: false,
+                            respawnTick: 500
                         });
 
-                    tendrils.restart();
+                    controllers.restart();
+                    respawnSweep();
 
                     Object.assign(colorGUI, {
-                            opacity: 0.8,
+                            opacity: 0.2,
                             color: [255, 255, 255]
                         });
 
@@ -175,17 +255,18 @@ export default (canvas, settings, debug) => {
                 },
                 'Flow only': () => {
                     Object.assign(state, defaultSettings, {
-                            autoClearView: true,
-                            showFlow: false,
-
-                            flowWeight: 0.82,
+                            autoClearView: false,
+                            flowDecay: 0.004,
+                            forceWeight: 0.015,
                             wanderWeight: 0,
-
-                            startRadius: 0.6,
-                            startSpeed: -0.06
+                            speedAlpha: 0,
+                            fadeAlpha: (1000/60)-0.000001,
+                            respawnAmount: 0.03,
+                            respawnTick: 500
                         });
 
-                    tendrils.restart();
+                    controllers.restart();
+                    respawnSweep();
 
                     Object.assign(colorGUI, {
                             opacity: 0.8,
@@ -201,17 +282,13 @@ export default (canvas, settings, debug) => {
                     Object.assign(state, defaultSettings, {
                             autoClearView: false,
                             showFlow: false,
-
                             flowWeight: 0,
                             wanderWeight: 0.002,
-
                             noiseSpeed: 0,
-
-                            startRadius: 0.5,
-                            startSpeed: 0
+                            speedAlpha: 0
                         });
 
-                    tendrils.restart();
+                    controllers.restart();
 
                     Object.assign(colorGUI, {
                             opacity: 0.1,
@@ -225,17 +302,15 @@ export default (canvas, settings, debug) => {
                 },
                 'Sea': () => {
                     Object.assign(state, defaultSettings, {
-                            startRadius: 1.77,
-                            startSpeed: -0.0001,
                             flowWidth: 5,
                             forceWeight: 0.015,
                             wanderWeight: 0.0014,
                             flowDecay: 0.007,
-                            fadeAlpha: 0.6,
+                            fadeAlpha: (1000/60)-0.0001,
                             speedAlpha: 0
                         });
 
-                    tendrils.restart();
+                    controllers.restart();
 
                     Object.assign(colorGUI, {
                             opacity: 0.8,
@@ -249,11 +324,9 @@ export default (canvas, settings, debug) => {
                 },
                 'Mad styles': () => {
                     Object.assign(state, defaultSettings, {
-                            startRadius: 0.1,
-                            startSpeed: 0.05
                         });
 
-                    tendrils.restart();
+                    controllers.restart();
                     controllers.cyclingColor = true;
                     updateGUI();
                 },
@@ -263,11 +336,81 @@ export default (canvas, settings, debug) => {
                             flowDecay: 0
                         });
 
-                    tendrils.restart();
+                    controllers.restart();
 
                     Object.assign(colorGUI, {
                             opacity: 0.006,
                             color: [255, 255, 255]
+                        });
+
+                    convertColor();
+
+                    controllers.cyclingColor = false;
+                    updateGUI();
+                },
+                'Turbulent': () => {
+                    Object.assign(state, defaultSettings, {
+                            autoClearView: false,
+                            noiseSpeed: 0.00001,
+                            noiseScale: 18,
+                            forceWeight: 0.014,
+                            wanderWeight: 0.0021,
+                            fadeAlpha: (1000/60)-0.001,
+                            speedAlpha: 0.000002
+                        });
+
+                    controllers.restart();
+
+                    Object.assign(colorGUI, {
+                            opacity: 0.9,
+                            color: [255, 10, 10]
+                        });
+
+                    convertColor();
+
+                    controllers.cyclingColor = false;
+                    updateGUI();
+                },
+                'Roots': () => {
+                    Object.assign(state, defaultSettings, {
+                            autoClearView: false,
+                            flowDecay: 0,
+                            noiseSpeed: 0,
+                            noiseScale: 18,
+                            forceWeight: 0.015,
+                            wanderWeight: 0.0023,
+                            speedAlpha: 0.00005
+                        });
+
+                    controllers.restart();
+
+                    Object.assign(colorGUI, {
+                            opacity: 0.03,
+                            color: [50, 255, 50]
+                        });
+
+                    convertColor();
+
+                    controllers.cyclingColor = false;
+                    updateGUI();
+                },
+                'Hairy': () => {
+                    Object.assign(state, defaultSettings, {
+                            autoClearView: false,
+                            timeStep: 1000/60,
+                            flowDecay: 0.001,
+                            wanderWeight: 0.002,
+                            fadeAlpha: (1000/60)-0.000001,
+                            speedAlpha: 0,
+                            respawnTick: 800
+                        });
+
+                    controllers.restart();
+                    respawnSweep();
+
+                    Object.assign(colorGUI, {
+                            opacity: 0.9,
+                            color: [255, 150, 255]
                         });
 
                     convertColor();
@@ -282,9 +425,3 @@ export default (canvas, settings, debug) => {
         }
     }
 };
-
-
-
-
-
-
