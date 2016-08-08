@@ -5,7 +5,6 @@
 
 import tendrilsApp from './tendrils/app';
 
-
 const readyStates = ['loading', 'interactive', 'complete'];
 
 // Load in stages.

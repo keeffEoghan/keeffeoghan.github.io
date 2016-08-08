@@ -1,8 +1,9 @@
 'use strict';
 
+const path = require('path');
 
 // Anything that needs to be statically served.
-var staticDestPath = './build/';
+const staticDestPath = './build/';
 
 
 module.exports = {
@@ -171,20 +172,41 @@ module.exports = {
                 },
                 module: {
                     loaders: [
-                        { test: /\.js$/, exclude: /node_modules/, loader: 'babel?presets[]=es2015,presets[]=stage-2' },
-                        { test: /[\\\/]modernizr\.js$/, loader: 'imports?this=>window,html5=>window.html5!exports?window.Modernizr' },
-                        { test: /\.(glsl|frag|vert)$/, loader: 'raw', exclude: /node_modules/ },
-                        { test: /\.(glsl|frag|vert)$/, loader: 'glslify', exclude: /node_modules/ }
+                        {
+                            test: /\.js$/,
+                            exclude: /node_modules/,
+                            loader: 'babel?presets[]=es2015,presets[]=stage-2'
+                        },
+                        {
+                            test: /[\\\/]modernizr\.js$/,
+                            loader: 'imports?this=>window,html5=>window.html5!exports?window.Modernizr'
+                        },
+                        {
+                            test: /\.(glsl|frag|vert)$/,
+                            exclude: /node_modules/,
+                            loader: 'raw!glslify'
+                        }
+                    ],
+                    postLoaders: [
+                        {
+                            test: /\.js$/,
+                            loader: 'ify'
+                        }
                     ]
                 },
-                plugins: []
+                plugins: [],
+                resolveLoader: {
+                    alias: {
+                        'glslify': path.join(__dirname, './loaders/glslify')
+                    }
+                }
             }
         },
         watch: {
             sourcePaths: {
-                html: ['./libs/**/*.html', './src/**/*.html'],
-                styles: ['./libs/**/*.scss', './src/**/*.scss'],
-                scripts: ['./libs/**/*.js', './src/**/*.js']
+                html: ['./{libs,src}/**/*.html'],
+                styles: ['./{libs,src}/**/*.scss'],
+                scripts: ['./{libs,src}/**/*.{js,glsl,vert,frag}']
             }
         },
         customDeps: {
@@ -202,7 +224,10 @@ module.exports = {
             // Because `@import` of .css files hasn't yet landed in gulp-sass,
             // any lib files listed here will be into .scss-suffixed libs.
             copyToSCSS: [
-                { path: 'node_modules/reset.css/', name: 'reset.css' }
+                {
+                    path: 'node_modules/reset.css/',
+                    name: 'reset.css'
+                }
             ]
         }
     }

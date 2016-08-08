@@ -36,13 +36,11 @@ gulp.task('watch',
 
         // If no arguments were supplied then we start all watches.
         // Else cycle supplied argumentss and build an array of method names.
-        if (!args.watchType) {
-            var watchMethods = Object.keys(watchFunctions);
-        } else {
-            var watchMethods = args.watchType.split(',').map(function(currentValue) {
-                return currentValue.trim();
-            });
-        }
+        var watchMethods = ((!args.watchType)?
+                Object.keys(watchFunctions)
+            :   args.watchType.split(',').map(function(currentValue) {
+                    return currentValue.trim();
+                }));
 
         // Cycle through the method names requiring watchers setup and call them.
         watchMethods.forEach(function(methodName) {
