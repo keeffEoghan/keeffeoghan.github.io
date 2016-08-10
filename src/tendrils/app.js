@@ -10,6 +10,7 @@ import vec2 from 'gl-matrix/src/gl-matrix/vec2';
 
 import * as spawnPixels from './spawn/pixels';
 import spawnPixelsFlowFrag from './spawn/pixels/flow.frag';
+import spawnPixelsSimpleFrag from './spawn/pixels/data.frag';
 
 import spawnReset from './spawn/ball';
 
@@ -78,9 +79,23 @@ export default (canvas, settings, debug) => {
     // const flowPixelScale = [1, 1];
     const flowPixelScale = [1, -1];
 
-    function respawnFlowPixels() {
+    function respawnFlow() {
         vec2.div(flowPixelSpawner.spawnSize, flowPixelScale, tendrils.viewSize);
         flowPixelSpawner.respawn(tendrils);
+    }
+
+
+    // Spawn on fastest particles.
+
+    const simplePixelSpawner = new spawnPixels.SpawnPixels(gl, {
+            shader: [spawnPixels.defaults().shader[0], spawnPixelsSimpleFrag],
+            buffer: null
+        });
+
+    function respawnFastest() {
+        simplePixelSpawner.buffer = tendrils.particles.buffers[0];
+        simplePixelSpawner.spawnSize = tendrils.particles.shape;
+        simplePixelSpawner.respawn(tendrils);
     }
 
 
@@ -90,7 +105,7 @@ export default (canvas, settings, debug) => {
 
     let video = null;
 
-    function respawnCamPixels() {
+    function respawnCam() {
         if(video) {
             camPixelSpawner.setPixels(video);
             camPixelSpawner.respawn(tendrils);
@@ -139,11 +154,16 @@ export default (canvas, settings, debug) => {
 
         gui.close();
 
-        const updateGUI = () => {
+        function updateGUI() {
             for(let f in gui.__folders) {
                 gui.__folders[f].__controllers.forEach((controller) =>
                         controller.updateDisplay());
             }
+        }
+
+        function restart() {
+            tendrils.clear();
+            resetSpawner.respawn(tendrils)
         }
 
 
@@ -174,7 +194,7 @@ export default (canvas, settings, debug) => {
         settingsGUI.__controllers[settingsKeys.indexOf('rootNum')]
             .onFinishChange((n) => {
                 tendrils.setup(n);
-                tendrils.restart();
+                restart();
             });
 
         settingsGUI.__controllers[settingsKeys.indexOf('respawnAmount')]
@@ -188,9 +208,8 @@ export default (canvas, settings, debug) => {
         const respawnCamSweep = (n = state.respawnTick) => {
             clearInterval(respawnCamInterval);
 
-            if(n > 0) {
-                respawnCamInterval = setInterval(respawnCamPixels, n);
-            }
+            respawnCamInterval = ((n > 0)?
+                setInterval(respawnCam, n) : null);
         };
 
 
@@ -237,13 +256,11 @@ export default (canvas, settings, debug) => {
                 clearView: () => tendrils.clearView(),
                 clearFlow: () => tendrils.clearFlow(),
                 respawn: () => resetSpawner.respawn(tendrils),
-                respawnCamPixels,
-                respawnFlowPixels,
+                respawnCam,
+                respawnFlow,
+                respawnFastest,
                 reset: () => tendrils.reset(),
-                restart: () => {
-                    tendrils.clear();
-                    resetSpawner.respawn(tendrils)
-                }
+                restart
             };
 
 
@@ -297,12 +314,18 @@ export default (canvas, settings, debug) => {
                 },
                 'Flow': () => {
                     Object.assign(state, defaultSettings, {
-                            showFlow: true
+                            showFlow: true,
+                            flowWidth: 2
                         });
 
                     Object.assign(resetSpawner.uniforms, {
                             radius: 0.25,
                             speed: 0.01
+                        });
+
+                    Object.assign(colorGUI, {
+                            opacity: 0.01,
+                            color: [255, 255, 255]
                         });
 
                     controllers.cyclingColor = false;
