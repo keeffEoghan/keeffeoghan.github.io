@@ -42,7 +42,7 @@ export const defaults = () => ({
         maxSpeed: 0.01,
         damping: 0.045,
 
-        flowDecay: 0.0001,
+        flowDecay: 0.0005,
         flowWidth: 5,
 
         noiseSpeed: 0.00025,
