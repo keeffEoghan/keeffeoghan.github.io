@@ -52,6 +52,7 @@ export const defaults = () => ({
         flowWeight: 1,
         wanderWeight: 0.001,
 
+        // @todo Make this a texture lookup instead
         color: [1, 1, 1, 0.05],
         fadeAlpha: -1,
         speedAlpha: 0.000001,

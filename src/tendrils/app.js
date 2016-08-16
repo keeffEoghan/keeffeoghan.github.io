@@ -19,7 +19,6 @@ import FlowLine from './flow-line/';
 import { Tendrils, defaults, glSettings } from './';
 
 const defaultSettings = Object.assign(defaults().state, {
-        respawnAmount: 0.03,
         respawnTick: 0
     });
 
@@ -27,16 +26,15 @@ export default (canvas, settings, debug) => {
     let tendrils;
     let flowInput;
 
-    // const gl = glContext(canvas, glSettings, () => tendrils.draw());
     const gl = glContext(canvas, glSettings, () => {
             tendrils.draw();
 
             gl.viewport(0, 0, ...tendrils.flow.shape);
 
             tendrils.flow.bind();
-            // gl.bindFramebuffer(gl.FRAMEBUFFER, null);
             Object.assign(flowInput.line.uniforms, tendrils.state);
 
+            // @todo Kill old flow lines once empty
             flowInput
                 .trimOld((1/tendrils.state.flowDecay)+100, tendrils.getTime())
                 .update().draw();
@@ -44,6 +42,7 @@ export default (canvas, settings, debug) => {
 
     tendrils = new Tendrils(gl);
 
+    // @todo New flow lines for new pointers
     flowInput = new FlowLine(gl);
 
     const pointerFlow = (e) => {
@@ -303,203 +302,203 @@ export default (canvas, settings, debug) => {
         };
 
         let presetters = {
-                'Default': () => {
-                    Object.assign(state, defaultSettings);
+            'Wings'() {
+                Object.assign(state, defaultSettings);
 
-                    controllers.cyclingColor = false;
+                controllers.cyclingColor = false;
 
-                    controllers.restart();
-                    updateGUI();
-                    respawnCamSweep();
-                },
-                'Flow': () => {
-                    Object.assign(state, defaultSettings, {
-                            showFlow: true,
-                            flowWidth: 2
-                        });
+                controllers.restart();
+                updateGUI();
+                respawnCamSweep();
+            },
+            'Flow'() {
+                Object.assign(state, defaultSettings, {
+                        showFlow: true,
+                        flowWidth: 2
+                    });
 
-                    Object.assign(resetSpawner.uniforms, {
-                            radius: 0.25,
-                            speed: 0.01
-                        });
+                Object.assign(resetSpawner.uniforms, {
+                        radius: 0.25,
+                        speed: 0.01
+                    });
 
-                    Object.assign(colorGUI, {
-                            opacity: 0.01,
-                            color: [255, 255, 255]
-                        });
+                Object.assign(colorGUI, {
+                        opacity: 0.01,
+                        color: [255, 255, 255]
+                    });
 
-                    controllers.cyclingColor = false;
+                controllers.cyclingColor = false;
 
-                    restartState();
-                },
-                'Fluid': () => {
-                    Object.assign(state, defaultSettings, {
-                            autoClearView: true,
-                            showFlow: false,
-                            respawnTick: 500
-                        });
+                restartState();
+            },
+            'Fluid'() {
+                Object.assign(state, defaultSettings, {
+                        autoClearView: true,
+                        showFlow: false,
+                        respawnTick: 500
+                    });
 
-                    Object.assign(colorGUI, {
-                            opacity: 0.2,
-                            color: [255, 255, 255]
-                        });
+                Object.assign(colorGUI, {
+                        opacity: 0.2,
+                        color: [255, 255, 255]
+                    });
 
-                    controllers.cyclingColor = false;
+                controllers.cyclingColor = false;
 
-                    restartState();
-                },
-                'Flow only': () => {
-                    Object.assign(state, defaultSettings, {
-                            autoClearView: false,
-                            flowDecay: 0.0005,
-                            forceWeight: 0.015,
-                            wanderWeight: 0,
-                            speedAlpha: 0,
-                            fadeAlpha: (1000/60)-0.000001,
-                            respawnAmount: 0.03,
-                            respawnTick: 0
-                        });
+                restartState();
+            },
+            'Flow only'() {
+                Object.assign(state, defaultSettings, {
+                        autoClearView: false,
+                        flowDecay: 0.0005,
+                        forceWeight: 0.015,
+                        wanderWeight: 0,
+                        speedAlpha: 0,
+                        fadeAlpha: (1000/60)-0.000001,
+                        respawnAmount: 0.03,
+                        respawnTick: 0
+                    });
 
-                    Object.assign(resetSpawner.uniforms, {
-                            radius: 0.25,
-                            speed: 0.015
-                        });
+                Object.assign(resetSpawner.uniforms, {
+                        radius: 0.25,
+                        speed: 0.015
+                    });
 
-                    Object.assign(colorGUI, {
-                            opacity: 0.8,
-                            color: [100, 200, 255]
-                        });
+                Object.assign(colorGUI, {
+                        opacity: 0.8,
+                        color: [100, 200, 255]
+                    });
 
-                    controllers.cyclingColor = false;
+                controllers.cyclingColor = false;
 
-                    restartState();
-                },
-                'Noise only': () => {
-                    Object.assign(state, defaultSettings, {
-                            autoClearView: false,
-                            showFlow: false,
-                            flowWeight: 0,
-                            wanderWeight: 0.002,
-                            noiseSpeed: 0,
-                            speedAlpha: 0
-                        });
+                restartState();
+            },
+            'Noise only'() {
+                Object.assign(state, defaultSettings, {
+                        autoClearView: false,
+                        showFlow: false,
+                        flowWeight: 0,
+                        wanderWeight: 0.002,
+                        noiseSpeed: 0,
+                        speedAlpha: 0
+                    });
 
-                    Object.assign(colorGUI, {
-                            opacity: 0.01,
-                            color: [255, 150, 0]
-                        });
+                Object.assign(colorGUI, {
+                        opacity: 0.01,
+                        color: [255, 150, 0]
+                    });
 
-                    controllers.cyclingColor = false;
+                controllers.cyclingColor = false;
 
-                    restartState();
-                },
-                'Sea': () => {
-                    Object.assign(state, defaultSettings, {
-                            flowWidth: 5,
-                            forceWeight: 0.015,
-                            wanderWeight: 0.0014,
-                            flowDecay: 0.001,
-                            fadeAlpha: (1000/60)-0.0001,
-                            speedAlpha: 0
-                        });
+                restartState();
+            },
+            'Sea'() {
+                Object.assign(state, defaultSettings, {
+                        flowWidth: 5,
+                        forceWeight: 0.015,
+                        wanderWeight: 0.0014,
+                        flowDecay: 0.001,
+                        fadeAlpha: (1000/60)-0.0001,
+                        speedAlpha: 0
+                    });
 
-                    Object.assign(resetSpawner.uniforms, {
-                            radius: 1,
-                            speed: 0
-                        });
+                Object.assign(resetSpawner.uniforms, {
+                        radius: 1,
+                        speed: 0
+                    });
 
-                    Object.assign(colorGUI, {
-                            opacity: 0.8,
-                            color: [55, 155, 255]
-                        });
+                Object.assign(colorGUI, {
+                        opacity: 0.8,
+                        color: [55, 155, 255]
+                    });
 
-                    controllers.cyclingColor = false;
+                controllers.cyclingColor = false;
 
-                    restartState();
-                },
-                'Mad styles': () => {
-                    Object.assign(state, defaultSettings);
+                restartState();
+            },
+            'Mad styles'() {
+                Object.assign(state, defaultSettings);
 
-                    controllers.cyclingColor = true;
+                controllers.cyclingColor = true;
 
-                    restartState();
-                },
-                'Ghostly': () => {
-                    Object.assign(state, defaultSettings, {
-                            autoClearView: false,
-                            flowDecay: 0
-                        });
+                restartState();
+            },
+            'Ghostly'() {
+                Object.assign(state, defaultSettings, {
+                        autoClearView: false,
+                        flowDecay: 0
+                    });
 
-                    Object.assign(colorGUI, {
-                            opacity: 0.006,
-                            color: [255, 255, 255]
-                        });
+                Object.assign(colorGUI, {
+                        opacity: 0.006,
+                        color: [255, 255, 255]
+                    });
 
-                    controllers.cyclingColor = false;
+                controllers.cyclingColor = false;
 
-                    restartState();
-                },
-                'Turbulent': () => {
-                    Object.assign(state, defaultSettings, {
-                            autoClearView: false,
-                            noiseSpeed: 0.00001,
-                            noiseScale: 18,
-                            forceWeight: 0.014,
-                            wanderWeight: 0.0021,
-                            fadeAlpha: (1000/60)-0.001,
-                            speedAlpha: 0.000002
-                        });
+                restartState();
+            },
+            'Turbulent'() {
+                Object.assign(state, defaultSettings, {
+                        autoClearView: false,
+                        noiseSpeed: 0.00001,
+                        noiseScale: 18,
+                        forceWeight: 0.014,
+                        wanderWeight: 0.0021,
+                        fadeAlpha: (1000/60)-0.001,
+                        speedAlpha: 0.000002
+                    });
 
-                    Object.assign(colorGUI, {
-                            opacity: 0.9,
-                            color: [255, 10, 10]
-                        });
+                Object.assign(colorGUI, {
+                        opacity: 0.9,
+                        color: [255, 10, 10]
+                    });
 
-                    controllers.cyclingColor = false;
+                controllers.cyclingColor = false;
 
-                    restartState();
-                },
-                'Roots': () => {
-                    Object.assign(state, defaultSettings, {
-                            autoClearView: false,
-                            flowDecay: 0,
-                            noiseSpeed: 0,
-                            noiseScale: 18,
-                            forceWeight: 0.015,
-                            wanderWeight: 0.0023,
-                            speedAlpha: 0.00005
-                        });
+                restartState();
+            },
+            'Roots'() {
+                Object.assign(state, defaultSettings, {
+                        autoClearView: false,
+                        flowDecay: 0,
+                        noiseSpeed: 0,
+                        noiseScale: 18,
+                        forceWeight: 0.015,
+                        wanderWeight: 0.0023,
+                        speedAlpha: 0.00005
+                    });
 
-                    Object.assign(colorGUI, {
-                            opacity: 0.03,
-                            color: [50, 255, 50]
-                        });
+                Object.assign(colorGUI, {
+                        opacity: 0.03,
+                        color: [50, 255, 50]
+                    });
 
-                    controllers.cyclingColor = false;
+                controllers.cyclingColor = false;
 
-                    restartState();
-                },
-                'Hairy': () => {
-                    Object.assign(state, defaultSettings, {
-                            autoClearView: false,
-                            timeStep: 1000/60,
-                            flowDecay: 0.001,
-                            wanderWeight: 0.002,
-                            fadeAlpha: (1000/60)-0.000001,
-                            speedAlpha: 0,
-                            respawnTick: 800
-                        });
+                restartState();
+            },
+            'Hairy'() {
+                Object.assign(state, defaultSettings, {
+                        autoClearView: false,
+                        timeStep: 1000/60,
+                        flowDecay: 0.001,
+                        wanderWeight: 0.002,
+                        fadeAlpha: (1000/60)-0.000001,
+                        speedAlpha: 0,
+                        respawnTick: 800
+                    });
 
-                    Object.assign(colorGUI, {
-                            opacity: 0.9,
-                            color: [255, 150, 255]
-                        });
+                Object.assign(colorGUI, {
+                        opacity: 0.9,
+                        color: [255, 150, 255]
+                    });
 
-                    controllers.cyclingColor = false;
+                controllers.cyclingColor = false;
 
-                    restartState();
-                }
-            };
+                restartState();
+            }
+        };
 
         for(let p in presetters) {
             presetsGUI.add(presetters, p);
