@@ -49,8 +49,9 @@ export class SpawnPixels {
         return Object.assign(uniforms, {
                 spawnData: this.buffer.color[0].bind(1),
                 spawnSize: this.spawnSize,
+                spawnMatrix: this.spawnMatrix,
                 jitter: aspect(this.jitter, uniforms.viewRes, this.jitterRad),
-                spawnMatrix: this.spawnMatrix
+                bias: 1
             });
     }
 

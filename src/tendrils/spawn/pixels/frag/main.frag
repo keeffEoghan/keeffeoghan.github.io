@@ -2,6 +2,11 @@
  * Tries a number of times to randomly select a pixel scored highest by a given
  * function.
  *
+ * @requires {function} apply A function that transforms a `vec4` of data into a
+ *                            valid `vec4` state.
+ * @requires {function} test A function that returns a float value for a given
+                             `vec4` state; greater values win the comparison.
+ *
  * @todo Some bug with `glslify-import` & sons breaks `node_mosules` aliased
  *       `require`s in `import`ed files, so we need to do it the looooooong way.
  */
@@ -18,6 +23,10 @@ vec2 spawnToPos(vec2 uv) {
     vec2 off = mix(-jitter, jitter, random(uv+time*0.001));
 
     return transform(spawnMatrix, uvToPos(uv+off)*flipUV*spawnSize);
+}
+
+vec4 pick(vec4 current, vec4 next) {
+    return ((test(current) > bias*test(next))? current : next);
 }
 
 void main() {

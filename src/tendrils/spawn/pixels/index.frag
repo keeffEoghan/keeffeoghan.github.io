@@ -14,7 +14,7 @@
 #pragma glslify: vignette = require(../../filter/pass/vignette)
 #pragma glslify: apply = require(./apply/compose-filter, apply = applyColor, pass = vignette)
 
-#pragma glslify: pick = require(./pick/particles)
+#pragma glslify: test = require(./test/particles)
 
 const float samples = 5.0;
 
