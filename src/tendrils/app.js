@@ -305,6 +305,11 @@ export default (canvas, settings, debug) => {
             'Wings'() {
                 Object.assign(state, defaultSettings);
 
+                Object.assign(resetSpawner.uniforms, {
+                        radius: 0.1,
+                        speed: 0
+                    });
+
                 controllers.cyclingColor = false;
 
                 controllers.restart();

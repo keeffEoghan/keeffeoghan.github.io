@@ -4,7 +4,7 @@
 #pragma glslify: vignette = require(../../filter/pass/vignette)
 #pragma glslify: apply = require(./apply/compose-filter, apply = applyID, pass = vignette)
 
-#pragma glslify: pick = require(./pick/particles)
+#pragma glslify: test = require(./test/particles)
 
 const float samples = 3.0;
 
