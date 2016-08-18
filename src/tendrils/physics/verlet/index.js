@@ -1,13 +1,34 @@
 /**
- * Verlet integration in 2D. See slide 26 of the second part of
+ * Verlet integration. See slide 26 of the second part of
  * [Acko's Animating Your Way to Glory](http://acko.net/blog/animate-your-way-to-glory/).
  *
- * @param acc Acceleration.
- * @param pos1 Position.
- * @param pos0 Last position.
- * @param dt Time elapsed since the last frame.
- * @return The new position (`pos2`).
+ * @param {Number} acc Acceleration.
+ * @param {Number} pos0 Last position.
+ * @param {Number} pos1 Current Position.
+ * @param {Number} dt0 Time elapsed in the last frame.
+ * @param {Number} dt1 Time elapsed in the current frame.
+ * @return {Number} Next position (`pos2`).
  */
-export const verlet = (acc, pos1, pos0, dt) => (2.0*pos1)-pos0+(acc*dt*dt);
+export const verlet = (acc, pos0, pos1, dt0, dt1) =>
+    (2*pos1)-pos0+(acc*dt0*(dt1 || dt0));
+
+/**
+ * The inverse (differentiation) of the above (integration) - find acceleration
+ * from positions and time.
+ *
+ *     pos2 = (2.0*pos1)-pos0+(acc*dt*dt)
+ *     (2.0*pos1)-pos0+(acc*dt*dt) = pos2
+ *     acc*dt*dt = pos2-(2.0*pos1)+pos0
+ *     acc = (pos2-(2.0*pos1)+pos0)/dt/dt
+ *
+ * @param {Number} pos0 First position.
+ * @param {Number} pos1 Last position.
+ * @param {Number} pos2 Current position.
+ * @param {Number} dt0 Time elapsed in the last frame.
+ * @param {Number} dt1 Time elapsed in the current frame.
+ * @return {Number} The acceleration.
+ */
+export const verletDxDt = (pos0, pos1, pos2, dt0, dt1) =>
+    (pos2-(2*pos1)+pos0)/dt0/(dt1 || dt0);
 
 export default verlet;
