@@ -28,7 +28,7 @@ export const verlet = (acc, pos0, pos1, dt0, dt1) =>
  * @param {Number} dt1 Time elapsed in the current frame.
  * @return {Number} The acceleration.
  */
-export const verletDxDt = (pos0, pos1, pos2, dt0, dt1) =>
+export const verletDyDt = (pos0, pos1, pos2, dt0, dt1) =>
     (pos2-(2*pos1)+pos0)/dt0/(dt1 || dt0);
 
 export default verlet;

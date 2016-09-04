@@ -17,6 +17,6 @@ export const euler = (vel, pos, dt) => pos+(vel*dt);
  * @param {Number} dt Time elapsed.
  * @return {Number} The velocity.
  */
-export const eulerDxDt = (pos0, pos1, dt) => (pos1-pos0)/dt;
+export const eulerDyDt = (pos0, pos1, dt) => (pos1-pos0)/dt;
 
 export default euler;

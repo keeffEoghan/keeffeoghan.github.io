@@ -1,12 +1,18 @@
 import 'pepjs';
 import glContext from 'gl-context';
 import getUserMedia from 'getusermedia';
+import analyser from 'web-audio-analyser';
 import offset from 'mouse-event-offset';
 import throttle from 'lodash/throttle';
 import mapRange from 'range-fit';
 import dat from 'dat-gui';
 import mat3 from 'gl-matrix/src/gl-matrix/mat3';
 import vec2 from 'gl-matrix/src/gl-matrix/vec2';
+
+import { Tendrils, defaults, glSettings } from './';
+
+import { step } from '../utils';
+import { reduce } from '../fp';
 
 import * as spawnPixels from './spawn/pixels';
 import spawnPixelsFlowFrag from './spawn/pixels/flow.frag';
@@ -16,7 +22,10 @@ import spawnReset from './spawn/ball';
 
 import FlowLine from './flow-line/';
 
-import { Tendrils, defaults, glSettings } from './';
+import makeAudioData from './audio/data';
+import { makeLog, makeOrderLog } from './data-log';
+import { frequencyScale } from './audio/utils';
+import { rate, mean } from './analyse';
 
 const defaultSettings = Object.assign(defaults().state, {
         respawnTick: 0
@@ -24,7 +33,11 @@ const defaultSettings = Object.assign(defaults().state, {
 
 export default (canvas, settings, debug) => {
     let tendrils;
+
     let flowInput;
+
+    let audioAnalyser;
+    let audioOrderLog;
 
     const gl = glContext(canvas, glSettings, () => {
             tendrils.draw();
@@ -38,6 +51,31 @@ export default (canvas, settings, debug) => {
             flowInput
                 .trimOld((1/tendrils.state.flowDecay)+100, tendrils.getTime())
                 .update().draw();
+
+            if(audioAnalyser && audioOrderLog) {
+                const audioData = step(audioOrderLog[0]);
+
+                audioAnalyser.frequencies(audioData);
+
+                reduce((lastOrderLog, nextOrderLog) =>
+                        rate(lastOrderLog[1], lastOrderLog[0], tendrils.dt,
+                            step(nextOrderLog)),
+                    audioOrderLog);
+
+                const analysed = audioOrderLog[audioOrderLog.length-1][0];
+
+                // const beat = weightedMean(analysed, analysed.length*0.1);
+                const beat = mean(analysed);
+                // const beat = sum(analysed);
+
+                if(beat*frequencyScale > 0.35) {
+                    respawnCam();
+                }
+
+                if(beat*frequencyScale > 0.25) {
+                    respawnFlow();
+                }
+            }
         });
 
     tendrils = new Tendrils(gl);
@@ -113,13 +151,14 @@ export default (canvas, settings, debug) => {
 
     function respawnVideo() {
         camPixelSpawner.buffer.shape = [video.videoWidth, video.videoHeight];
-        mat3.scale(camPixelSpawner.spawnMatrix, camPixelSpawner.spawnMatrix, [-1, 1]);
+        mat3.scale(camPixelSpawner.spawnMatrix,
+            camPixelSpawner.spawnMatrix, [-1, 1]);
     }
 
     getUserMedia({
             video: true,
             // @todo Can we plug audio into an analyser node while muted?
-            audio: false
+            audio: true
         },
         (e, stream) => {
             if(e) {
@@ -128,9 +167,20 @@ export default (canvas, settings, debug) => {
             else {
                 video = document.createElement('video');
 
+                video.muted = true;
                 video.src = self.URL.createObjectURL(stream);
                 video.play();
                 video.addEventListener('canplay', respawnVideo);
+
+
+                // Trying out audio analyser.
+
+                audioAnalyser = analyser(stream, {
+                        audible: false
+                    });
+
+                audioOrderLog = makeOrderLog(1, (size) =>
+                    makeLog(size, () => makeAudioData(audioAnalyser)));
             }
         });
 
@@ -143,6 +193,8 @@ export default (canvas, settings, debug) => {
     self.addEventListener('resize', throttle(resize, 200), false);
 
     resize();
+
+
     tendrils.setup();
     tendrils.resetParticles();
     resetSpawner.respawn(tendrils);
