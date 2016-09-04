@@ -21,6 +21,7 @@
         "eqeqeq": "warn",
         "no-eq-null": "warn",
         "no-console": "off",
+        "no-inner-declarations": "off",
         "arrow-parens": "error",
         "arrow-spacing": "error",
         "wrap-iife": "error",
