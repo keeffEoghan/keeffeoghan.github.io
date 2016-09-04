@@ -5,8 +5,8 @@
 
 #pragma glslify: length2 = require(../../../utils/length-2)
 
-vec4 pick(vec4 current, vec4 next) {
-    return ((length2(current.zw) > length2(next.zw))? current : next);
+float test(vec4 data) {
+    return length2(data.zw);
 }
 
-#pragma glslify: export(pick)
+#pragma glslify: export(test)
