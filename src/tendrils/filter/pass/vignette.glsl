@@ -1,3 +1,5 @@
+// @todo Tweak shape of vignette falloff.
+
 #pragma glslify: length2 = require(../../utils/length-2)
 
 const vec2 midUV = vec2(0.5);

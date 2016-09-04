@@ -215,12 +215,7 @@ export class Tendrils {
 
 
         // Time
-
-        const t0 = this.time;
-
-        this.time = this.getTime();
-
-        const dt = (this.state.timeStep || this.time-t0);
+        const dt = this.tick();
 
 
         // Physics
@@ -520,6 +515,14 @@ export class Tendrils {
 
     getTime(time = Date.now()) {
         return time-this.start;
+    }
+
+    tick(timeStep = this.state.timeStep) {
+        const t0 = this.time;
+
+        this.time = this.getTime();
+
+        return this.dt = (timeStep || this.time-t0);
     }
 }
 
