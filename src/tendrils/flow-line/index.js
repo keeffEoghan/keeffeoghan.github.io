@@ -17,7 +17,7 @@ export class FlowLine {
                     ...defaults().uniforms,
                     speed: 3,
                     maxSpeed: 0.01,
-                    rad: 0.25,
+                    rad: 0.1,
                     crestShape: 0.6
                 },
                 attributes: {

@@ -16,7 +16,8 @@ import frag from './index.frag';
 export const defaults = () => ({
     shader: [vert, frag],
     // buffer: [[1, 1]]
-    buffer: [[1, 1], { float: true }]
+    buffer: [[1, 1], { float: true }],
+    spawnSize: [1, 1]
 });
 
 export class SpawnPixels {
@@ -39,8 +40,8 @@ export class SpawnPixels {
         this.jitterRad = 4;
 
         this.jitter = vec2.create();
-        // Fill the across the max dimension of the view.
-        this.spawnSize = [1, 1];
+
+        this.spawnSize = params.spawnSize;
         this.spawnMatrix = mat3.create();
     }
 
@@ -48,8 +49,9 @@ export class SpawnPixels {
         return Object.assign(uniforms, {
                 spawnData: this.buffer.color[0].bind(1),
                 spawnSize: this.spawnSize,
+                spawnMatrix: this.spawnMatrix,
                 jitter: aspect(this.jitter, uniforms.viewRes, this.jitterRad),
-                spawnMatrix: this.spawnMatrix
+                bias: 1
             });
     }
 
