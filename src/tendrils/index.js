@@ -42,7 +42,7 @@ export const defaults = () => ({
         maxSpeed: 0.01,
         damping: 0.045,
 
-        flowDecay: 0.0001,
+        flowDecay: 0.0005,
         flowWidth: 5,
 
         noiseSpeed: 0.00025,
@@ -52,6 +52,7 @@ export const defaults = () => ({
         flowWeight: 1,
         wanderWeight: 0.001,
 
+        // @todo Make this a texture lookup instead
         color: [1, 1, 1, 0.05],
         fadeAlpha: -1,
         speedAlpha: 0.000001,
@@ -214,12 +215,7 @@ export class Tendrils {
 
 
         // Time
-
-        const t0 = this.time;
-
-        this.time = this.getTime();
-
-        const dt = (this.state.timeStep || this.time-t0);
+        const dt = this.tick();
 
 
         // Physics
@@ -519,6 +515,14 @@ export class Tendrils {
 
     getTime(time = Date.now()) {
         return time-this.start;
+    }
+
+    tick(timeStep = this.state.timeStep) {
+        const t0 = this.time;
+
+        this.time = this.getTime();
+
+        return this.dt = (timeStep || this.time-t0);
     }
 }
 
