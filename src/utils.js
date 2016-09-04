@@ -1,4 +1,11 @@
-export const step = (array) => array.unshift(array.pop());
+export function step(array) {
+    const next = Array.prototype.pop.call(array);
+
+    Array.prototype.unshift.call(array, next);
+
+    return next;
+}
+
 
 const invLog2 = 1/Math.log(2);
 

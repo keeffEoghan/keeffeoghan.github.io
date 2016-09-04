@@ -4,7 +4,7 @@
  * @see `../../../filter/`
  * @see `./`
  * @requires {function} pass The filter pass function, given the pixel.
- * @requires {function} pass The apply function, given the result of `pass`.
+ * @requires {function} apply The apply function, given the result of `pass`.
  */
 
 vec4 compose(vec2 uv, vec2 pos, vec4 pixel) {
