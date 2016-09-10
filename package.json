@@ -5,6 +5,10 @@
   "authors": [
     "Eoghan O'Keeffe <keeffeoghan@gmail.com>"
   ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/keeffEoghan/portfolio.git"
+  },
   "scripts": {
     "gulp": "gulp",
     "glslify": "glslify"
@@ -45,6 +49,7 @@
     "polyline-normals": "^2.0.2",
     "range-fit": "^0.1.1",
     "reset.css": "^2.0.2",
+    "soundcloud-badge": "^1.1.0",
     "web-audio-analyser": "^2.0.1"
   },
   "devDependencies": {
