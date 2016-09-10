@@ -199,6 +199,9 @@ module.exports = {
                     alias: {
                         'glslify': path.join(__dirname, './loaders/glslify')
                     }
+                },
+                node: {
+                    fs: 'empty'
                 }
             }
         },

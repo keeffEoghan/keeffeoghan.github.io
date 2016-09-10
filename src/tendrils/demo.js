@@ -2,12 +2,13 @@ import 'pepjs';
 import glContext from 'gl-context';
 import getUserMedia from 'getusermedia';
 import analyser from 'web-audio-analyser';
+import soundCloud from 'soundcloud-badge';
 import offset from 'mouse-event-offset';
 import throttle from 'lodash/throttle';
 import mapRange from 'range-fit';
-import dat from 'dat-gui';
 import mat3 from 'gl-matrix/src/gl-matrix/mat3';
 import vec2 from 'gl-matrix/src/gl-matrix/vec2';
+import dat from 'dat-gui';
 
 import { Tendrils, defaults, glSettings } from './';
 
@@ -25,7 +26,7 @@ import FlowLine from './flow-line/';
 import makeAudioData from './audio/data';
 import { makeLog, makeOrderLog } from './data-log';
 import { frequencyScale } from './audio/utils';
-import { rate, sum, weightedMean } from './analyse';
+import { rate, sum, mean, weightedMean } from './analyse';
 
 const defaultSettings = Object.assign(defaults().state, {
         respawnTick: 0
@@ -36,8 +37,12 @@ export default (canvas, settings, debug) => {
 
     let flowInput;
 
-    let audioAnalyser;
-    let audioOrderLog;
+    let track;
+    let trackAnalyser;
+    let trackOrderLog;
+
+    let micAnalyser;
+    let micOrderLog;
 
     const gl = glContext(canvas, glSettings, () => {
             tendrils.draw();
@@ -52,27 +57,62 @@ export default (canvas, settings, debug) => {
                 .trimOld((1/tendrils.state.flowDecay)+100, tendrils.getTime())
                 .update().draw();
 
-            if(audioAnalyser && audioOrderLog) {
-                const audioData = step(audioOrderLog[0]);
+            if(trackAnalyser && trackOrderLog) {
+                const audioData = step(trackOrderLog[0]);
 
-                audioAnalyser.frequencies(audioData);
+                trackAnalyser.frequencies(audioData);
 
                 reduce((lastOrderLog, nextOrderLog) =>
                         rate(lastOrderLog[1], lastOrderLog[0], tendrils.dt,
                             step(nextOrderLog)),
-                    audioOrderLog);
+                    trackOrderLog);
 
-                const analysed = audioOrderLog[audioOrderLog.length-1][0];
+                const analysed = [
+                    trackOrderLog[1][0],
+                    trackOrderLog[trackOrderLog.length-1][0]
+                ];
 
-                const volume = sum(audioData);
-                const beat = weightedMean(analysed, analysed.length*0.2);
+                const volume = sum(analysed[0]);
+                const beat = mean(analysed[1]);
 
-                if(beat*frequencyScale > 0.0025) {
+                if(beat*frequencyScale > 0.0018) {
                     respawnCam();
+                    console.log('track beat', beat*frequencyScale);
+                }
+
+                // if(volume*frequencyScale > 410) {
+                if(volume*frequencyScale > 1.8) {
+                    respawnFlow();
+                    console.log('track volume', volume*frequencyScale);
+                }
+            }
+
+            if(micAnalyser && micOrderLog) {
+                const audioData = step(micOrderLog[0]);
+
+                micAnalyser.frequencies(audioData);
+
+                reduce((lastOrderLog, nextOrderLog) =>
+                        rate(lastOrderLog[1], lastOrderLog[0], tendrils.dt,
+                            step(nextOrderLog)),
+                    micOrderLog);
+
+                const analysed = [
+                    micOrderLog[0][0],
+                    micOrderLog[micOrderLog.length-1][0]
+                ];
+
+                const volume = sum(analysed[0]);
+                const beat = weightedMean(analysed[1], analysed[1].length*0.2);
+
+                if(beat*frequencyScale > 0.0018) {
+                    respawnCam();
+                    console.log('mic beat', beat*frequencyScale);
                 }
 
                 if(volume*frequencyScale > 200) {
                     respawnFlow();
+                    console.log('mic volume', volume*frequencyScale);
                 }
             }
         });
@@ -174,13 +214,41 @@ export default (canvas, settings, debug) => {
 
                 // Trying out audio analyser.
 
-                audioAnalyser = analyser(stream, {
+                micAnalyser = analyser(stream, {
                         audible: false
                     });
 
-                audioOrderLog = makeOrderLog(2, (size) =>
-                    makeLog(size, () => makeAudioData(audioAnalyser)));
+                micOrderLog = makeOrderLog(2, (size) =>
+                    makeLog(size, () => makeAudioData(micAnalyser)));
             }
+        });
+
+    soundCloud({
+            client_id: '75aca2e2b815f9f5d4e92916c7b80846',
+            song: 'https://soundcloud.com/max-cooper/essential-mix-max-cooper-no-voice-overs',
+            dark: false
+        },
+        (e, src, data, el) => {
+            if(e) {
+                throw e;
+            }
+
+            track = Object.assign(new Audio(), {
+                    crossOrigin: 'Anonymous',
+                    src: src,
+                    controls: true
+                });
+
+            trackAnalyser = analyser(track, {
+                    stereo: true
+                });
+
+            trackOrderLog = makeOrderLog(2, (size) =>
+                makeLog(size, () => makeAudioData(trackAnalyser)));
+
+            track.play();
+
+            el.querySelector('.npm-scb-info').appendChild(track);
         });
 
 
