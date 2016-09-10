@@ -1,3 +1,6 @@
+# Explicit
+*.gitignored
+
 # Logs
 logs
 *.log
