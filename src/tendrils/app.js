@@ -25,7 +25,7 @@ import FlowLine from './flow-line/';
 import makeAudioData from './audio/data';
 import { makeLog, makeOrderLog } from './data-log';
 import { frequencyScale } from './audio/utils';
-import { rate, mean } from './analyse';
+import { rate, sum, weightedMean } from './analyse';
 
 const defaultSettings = Object.assign(defaults().state, {
         respawnTick: 0
@@ -64,15 +64,14 @@ export default (canvas, settings, debug) => {
 
                 const analysed = audioOrderLog[audioOrderLog.length-1][0];
 
-                // const beat = weightedMean(analysed, analysed.length*0.1);
-                const beat = mean(analysed);
-                // const beat = sum(analysed);
+                const volume = sum(audioData);
+                const beat = weightedMean(analysed, analysed.length*0.2);
 
-                if(beat*frequencyScale > 0.35) {
+                if(beat*frequencyScale > 0.0025) {
                     respawnCam();
                 }
 
-                if(beat*frequencyScale > 0.25) {
+                if(volume*frequencyScale > 200) {
                     respawnFlow();
                 }
             }
@@ -179,7 +178,7 @@ export default (canvas, settings, debug) => {
                         audible: false
                     });
 
-                audioOrderLog = makeOrderLog(1, (size) =>
+                audioOrderLog = makeOrderLog(2, (size) =>
                     makeLog(size, () => makeAudioData(audioAnalyser)));
             }
         });
