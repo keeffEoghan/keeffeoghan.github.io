@@ -3,7 +3,7 @@
  * @main Index
  */
 
-import tendrilsApp from '../tendrils/app';
+import tendrilsApp from '../tendrils/demo';
 
 
 const readyStates = ['loading', 'interactive', 'complete'];
