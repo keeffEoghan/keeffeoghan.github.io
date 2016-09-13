@@ -25,8 +25,7 @@ import FlowLine from './flow-line/';
 
 import makeAudioData from './audio/data';
 import { makeLog, makeOrderLog } from './data-log';
-import { frequencyScale } from './audio/utils';
-import { rate, sum, mean, weightedMean } from './analyse';
+import { orderLogRates, peak, sum, mean, weightedMean } from './analyse';
 
 const defaultSettings = Object.assign(defaults().state, {
         respawnTick: 0
@@ -58,61 +57,31 @@ export default (canvas, settings, debug) => {
                 .update().draw();
 
             if(trackAnalyser && trackOrderLog) {
-                const audioData = step(trackOrderLog[0]);
+                trackAnalyser.frequencies(step(trackOrderLog[0]));
+                orderLogRates(trackOrderLog, tendrils.dt);
 
-                trackAnalyser.frequencies(audioData);
-
-                reduce((lastOrderLog, nextOrderLog) =>
-                        rate(lastOrderLog[1], lastOrderLog[0], tendrils.dt,
-                            step(nextOrderLog)),
-                    trackOrderLog);
-
-                const analysed = [
-                    trackOrderLog[1][0],
-                    trackOrderLog[trackOrderLog.length-1][0]
-                ];
-
-                const volume = sum(analysed[0]);
-                const beat = mean(analysed[1]);
-
-                if(beat*frequencyScale > 0.0018) {
+                if(mean(trackOrderLog[trackOrderLog.length-1][0]) > 0.1) {
                     respawnCam();
-                    console.log('track beat', beat*frequencyScale);
+                    console.log('track beat');
                 }
-
-                // if(volume*frequencyScale > 410) {
-                if(volume*frequencyScale > 1.8) {
+                else if(sum(trackOrderLog[1][0]) > 10) {
                     respawnFlow();
-                    console.log('track volume', volume*frequencyScale);
+                    console.log('track volume');
                 }
-            }
+                else if(micAnalyser && micOrderLog) {
+                    micAnalyser.frequencies(step(micOrderLog[0]));
+                    orderLogRates(micOrderLog, tendrils.dt);
 
-            if(micAnalyser && micOrderLog) {
-                const audioData = step(micOrderLog[0]);
+                    const beats = micOrderLog[micOrderLog.length-1][0];
 
-                micAnalyser.frequencies(audioData);
-
-                reduce((lastOrderLog, nextOrderLog) =>
-                        rate(lastOrderLog[1], lastOrderLog[0], tendrils.dt,
-                            step(nextOrderLog)),
-                    micOrderLog);
-
-                const analysed = [
-                    micOrderLog[0][0],
-                    micOrderLog[micOrderLog.length-1][0]
-                ];
-
-                const volume = sum(analysed[0]);
-                const beat = weightedMean(analysed[1], analysed[1].length*0.2);
-
-                if(beat*frequencyScale > 0.0018) {
-                    respawnCam();
-                    console.log('mic beat', beat*frequencyScale);
-                }
-
-                if(volume*frequencyScale > 200) {
-                    respawnFlow();
-                    console.log('mic volume', volume*frequencyScale);
+                    if(weightedMean(beats, beats.length*0.2) > 2) {
+                        respawnCam();
+                        console.log('mic beat');
+                    }
+                    else if(peak(micOrderLog[1][0]) > 5) {
+                        respawnFlow();
+                        console.log('mic volume');
+                    }
                 }
             }
         });
@@ -218,8 +187,13 @@ export default (canvas, settings, debug) => {
                         audible: false
                     });
 
-                micOrderLog = makeOrderLog(2, (size) =>
-                    makeLog(size, () => makeAudioData(micAnalyser)));
+                micAnalyser.analyser.fftSize = Math.pow(2, 8);
+
+                const order = 2;
+
+                micOrderLog = makeOrderLog(order, (size) =>
+                    makeLog(size, () => makeAudioData(micAnalyser,
+                        ((size === order)? Uint8Array : Float32Array))));
             }
         });
 
@@ -239,12 +213,17 @@ export default (canvas, settings, debug) => {
                     controls: true
                 });
 
-            trackAnalyser = analyser(track, {
-                    stereo: true
-                });
+            // @todo Stereo: true
 
-            trackOrderLog = makeOrderLog(2, (size) =>
-                makeLog(size, () => makeAudioData(trackAnalyser)));
+            trackAnalyser = analyser(track);
+
+            trackAnalyser.analyser.fftSize = Math.pow(2, 5);
+
+            const order = 3;
+
+            trackOrderLog = makeOrderLog(order, (size) =>
+                makeLog(size, () => makeAudioData(trackAnalyser,
+                    ((size === order)? Uint8Array : Float32Array))));
 
             track.play();
 
