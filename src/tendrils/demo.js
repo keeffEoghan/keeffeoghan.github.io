@@ -1,3 +1,5 @@
+import '../utils/https-redirect';
+
 import 'pepjs';
 import glContext from 'gl-context';
 import getUserMedia from 'getusermedia';
