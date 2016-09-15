@@ -36,14 +36,14 @@ export const defaults = () => ({
         timeStep: 1000/60,
 
         autoClearView: false,
-        showFlow: false,
+        showFlow: true,
 
         minSpeed: 0.000001,
         maxSpeed: 0.01,
         damping: 0.045,
 
         flowDecay: 0.0005,
-        flowWidth: 5,
+        flowWidth: 3,
 
         noiseSpeed: 0.00025,
         noiseScale: 2.125,
@@ -53,7 +53,7 @@ export const defaults = () => ({
         wanderWeight: 0.001,
 
         // @todo Make this a texture lookup instead
-        color: [1, 1, 1, 0.05],
+        color: [1, 1, 1, 0.01],
         fadeAlpha: -1,
         speedAlpha: 0.000001,
 
