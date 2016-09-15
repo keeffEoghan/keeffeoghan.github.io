@@ -29,9 +29,7 @@ import makeAudioData from './audio/data';
 import { makeLog, makeOrderLog } from './data-log';
 import { orderLogRates, peak, sum, mean, weightedMean } from './analyse';
 
-const defaultSettings = Object.assign(defaults().state, {
-        respawnTick: 0
-    });
+const defaultSettings = defaults().state;
 
 export default (canvas, settings, debug) => {
     let tendrils;
@@ -44,6 +42,21 @@ export default (canvas, settings, debug) => {
 
     let micAnalyser;
     let micOrderLog;
+
+    const audioDefaults = {
+        track: true,
+        trackBeatAt: 0.1,
+        trackLoudAt: 9,
+
+        mic: true,
+        micBeatAt: 1,
+        micLoudAt: 4,
+
+        audible: true
+    };
+
+    const audioState = {...audioDefaults};
+
 
     const gl = glContext(canvas, glSettings, () => {
             tendrils.draw();
@@ -58,33 +71,45 @@ export default (canvas, settings, debug) => {
                 .trimOld((1/tendrils.state.flowDecay)+100, tendrils.getTime())
                 .update().draw();
 
-            if(trackAnalyser && trackOrderLog) {
+
+            // React to sound
+            
+            let soundInput = null;
+
+            if(audioState.track && trackAnalyser && trackOrderLog) {
                 trackAnalyser.frequencies(step(trackOrderLog[0]));
                 orderLogRates(trackOrderLog, tendrils.dt);
 
-                if(mean(trackOrderLog[trackOrderLog.length-1][0]) > 0.1) {
-                    respawnCam();
+                if(mean(trackOrderLog[trackOrderLog.length-1][0]) >
+                        audioState.trackBeatAt) {
+                    soundInput = respawnCam;
                     console.log('track beat');
                 }
-                else if(sum(trackOrderLog[1][0]) > 10) {
-                    respawnFlow();
+                else if(sum(trackOrderLog[1][0]) > audioState.trackLoudAt) {
+                    soundInput = respawnFlow;
                     console.log('track volume');
                 }
-                else if(micAnalyser && micOrderLog) {
-                    micAnalyser.frequencies(step(micOrderLog[0]));
-                    orderLogRates(micOrderLog, tendrils.dt);
+            }
 
-                    const beats = micOrderLog[micOrderLog.length-1][0];
+            if(!soundInput && audioState.mic && micAnalyser && micOrderLog) {
+                micAnalyser.frequencies(step(micOrderLog[0]));
+                orderLogRates(micOrderLog, tendrils.dt);
 
-                    if(weightedMean(beats, beats.length*0.2) > 2) {
-                        respawnCam();
-                        console.log('mic beat');
-                    }
-                    else if(peak(micOrderLog[1][0]) > 5) {
-                        respawnFlow();
-                        console.log('mic volume');
-                    }
+                const beats = micOrderLog[micOrderLog.length-1][0];
+
+                if(weightedMean(beats, beats.length*0.2) >
+                        audioState.micBeatAt) {
+                    soundInput = respawnCam;
+                    console.log('mic beat');
                 }
+                else if(peak(micOrderLog[1][0]) > audioState.micLoudAt) {
+                    soundInput = respawnFlow();
+                    console.log('mic volume');
+                }
+            }
+
+            if(soundInput) {
+                soundInput();
             }
         });
 
@@ -167,7 +192,6 @@ export default (canvas, settings, debug) => {
 
     getUserMedia({
             video: true,
-            // @todo Can we plug audio into an analyser node while muted?
             audio: true
         },
         (e, stream) => {
@@ -201,7 +225,8 @@ export default (canvas, settings, debug) => {
 
     soundCloud({
             client_id: '75aca2e2b815f9f5d4e92916c7b80846',
-            song: 'https://soundcloud.com/max-cooper/essential-mix-max-cooper-no-voice-overs',
+            song: 'https://soundcloud.com/max-cooper/waves-1',
+            // song: 'https://soundcloud.com/max-cooper/essential-mix-max-cooper-no-voice-overs',
             dark: false
         },
         (e, src, data, el) => {
@@ -217,7 +242,9 @@ export default (canvas, settings, debug) => {
 
             // @todo Stereo: true
 
-            trackAnalyser = analyser(track);
+            trackAnalyser = analyser(track, {
+                    audible: audioState.audible
+                });
 
             trackAnalyser.analyser.fftSize = Math.pow(2, 5);
 
@@ -271,49 +298,27 @@ export default (canvas, settings, debug) => {
 
         let settingsGUI = gui.addFolder('settings');
 
-
-        // Generic settings; no need to do anything special here
-
-        let settingsKeys = [];
-
-        Object.assign(state, {
-            respawnTick: 0
-        });
-
         for(let s in state) {
             if(!(typeof state[s]).match(/(object|array)/gi)) {
-                settingsGUI.add(state, s);
-                settingsKeys.push(s);
+                let control = settingsGUI.add(state, s);
+
+                // Some special cases
+
+                if(s === 'rootNum') {
+                    control.onFinishChange((n) => {
+                        tendrils.setup(n);
+                        restart();
+                    });
+                }
+
+                if(s === 'respawnAmount') {
+                    control.onFinishChange((n) => {
+                        tendrils.setupRespawn(state.rootNum, n);
+                        tendrils.setupSpawnCache();
+                    });
+                }
             }
         }
-
-
-        // Some special cases
-
-        settingsGUI.__controllers[settingsKeys.indexOf('rootNum')]
-            .onFinishChange((n) => {
-                tendrils.setup(n);
-                restart();
-            });
-
-        settingsGUI.__controllers[settingsKeys.indexOf('respawnAmount')]
-            .onFinishChange((n) => {
-                tendrils.setupRespawn(state.rootNum, n);
-                tendrils.setupSpawnCache();
-            });
-
-        let respawnCamInterval;
-
-        const respawnCamSweep = (n = state.respawnTick) => {
-            clearInterval(respawnCamInterval);
-
-            respawnCamInterval = ((n > 0)?
-                setInterval(respawnCam, n) : null);
-        };
-
-
-        settingsGUI.__controllers[settingsKeys.indexOf('respawnTick')]
-            .onFinishChange(respawnCamSweep);
 
 
         // DAT.GUI's color controllers are a bit fucked.
@@ -342,6 +347,28 @@ export default (canvas, settings, debug) => {
         for(let s in resetSpawner.uniforms) {
             if(!(typeof resetSpawner.uniforms[s]).match(/(object|array)/gi)) {
                 respawnGUI.add(resetSpawner.uniforms, s);
+            }
+        }
+
+
+        // Audio
+
+        let audioGUI = gui.addFolder('audio');
+
+        for(let s in audioState) {
+            let control = audioGUI.add(audioState, s);
+
+            if(s === 'audible') {
+                control.onChange((v) => {
+                    const out = (trackAnalyser.merger || trackAnalyser.analyser);
+
+                    if(v) {
+                        out.connect(trackAnalyser.ctx.destination);
+                    }
+                    else {
+                        out.disconnect();
+                    }
+                });
             }
         }
 
@@ -398,7 +425,6 @@ export default (canvas, settings, debug) => {
             controllers.restart();
             updateGUI();
             convertColor();
-            respawnCamSweep();
         };
 
         let presetters = {
@@ -414,7 +440,6 @@ export default (canvas, settings, debug) => {
 
                 controllers.restart();
                 updateGUI();
-                respawnCamSweep();
             },
             'Flow'() {
                 Object.assign(state, defaultSettings, {
@@ -440,7 +465,6 @@ export default (canvas, settings, debug) => {
                 Object.assign(state, defaultSettings, {
                         autoClearView: true,
                         showFlow: false,
-                        respawnTick: 500
                     });
 
                 Object.assign(colorGUI, {
@@ -461,7 +485,6 @@ export default (canvas, settings, debug) => {
                         speedAlpha: 0,
                         fadeAlpha: (1000/60)-0.000001,
                         respawnAmount: 0.03,
-                        respawnTick: 0
                     });
 
                 Object.assign(resetSpawner.uniforms, {
@@ -591,7 +614,6 @@ export default (canvas, settings, debug) => {
                         wanderWeight: 0.002,
                         fadeAlpha: (1000/60)-0.000001,
                         speedAlpha: 0,
-                        respawnTick: 800
                     });
 
                 Object.assign(colorGUI, {
