@@ -446,7 +446,8 @@ export default (canvas, settings, debug) => {
                         speed: 0.01
                     });
 
-                Object.assign(colorGUI, {
+
+                Object.assign(colorGUI, colorDefaults, {
                         alpha: 0.01,
                         color: [255, 255, 255]
                     });
@@ -464,6 +465,8 @@ export default (canvas, settings, debug) => {
                         radius: 0.1,
                         speed: 0
                     });
+
+                Object.assign(colorGUI, colorDefaults);
 
                 controllers.cyclingColor = false;
 
@@ -559,6 +562,8 @@ export default (canvas, settings, debug) => {
                 Object.assign(state, defaultSettings, {
                         showFlow: false
                     });
+
+                Object.assign(colorGUI, colorDefaults);
 
                 controllers.cyclingColor = true;
 
