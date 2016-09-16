@@ -492,7 +492,6 @@ export default (canvas, settings, debug) => {
                         forceWeight: 0.015,
                         wanderWeight: 0,
                         speedAlpha: 0,
-                        // fadeAlpha: 10000,
                         respawnAmount: 0.03,
                     });
 
@@ -589,7 +588,6 @@ export default (canvas, settings, debug) => {
                         noiseScale: 18,
                         forceWeight: 0.014,
                         wanderWeight: 0.0021,
-                        // fadeAlpha: 100,
                         speedAlpha: 0.000002
                     });
 
@@ -598,6 +596,28 @@ export default (canvas, settings, debug) => {
                         color: [255, 10, 10],
                         baseAlpha: 0.01,
                         baseColor: [0, 0, 0]
+                    });
+
+                controllers.cyclingColor = false;
+
+                restartState();
+            },
+            'Crawlies'() {
+                Object.assign(state, defaultSettings, {
+                        showFlow: false,
+                        autoClearView: false,
+                        noiseSpeed: 0.00001,
+                        noiseScale: 60,
+                        forceWeight: 0.014,
+                        wanderWeight: 0.0021,
+                        speedAlpha: 0.000002
+                    });
+
+                Object.assign(colorGUI, colorDefaults, {
+                        alpha: 1,
+                        color: [0, 0, 0],
+                        baseAlpha: 0.004,
+                        baseColor: [255, 255, 255]
                     });
 
                 controllers.cyclingColor = false;
@@ -633,7 +653,6 @@ export default (canvas, settings, debug) => {
                         timeStep: 1000/60,
                         flowDecay: 0.001,
                         wanderWeight: 0.002,
-                        // fadeAlpha: 1000,
                         speedAlpha: 0
                     });
 

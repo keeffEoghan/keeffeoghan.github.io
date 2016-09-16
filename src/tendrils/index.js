@@ -283,6 +283,7 @@ export class Tendrils {
 
         // Render to the view.
         
+        // Overlay fade.
         if(this.state.baseColor[3] > 0) {
             this.baseShader.bind();
             this.baseShader.uniforms.color = this.state.baseColor;
@@ -290,6 +291,7 @@ export class Tendrils {
             this.screen.render();
         }
 
+        // Show flow
         if(this.state.showFlow) {
             // @todo Surely just render the flow texture instead?
             this.particles.render = this.flowScreenShader;
@@ -319,7 +321,7 @@ export class Tendrils {
             this.particles.draw(this.uniforms.render, this.gl.LINES);
         }
         else {
-            // Multi-buffer passes
+            // Multi-buffer fade etc passes
 
             this.buffers[0].bind();
             this.gl.clear(this.gl.COLOR_BUFFER_BIT);
