@@ -44,15 +44,15 @@ export default (canvas, settings, debug) => {
     let micOrderLog;
 
     const audioDefaults = {
+        audible: false,
+
         track: true,
         trackBeatAt: 0.1,
         trackLoudAt: 9,
 
         mic: true,
         micBeatAt: 1,
-        micLoudAt: 4,
-
-        audible: true
+        micLoudAt: 5
     };
 
     const audioState = {...audioDefaults};
@@ -323,20 +323,27 @@ export default (canvas, settings, debug) => {
 
         // DAT.GUI's color controllers are a bit fucked.
 
-        let colorGUI = {
+        const colorDefaults = {
                 color: state.color.slice(0, 3).map((c) => c*255),
-                opacity: state.color[3]
+                alpha: state.color[3],
+
+                baseColor: state.baseColor.slice(0, 3).map((c) => c*255),
+                baseAlpha: state.baseColor[3]
             };
 
-        const convertColor = () => {
-            state.color = [
-                    ...colorGUI.color.slice(0, 3).map((c) => c/255),
-                    colorGUI.opacity
-                ];
-        }
+        let colorGUI = {...colorDefaults};
+
+        const convertColor = () => Object.assign(state, {
+            color: [...colorGUI.color.map((c) => c/255), colorGUI.alpha],
+            baseColor: [...colorGUI.baseColor.map((c) => c/255), colorGUI.baseAlpha]
+        });
 
         settingsGUI.addColor(colorGUI, 'color').onChange(convertColor);
-        settingsGUI.add(colorGUI, 'opacity').onChange(convertColor);
+        settingsGUI.add(colorGUI, 'alpha').onChange(convertColor);
+
+        settingsGUI.addColor(colorGUI, 'baseColor').onChange(convertColor);
+        settingsGUI.add(colorGUI, 'baseAlpha').onChange(convertColor);
+
         convertColor();
 
 
@@ -400,7 +407,7 @@ export default (canvas, settings, debug) => {
         const cycleColor = () => {
             if(controllers.cyclingColor) {
                 Object.assign(colorGUI, {
-                    opacity: 0.2,
+                    alpha: 0.2,
                     color: [
                         Math.sin(Date.now()*0.009)*200,
                         100+Math.sin(Date.now()*0.006)*155,
@@ -428,23 +435,10 @@ export default (canvas, settings, debug) => {
         };
 
         let presetters = {
-            'Wings'() {
-                Object.assign(state, defaultSettings);
-
-                Object.assign(resetSpawner.uniforms, {
-                        radius: 0.1,
-                        speed: 0
-                    });
-
-                controllers.cyclingColor = false;
-
-                controllers.restart();
-                updateGUI();
-            },
             'Flow'() {
                 Object.assign(state, defaultSettings, {
                         showFlow: true,
-                        flowWidth: 2
+                        flowWidth: 5
                     });
 
                 Object.assign(resetSpawner.uniforms, {
@@ -453,8 +447,22 @@ export default (canvas, settings, debug) => {
                     });
 
                 Object.assign(colorGUI, {
-                        opacity: 0.01,
+                        alpha: 0.01,
                         color: [255, 255, 255]
+                    });
+
+                controllers.cyclingColor = false;
+
+                restartState();
+            },
+            'Wings'() {
+                Object.assign(state, defaultSettings, {
+                        showFlow: false
+                    });
+
+                Object.assign(resetSpawner.uniforms, {
+                        radius: 0.1,
+                        speed: 0
                     });
 
                 controllers.cyclingColor = false;
@@ -464,11 +472,11 @@ export default (canvas, settings, debug) => {
             'Fluid'() {
                 Object.assign(state, defaultSettings, {
                         autoClearView: true,
-                        showFlow: false,
+                        showFlow: false
                     });
 
-                Object.assign(colorGUI, {
-                        opacity: 0.2,
+                Object.assign(colorGUI, colorDefaults, {
+                        alpha: 0.2,
                         color: [255, 255, 255]
                     });
 
@@ -478,12 +486,12 @@ export default (canvas, settings, debug) => {
             },
             'Flow only'() {
                 Object.assign(state, defaultSettings, {
+                        showFlow: false,
                         autoClearView: false,
                         flowDecay: 0.0005,
                         forceWeight: 0.015,
                         wanderWeight: 0,
                         speedAlpha: 0,
-                        fadeAlpha: (1000/60)-0.000001,
                         respawnAmount: 0.03,
                     });
 
@@ -492,9 +500,11 @@ export default (canvas, settings, debug) => {
                         speed: 0.015
                     });
 
-                Object.assign(colorGUI, {
-                        opacity: 0.8,
-                        color: [100, 200, 255]
+                Object.assign(colorGUI, colorDefaults, {
+                        alpha: 0.8,
+                        color: [100, 200, 255],
+                        baseAlpha: 0.1,
+                        baseColor: [0, 0, 0]
                     });
 
                 controllers.cyclingColor = false;
@@ -511,8 +521,8 @@ export default (canvas, settings, debug) => {
                         speedAlpha: 0
                     });
 
-                Object.assign(colorGUI, {
-                        opacity: 0.01,
+                Object.assign(colorGUI, colorDefaults, {
+                        alpha: 0.01,
                         color: [255, 150, 0]
                     });
 
@@ -522,11 +532,12 @@ export default (canvas, settings, debug) => {
             },
             'Sea'() {
                 Object.assign(state, defaultSettings, {
+                        showFlow: false,
                         flowWidth: 5,
                         forceWeight: 0.015,
                         wanderWeight: 0.0014,
                         flowDecay: 0.001,
-                        fadeAlpha: (1000/60)-0.0001,
+                        fadeAlpha: 10,
                         speedAlpha: 0
                     });
 
@@ -535,8 +546,8 @@ export default (canvas, settings, debug) => {
                         speed: 0
                     });
 
-                Object.assign(colorGUI, {
-                        opacity: 0.8,
+                Object.assign(colorGUI, colorDefaults, {
+                        alpha: 0.8,
                         color: [55, 155, 255]
                     });
 
@@ -545,7 +556,9 @@ export default (canvas, settings, debug) => {
                 restartState();
             },
             'Mad styles'() {
-                Object.assign(state, defaultSettings);
+                Object.assign(state, defaultSettings, {
+                        showFlow: false
+                    });
 
                 controllers.cyclingColor = true;
 
@@ -553,12 +566,13 @@ export default (canvas, settings, debug) => {
             },
             'Ghostly'() {
                 Object.assign(state, defaultSettings, {
+                        showFlow: false,
                         autoClearView: false,
                         flowDecay: 0
                     });
 
-                Object.assign(colorGUI, {
-                        opacity: 0.006,
+                Object.assign(colorGUI, colorDefaults, {
+                        alpha: 0.006,
                         color: [255, 255, 255]
                     });
 
@@ -568,18 +582,42 @@ export default (canvas, settings, debug) => {
             },
             'Turbulent'() {
                 Object.assign(state, defaultSettings, {
+                        showFlow: false,
                         autoClearView: false,
                         noiseSpeed: 0.00001,
                         noiseScale: 18,
                         forceWeight: 0.014,
                         wanderWeight: 0.0021,
-                        fadeAlpha: (1000/60)-0.001,
                         speedAlpha: 0.000002
                     });
 
-                Object.assign(colorGUI, {
-                        opacity: 0.9,
-                        color: [255, 10, 10]
+                Object.assign(colorGUI, colorDefaults, {
+                        alpha: 0.9,
+                        color: [255, 10, 10],
+                        baseAlpha: 0.01,
+                        baseColor: [0, 0, 0]
+                    });
+
+                controllers.cyclingColor = false;
+
+                restartState();
+            },
+            'Crawlies'() {
+                Object.assign(state, defaultSettings, {
+                        showFlow: false,
+                        autoClearView: false,
+                        noiseSpeed: 0.00001,
+                        noiseScale: 60,
+                        forceWeight: 0.014,
+                        wanderWeight: 0.0021,
+                        speedAlpha: 0.000002
+                    });
+
+                Object.assign(colorGUI, colorDefaults, {
+                        alpha: 1,
+                        color: [0, 0, 0],
+                        baseAlpha: 0.004,
+                        baseColor: [255, 255, 255]
                     });
 
                 controllers.cyclingColor = false;
@@ -588,17 +626,19 @@ export default (canvas, settings, debug) => {
             },
             'Roots'() {
                 Object.assign(state, defaultSettings, {
+                        showFlow: false,
                         autoClearView: false,
                         flowDecay: 0,
                         noiseSpeed: 0,
                         noiseScale: 18,
                         forceWeight: 0.015,
                         wanderWeight: 0.0023,
-                        speedAlpha: 0.00005
+                        speedAlpha: 0.00005,
+                        lineWidth: 3
                     });
 
-                Object.assign(colorGUI, {
-                        opacity: 0.03,
+                Object.assign(colorGUI, colorDefaults, {
+                        alpha: 0.03,
                         color: [50, 255, 50]
                     });
 
@@ -608,17 +648,19 @@ export default (canvas, settings, debug) => {
             },
             'Hairy'() {
                 Object.assign(state, defaultSettings, {
+                        showFlow: false,
                         autoClearView: false,
                         timeStep: 1000/60,
                         flowDecay: 0.001,
                         wanderWeight: 0.002,
-                        fadeAlpha: (1000/60)-0.000001,
-                        speedAlpha: 0,
+                        speedAlpha: 0
                     });
 
-                Object.assign(colorGUI, {
-                        opacity: 0.9,
-                        color: [255, 150, 255]
+                Object.assign(colorGUI, colorDefaults, {
+                        alpha: 0.9,
+                        color: [255, 150, 255],
+                        baseAlpha: 0.0025,
+                        baseColor: [0, 0, 0]
                     });
 
                 controllers.cyclingColor = false;
