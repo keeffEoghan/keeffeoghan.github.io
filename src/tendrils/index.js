@@ -2,13 +2,14 @@
 
 import shader from 'gl-shader';
 import FBO from 'gl-fbo';
-import triangle from 'a-big-triangle';
 import ndarray from 'ndarray';
 
 import Particles from './particles';
 import { step/*, nextPow2*/ } from '../utils';
 import spawner from './spawn/init/cpu';
 import { maxAspect } from './utils/aspect';
+
+import Screen from './screen';
 
 
 // Shaders
@@ -23,6 +24,7 @@ import flowScreenVert from './flow/screen.vert';
 import flowFrag from './flow/index.frag';
 
 import screenVert from './screen/index.vert';
+import screenFrag from './screen/index.frag';
 
 // @todo Try drawing a semi-transparent block over the last frame?
 import copyFadeFrag from './screen/copy-fade.frag';
@@ -43,7 +45,7 @@ export const defaults = () => ({
         damping: 0.045,
 
         flowDecay: 0.0005,
-        flowWidth: 3,
+        flowWidth: 5,
 
         noiseSpeed: 0.00025,
         noiseScale: 2.125,
@@ -54,8 +56,11 @@ export const defaults = () => ({
 
         // @todo Make this a texture lookup instead
         color: [1, 1, 1, 0.01],
+        // @todo Move this to another module, doesn't need to be here
+        baseColor: [0, 0, 0, 0],
         fadeAlpha: -1,
         speedAlpha: 0.000001,
+        lineWidth: 1,
 
         respawnAmount: 0.02
     },
@@ -81,6 +86,8 @@ export class Tendrils {
         this.gl = gl;
         this.state = params.state;
 
+        this.screen = new Screen(this.gl);
+
         this.flow = FBO(this.gl, [1, 1], { float: true });
 
         // Multiple bufferring
@@ -91,6 +98,8 @@ export class Tendrils {
             FBO(this.gl, [1, 1]),
             FBO(this.gl, [1, 1])
         ];
+
+        this.baseShader = shader(this.gl, screenVert, screenFrag);
 
         this.logicShader = null;
 
@@ -241,8 +250,6 @@ export class Tendrils {
             this.gl.blendFunc(this.gl.SRC_ALPHA, this.gl.ONE_MINUS_SRC_ALPHA);
         }
 
-        // return;
-
 
         // Flow FBO and view renders
 
@@ -275,9 +282,21 @@ export class Tendrils {
 
 
         // Render to the view.
+        
+        if(this.state.baseColor[3] > 0) {
+            this.baseShader.bind();
+            this.baseShader.uniforms.color = this.state.baseColor;
+            this.gl.bindFramebuffer(this.gl.FRAMEBUFFER, null);
+            this.screen.render();
+        }
 
         if(this.state.showFlow) {
+            // @todo Surely just render the flow texture instead?
             this.particles.render = this.flowScreenShader;
+
+            if(this.state.lineWidth > 0) {
+                this.gl.lineWidth(this.state.lineWidth);
+            }
 
             // Render the flow directly to the screen
             this.gl.bindFramebuffer(this.gl.FRAMEBUFFER, null);
@@ -286,7 +305,7 @@ export class Tendrils {
 
         // Set up the particles for rendering
         this.particles.render = this.renderShader;
-        this.gl.lineWidth(1);
+        this.gl.lineWidth(this.state.lineWidth);
 
         if(directDraw) {
             // Render the particles directly to the screen
@@ -310,12 +329,12 @@ export class Tendrils {
             this.fadeShader.bind();
 
             Object.assign(this.fadeShader.uniforms, {
-                    opacity: Math.min(0, this.state.fadeAlpha/dt),
+                    opacity: this.state.fadeAlpha,
                     view: this.buffers[1].color[0].bind(1),
                     viewRes: this.viewRes
                 });
 
-            triangle(this.gl);
+            this.screen.render();
 
 
             // Render the particles into the current buffer
@@ -335,7 +354,7 @@ export class Tendrils {
                     viewRes: this.viewRes
                 });
 
-            triangle(this.gl);
+            this.screen.render();
 
             // Step buffers
             step(this.buffers);

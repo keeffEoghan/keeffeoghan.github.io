@@ -18,7 +18,7 @@
 import geom from 'gl-geometry';
 import shader from 'gl-shader';
 import FBO from 'gl-fbo';
-import triangle from 'a-big-triangle';
+import triangle from 'gl-big-triangle';
 import ndarray from 'ndarray';
 import isFunction from 'lodash/isFunction';
 
@@ -48,6 +48,8 @@ export class Particles {
         };
 
         this.gl = gl;
+
+        this.triangle = triangle(this.gl);
 
         // The dimensions of the state data FBOs. Can be 1:1 with the number of
         // particle vertices, or
@@ -128,7 +130,10 @@ export class Particles {
             }),
             update);
 
-        triangle(this.gl);
+        this.triangle.bind();
+        this.triangle.draw();
+        this.triangle.unbind();
+
         this.gl.bindFramebuffer(this.gl.FRAMEBUFFER, null);
     }
 
