@@ -7,12 +7,27 @@
 
 import { eulerDyDt } from '../physics/euler';
 import { map, reduce } from '../../fp';
+import { step } from '../../utils';
 
 
 // Use them to derive higher-order info (velocity, acceleration, force, jerk...)
 
-export const rate = (last, current, dt, out = new Uint8Array(last.length)) =>
+export const logRates = (last, current, dt, out = new Uint8Array(last.length)) =>
     map((v, i) => eulerDyDt(v, current[i], dt), last, out);
+
+/**
+ * Put the rates of change of the previous (lower) order of data into the next
+ * (higher) order of data, for each order.
+ *
+ * @see `makeOrderLog` in `../data-log/`.
+ */
+export function orderLogRates(orderLog, dt = 1) {
+    for(let o = 1, oL = orderLog.length; o < oL; ++o) {
+        logRates(orderLog[o-1][1], orderLog[o-1][0], dt, step(orderLog[o]));
+    }
+
+    return orderLog;
+}
 
 
 // Interpret from that info.
@@ -36,10 +51,11 @@ export const peakPos = (data) => reduce((max, v, i) => {
         pos: -1
     });
 
-export const sum = (data) => reduce((sum, v) => sum+v, data, 0);
+export const sum = (data) => reduce((sum, v) => sum+Math.abs(v), data, 0);
 
 export const weightedSum = (data, fulcrum) =>
-    reduce((sum, v, i) => sum+(v*(1-(Math.abs(i-fulcrum)/(data.length-1)))),
+    reduce((sum, v, i) =>
+            sum+Math.abs(v*(1-(Math.abs(i-fulcrum)/(data.length-1)))),
         data, 0);
 
 export const mean = (data) => sum(data)/data.length;
