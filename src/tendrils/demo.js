@@ -1,5 +1,3 @@
-import '../utils/https-redirect';
-
 import 'pepjs';
 import glContext from 'gl-context';
 import getUserMedia from 'getusermedia';
@@ -13,10 +11,11 @@ import vec2 from 'gl-matrix/src/gl-matrix/vec2';
 import querystring from 'querystring';
 import dat from 'dat-gui';
 
+import redirect from '../utils/protocol-redirect';
+
 import { Tendrils, defaults, glSettings } from './';
 
 import { step } from '../utils';
-import { reduce } from '../fp';
 
 import * as spawnPixels from './spawn/pixels';
 import spawnPixelsFlowFrag from './spawn/pixels/flow.frag';
@@ -35,11 +34,14 @@ const queries = querystring.parse(location.search.slice(1));
 const defaultSettings = defaults().state;
 
 export default (canvas, settings, debug) => {
+    if(redirect()) {
+        return;
+    }
+
     let tendrils;
 
     let flowInput;
 
-    let track;
     let trackAnalyser;
     let trackOrderLog;
 
@@ -282,7 +284,7 @@ export default (canvas, settings, debug) => {
                     throw e;
                 }
                 else {
-                    track = setupTrack(src, el.querySelector('.npm-scb-info'));
+                    setupTrack(src, el.querySelector('.npm-scb-info'));
                 }
             });
     }
