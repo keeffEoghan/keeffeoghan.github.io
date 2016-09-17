@@ -150,12 +150,23 @@ export default (canvas, settings, debug) => {
             buffer: tendrils.flow
         });
 
-    // This flips the lookup, which is interesting (reflection)
-    // const flowPixelScale = [1, 1];
-    const flowPixelScale = [1, -1];
+    const flowPixelScales = {
+        'normal': [1, -1],
+        // This flips the lookup, which is interesting (reflection)
+        'mirror x': [-1, -1],
+        'mirror y': [1, 1],
+        'mirror xy': [-1, 1],
+    };
+
+    const flowPixelDefaults = {
+        scale: 'normal'
+    };
+    const flowPixelState = {...flowPixelDefaults};
 
     function respawnFlow() {
-        vec2.div(flowPixelSpawner.spawnSize, flowPixelScale, tendrils.viewSize);
+        vec2.div(flowPixelSpawner.spawnSize,
+            flowPixelScales[flowPixelState.scale], tendrils.viewSize);
+
         flowPixelSpawner.respawn(tendrils);
     }
 
@@ -377,6 +388,13 @@ export default (canvas, settings, debug) => {
             }
         }
 
+        const resetSpawnerDefaults = {
+            radius: 0.3,
+            speed: 0.005
+        };
+
+        respawnGUI.add(flowPixelState, 'scale', Object.keys(flowPixelScales));
+
 
         // Audio
 
@@ -448,15 +466,9 @@ export default (canvas, settings, debug) => {
 
         let presetsGUI = gui.addFolder('presets');
 
-        const restartState = () => {
-            controllers.restart();
-            updateGUI();
-            convertColor();
-        };
-
         let presetters = {
             'Flow'() {
-                Object.assign(state, defaultSettings, {
+                Object.assign(state, {
                         showFlow: true,
                         flowWidth: 5
                     });
@@ -466,18 +478,13 @@ export default (canvas, settings, debug) => {
                         speed: 0.01
                     });
 
-
-                Object.assign(colorGUI, colorDefaults, {
+                Object.assign(colorGUI, {
                         alpha: 0.01,
                         color: [255, 255, 255]
                     });
-
-                controllers.cyclingColor = false;
-
-                restartState();
             },
             'Wings'() {
-                Object.assign(state, defaultSettings, {
+                Object.assign(state, {
                         showFlow: false
                     });
 
@@ -486,29 +493,21 @@ export default (canvas, settings, debug) => {
                         speed: 0
                     });
 
-                Object.assign(colorGUI, colorDefaults);
-
-                controllers.cyclingColor = false;
-
-                restartState();
+                Object.assign(colorGUI);
             },
             'Fluid'() {
-                Object.assign(state, defaultSettings, {
+                Object.assign(state, {
                         autoClearView: true,
                         showFlow: false
                     });
 
-                Object.assign(colorGUI, colorDefaults, {
+                Object.assign(colorGUI, {
                         alpha: 0.2,
                         color: [255, 255, 255]
                     });
-
-                controllers.cyclingColor = false;
-
-                restartState();
             },
             'Flow only'() {
-                Object.assign(state, defaultSettings, {
+                Object.assign(state, {
                         showFlow: false,
                         autoClearView: false,
                         flowDecay: 0.0005,
@@ -523,19 +522,15 @@ export default (canvas, settings, debug) => {
                         speed: 0.015
                     });
 
-                Object.assign(colorGUI, colorDefaults, {
+                Object.assign(colorGUI, {
                         alpha: 0.8,
                         color: [100, 200, 255],
                         baseAlpha: 0.1,
                         baseColor: [0, 0, 0]
                     });
-
-                controllers.cyclingColor = false;
-
-                restartState();
             },
             'Noise only'() {
-                Object.assign(state, defaultSettings, {
+                Object.assign(state, {
                         autoClearView: false,
                         showFlow: false,
                         flowWeight: 0,
@@ -544,17 +539,13 @@ export default (canvas, settings, debug) => {
                         speedAlpha: 0
                     });
 
-                Object.assign(colorGUI, colorDefaults, {
+                Object.assign(colorGUI, {
                         alpha: 0.01,
                         color: [255, 150, 0]
                     });
-
-                controllers.cyclingColor = false;
-
-                restartState();
             },
             'Sea'() {
-                Object.assign(state, defaultSettings, {
+                Object.assign(state, {
                         showFlow: false,
                         flowWidth: 5,
                         forceWeight: 0.015,
@@ -569,44 +560,34 @@ export default (canvas, settings, debug) => {
                         speed: 0
                     });
 
-                Object.assign(colorGUI, colorDefaults, {
+                Object.assign(colorGUI, {
                         alpha: 0.8,
                         color: [55, 155, 255]
                     });
-
-                controllers.cyclingColor = false;
-
-                restartState();
             },
             'Mad styles'() {
-                Object.assign(state, defaultSettings, {
+                Object.assign(state, {
                         showFlow: false
                     });
 
-                Object.assign(colorGUI, colorDefaults);
+                Object.assign(colorGUI);
 
                 controllers.cyclingColor = true;
-
-                restartState();
             },
             'Ghostly'() {
-                Object.assign(state, defaultSettings, {
+                Object.assign(state, {
                         showFlow: false,
                         autoClearView: false,
                         flowDecay: 0
                     });
 
-                Object.assign(colorGUI, colorDefaults, {
+                Object.assign(colorGUI, {
                         alpha: 0.006,
                         color: [255, 255, 255]
                     });
-
-                controllers.cyclingColor = false;
-
-                restartState();
             },
-            'Turbulent'() {
-                Object.assign(state, defaultSettings, {
+            'Rorschach'() {
+                Object.assign(state, {
                         showFlow: false,
                         autoClearView: false,
                         noiseSpeed: 0.00001,
@@ -616,19 +597,19 @@ export default (canvas, settings, debug) => {
                         speedAlpha: 0.000002
                     });
 
-                Object.assign(colorGUI, colorDefaults, {
+                Object.assign(flowPixelState, {
+                    scale: 'mirror x'
+                });
+
+                Object.assign(colorGUI, {
                         alpha: 0.9,
                         color: [255, 10, 10],
                         baseAlpha: 0.01,
                         baseColor: [0, 0, 0]
                     });
-
-                controllers.cyclingColor = false;
-
-                restartState();
             },
             'Crawlink'() {
-                Object.assign(state, defaultSettings, {
+                Object.assign(state, {
                         showFlow: false,
                         autoClearView: false,
                         noiseSpeed: 0.00001,
@@ -638,19 +619,15 @@ export default (canvas, settings, debug) => {
                         speedAlpha: 0.000002
                     });
 
-                Object.assign(colorGUI, colorDefaults, {
+                Object.assign(colorGUI, {
                         alpha: 1,
                         color: [0, 0, 0],
                         baseAlpha: 0.005,
                         baseColor: [255, 255, 255]
                     });
-
-                controllers.cyclingColor = false;
-
-                restartState();
             },
             'Roots'() {
-                Object.assign(state, defaultSettings, {
+                Object.assign(state, {
                         showFlow: false,
                         autoClearView: false,
                         flowDecay: 0,
@@ -662,17 +639,13 @@ export default (canvas, settings, debug) => {
                         lineWidth: 3
                     });
 
-                Object.assign(colorGUI, colorDefaults, {
+                Object.assign(colorGUI, {
                         alpha: 0.03,
                         color: [50, 255, 50]
                     });
-
-                controllers.cyclingColor = false;
-
-                restartState();
             },
             'Hairy'() {
-                Object.assign(state, defaultSettings, {
+                Object.assign(state, {
                         showFlow: false,
                         autoClearView: false,
                         timeStep: 1000/60,
@@ -681,20 +654,31 @@ export default (canvas, settings, debug) => {
                         speedAlpha: 0
                     });
 
-                Object.assign(colorGUI, colorDefaults, {
+                Object.assign(colorGUI, {
                         alpha: 0.9,
                         color: [255, 150, 255],
                         baseAlpha: 0.005,
                         baseColor: [0, 0, 0]
                     });
-
-                controllers.cyclingColor = false;
-
-                restartState();
             }
         };
 
+        const wrapPresetter = (presetter) => {
+            Object.assign(state, defaultSettings);
+            Object.assign(resetSpawner.uniforms, resetSpawnerDefaults);
+            Object.assign(flowPixelState, flowPixelDefaults);
+            Object.assign(colorGUI, colorDefaults);
+            controllers.cyclingColor = false;
+
+            presetter();
+
+            controllers.restart();
+            updateGUI();
+            convertColor();
+        };
+
         for(let p in presetters) {
+            presetters[p] = wrapPresetter.bind(null, presetters[p]);
             presetsGUI.add(presetters, p);
         }
 
