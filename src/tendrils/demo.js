@@ -256,13 +256,14 @@ export default (canvas, settings, debug) => {
         return track;
     };
 
-    const trackURL = (queries.track || 'https://soundcloud.com/max-cooper/waves-1');
+    const trackURL = ((queries.track)?
+            decodeURIComponent(queries.track)
+        :   'https://soundcloud.com/max-cooper/waves-1');
 
-    if(trackURL.match(/^(https?\:\/\/)?(www\.)?soundcloud\.com\//gi)) {
+    if(trackURL.match(/^(https?)?(\:\/\/)?(www\.)?soundcloud\.com\//gi)) {
         soundCloud({
                 client_id: '75aca2e2b815f9f5d4e92916c7b80846',
                 song: trackURL,
-                // song: 'https://soundcloud.com/max-cooper/essential-mix-max-cooper-no-voice-overs',
                 dark: false
             },
             (e, src, data, el) => {
