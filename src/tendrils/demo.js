@@ -10,6 +10,7 @@ import throttle from 'lodash/throttle';
 import mapRange from 'range-fit';
 import mat3 from 'gl-matrix/src/gl-matrix/mat3';
 import vec2 from 'gl-matrix/src/gl-matrix/vec2';
+import querystring from 'querystring';
 import dat from 'dat-gui';
 
 import { Tendrils, defaults, glSettings } from './';
@@ -29,6 +30,8 @@ import makeAudioData from './audio/data';
 import { makeLog, makeOrderLog } from './data-log';
 import { orderLogRates, peak, sum, mean, weightedMean } from './analyse';
 
+const queries = querystring.parse(location.search.slice(1));
+
 const defaultSettings = defaults().state;
 
 export default (canvas, settings, debug) => {
@@ -44,7 +47,7 @@ export default (canvas, settings, debug) => {
     let micOrderLog;
 
     const audioDefaults = {
-        audible: false,
+        audible: !('mute' in queries),
 
         track: true,
         trackBeatAt: 0.1,
@@ -223,41 +226,57 @@ export default (canvas, settings, debug) => {
             }
         });
 
-    soundCloud({
-            client_id: '75aca2e2b815f9f5d4e92916c7b80846',
-            song: 'https://soundcloud.com/max-cooper/waves-1',
-            // song: 'https://soundcloud.com/max-cooper/essential-mix-max-cooper-no-voice-overs',
-            dark: false
-        },
-        (e, src, data, el) => {
-            if(e) {
-                throw e;
-            }
 
-            track = Object.assign(new Audio(), {
-                    crossOrigin: 'Anonymous',
-                    src: src,
-                    controls: true
-                });
+    // Track setup
+    
+    const setupTrack = (src, el = document.body) => {
+        let track = Object.assign(new Audio(), {
+                crossOrigin: 'Anonymous',
+                src: src,
+                controls: true
+            });
 
-            // @todo Stereo: true
+        // @todo Stereo: true
 
-            trackAnalyser = analyser(track, {
-                    audible: audioState.audible
-                });
+        trackAnalyser = analyser(track, {
+                audible: audioState.audible
+            });
 
-            trackAnalyser.analyser.fftSize = Math.pow(2, 5);
+        trackAnalyser.analyser.fftSize = Math.pow(2, 5);
 
-            const order = 3;
+        const order = 3;
 
-            trackOrderLog = makeOrderLog(order, (size) =>
-                makeLog(size, () => makeAudioData(trackAnalyser,
-                    ((size === order)? Uint8Array : Float32Array))));
+        trackOrderLog = makeOrderLog(order, (size) =>
+            makeLog(size, () => makeAudioData(trackAnalyser,
+                ((size === order)? Uint8Array : Float32Array))));
 
-            track.play();
+        track.play();
+        el.appendChild(track);
 
-            el.querySelector('.npm-scb-info').appendChild(track);
-        });
+        return track;
+    };
+
+    const trackURL = (queries.track || 'https://soundcloud.com/max-cooper/waves-1');
+
+    if(trackURL.match(/^(https?\:\/\/)?(www\.)?soundcloud\.com\//gi)) {
+        soundCloud({
+                client_id: '75aca2e2b815f9f5d4e92916c7b80846',
+                song: trackURL,
+                // song: 'https://soundcloud.com/max-cooper/essential-mix-max-cooper-no-voice-overs',
+                dark: false
+            },
+            (e, src, data, el) => {
+                if(e) {
+                    throw e;
+                }
+                else {
+                    track = setupTrack(src, el.querySelector('.npm-scb-info'));
+                }
+            });
+    }
+    else {
+        setupTrack(trackURL, canvas.parentElement);
+    }
 
 
     function resize() {
@@ -607,7 +626,7 @@ export default (canvas, settings, debug) => {
 
                 restartState();
             },
-            'Crawlies'() {
+            'Crawlink'() {
                 Object.assign(state, defaultSettings, {
                         showFlow: false,
                         autoClearView: false,
@@ -621,7 +640,7 @@ export default (canvas, settings, debug) => {
                 Object.assign(colorGUI, colorDefaults, {
                         alpha: 1,
                         color: [0, 0, 0],
-                        baseAlpha: 0.004,
+                        baseAlpha: 0.005,
                         baseColor: [255, 255, 255]
                     });
 
@@ -664,7 +683,7 @@ export default (canvas, settings, debug) => {
                 Object.assign(colorGUI, colorDefaults, {
                         alpha: 0.9,
                         color: [255, 150, 255],
-                        baseAlpha: 0.0025,
+                        baseAlpha: 0.005,
                         baseColor: [0, 0, 0]
                     });
 
