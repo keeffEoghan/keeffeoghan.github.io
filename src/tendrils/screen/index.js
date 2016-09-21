@@ -5,10 +5,6 @@
 import Triangle from 'gl-big-triangle';
 
 export class Screen extends Triangle {
-    constructor(gl) {
-        return super(gl);
-    }
-
     render() {
         super.bind();
         super.draw();
