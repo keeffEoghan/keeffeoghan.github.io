@@ -5,6 +5,7 @@ import FBO from 'gl-fbo';
 import ndarray from 'ndarray';
 
 import Particles from './particles';
+import Timer from './timer';
 import { step/*, nextPow2*/ } from '../utils';
 import spawner from './spawn/init/cpu';
 import { maxAspect } from './utils/aspect';
@@ -64,6 +65,7 @@ export const defaults = () => ({
 
         respawnAmount: 0.02
     },
+    timer: new Timer(),
     logicShader: null,
     renderShader: [renderVert, renderFrag],
     flowShader: [flowVert, flowFrag],
@@ -132,7 +134,7 @@ export class Tendrils {
 
         this.viewSize = [0, 0];
 
-        this.time = this.start = Date.now();
+        this.timer = params.timer;
 
         this.tempData = [];
 
@@ -224,7 +226,8 @@ export class Tendrils {
 
 
         // Time
-        const dt = this.tick();
+        this.timer.rate = this.state.timeStep;
+        this.timer.tick();
 
 
         // Physics
@@ -236,9 +239,9 @@ export class Tendrils {
             this.gl.disable(this.gl.BLEND);
 
             Object.assign(this.uniforms.update, this.state, {
-                    dt,
-                    time: this.time,
-                    start: this.start,
+                    dt: this.timer.dt,
+                    time: this.timer.time,
+                    start: this.timer.start,
                     flow: this.flow.color[0].bind(1),
                     viewSize: this.viewSize,
                     viewRes: this.viewRes
@@ -254,7 +257,7 @@ export class Tendrils {
         // Flow FBO and view renders
 
         Object.assign(this.uniforms.render, this.state, {
-                time: this.time,
+                time: this.timer.time,
                 previous: this.particles.buffers[1].color[0].bind(2),
                 dataRes: this.particles.shape,
                 viewSize: this.viewSize,
@@ -282,7 +285,7 @@ export class Tendrils {
 
 
         // Render to the view.
-        
+
         // Overlay fade.
         if(this.state.baseColor[3] > 0) {
             this.baseShader.bind();
@@ -380,7 +383,7 @@ export class Tendrils {
 
         /**
          * @todo Why do these 2 lines seem to be equivalent? Something to do
-         *       with how `a-big-triangle` scales its geometry over the screen?
+         *       with how `gl-big-triangle` scales its geometry over the screen?
          */
         // this.gl.viewport(0, 0, 1, 1);
         this.gl.viewport(0, 0, this.viewRes[0], this.viewRes[1]);
@@ -420,6 +423,7 @@ export class Tendrils {
 
     respawnShader(spawnShader, update) {
         this.resize(false);
+        this.timer.tick();
 
         this.particles.logic = spawnShader;
 
@@ -428,7 +432,7 @@ export class Tendrils {
 
         this.particles.step(Particles.applyUpdate({
                 ...this.state,
-                time: this.time,
+                time: this.timer.time,
                 viewSize: this.viewSize,
                 viewRes: this.viewRes
             },
@@ -532,18 +536,6 @@ export class Tendrils {
         offset[1] = Math.min(offset[1], shape[1]-stride[1]);
 
         return offset;
-    }
-
-    getTime(time = Date.now()) {
-        return time-this.start;
-    }
-
-    tick(timeStep = this.state.timeStep) {
-        const t0 = this.time;
-
-        this.time = this.getTime();
-
-        return this.dt = (timeStep || this.time-t0);
     }
 }
 
