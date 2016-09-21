@@ -10,7 +10,7 @@
 import texture from 'gl-texture2d';
 import ndarray from 'ndarray';
 
-import { map } from '../../fp';
+import { mapList } from '../../fp/map';
 import { waveformMap, frequencyMap } from './utils';
 
 export class AudioTexture {
@@ -33,13 +33,13 @@ export class AudioTexture {
      */
 
     waveform(data = this.array.data) {
-        map(waveformMap, data, this.array.data);
+        mapList(waveformMap, data, this.array.data);
 
         return this;
     }
 
     frequency(data = this.array.data) {
-        map(frequencyMap, data, this.array.data);
+        mapList(frequencyMap, data, this.array.data);
 
         return this;
     }
