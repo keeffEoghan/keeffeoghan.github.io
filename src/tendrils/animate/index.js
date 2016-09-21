@@ -1,23 +1,41 @@
-// import bezier from 'bezier';
+// import { reduce } from '../../fp/reduce';
 
 // Timeline - wrapper for the bezier API.
-
-// Function to accept a number of keyframes.
-// Pass as the number of bezier points to `bezier.prepare`. Does it make sense
-// to handle the whole timeline as a single big bezier curve, or to treat each
-// pair of keyframes as a single simple bezier?
-
-// Function to accept an array of easing points - with default?
-// Use these to animate.
-// If the above isn't fast, could avoid prepping and just use a fixed-dimension
-// curve between each pair of keyframes in this list.
+// Animate along an array of keyframes, using bezier curves or lerp between each
+// pair.
 
 // Functions to animate.
-// Animating between 2 keyframes is just using the `bezier.curve` function.
-// Animating along the full timeline could use that function, taking the integer
-// part of a tween number as the index of the first keyframe, and the fractional
-// part as the tween number passed to `bezier.curve`.
+/**
+ * Animate along a timeline of keyframes (properties, timings, and curves),
+ * using the tweens.
+ */
+
+/**
+ * Prepare a timeline from a given set of keyframes (properties, timings, and
+ * curves).
+ * Create a lookup table from the provided keyframes config - a total duration
+ * and a reverse lookup from key times to key names.
+ *
+ * @param {Array.<Object>} frames
+ *        A list of keyframes, each an object of the form:
+ *            value: {(Number|Object.<Number>)} The value/s to be animated
+ *            span: {Number} Time until the next frame
+ *            ease: {?Array.<Number>} A bezier easing curve to use for animating
+ */
+// export const timeline = (frames) => reduce((out, frame, k) => {
+//         out.times[];
+//         out.span += frame.span;
+//     },
+//     frames, {
+//         frames,
+//         times: ,
+//         span: 0
+//     });
 
 // A full playthrough function.
 // Simple wrapper, with start-time, time, rate, start, stop, play, loop, etc.
 // Uses the above with its timing to play a full sequence.
+
+// Smooth transitions between curves - needed, or manual?
+// Set the first control point of each next curve to be the colinear reflection
+// of the last control point of the current curve in its final point.

@@ -1,3 +1,5 @@
+/* global Uint8Array, Float32Array */
+
 import 'pepjs';
 import glContext from 'gl-context';
 import getUserMedia from 'getusermedia';
@@ -49,6 +51,10 @@ export default (canvas, settings, debug) => {
     let micOrderLog;
 
     const audioDefaults = {
+        trackURL: ((queries.track)?
+                decodeURIComponent(queries.track)
+            :   'https://soundcloud.com/max-cooper/waves-1'),
+
         audible: !('mute' in queries),
 
         track: true,
@@ -73,17 +79,17 @@ export default (canvas, settings, debug) => {
 
             // @todo Kill old flow lines once empty
             flowInput
-                .trimOld((1/tendrils.state.flowDecay)+100, tendrils.getTime())
+                .trimOld((1/tendrils.state.flowDecay)+100, tendrils.timer.now())
                 .update().draw();
 
 
             // React to sound
-            
+
             let soundInput = null;
 
             if(audioState.track && trackAnalyser && trackOrderLog) {
                 trackAnalyser.frequencies(step(trackOrderLog[0]));
-                orderLogRates(trackOrderLog, tendrils.dt);
+                orderLogRates(trackOrderLog, tendrils.timer.dt);
 
                 if(mean(trackOrderLog[trackOrderLog.length-1][0]) >
                         audioState.trackBeatAt) {
@@ -98,7 +104,7 @@ export default (canvas, settings, debug) => {
 
             if(!soundInput && audioState.mic && micAnalyser && micOrderLog) {
                 micAnalyser.frequencies(step(micOrderLog[0]));
-                orderLogRates(micOrderLog, tendrils.dt);
+                orderLogRates(micOrderLog, tendrils.timer.dt);
 
                 const beats = micOrderLog[micOrderLog.length-1][0];
 
@@ -124,7 +130,7 @@ export default (canvas, settings, debug) => {
     flowInput = new FlowLine(gl);
 
     const pointerFlow = (e) => {
-        flowInput.times.push(tendrils.getTime());
+        flowInput.times.push(tendrils.timer.now());
 
         const flow = offset(e, canvas, vec2.create());
 
@@ -241,7 +247,7 @@ export default (canvas, settings, debug) => {
 
 
     // Track setup
-    
+
     const setupTrack = (src, el = document.body) => {
         let track = Object.assign(new Audio(), {
                 crossOrigin: 'Anonymous',
@@ -269,14 +275,10 @@ export default (canvas, settings, debug) => {
         return track;
     };
 
-    const trackURL = ((queries.track)?
-            decodeURIComponent(queries.track)
-        :   'https://soundcloud.com/max-cooper/waves-1');
-
-    if(trackURL.match(/^(https?)?(\:\/\/)?(www\.)?soundcloud\.com\//gi)) {
+    if(audioState.trackURL.match(/^(https?)?(\:\/\/)?(www\.)?soundcloud\.com\//gi)) {
         soundCloud({
                 client_id: '75aca2e2b815f9f5d4e92916c7b80846',
-                song: trackURL,
+                song: audioState.trackURL,
                 dark: false
             },
             (e, src, data, el) => {
@@ -289,7 +291,7 @@ export default (canvas, settings, debug) => {
             });
     }
     else {
-        setupTrack(trackURL, canvas.parentElement);
+        setupTrack(audioState.trackURL, canvas.parentElement);
     }
 
 
@@ -313,10 +315,13 @@ export default (canvas, settings, debug) => {
 
         gui.close();
 
-        function updateGUI() {
-            for(let f in gui.__folders) {
-                gui.__folders[f].__controllers.forEach((controller) =>
-                        controller.updateDisplay());
+        function updateGUI(node = gui) {
+            if(node.__controllers) {
+                node.__controllers.forEach((control) => control.updateDisplay());
+            }
+
+            for(let f in node.__folders) {
+                updateGUI(node.__folders[f]);
             }
         }
 
@@ -404,6 +409,14 @@ export default (canvas, settings, debug) => {
 
         for(let s in audioState) {
             let control = audioGUI.add(audioState, s);
+
+            if(s === 'trackURL') {
+                control.onFinishChange((v) =>
+                    location.search = querystring.encode({
+                            ...queries,
+                            track: encodeURIComponent(v)
+                        }));
+            }
 
             if(s === 'audible') {
                 control.onChange((v) => {
@@ -588,7 +601,7 @@ export default (canvas, settings, debug) => {
                         color: [255, 255, 255]
                     });
             },
-            'Rorschach'() {
+            'Turbulence'() {
                 Object.assign(state, {
                         showFlow: false,
                         autoClearView: false,
@@ -599,10 +612,6 @@ export default (canvas, settings, debug) => {
                         speedAlpha: 0.000002
                     });
 
-                Object.assign(flowPixelState, {
-                    scale: 'mirror x'
-                });
-
                 Object.assign(colorGUI, {
                         alpha: 0.9,
                         color: [255, 10, 10],
@@ -610,7 +619,7 @@ export default (canvas, settings, debug) => {
                         baseColor: [0, 0, 0]
                     });
             },
-            'Crawlink'() {
+            'Rorschach'() {
                 Object.assign(state, {
                         showFlow: false,
                         autoClearView: false,
@@ -621,10 +630,14 @@ export default (canvas, settings, debug) => {
                         speedAlpha: 0.000002
                     });
 
+                Object.assign(flowPixelState, {
+                    scale: 'mirror xy'
+                });
+
                 Object.assign(colorGUI, {
                         alpha: 1,
                         color: [0, 0, 0],
-                        baseAlpha: 0.005,
+                        baseAlpha: 0.01,
                         baseColor: [255, 255, 255]
                     });
             },
