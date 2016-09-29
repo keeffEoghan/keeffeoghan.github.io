@@ -2,6 +2,7 @@
 
 import 'pepjs';
 import glContext from 'gl-context';
+import vkey from 'vkey';
 import getUserMedia from 'getusermedia';
 import analyser from 'web-audio-analyser';
 import soundCloud from 'soundcloud-badge';
@@ -57,11 +58,11 @@ export default (canvas, settings, debug) => {
 
         audible: !('mute' in queries),
 
-        track: true,
+        track: !('track_off' in queries),
         trackBeatAt: 0.1,
         trackLoudAt: 9,
 
-        mic: true,
+        mic: !('mic_off' in queries),
         micBeatAt: 1,
         micLoudAt: 5
     };
@@ -126,6 +127,15 @@ export default (canvas, settings, debug) => {
 
     tendrils = new Tendrils(gl);
 
+    const resetSpawner = spawnReset(gl);
+
+    const respawn = () => resetSpawner.respawn(tendrils);
+
+    const state = tendrils.state;
+
+
+    // Flow line
+
     // @todo New flow lines for new pointers
     flowInput = new FlowLine(gl);
 
@@ -141,10 +151,6 @@ export default (canvas, settings, debug) => {
     };
 
     canvas.addEventListener('pointermove', pointerFlow, false);
-
-    const resetSpawner = spawnReset(gl);
-
-    const state = tendrils.state;
 
 
     // Feedback loop from flow
@@ -295,6 +301,30 @@ export default (canvas, settings, debug) => {
     }
 
 
+    // Keyboard mash!
+
+    document.body.addEventListener('keydown', (e) => {
+            const key = vkey[e.keyCode];
+
+            if(key.match(/^<escape>$/)) {
+                tendrils.reset();
+            }
+            else if(key.match(/^<space>$/)) {
+                respawnCam();
+            }
+            else if(key.match(/^[A-Z]$/)) {
+                respawnFlow();
+            }
+            else if(key.match(/^[0-9]$/)) {
+                respawnFastest();
+            }
+            else {
+                respawn();
+            }
+        },
+        false);
+
+
     function resize() {
         canvas.width = self.innerWidth;
         canvas.height = self.innerHeight;
@@ -441,7 +471,7 @@ export default (canvas, settings, debug) => {
                 clear: () => tendrils.clear(),
                 clearView: () => tendrils.clearView(),
                 clearFlow: () => tendrils.clearFlow(),
-                respawn: () => resetSpawner.respawn(tendrils),
+                respawn,
                 respawnCam,
                 respawnFlow,
                 respawnFastest,
