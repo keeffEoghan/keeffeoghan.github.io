@@ -35,9 +35,6 @@ export const defaults = () => ({
     state: {
         rootNum: Math.pow(2, 9),
 
-        paused: false,
-        timeStep: 1000/60,
-
         autoClearView: false,
         showFlow: true,
 
@@ -65,7 +62,9 @@ export const defaults = () => ({
 
         respawnAmount: 0.02
     },
-    timer: new Timer(),
+    timer: Object.assign(new Timer(), {
+            step: 1000/60
+        }),
     logicShader: null,
     renderShader: [renderVert, renderFrag],
     flowShader: [flowVert, flowFrag],
@@ -220,28 +219,24 @@ export class Tendrils {
     }
 
     draw() {
+        const dt = this.timer.tick();
         const directDraw = this.directDraw();
 
         this.resize(directDraw);
 
 
-        // Time
-        this.timer.rate = this.state.timeStep;
-        this.timer.tick();
-
-
         // Physics
 
-        if(!this.state.paused) {
+        if(!this.timer.paused) {
             this.particles.logic = this.logicShader;
 
             // Disabling blending here is important
             this.gl.disable(this.gl.BLEND);
 
             Object.assign(this.uniforms.update, this.state, {
-                    dt: this.timer.dt,
+                    dt,
                     time: this.timer.time,
-                    start: this.timer.start,
+                    start: this.timer.since,
                     flow: this.flow.color[0].bind(1),
                     viewSize: this.viewSize,
                     viewRes: this.viewRes
