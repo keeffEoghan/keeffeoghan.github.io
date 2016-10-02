@@ -1,24 +1,50 @@
 export class Timer {
-    constructor(start = Date.now()) {
-        this.start = this.time = start;
-        this.dt = 0;
-        this.rate = 0;
+    constructor(now) {
+        this.time = 0;
+
+        this.since = 0;
+        this.rate = 1;
+        this.fixed = 0;
+
+        this.paused = false;
+        this.delay = 0;
+
+        this.reset(now);
     }
 
-    now(time = Date.now()) {
-        return time-this.start;
+    now(now = Date.now()) {
+        return (now-this.since)*this.rate;
     }
 
-    tick() {
-        const t0 = this.time;
+    tick(now) {
+        let time = this.time;
+        let dt = 0;
 
-        this.time = this.now();
+        if(this.fixed > 0) {
+            dt = this.fixed*this.rate;
+            time += dt;
+        }
+        else {
+            let last = time;
 
-        return this.dt = (this.rate || this.time-t0);
+            time = this.now(now);
+            dt = time-last;
+        }
+
+        if(this.paused) {
+            this.since += dt;
+            dt = 0;
+        }
+        else {
+            this.time = time;
+        }
+
+        return dt;
     }
 
-    restart(start) {
-        this.constructor(start);
+    reset(now = Date.now()) {
+        this.since = now;
+        this.time = this.now(now);
     }
 }
 
