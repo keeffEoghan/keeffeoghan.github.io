@@ -1,27 +1,28 @@
 export class Timer {
-    constructor(now) {
+    constructor(since, now) {
         this.time = 0;
-
         this.since = 0;
+
+        this.offset = 0;
+
         this.rate = 1;
-        this.fixed = 0;
+        this.step = 0;
 
         this.paused = false;
-        this.delay = 0;
 
-        this.reset(now);
+        this.reset(since, now);
     }
 
     now(now = Date.now()) {
-        return (now-this.since)*this.rate;
+        return (now-this.offset)*this.rate;
     }
 
     tick(now) {
         let time = this.time;
         let dt = 0;
 
-        if(this.fixed > 0) {
-            dt = this.fixed*this.rate;
+        if(this.step > 0) {
+            dt = this.step*this.rate;
             time += dt;
         }
         else {
@@ -32,7 +33,7 @@ export class Timer {
         }
 
         if(this.paused) {
-            this.since += dt;
+            this.offset += dt;
             dt = 0;
         }
         else {
@@ -40,10 +41,11 @@ export class Timer {
         }
 
         return dt;
+        // return Math.abs(dt);
     }
 
-    reset(now = Date.now()) {
-        this.since = now;
+    reset(since = Date.now(), now = since) {
+        this.since = this.offset = since;
         this.time = this.now(now);
     }
 }

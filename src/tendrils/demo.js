@@ -69,7 +69,6 @@ export default (canvas, settings, debug) => {
 
     const audioState = {...audioDefaults};
 
-
     const gl = glContext(canvas, glSettings, () => {
             tendrils.draw();
 
@@ -130,6 +129,10 @@ export default (canvas, settings, debug) => {
     const resetSpawner = spawnReset(gl);
 
     const respawn = () => resetSpawner.respawn(tendrils);
+    const restart = () => {
+        tendrils.clear();
+        respawn();
+    };
 
     const state = tendrils.state;
 
@@ -200,6 +203,10 @@ export default (canvas, settings, debug) => {
 
 
     // Cam
+    /**
+     * @todo Use image as color LUT values - to show the cam feed clearly at the
+     *       start, then seamlessly flow into the visuals.
+     */
 
     const camPixelSpawner = new spawnPixels.SpawnPixels(gl);
 
@@ -302,6 +309,11 @@ export default (canvas, settings, debug) => {
 
 
     // Keyboard mash!
+    /**
+     * @todo Smash in some shapes, flow inputs, colour inputs (discrete forms).
+     * @todo Increment/decrement state values by various amounts.
+     * @todo Use the above to play the visuals and set keyframes in real time?
+     */
 
     document.body.addEventListener('keydown', (e) => {
             const key = vkey[e.keyCode];
@@ -319,7 +331,7 @@ export default (canvas, settings, debug) => {
                 respawnFastest();
             }
             else {
-                respawn();
+                restart();
             }
         },
         false);
@@ -343,6 +355,8 @@ export default (canvas, settings, debug) => {
     if(debug) {
         const gui = new dat.GUI();
 
+        gui.domElement.addEventListener('keydown', (e) => e.stopPropagation());
+
         gui.close();
 
         function updateGUI(node = gui) {
@@ -355,20 +369,15 @@ export default (canvas, settings, debug) => {
             }
         }
 
-        function restart() {
-            tendrils.clear();
-            resetSpawner.respawn(tendrils)
-        }
-
 
         // Settings
 
 
-        let settingsGUI = gui.addFolder('settings');
+        const settingsGUI = gui.addFolder('settings');
 
         for(let s in state) {
             if(!(typeof state[s]).match(/(object|array)/gi)) {
-                let control = settingsGUI.add(state, s);
+                const control = settingsGUI.add(state, s);
 
                 // Some special cases
 
@@ -399,7 +408,7 @@ export default (canvas, settings, debug) => {
                 baseAlpha: state.baseColor[3]
             };
 
-        let colorGUI = {...colorDefaults};
+        const colorGUI = {...colorDefaults};
 
         const convertColor = () => Object.assign(state, {
             color: [...colorGUI.color.map((c) => c/255), colorGUI.alpha],
@@ -417,7 +426,7 @@ export default (canvas, settings, debug) => {
 
         // Respawn
 
-        let respawnGUI = gui.addFolder('respawn');
+        const respawnGUI = gui.addFolder('respawn');
 
         for(let s in resetSpawner.uniforms) {
             if(!(typeof resetSpawner.uniforms[s]).match(/(object|array)/gi)) {
@@ -433,12 +442,20 @@ export default (canvas, settings, debug) => {
         respawnGUI.add(flowPixelState, 'scale', Object.keys(flowPixelScales));
 
 
+        // Time
+
+        const timeGUI = gui.addFolder('time');
+
+        ['paused', 'step', 'rate'].forEach((t) =>
+            timeGUI.add(tendrils.timer, t));
+
+
         // Audio
 
-        let audioGUI = gui.addFolder('audio');
+        const audioGUI = gui.addFolder('audio');
 
         for(let s in audioState) {
-            let control = audioGUI.add(audioState, s);
+            const control = audioGUI.add(audioState, s);
 
             if(s === 'trackURL') {
                 control.onFinishChange((v) =>
@@ -465,7 +482,7 @@ export default (canvas, settings, debug) => {
 
         // Controls
 
-        let controllers = {
+        const controllers = {
                 cyclingColor: false,
 
                 clear: () => tendrils.clear(),
@@ -480,7 +497,7 @@ export default (canvas, settings, debug) => {
             };
 
 
-        let controlsGUI = gui.addFolder('controls');
+        const controlsGUI = gui.addFolder('controls');
 
         for(let c in controllers) {
             controlsGUI.add(controllers, c);
@@ -509,9 +526,9 @@ export default (canvas, settings, debug) => {
 
         // Presets
 
-        let presetsGUI = gui.addFolder('presets');
+        const presetsGUI = gui.addFolder('presets');
 
-        let presetters = {
+        const presetters = {
             'Flow'() {
                 Object.assign(state, {
                         showFlow: true,
