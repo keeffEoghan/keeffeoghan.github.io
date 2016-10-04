@@ -112,7 +112,7 @@ export default (canvas, settings, debug) => {
                 speedAlpha: 0.00005,
                 lineWidth: 3
             },
-            time: 7000,
+            time: 9000,
             ease: [0, 1.1, 1]
         })
         .smoothTo({
@@ -123,7 +123,7 @@ export default (canvas, settings, debug) => {
                 noiseScale: 20,
                 speedAlpha: 0
             },
-            time: 10000,
+            time: 11000,
             ease: [0, 0.9, 1]
         })
         .smoothTo({
@@ -134,7 +134,7 @@ export default (canvas, settings, debug) => {
                 wanderWeight: 0.0021,
                 speedAlpha: 0.000002
             },
-            time: 12000
+            time: 15000
         })
         .smoothTo({
             to: {
@@ -166,7 +166,7 @@ export default (canvas, settings, debug) => {
                 flowWidth: 5,
                 done: () => tendrils.clearView()
             },
-            time: 20000,
+            time: 19000,
             ease: [0, 0.9, 1]
         });
 
