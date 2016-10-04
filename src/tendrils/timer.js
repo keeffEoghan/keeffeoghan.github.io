@@ -8,7 +8,11 @@ export class Timer {
         this.rate = 1;
         this.step = 0;
 
+        this.dt = 0;
+
         this.paused = false;
+        this.end = false;
+        this.loop = false;
 
         this.reset(since, now);
     }
@@ -26,22 +30,32 @@ export class Timer {
             time += dt;
         }
         else {
-            let last = time;
+            let past = time;
 
             time = this.now(now);
-            dt = time-last;
+            dt = time-past;
         }
 
         if(this.paused) {
             this.offset += dt;
             dt = 0;
         }
-        else {
+        else if(this.end === false) {
             this.time = time;
         }
+        else if(this.loop) {
+            this.time = time%this.end;
+        }
+        else {
+            this.time = ((this.rate > 0)? Math.min : Math.max)(time, this.end);
 
-        return dt;
-        // return Math.abs(dt);
+            if(this.time !== time) {
+                this.paused = true;
+            }
+        }
+
+        return this.dt = dt;
+        // return this.dt = Math.abs(dt);
     }
 
     reset(since = Date.now(), now = since) {
