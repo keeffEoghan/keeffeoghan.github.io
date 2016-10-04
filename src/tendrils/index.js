@@ -35,11 +35,8 @@ export const defaults = () => ({
     state: {
         rootNum: Math.pow(2, 9),
 
-        paused: false,
-        timeStep: 1000/60,
-
         autoClearView: false,
-        showFlow: true,
+        showFlow: false,
 
         minSpeed: 0.000001,
         maxSpeed: 0.01,
@@ -65,7 +62,9 @@ export const defaults = () => ({
 
         respawnAmount: 0.02
     },
-    timer: new Timer(),
+    timer: Object.assign(new Timer(), {
+            step: 1000/60
+        }),
     logicShader: null,
     renderShader: [renderVert, renderFrag],
     flowShader: [flowVert, flowFrag],
@@ -219,29 +218,24 @@ export class Tendrils {
         this.reset();
     }
 
-    draw() {
+    draw(dt = this.timer.tick()) {
         const directDraw = this.directDraw();
 
         this.resize(directDraw);
 
 
-        // Time
-        this.timer.rate = this.state.timeStep;
-        this.timer.tick();
-
-
         // Physics
 
-        if(!this.state.paused) {
+        if(!this.timer.paused) {
             this.particles.logic = this.logicShader;
 
             // Disabling blending here is important
             this.gl.disable(this.gl.BLEND);
 
             Object.assign(this.uniforms.update, this.state, {
-                    dt: this.timer.dt,
+                    dt,
                     time: this.timer.time,
-                    start: this.timer.start,
+                    start: this.timer.since,
                     flow: this.flow.color[0].bind(1),
                     viewSize: this.viewSize,
                     viewRes: this.viewRes
@@ -271,7 +265,7 @@ export class Tendrils {
 
         this.flow.bind();
 
-        this.gl.lineWidth(this.state.flowWidth);
+        this.gl.lineWidth(Math.max(0, this.state.flowWidth));
         this.particles.draw(this.uniforms.render, this.gl.LINES);
 
         /**
@@ -300,7 +294,7 @@ export class Tendrils {
             this.particles.render = this.flowScreenShader;
 
             if(this.state.lineWidth > 0) {
-                this.gl.lineWidth(this.state.lineWidth);
+                this.gl.lineWidth(Math.max(0, this.state.lineWidth));
             }
 
             // Render the flow directly to the screen
@@ -310,7 +304,7 @@ export class Tendrils {
 
         // Set up the particles for rendering
         this.particles.render = this.renderShader;
-        this.gl.lineWidth(this.state.lineWidth);
+        this.gl.lineWidth(Math.max(0, this.state.lineWidth));
 
         if(directDraw) {
             // Render the particles directly to the screen
