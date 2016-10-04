@@ -53,7 +53,7 @@ export const defaults = () => ({
         wanderWeight: 0.001,
 
         // @todo Make this a texture lookup instead
-        color: [1, 1, 1, 0.01],
+        color: [1, 1, 1, 0.05],
         // @todo Move this to another module, doesn't need to be here
         baseColor: [0, 0, 0, 0],
         fadeAlpha: -1,
