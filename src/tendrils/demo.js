@@ -16,6 +16,8 @@ import dat from 'dat-gui';
 
 import redirect from '../utils/protocol-redirect';
 
+import Timer from './timer';
+
 import { Tendrils, defaults, glSettings } from './';
 
 import { step } from '../utils';
@@ -32,6 +34,8 @@ import makeAudioData from './audio/data';
 import { makeLog, makeOrderLog } from './data-log';
 import { orderLogRates, peak, sum, mean, weightedMean } from './analyse';
 
+import Sequencer from './animate';
+
 const queries = querystring.parse(location.search.slice(1));
 
 const defaultSettings = defaults().state;
@@ -40,6 +44,8 @@ export default (canvas, settings, debug) => {
     if(redirect()) {
         return;
     }
+
+    const timer = new Timer();
 
     let tendrils;
 
@@ -69,8 +75,105 @@ export default (canvas, settings, debug) => {
 
     const audioState = {...audioDefaults};
 
+    const sequencer = (new Sequencer())
+        .smoothTo({
+            to: {
+                noiseSpeed: 0.00001,
+                noiseScale: 60,
+                forceWeight: 0.014,
+                wanderWeight: 0.0021,
+                speedAlpha: 0.000002
+            },
+            time: 3000,
+            ease: [0, 0.9, 1]
+        })
+        .smoothTo({
+            to: {
+                noiseSpeed: 0.00001,
+                noiseScale: 18,
+                forceWeight: 0.014,
+                wanderWeight: 0.0021,
+                speedAlpha: 0.000002,
+                done: () => console.log('done 5000')
+            },
+            time: 5000,
+            ease: [0, 0.3, 1]
+        })
+        .smoothTo({
+            to: {
+                flowDecay: 0,
+                noiseSpeed: 0,
+                noiseScale: 18,
+                forceWeight: 0.015,
+                wanderWeight: 0.0023,
+                speedAlpha: 0.00005,
+                lineWidth: 3,
+                done: () => console.log('done 6000')
+            },
+            time: 6000,
+            ease: [0, 1.1, 1]
+        })
+        .smoothTo({
+            to: {
+                flowWeight: 0,
+                wanderWeight: 0.002,
+                noiseSpeed: 0,
+                noiseScale: 20,
+                speedAlpha: 0,
+                done: () => console.log('done 10000')
+            },
+            time: 10000,
+            ease: [0, 0.9, 1]
+        })
+        .smoothTo({
+            to: {
+                noiseSpeed: 0.00001,
+                noiseScale: 60,
+                forceWeight: 0.014,
+                wanderWeight: 0.0021,
+                speedAlpha: 0.000002,
+                done: () => console.log('done 13000')
+            },
+            time: 13000
+        })
+        .smoothTo({
+            to: {
+                flowWeight: 0,
+                wanderWeight: 0.002,
+                noiseSpeed: 0,
+                noiseScale: 2.125,
+                speedAlpha: 0,
+                lineWidth: 1,
+                done: () => console.log('done 15000')
+            },
+            time: 15000,
+            ease: [0, 0.9, 1]
+        })
+        .smoothTo({
+            to: {
+                flowWeight: 0,
+                wanderWeight: 0.002,
+                noiseSpeed: 0,
+                noiseScale: 2.125,
+                speedAlpha: 0,
+                done: () => console.log('done 19000')
+            },
+            time: 19000,
+            ease: [0, 0.9, 1]
+        });
+
+    sequencer.timer = new Timer();
+    sequencer.timer.end = 20000;
+    sequencer.timer.loop = true;
+
     const gl = glContext(canvas, glSettings, () => {
-            tendrils.draw();
+            const now = Date.now();
+            const dt = timer.tick(now);
+
+            sequencer.timer.tick(now);
+            sequencer.play(sequencer.timer.time, tendrils.state);
+
+            tendrils.draw(dt);
 
             gl.viewport(0, 0, ...tendrils.flow.shape);
 
@@ -79,7 +182,7 @@ export default (canvas, settings, debug) => {
 
             // @todo Kill old flow lines once empty
             flowInput
-                .trimOld((1/tendrils.state.flowDecay)+100, tendrils.timer.now())
+                .trimOld((1/tendrils.state.flowDecay)+100, timer.now())
                 .update().draw();
 
 
@@ -89,7 +192,7 @@ export default (canvas, settings, debug) => {
 
             if(audioState.track && trackAnalyser && trackOrderLog) {
                 trackAnalyser.frequencies(step(trackOrderLog[0]));
-                orderLogRates(trackOrderLog, tendrils.timer.dt);
+                orderLogRates(trackOrderLog, dt);
 
                 if(mean(trackOrderLog[trackOrderLog.length-1][0]) >
                         audioState.trackBeatAt) {
@@ -104,7 +207,7 @@ export default (canvas, settings, debug) => {
 
             if(!soundInput && audioState.mic && micAnalyser && micOrderLog) {
                 micAnalyser.frequencies(step(micOrderLog[0]));
-                orderLogRates(micOrderLog, tendrils.timer.dt);
+                orderLogRates(micOrderLog, dt);
 
                 const beats = micOrderLog[micOrderLog.length-1][0];
 
@@ -124,7 +227,7 @@ export default (canvas, settings, debug) => {
             }
         });
 
-    tendrils = new Tendrils(gl);
+    tendrils = new Tendrils(gl, { timer });
 
     const resetSpawner = spawnReset(gl);
 
@@ -143,7 +246,7 @@ export default (canvas, settings, debug) => {
     flowInput = new FlowLine(gl);
 
     const pointerFlow = (e) => {
-        flowInput.times.push(tendrils.timer.now());
+        flowInput.times.push(timer.now());
 
         const flow = offset(e, canvas, vec2.create());
 
@@ -318,7 +421,11 @@ export default (canvas, settings, debug) => {
     document.body.addEventListener('keydown', (e) => {
             const key = vkey[e.keyCode];
 
-            if(key.match(/^<escape>$/)) {
+            if(key.match(/^<enter>$/)) {
+                self.prompt('Animation sequence:',
+                    JSON.stringify(sequencer.keyframes));
+            }
+            else if(key.match(/^<escape>$/)) {
                 tendrils.reset();
             }
             else if(key.match(/^<space>$/)) {
@@ -446,8 +553,7 @@ export default (canvas, settings, debug) => {
 
         const timeGUI = gui.addFolder('time');
 
-        ['paused', 'step', 'rate'].forEach((t) =>
-            timeGUI.add(tendrils.timer, t));
+        ['paused', 'step', 'rate'].forEach((t) => timeGUI.add(timer, t));
 
 
         // Audio
@@ -546,10 +652,6 @@ export default (canvas, settings, debug) => {
                     });
             },
             'Wings'() {
-                Object.assign(state, {
-                        showFlow: false
-                    });
-
                 Object.assign(resetSpawner.uniforms, {
                         radius: 0.1,
                         speed: 0
@@ -559,8 +661,7 @@ export default (canvas, settings, debug) => {
             },
             'Fluid'() {
                 Object.assign(state, {
-                        autoClearView: true,
-                        showFlow: false
+                        autoClearView: true
                     });
 
                 Object.assign(colorGUI, {
@@ -570,8 +671,6 @@ export default (canvas, settings, debug) => {
             },
             'Flow only'() {
                 Object.assign(state, {
-                        showFlow: false,
-                        autoClearView: false,
                         flowDecay: 0.0005,
                         forceWeight: 0.015,
                         wanderWeight: 0,
@@ -593,8 +692,6 @@ export default (canvas, settings, debug) => {
             },
             'Noise only'() {
                 Object.assign(state, {
-                        autoClearView: false,
-                        showFlow: false,
                         flowWeight: 0,
                         wanderWeight: 0.002,
                         noiseSpeed: 0,
@@ -608,7 +705,6 @@ export default (canvas, settings, debug) => {
             },
             'Sea'() {
                 Object.assign(state, {
-                        showFlow: false,
                         flowWidth: 5,
                         forceWeight: 0.015,
                         wanderWeight: 0.0014,
@@ -638,8 +734,6 @@ export default (canvas, settings, debug) => {
             },
             'Ghostly'() {
                 Object.assign(state, {
-                        showFlow: false,
-                        autoClearView: false,
                         flowDecay: 0
                     });
 
@@ -650,8 +744,6 @@ export default (canvas, settings, debug) => {
             },
             'Turbulence'() {
                 Object.assign(state, {
-                        showFlow: false,
-                        autoClearView: false,
                         noiseSpeed: 0.00001,
                         noiseScale: 18,
                         forceWeight: 0.014,
@@ -668,8 +760,6 @@ export default (canvas, settings, debug) => {
             },
             'Rorschach'() {
                 Object.assign(state, {
-                        showFlow: false,
-                        autoClearView: false,
                         noiseSpeed: 0.00001,
                         noiseScale: 60,
                         forceWeight: 0.014,
@@ -690,8 +780,6 @@ export default (canvas, settings, debug) => {
             },
             'Roots'() {
                 Object.assign(state, {
-                        showFlow: false,
-                        autoClearView: false,
                         flowDecay: 0,
                         noiseSpeed: 0,
                         noiseScale: 18,
@@ -708,9 +796,6 @@ export default (canvas, settings, debug) => {
             },
             'Hairy'() {
                 Object.assign(state, {
-                        showFlow: false,
-                        autoClearView: false,
-                        timeStep: 1000/60,
                         flowDecay: 0.001,
                         wanderWeight: 0.002,
                         speedAlpha: 0
@@ -744,6 +829,6 @@ export default (canvas, settings, debug) => {
             presetsGUI.add(presetters, p);
         }
 
-        presetters['Flow']();
+        presetters['Rorschach']();
     }
 };

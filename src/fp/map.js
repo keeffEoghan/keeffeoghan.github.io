@@ -17,7 +17,11 @@ export const mapList = (f, x, out = []) => reduceList((acc, v, i) => {
  * Same as above signature, but iterates over all the given object's own
  * properties.
  */
-export const map = (f, any, out) =>
-    mapList((k, i) => f(any[k], k, any, i), Object.keys(any), out);
+export const map = (f, any, out) => reduceList((acc, k, i) => {
+        acc[k] = f(any[k], k, any, i);
+
+        return acc;
+    },
+    Object.keys(any), out);
 
 export default map;

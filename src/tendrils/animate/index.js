@@ -1,41 +1,53 @@
-// import { reduce } from '../../fp/reduce';
-
-// Timeline - wrapper for the bezier API.
-// Animate along an array of keyframes, using bezier curves or lerp between each
-// pair.
-
-// Functions to animate.
 /**
- * Animate along a timeline of keyframes (properties, timings, and curves),
- * using the tweens.
+ * A convenience class that wraps the timeline, tween, and ease-joining
+ * utilities into a single package.
  */
+import isFunction from 'lodash/isFunction';
 
-/**
- * Prepare a timeline from a given set of keyframes (properties, timings, and
- * curves).
- * Create a lookup table from the provided keyframes config - a total duration
- * and a reverse lookup from key times to key names.
- *
- * @param {Array.<Object>} frames
- *        A list of keyframes, each an object of the form:
- *            value: {(Number|Object.<Number>)} The value/s to be animated
- *            span: {Number} Time until the next frame
- *            ease: {?Array.<Number>} A bezier easing curve to use for animating
- */
-// export const timeline = (frames) => reduce((out, frame, k) => {
-//         out.times[];
-//         out.span += frame.span;
-//     },
-//     frames, {
-//         frames,
-//         times: ,
-//         span: 0
-//     });
+import Timeline from './timeline';
+import tween from './tween';
+import joinCurve from './join-curve';
+import map from '../../fp/map';
 
-// A full playthrough function.
-// Simple wrapper, with start-time, time, rate, start, stop, play, loop, etc.
-// Uses the above with its timing to play a full sequence.
+export class Sequencer {
+    constructor(frames) {
+        this.timeline = new Timeline(frames);
+    }
 
-// Smooth transitions between curves - needed, or manual?
-// Set the first control point of each next curve to be the colinear reflection
-// of the last control point of the current curve in its final point.
+    easeTo(align, ...frame) {
+        const f = this.timeline.add(...frame);
+
+        // If there's a previous frame, ease smoothly from it.
+        if(f > 0) {
+            const added = this.timeline.frames[f];
+
+            const ease = ((added.ease && added.ease.length)?
+                    added.ease : [0, 1]);
+
+            ease.splice(1, 0, joinCurve(this.timeline.frames[f-1].ease, align));
+            added.ease = ease;
+        }
+
+        return this;
+    }
+
+    smoothTo(...frame) {
+        return this.easeTo(1, ...frame);
+    }
+
+    flipTo(...frame) {
+        return this.easeTo(-1, ...frame);
+    }
+
+    play(time, out = {}) {
+        const span = this.timeline.play(time);
+
+        if(span.apply) {
+            map((v) => ((isFunction(v))? v() : v), span.apply, out);
+        }
+
+        return tween(span, out);
+    }
+}
+
+export default Sequencer;

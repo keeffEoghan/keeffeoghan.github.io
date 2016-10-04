@@ -3,6 +3,8 @@
  * @main Index
  */
 
+import 'babel-polyfill';
+
 import tendrilsApp from './tendrils/demo';
 
 const readyStates = ['loading', 'interactive', 'complete'];

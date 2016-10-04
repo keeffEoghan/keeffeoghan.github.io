@@ -36,7 +36,7 @@ export const defaults = () => ({
         rootNum: Math.pow(2, 9),
 
         autoClearView: false,
-        showFlow: true,
+        showFlow: false,
 
         minSpeed: 0.000001,
         maxSpeed: 0.01,
@@ -218,8 +218,7 @@ export class Tendrils {
         this.reset();
     }
 
-    draw() {
-        const dt = this.timer.tick();
+    draw(dt = this.timer.tick()) {
         const directDraw = this.directDraw();
 
         this.resize(directDraw);
@@ -266,7 +265,7 @@ export class Tendrils {
 
         this.flow.bind();
 
-        this.gl.lineWidth(this.state.flowWidth);
+        this.gl.lineWidth(Math.max(0, this.state.flowWidth));
         this.particles.draw(this.uniforms.render, this.gl.LINES);
 
         /**
@@ -295,7 +294,7 @@ export class Tendrils {
             this.particles.render = this.flowScreenShader;
 
             if(this.state.lineWidth > 0) {
-                this.gl.lineWidth(this.state.lineWidth);
+                this.gl.lineWidth(Math.max(0, this.state.lineWidth));
             }
 
             // Render the flow directly to the screen
@@ -305,7 +304,7 @@ export class Tendrils {
 
         // Set up the particles for rendering
         this.particles.render = this.renderShader;
-        this.gl.lineWidth(this.state.lineWidth);
+        this.gl.lineWidth(Math.max(0, this.state.lineWidth));
 
         if(directDraw) {
             // Render the particles directly to the screen
