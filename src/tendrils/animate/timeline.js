@@ -41,8 +41,17 @@ export class Timeline {
         this.frames = sort([...frames]);
 
         // The playhead, current position and frames on the timeline (if valid).
+        this.time = 0;
         this.gap = -1;
         this.span = undefined;
+
+        /**
+         * If symmetric, the eases play the same forwards as backwards; the
+         * later frame's ease is used.
+         * If not, frames are reached by the same ease, forwards or backwards;
+         * the destination frame's ease is used.
+         */
+        this.symmetric = true;
     }
 
     add(frame, ...rest) {
@@ -142,7 +151,7 @@ export class Timeline {
         let a = this.frames[Math.floor(gap)];
         let b = this.frames[Math.ceil(gap)];
 
-        if(gap < this.gap) {
+        if(!this.symmetric && time < this.time) {
             let swap = a;
 
             a = b;
@@ -162,6 +171,7 @@ export class Timeline {
 
         this.span = this.spanGapAt(time, gap, this.span);
         this.gap = gap;
+        this.time = time;
     }
 
     within(time) {
