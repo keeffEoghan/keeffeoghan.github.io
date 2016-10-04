@@ -42,11 +42,15 @@ export class Sequencer {
     play(time, out = {}) {
         const span = this.timeline.play(time);
 
+        if(this.timeline.within(time)) {
+            tween(span, out);
+        }
+
         if(span.apply) {
             map((v) => ((isFunction(v))? v() : v), span.apply, out);
         }
 
-        return tween(span, out);
+        return out;
     }
 }
 
