@@ -68,9 +68,7 @@ function runWebpack(taskOptions) {
     // Open a stream, trigger webpack-stream compilation and push output to file system.
     return gulp.src(scriptSettings.sourcePaths)
         // Pass a named file stream to webpack, for multiple entry points
-        .pipe(named(function(file) {
-            return file.relative.replace(/\.main\.js$/gi, '');
-        }))
+        .pipe(named((file) => file.relative.replace(/\.main\.js$/gi, '')))
         .pipe(webpackStream(scriptSettings.webpackSettings))
         .pipe(gulp.dest(scriptSettings.destPath));
 }

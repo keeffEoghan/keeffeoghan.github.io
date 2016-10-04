@@ -13,6 +13,7 @@
 #pragma glslify: applyColor = require(./apply/color)
 #pragma glslify: vignette = require(../../filter/pass/vignette)
 #pragma glslify: apply = require(./apply/compose-filter, apply = applyColor, pass = vignette)
+// #pragma glslify: apply = require(./apply/color)
 
 #pragma glslify: test = require(./test/particles)
 

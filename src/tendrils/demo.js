@@ -2,6 +2,7 @@
 
 import 'pepjs';
 import glContext from 'gl-context';
+import vkey from 'vkey';
 import getUserMedia from 'getusermedia';
 import analyser from 'web-audio-analyser';
 import soundCloud from 'soundcloud-badge';
@@ -14,6 +15,8 @@ import querystring from 'querystring';
 import dat from 'dat-gui';
 
 import redirect from '../utils/protocol-redirect';
+
+import Timer from './timer';
 
 import { Tendrils, defaults, glSettings } from './';
 
@@ -31,6 +34,8 @@ import makeAudioData from './audio/data';
 import { makeLog, makeOrderLog } from './data-log';
 import { orderLogRates, peak, sum, mean, weightedMean } from './analyse';
 
+import Sequencer from './animate';
+
 const queries = querystring.parse(location.search.slice(1));
 
 const defaultSettings = defaults().state;
@@ -39,6 +44,8 @@ export default (canvas, settings, debug) => {
     if(redirect()) {
         return;
     }
+
+    const timer = new Timer();
 
     let tendrils;
 
@@ -57,20 +64,131 @@ export default (canvas, settings, debug) => {
 
         audible: !('mute' in queries),
 
-        track: true,
+        track: !('track_off' in queries),
         trackBeatAt: 0.1,
         trackLoudAt: 9,
 
-        mic: true,
+        mic: !('mic_off' in queries),
         micBeatAt: 1,
         micLoudAt: 5
     };
 
     const audioState = {...audioDefaults};
 
+    let seq = 0;
+
+    const sequencer = (new Sequencer())
+        .smoothTo({
+            to: {
+                noiseSpeed: 0.00001,
+                noiseScale: 60,
+                forceWeight: 0.014,
+                wanderWeight: 0.0021,
+                speedAlpha: 0.000002
+            },
+            time: 3000,
+            ease: [0, 0.9, 1]
+        })
+        .smoothTo({
+            to: {
+                noiseSpeed: 0.00001,
+                noiseScale: 18,
+                forceWeight: 0.014,
+                wanderWeight: 0.0021,
+                speedAlpha: 0.000002,
+                done: () => console.log('done', seq++)
+            },
+            time: 5000,
+            ease: [0, 0.3, 1]
+        })
+        .smoothTo({
+            to: {
+                flowDecay: 0,
+                noiseSpeed: 0,
+                noiseScale: 18,
+                forceWeight: 0.015,
+                wanderWeight: 0.0023,
+                speedAlpha: 0.00005,
+                lineWidth: 3,
+                done: () => console.log('done', seq++)
+            },
+            time: 7000,
+            ease: [0, 1.1, 1]
+        })
+        .smoothTo({
+            to: {
+                flowWeight: 0,
+                wanderWeight: 0.002,
+                noiseSpeed: 0,
+                noiseScale: 20,
+                speedAlpha: 0,
+                done: () => console.log('done', seq++)
+            },
+            time: 10000,
+            ease: [0, 0.9, 1]
+        })
+        .smoothTo({
+            to: {
+                noiseSpeed: 0.00001,
+                noiseScale: 60,
+                forceWeight: 0.014,
+                wanderWeight: 0.0021,
+                speedAlpha: 0.000002,
+                done: () => console.log('done', seq++)
+            },
+            time: 12000
+        })
+        .smoothTo({
+            to: {
+                flowDecay: defaultSettings.flowDecay,
+                flowWeight: 1,
+                wanderWeight: 0.002,
+                noiseSpeed: 0,
+                noiseScale: 2.125,
+                speedAlpha: 0,
+                lineWidth: 1,
+                done: () => console.log('done', seq++)
+            },
+            time: 14000,
+            ease: [0, 0.9, 1]
+        })
+        .smoothTo({
+            to: {
+                wanderWeight: 0.002,
+                noiseSpeed: 0,
+                noiseScale: 2.125,
+                speedAlpha: 0,
+                done: () => console.log('done', seq++)
+            },
+            time: 17000,
+            ease: [0, 0.9, 1]
+        })
+        .smoothTo({
+            to: {
+                ...defaultSettings,
+                showFlow: true,
+                flowWidth: 5,
+                done: () => console.log('done', seq++)
+            },
+            time: 20000,
+            ease: [0, 0.9, 1]
+        });
+
+    sequencer.timer = new Timer();
+
+    // const frames = sequencer.timeline.frames;
+    //
+    // sequencer.timer.end = frames[frames.length-1].time+2000;
+    // sequencer.timer.loop = true;
 
     const gl = glContext(canvas, glSettings, () => {
-            tendrils.draw();
+            const now = Date.now();
+            const dt = timer.tick(now);
+
+            sequencer.timer.tick(now);
+            sequencer.play(sequencer.timer.time, tendrils.state);
+
+            tendrils.draw(dt);
 
             gl.viewport(0, 0, ...tendrils.flow.shape);
 
@@ -79,7 +197,7 @@ export default (canvas, settings, debug) => {
 
             // @todo Kill old flow lines once empty
             flowInput
-                .trimOld((1/tendrils.state.flowDecay)+100, tendrils.timer.now())
+                .trimOld((1/tendrils.state.flowDecay)+100, timer.now())
                 .update().draw();
 
 
@@ -89,7 +207,7 @@ export default (canvas, settings, debug) => {
 
             if(audioState.track && trackAnalyser && trackOrderLog) {
                 trackAnalyser.frequencies(step(trackOrderLog[0]));
-                orderLogRates(trackOrderLog, tendrils.timer.dt);
+                orderLogRates(trackOrderLog, dt);
 
                 if(mean(trackOrderLog[trackOrderLog.length-1][0]) >
                         audioState.trackBeatAt) {
@@ -104,7 +222,7 @@ export default (canvas, settings, debug) => {
 
             if(!soundInput && audioState.mic && micAnalyser && micOrderLog) {
                 micAnalyser.frequencies(step(micOrderLog[0]));
-                orderLogRates(micOrderLog, tendrils.timer.dt);
+                orderLogRates(micOrderLog, dt);
 
                 const beats = micOrderLog[micOrderLog.length-1][0];
 
@@ -124,13 +242,26 @@ export default (canvas, settings, debug) => {
             }
         });
 
-    tendrils = new Tendrils(gl);
+    tendrils = new Tendrils(gl, { timer });
+
+    const resetSpawner = spawnReset(gl);
+
+    const respawn = () => resetSpawner.respawn(tendrils);
+    const restart = () => {
+        tendrils.clear();
+        respawn();
+    };
+
+    const state = tendrils.state;
+
+
+    // Flow line
 
     // @todo New flow lines for new pointers
     flowInput = new FlowLine(gl);
 
     const pointerFlow = (e) => {
-        flowInput.times.push(tendrils.timer.now());
+        flowInput.times.push(timer.now());
 
         const flow = offset(e, canvas, vec2.create());
 
@@ -141,10 +272,6 @@ export default (canvas, settings, debug) => {
     };
 
     canvas.addEventListener('pointermove', pointerFlow, false);
-
-    const resetSpawner = spawnReset(gl);
-
-    const state = tendrils.state;
 
 
     // Feedback loop from flow
@@ -194,6 +321,10 @@ export default (canvas, settings, debug) => {
 
 
     // Cam
+    /**
+     * @todo Use image as color LUT values - to show the cam feed clearly at the
+     *       start, then seamlessly flow into the visuals.
+     */
 
     const camPixelSpawner = new spawnPixels.SpawnPixels(gl);
 
@@ -295,6 +426,39 @@ export default (canvas, settings, debug) => {
     }
 
 
+    // Keyboard mash!
+    /**
+     * @todo Smash in some shapes, flow inputs, colour inputs (discrete forms).
+     * @todo Increment/decrement state values by various amounts.
+     * @todo Use the above to play the visuals and set keyframes in real time?
+     */
+
+    document.body.addEventListener('keydown', (e) => {
+            const key = vkey[e.keyCode];
+
+            if(key.match(/^<enter>$/)) {
+                self.prompt('Animation sequence:',
+                    JSON.stringify(sequencer.keyframes));
+            }
+            else if(key.match(/^<escape>$/)) {
+                tendrils.reset();
+            }
+            else if(key.match(/^<space>$/)) {
+                respawnCam();
+            }
+            else if(key.match(/^[A-Z]$/)) {
+                respawnFlow();
+            }
+            else if(key.match(/^[0-9]$/)) {
+                respawnFastest();
+            }
+            else {
+                restart();
+            }
+        },
+        false);
+
+
     function resize() {
         canvas.width = self.innerWidth;
         canvas.height = self.innerHeight;
@@ -313,6 +477,8 @@ export default (canvas, settings, debug) => {
     if(debug) {
         const gui = new dat.GUI();
 
+        gui.domElement.addEventListener('keydown', (e) => e.stopPropagation());
+
         gui.close();
 
         function updateGUI(node = gui) {
@@ -325,20 +491,15 @@ export default (canvas, settings, debug) => {
             }
         }
 
-        function restart() {
-            tendrils.clear();
-            resetSpawner.respawn(tendrils)
-        }
-
 
         // Settings
 
 
-        let settingsGUI = gui.addFolder('settings');
+        const settingsGUI = gui.addFolder('settings');
 
         for(let s in state) {
             if(!(typeof state[s]).match(/(object|array)/gi)) {
-                let control = settingsGUI.add(state, s);
+                const control = settingsGUI.add(state, s);
 
                 // Some special cases
 
@@ -369,7 +530,7 @@ export default (canvas, settings, debug) => {
                 baseAlpha: state.baseColor[3]
             };
 
-        let colorGUI = {...colorDefaults};
+        const colorGUI = {...colorDefaults};
 
         const convertColor = () => Object.assign(state, {
             color: [...colorGUI.color.map((c) => c/255), colorGUI.alpha],
@@ -387,7 +548,7 @@ export default (canvas, settings, debug) => {
 
         // Respawn
 
-        let respawnGUI = gui.addFolder('respawn');
+        const respawnGUI = gui.addFolder('respawn');
 
         for(let s in resetSpawner.uniforms) {
             if(!(typeof resetSpawner.uniforms[s]).match(/(object|array)/gi)) {
@@ -403,12 +564,19 @@ export default (canvas, settings, debug) => {
         respawnGUI.add(flowPixelState, 'scale', Object.keys(flowPixelScales));
 
 
+        // Time
+
+        const timeGUI = gui.addFolder('time');
+
+        ['paused', 'step', 'rate'].forEach((t) => timeGUI.add(timer, t));
+
+
         // Audio
 
-        let audioGUI = gui.addFolder('audio');
+        const audioGUI = gui.addFolder('audio');
 
         for(let s in audioState) {
-            let control = audioGUI.add(audioState, s);
+            const control = audioGUI.add(audioState, s);
 
             if(s === 'trackURL') {
                 control.onFinishChange((v) =>
@@ -435,13 +603,13 @@ export default (canvas, settings, debug) => {
 
         // Controls
 
-        let controllers = {
+        const controllers = {
                 cyclingColor: false,
 
                 clear: () => tendrils.clear(),
                 clearView: () => tendrils.clearView(),
                 clearFlow: () => tendrils.clearFlow(),
-                respawn: () => resetSpawner.respawn(tendrils),
+                respawn,
                 respawnCam,
                 respawnFlow,
                 respawnFastest,
@@ -450,7 +618,7 @@ export default (canvas, settings, debug) => {
             };
 
 
-        let controlsGUI = gui.addFolder('controls');
+        const controlsGUI = gui.addFolder('controls');
 
         for(let c in controllers) {
             controlsGUI.add(controllers, c);
@@ -479,9 +647,9 @@ export default (canvas, settings, debug) => {
 
         // Presets
 
-        let presetsGUI = gui.addFolder('presets');
+        const presetsGUI = gui.addFolder('presets');
 
-        let presetters = {
+        const presetters = {
             'Flow'() {
                 Object.assign(state, {
                         showFlow: true,
@@ -499,10 +667,6 @@ export default (canvas, settings, debug) => {
                     });
             },
             'Wings'() {
-                Object.assign(state, {
-                        showFlow: false
-                    });
-
                 Object.assign(resetSpawner.uniforms, {
                         radius: 0.1,
                         speed: 0
@@ -512,8 +676,7 @@ export default (canvas, settings, debug) => {
             },
             'Fluid'() {
                 Object.assign(state, {
-                        autoClearView: true,
-                        showFlow: false
+                        autoClearView: true
                     });
 
                 Object.assign(colorGUI, {
@@ -523,8 +686,6 @@ export default (canvas, settings, debug) => {
             },
             'Flow only'() {
                 Object.assign(state, {
-                        showFlow: false,
-                        autoClearView: false,
                         flowDecay: 0.0005,
                         forceWeight: 0.015,
                         wanderWeight: 0,
@@ -546,8 +707,6 @@ export default (canvas, settings, debug) => {
             },
             'Noise only'() {
                 Object.assign(state, {
-                        autoClearView: false,
-                        showFlow: false,
                         flowWeight: 0,
                         wanderWeight: 0.002,
                         noiseSpeed: 0,
@@ -561,7 +720,6 @@ export default (canvas, settings, debug) => {
             },
             'Sea'() {
                 Object.assign(state, {
-                        showFlow: false,
                         flowWidth: 5,
                         forceWeight: 0.015,
                         wanderWeight: 0.0014,
@@ -591,8 +749,6 @@ export default (canvas, settings, debug) => {
             },
             'Ghostly'() {
                 Object.assign(state, {
-                        showFlow: false,
-                        autoClearView: false,
                         flowDecay: 0
                     });
 
@@ -603,8 +759,6 @@ export default (canvas, settings, debug) => {
             },
             'Turbulence'() {
                 Object.assign(state, {
-                        showFlow: false,
-                        autoClearView: false,
                         noiseSpeed: 0.00001,
                         noiseScale: 18,
                         forceWeight: 0.014,
@@ -621,8 +775,6 @@ export default (canvas, settings, debug) => {
             },
             'Rorschach'() {
                 Object.assign(state, {
-                        showFlow: false,
-                        autoClearView: false,
                         noiseSpeed: 0.00001,
                         noiseScale: 60,
                         forceWeight: 0.014,
@@ -643,8 +795,6 @@ export default (canvas, settings, debug) => {
             },
             'Roots'() {
                 Object.assign(state, {
-                        showFlow: false,
-                        autoClearView: false,
                         flowDecay: 0,
                         noiseSpeed: 0,
                         noiseScale: 18,
@@ -661,9 +811,6 @@ export default (canvas, settings, debug) => {
             },
             'Hairy'() {
                 Object.assign(state, {
-                        showFlow: false,
-                        autoClearView: false,
-                        timeStep: 1000/60,
                         flowDecay: 0.001,
                         wanderWeight: 0.002,
                         speedAlpha: 0
@@ -697,6 +844,6 @@ export default (canvas, settings, debug) => {
             presetsGUI.add(presetters, p);
         }
 
-        presetters['Flow']();
+        presetters['Rorschach']();
     }
 };
