@@ -75,6 +75,8 @@ export default (canvas, settings, debug) => {
 
     const audioState = {...audioDefaults};
 
+    let seq = 0;
+
     const sequencer = (new Sequencer())
         .smoothTo({
             to: {
@@ -94,7 +96,7 @@ export default (canvas, settings, debug) => {
                 forceWeight: 0.014,
                 wanderWeight: 0.0021,
                 speedAlpha: 0.000002,
-                done: () => console.log('done 5000')
+                done: () => console.log('done', seq++)
             },
             time: 5000,
             ease: [0, 0.3, 1]
@@ -108,9 +110,9 @@ export default (canvas, settings, debug) => {
                 wanderWeight: 0.0023,
                 speedAlpha: 0.00005,
                 lineWidth: 3,
-                done: () => console.log('done 6000')
+                done: () => console.log('done', seq++)
             },
-            time: 6000,
+            time: 7000,
             ease: [0, 1.1, 1]
         })
         .smoothTo({
@@ -120,7 +122,7 @@ export default (canvas, settings, debug) => {
                 noiseSpeed: 0,
                 noiseScale: 20,
                 speedAlpha: 0,
-                done: () => console.log('done 10000')
+                done: () => console.log('done', seq++)
             },
             time: 10000,
             ease: [0, 0.9, 1]
@@ -132,39 +134,52 @@ export default (canvas, settings, debug) => {
                 forceWeight: 0.014,
                 wanderWeight: 0.0021,
                 speedAlpha: 0.000002,
-                done: () => console.log('done 13000')
+                done: () => console.log('done', seq++)
             },
-            time: 13000
+            time: 12000
         })
         .smoothTo({
             to: {
-                flowWeight: 0,
+                flowDecay: defaultSettings.flowDecay,
+                flowWeight: 1,
                 wanderWeight: 0.002,
                 noiseSpeed: 0,
                 noiseScale: 2.125,
                 speedAlpha: 0,
                 lineWidth: 1,
-                done: () => console.log('done 15000')
+                done: () => console.log('done', seq++)
             },
-            time: 15000,
+            time: 14000,
             ease: [0, 0.9, 1]
         })
         .smoothTo({
             to: {
-                flowWeight: 0,
                 wanderWeight: 0.002,
                 noiseSpeed: 0,
                 noiseScale: 2.125,
                 speedAlpha: 0,
-                done: () => console.log('done 19000')
+                done: () => console.log('done', seq++)
             },
-            time: 19000,
+            time: 17000,
+            ease: [0, 0.9, 1]
+        })
+        .smoothTo({
+            to: {
+                ...defaultSettings,
+                showFlow: true,
+                flowWidth: 5,
+                done: () => console.log('done', seq++)
+            },
+            time: 20000,
             ease: [0, 0.9, 1]
         });
 
     sequencer.timer = new Timer();
-    sequencer.timer.end = 20000;
-    sequencer.timer.loop = true;
+
+    // const frames = sequencer.timeline.frames;
+    //
+    // sequencer.timer.end = frames[frames.length-1].time+2000;
+    // sequencer.timer.loop = true;
 
     const gl = glContext(canvas, glSettings, () => {
             const now = Date.now();
