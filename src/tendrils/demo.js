@@ -75,16 +75,18 @@ export default (canvas, settings, debug) => {
 
     const audioState = {...audioDefaults};
 
-    let seq = 0;
-
     const sequencer = (new Sequencer())
         .smoothTo({
             to: {
+                ...defaultSettings,
+                showFlow: false,
                 noiseSpeed: 0.00001,
                 noiseScale: 60,
                 forceWeight: 0.014,
                 wanderWeight: 0.0021,
-                speedAlpha: 0.000002
+                speedAlpha: 0.000002,
+                color: [0, 0, 0, 0.1],
+                baseColor: [1, 1, 1, 0.01],
             },
             time: 3000,
             ease: [0, 0.9, 1]
@@ -95,8 +97,7 @@ export default (canvas, settings, debug) => {
                 noiseScale: 18,
                 forceWeight: 0.014,
                 wanderWeight: 0.0021,
-                speedAlpha: 0.000002,
-                done: () => console.log('done', seq++)
+                speedAlpha: 0.000002
             },
             time: 5000,
             ease: [0, 0.3, 1]
@@ -109,10 +110,9 @@ export default (canvas, settings, debug) => {
                 forceWeight: 0.015,
                 wanderWeight: 0.0023,
                 speedAlpha: 0.00005,
-                lineWidth: 3,
-                done: () => console.log('done', seq++)
+                lineWidth: 3
             },
-            time: 7000,
+            time: 9000,
             ease: [0, 1.1, 1]
         })
         .smoothTo({
@@ -121,10 +121,9 @@ export default (canvas, settings, debug) => {
                 wanderWeight: 0.002,
                 noiseSpeed: 0,
                 noiseScale: 20,
-                speedAlpha: 0,
-                done: () => console.log('done', seq++)
+                speedAlpha: 0
             },
-            time: 10000,
+            time: 11000,
             ease: [0, 0.9, 1]
         })
         .smoothTo({
@@ -133,10 +132,9 @@ export default (canvas, settings, debug) => {
                 noiseScale: 60,
                 forceWeight: 0.014,
                 wanderWeight: 0.0021,
-                speedAlpha: 0.000002,
-                done: () => console.log('done', seq++)
+                speedAlpha: 0.000002
             },
-            time: 12000
+            time: 15000
         })
         .smoothTo({
             to: {
@@ -146,8 +144,7 @@ export default (canvas, settings, debug) => {
                 noiseSpeed: 0,
                 noiseScale: 2.125,
                 speedAlpha: 0,
-                lineWidth: 1,
-                done: () => console.log('done', seq++)
+                lineWidth: 1
             },
             time: 14000,
             ease: [0, 0.9, 1]
@@ -157,8 +154,7 @@ export default (canvas, settings, debug) => {
                 wanderWeight: 0.002,
                 noiseSpeed: 0,
                 noiseScale: 2.125,
-                speedAlpha: 0,
-                done: () => console.log('done', seq++)
+                speedAlpha: 0
             },
             time: 17000,
             ease: [0, 0.9, 1]
@@ -168,9 +164,9 @@ export default (canvas, settings, debug) => {
                 ...defaultSettings,
                 showFlow: true,
                 flowWidth: 5,
-                done: () => console.log('done', seq++)
+                done: () => tendrils.clearView()
             },
-            time: 20000,
+            time: 19000,
             ease: [0, 0.9, 1]
         });
 
@@ -438,13 +434,16 @@ export default (canvas, settings, debug) => {
 
             if(key.match(/^<enter>$/)) {
                 self.prompt('Animation sequence:',
-                    JSON.stringify(sequencer.keyframes));
+                    JSON.stringify(sequencer.timeline.frames));
             }
             else if(key.match(/^<escape>$/)) {
                 tendrils.reset();
             }
             else if(key.match(/^<space>$/)) {
                 respawnCam();
+            }
+            else if(key.match(/^<backspace>$/)) {
+                sequencer.timer.reset();
             }
             else if(key.match(/^[A-Z]$/)) {
                 respawnFlow();
