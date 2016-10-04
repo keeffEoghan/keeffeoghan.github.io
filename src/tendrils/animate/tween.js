@@ -16,9 +16,13 @@ export const tweenValue = (a, b, t, ease) =>
  * tweened numbers in a given output object.
  */
 export const tweenProps = (a, b, t, ease, out = {}) =>
-    map((v, k) => ((isNumber(v))?
-                tweenValue(((k in a)? a[k] : out[k]), v, t, ease)
-            :   ((t < 1)? a[k] : v)),
+    map((v1, k) => {
+            const v0 = ((k in a)? a[k] : out[k]);
+
+            return ((isNumber(v1))?
+                    tweenValue(v0, v1, t, ease)
+                :   ((t < 1)? v0 : v1));
+        },
         b, out);
 
 /**
