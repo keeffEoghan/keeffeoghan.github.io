@@ -1,11 +1,8 @@
-import { reduceList } from './reduce';
-
 /**
  * Iterate an array-like object.
  * Similar to native, but with iteratee-first arguments.
  */
-export const eachList = (f, x) =>
-    reduceList((nil, v, i) => f(v, i, x), x, null);
+export const eachList = (f, x) => Array.prototype.forEach.call(x, f);
 
 /**
  * Iterate any type of object.
@@ -13,6 +10,6 @@ export const eachList = (f, x) =>
  * properties.
  */
 export const each = (f, any) =>
-    eachList((k, i) => f(any[k], k, any, i), Object.keys(any));
+    eachList((k, i, keys) => f(any[k], k, any, i, keys), Object.keys(any));
 
 export default each;
