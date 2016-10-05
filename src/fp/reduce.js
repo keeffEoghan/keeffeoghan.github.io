@@ -15,8 +15,9 @@ export const reduceList = (f, list, out) => ((out === undefined)?
  */
 export const reduce = (f, any, out) =>
     reduceList(((out === undefined)?
-                (acc, k, i) => f(((i)? acc : any[acc]), any[k], k, any, i)
-            :   (acc, k, i) => f(acc, any[k], k, any, i)),
+                (acc, k, i, keys) =>
+                    f(((i)? acc : any[acc]), any[k], k, any, i, keys)
+            :   (acc, k, i, keys) => f(acc, any[k], k, any, i, keys)),
         Object.keys(any), out);
 
 export default reduce;

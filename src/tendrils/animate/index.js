@@ -14,21 +14,24 @@ export class Sequencer {
         this.timeline = new Timeline(frames);
     }
 
-    easeTo(align, ...frame) {
-        const f = this.timeline.add(...frame);
+    play(time, out = {}) {
+        const span = this.timeline.play(time);
 
-        // If there's a previous frame, ease smoothly from it.
-        if(f > 0) {
-            const added = this.timeline.frames[f];
+        if(span) {
+            if(this.timeline.within(time)) {
+                tween(span, out);
+            }
 
-            const ease = ((added.ease && added.ease.length)?
-                    added.ease : [0, 1]);
-
-            ease.splice(1, 0, joinCurve(this.timeline.frames[f-1].ease, align));
-            added.ease = ease;
+            if(span.apply) {
+                map((v) => ((isFunction(v))? v() : v), span.apply, out);
+            }
         }
 
-        return this;
+        return out;
+    }
+
+    easeTo(align, ...frame) {
+        return this.easeJoin(this.timeline.add(...frame), align);
     }
 
     smoothTo(...frame) {
@@ -39,18 +42,31 @@ export class Sequencer {
         return this.easeTo(-1, ...frame);
     }
 
-    play(time, out = {}) {
-        const span = this.timeline.play(time);
+    easeOver(duration, align, ...frame) {
+        return this.easeJoin(this.timeline.addSpan(duration, ...frame), align);
+    }
 
-        if(this.timeline.within(time)) {
-            tween(span, out);
+    smoothOver(duration, ...frame) {
+        return this.easeOver(1, ...frame);
+    }
+
+    flipOver(duration, ...frame) {
+        return this.easeOver(-1, ...frame);
+    }
+
+    // If there's a previous frame, ease smoothly from it.
+    easeJoin(f, align) {
+        if(f > 0) {
+            const frame = this.timeline.frames[f];
+
+            const ease = ((frame.ease && frame.ease.length)?
+                    frame.ease : [0, 1]);
+
+            ease.splice(1, 0, joinCurve(this.timeline.frames[f-1].ease, align));
+            frame.ease = ease;
         }
 
-        if(span.apply) {
-            map((v) => ((isFunction(v))? v() : v), span.apply, out);
-        }
-
-        return out;
+        return this;
     }
 }
 

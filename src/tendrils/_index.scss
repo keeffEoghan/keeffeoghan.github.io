@@ -11,3 +11,17 @@ canvas {
 .hue-field {
     width: 13px !important;
 }
+
+.npm-scb-wrap.open {
+    .npm-scb-now-playing {
+        opacity: 0;
+    }
+
+    .npm-scb-inner {
+        top: 0;
+    }
+}
+
+.track {
+    margin: 1em;
+}

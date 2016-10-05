@@ -4,7 +4,7 @@
  * the previously accumulated arguments.
  */
 export const part = (f) => (...rest) =>
-    ((rest.length)? part(() => f(...rest)) : f());
+    ((rest.length)? part((...next) => f(...rest, ...next)) : f());
 
 /**
  * Returns a wrap of the function `f`, which accumulates the arguments of each
@@ -13,7 +13,8 @@ export const part = (f) => (...rest) =>
  */
 export const curry = (f, arity = f.length) => (...rest) =>
     ((arity > rest.length)?
-        curry(() => f(...rest), arity-rest.length)
+        curry((...next) => f(...rest, ...next), arity-rest.length)
     :   f(...rest));
+
 
 export default part;
