@@ -37,10 +37,11 @@ export const within = (a, b, time) => {
  * An always time-sorted array of frames.
  */
 export class Timeline {
-    constructor(frames = []) {
+    constructor(frames = [], symmetric = true) {
         this.frames = sort([...frames]);
 
-        // The playhead, current position and frames on the timeline (if valid).
+        // The playhead: time, current in-between position, and pair of frames
+        // on the timeline (if valid).
         this.time = 0;
         this.gap = -1;
         this.span = undefined;
@@ -51,8 +52,11 @@ export class Timeline {
          * If not, frames are reached by the same ease, forwards or backwards;
          * the destination frame's ease is used.
          */
-        this.symmetric = true;
+        this.symmetric = symmetric;
     }
+
+
+    // Keyframes - changing and ordering
 
     add(frame, ...rest) {
         if(rest.length) {
@@ -68,14 +72,22 @@ export class Timeline {
         }
     }
 
+    addSpan(duration, ...rest) {
+        const f = this.add(...rest);
+
+        if(duration) {
+            this.add(null, this.frames[f].time-duration);
+        }
+
+        return f;
+    }
+
     splice(frames) {
         return each((frame) => this.add(frame), frames);
     }
 
-    duration() {
-        return ((this.frames.length)?
-            this.frames[this.frames.length-1].time : 0);
-    }
+
+    // Playback - changing state
 
     seek(time) {
         if(this.valid() && within(this.span.a, this.span.b, time)) {
@@ -128,14 +140,19 @@ export class Timeline {
         return span;
     }
 
-    valid(gap = this.gap, span = this.span) {
-        return (gap > 0 && span);
+    setSpanGapAt(time) {
+        const gap = this.gapAt(time);
+
+        this.span = this.spanGapAt(time, gap, this.span);
+        this.gap = gap;
+        this.time = time;
     }
+
+
+    // Querying state
 
     gapAt(time) {
         if(this.frames.length < 2) {
-            console.warn('Timeline: Need at least 2 frames to animate between.');
-
             return -1;
         }
         else {
@@ -148,40 +165,53 @@ export class Timeline {
     }
 
     spanGapAt(time, gap = this.gapAt(time), out = {}) {
-        let a = this.frames[Math.floor(gap)];
-        let b = this.frames[Math.ceil(gap)];
+        if(gap >= 0) {
+            let a = this.frames[Math.floor(gap)];
+            let b = this.frames[Math.ceil(gap)];
 
-        if(!this.symmetric && time < this.time) {
-            let swap = a;
+            if(!this.symmetric && time < this.time) {
+                let swap = a;
 
-            a = b;
-            b = swap;
+                a = b;
+                b = swap;
+            }
+
+            out.a = a.to;
+            out.b = b.to;
+            out.t = offset(a, b, time);
+            out.ease = b.ease;
         }
-
-        out.a = a.to;
-        out.b = b.to;
-        out.t = offset(a, b, time);
-        out.ease = b.ease;
+        else {
+            out = undefined;
+        }
 
         return out;
     }
 
-    setSpanGapAt(time) {
-        const gap = this.gapAt(time);
+    valid(gap = this.gap, span = this.span) {
+        return (gap > 0 && span);
+    }
 
-        this.span = this.spanGapAt(time, gap, this.span);
-        this.gap = gap;
-        this.time = time;
+
+    // Time
+
+    start() {
+        return ((this.frames.length)? this.frames[0].time : 0);
+    }
+
+    end() {
+        return ((this.frames.length)?
+            this.frames[this.frames.length-1].time : 0);
+    }
+
+    duration() {
+        return this.start()-this.end();
     }
 
     within(time) {
         return ((this.frames.length < 2)?
                 false
             :   within(this.frames[0], this.frames[this.frames.length-1], time));
-    }
-
-    reset(frames) {
-        this.constructor(frames);
     }
 }
 

@@ -20,7 +20,6 @@ import Timer from './timer';
 
 import { Tendrils, defaults, glSettings } from './';
 
-import { step } from '../utils';
 
 import * as spawnPixels from './spawn/pixels';
 import spawnPixelsFlowFrag from './spawn/pixels/flow.frag';
@@ -35,6 +34,11 @@ import { makeLog, makeOrderLog } from './data-log';
 import { orderLogRates, peak, sum, mean, weightedMean } from './analyse';
 
 import Sequencer from './animate';
+
+import { curry } from '../fp/partial';
+import each from '../fp/each';
+import reduce from '../fp/reduce';
+import { step } from '../utils';
 
 const queries = querystring.parse(location.search.slice(1));
 
@@ -73,104 +77,13 @@ export default (canvas, settings, debug) => {
         micLoudAt: 5
     };
 
+    let track;
+
     const audioState = {...audioDefaults};
 
-    const sequencer = (new Sequencer())
-        .smoothTo({
-            to: {
-                ...defaultSettings,
-                showFlow: false,
-                noiseSpeed: 0.00001,
-                noiseScale: 60,
-                forceWeight: 0.014,
-                wanderWeight: 0.0021,
-                speedAlpha: 0.000002,
-                color: [0, 0, 0, 0.1],
-                baseColor: [1, 1, 1, 0.01],
-            },
-            time: 3000,
-            ease: [0, 0.9, 1]
-        })
-        .smoothTo({
-            to: {
-                noiseSpeed: 0.00001,
-                noiseScale: 18,
-                forceWeight: 0.014,
-                wanderWeight: 0.0021,
-                speedAlpha: 0.000002
-            },
-            time: 5000,
-            ease: [0, 0.3, 1]
-        })
-        .smoothTo({
-            to: {
-                flowDecay: 0,
-                noiseSpeed: 0,
-                noiseScale: 18,
-                forceWeight: 0.015,
-                wanderWeight: 0.0023,
-                speedAlpha: 0.00005,
-                lineWidth: 3
-            },
-            time: 9000,
-            ease: [0, 1.1, 1]
-        })
-        .smoothTo({
-            to: {
-                flowWeight: 0,
-                wanderWeight: 0.002,
-                noiseSpeed: 0,
-                noiseScale: 20,
-                speedAlpha: 0
-            },
-            time: 11000,
-            ease: [0, 0.9, 1]
-        })
-        .smoothTo({
-            to: {
-                noiseSpeed: 0.00001,
-                noiseScale: 60,
-                forceWeight: 0.014,
-                wanderWeight: 0.0021,
-                speedAlpha: 0.000002
-            },
-            time: 15000
-        })
-        .smoothTo({
-            to: {
-                flowDecay: defaultSettings.flowDecay,
-                flowWeight: 1,
-                wanderWeight: 0.002,
-                noiseSpeed: 0,
-                noiseScale: 2.125,
-                speedAlpha: 0,
-                lineWidth: 1
-            },
-            time: 14000,
-            ease: [0, 0.9, 1]
-        })
-        .smoothTo({
-            to: {
-                wanderWeight: 0.002,
-                noiseSpeed: 0,
-                noiseScale: 2.125,
-                speedAlpha: 0
-            },
-            time: 17000,
-            ease: [0, 0.9, 1]
-        })
-        .smoothTo({
-            to: {
-                ...defaultSettings,
-                showFlow: true,
-                flowWidth: 5,
-                done: () => tendrils.clearView()
-            },
-            time: 19000,
-            ease: [0, 0.9, 1]
-        });
+    const sequencer = new Sequencer();
 
-    sequencer.timer = new Timer();
+    sequencer.timer = new Timer(0);
 
     // const frames = sequencer.timeline.frames;
     //
@@ -179,12 +92,14 @@ export default (canvas, settings, debug) => {
 
     const gl = glContext(canvas, glSettings, () => {
             const now = Date.now();
-            const dt = timer.tick(now);
+            const dt = timer.tick(now).dt;
 
-            sequencer.timer.tick(now);
-            sequencer.play(sequencer.timer.time, tendrils.state);
+            if(track && track.currentTime >= 0) {
+                sequencer.timer.tick(track.currentTime*1000);
+                sequencer.play(sequencer.timer.time, tendrils.state);
+            }
 
-            tendrils.draw(dt);
+            tendrils.draw();
 
             gl.viewport(0, 0, ...tendrils.flow.shape);
 
@@ -376,11 +291,13 @@ export default (canvas, settings, debug) => {
     // Track setup
 
     const setupTrack = (src, el = document.body) => {
-        let track = Object.assign(new Audio(), {
+        track = Object.assign(new Audio(), {
                 crossOrigin: 'Anonymous',
                 src: src,
                 controls: true
             });
+
+        track.classList.add('track');
 
         // @todo Stereo: true
 
@@ -414,48 +331,13 @@ export default (canvas, settings, debug) => {
                 }
                 else {
                     setupTrack(src, el.querySelector('.npm-scb-info'));
+                    el.querySelector('.npm-scb-wrap').classList.add('open');
                 }
             });
     }
     else {
         setupTrack(audioState.trackURL, canvas.parentElement);
     }
-
-
-    // Keyboard mash!
-    /**
-     * @todo Smash in some shapes, flow inputs, colour inputs (discrete forms).
-     * @todo Increment/decrement state values by various amounts.
-     * @todo Use the above to play the visuals and set keyframes in real time?
-     */
-
-    document.body.addEventListener('keydown', (e) => {
-            const key = vkey[e.keyCode];
-
-            if(key.match(/^<enter>$/)) {
-                self.prompt('Animation sequence:',
-                    JSON.stringify(sequencer.timeline.frames));
-            }
-            else if(key.match(/^<escape>$/)) {
-                tendrils.reset();
-            }
-            else if(key.match(/^<space>$/)) {
-                respawnCam();
-            }
-            else if(key.match(/^<backspace>$/)) {
-                sequencer.timer.reset();
-            }
-            else if(key.match(/^[A-Z]$/)) {
-                respawnFlow();
-            }
-            else if(key.match(/^[0-9]$/)) {
-                respawnFastest();
-            }
-            else {
-                restart();
-            }
-        },
-        false);
 
 
     function resize() {
@@ -469,8 +351,103 @@ export default (canvas, settings, debug) => {
 
 
     tendrils.setup();
-    tendrils.resetParticles();
     resetSpawner.respawn(tendrils);
+
+
+    // Test sequence.
+    // sequencer.smoothTo({
+    //         to: {
+    //             ...defaultSettings,
+    //             showFlow: false,
+    //             noiseSpeed: 0.00001,
+    //             noiseScale: 60,
+    //             forceWeight: 0.014,
+    //             wanderWeight: 0.0021,
+    //             speedAlpha: 0.000002,
+    //             color: [0, 0, 0, 0.1],
+    //             baseColor: [1, 1, 1, 0.01],
+    //         },
+    //         time: 3000,
+    //         ease: [0, 0.9, 1]
+    //     })
+    //     .smoothTo({
+    //         to: {
+    //             noiseSpeed: 0.00001,
+    //             noiseScale: 18,
+    //             forceWeight: 0.014,
+    //             wanderWeight: 0.0021,
+    //             speedAlpha: 0.000002
+    //         },
+    //         time: 5000,
+    //         ease: [0, 0.3, 1]
+    //     })
+    //     .smoothTo({
+    //         to: {
+    //             flowDecay: 0,
+    //             noiseSpeed: 0,
+    //             noiseScale: 18,
+    //             forceWeight: 0.015,
+    //             wanderWeight: 0.0023,
+    //             speedAlpha: 0.00005,
+    //             lineWidth: 3
+    //         },
+    //         time: 9000,
+    //         ease: [0, 1.1, 1]
+    //     })
+    //     .smoothTo({
+    //         to: {
+    //             flowWeight: 0,
+    //             wanderWeight: 0.002,
+    //             noiseSpeed: 0,
+    //             noiseScale: 20,
+    //             speedAlpha: 0
+    //         },
+    //         time: 11000,
+    //         ease: [0, 0.9, 1]
+    //     })
+    //     .smoothTo({
+    //         to: {
+    //             noiseSpeed: 0.00001,
+    //             noiseScale: 60,
+    //             forceWeight: 0.014,
+    //             wanderWeight: 0.0021,
+    //             speedAlpha: 0.000002
+    //         },
+    //         time: 15000
+    //     })
+    //     .smoothTo({
+    //         to: {
+    //             flowDecay: defaultSettings.flowDecay,
+    //             flowWeight: 1,
+    //             wanderWeight: 0.002,
+    //             noiseSpeed: 0,
+    //             noiseScale: 2.125,
+    //             speedAlpha: 0,
+    //             lineWidth: 1
+    //         },
+    //         time: 14000,
+    //         ease: [0, 0.9, 1]
+    //     })
+    //     .smoothTo({
+    //         to: {
+    //             wanderWeight: 0.002,
+    //             noiseSpeed: 0,
+    //             noiseScale: 2.125,
+    //             speedAlpha: 0
+    //         },
+    //         time: 17000,
+    //         ease: [0, 0.9, 1]
+    //     })
+    //     .smoothTo({
+    //         to: {
+    //             ...defaultSettings,
+    //             showFlow: true,
+    //             flowWidth: 5,
+    //             done: restart
+    //         },
+    //         time: 19000,
+    //         ease: [0, 0.9, 1]
+    //     });
 
 
     if(debug) {
@@ -506,13 +483,6 @@ export default (canvas, settings, debug) => {
                     control.onFinishChange((n) => {
                         tendrils.setup(n);
                         restart();
-                    });
-                }
-
-                if(s === 'respawnAmount') {
-                    control.onFinishChange((n) => {
-                        tendrils.setupRespawn(state.rootNum, n);
-                        tendrils.setupSpawnCache();
                     });
                 }
             }
@@ -566,8 +536,9 @@ export default (canvas, settings, debug) => {
         // Time
 
         const timeGUI = gui.addFolder('time');
+        const timeSettings = ['paused', 'step', 'rate', 'end', 'loop'];
 
-        ['paused', 'step', 'rate'].forEach((t) => timeGUI.add(timer, t));
+        timeSettings.forEach((t) => timeGUI.add(timer, t));
 
 
         // Audio
@@ -603,8 +574,6 @@ export default (canvas, settings, debug) => {
         // Controls
 
         const controllers = {
-                cyclingColor: false,
-
                 clear: () => tendrils.clear(),
                 clearView: () => tendrils.clearView(),
                 clearFlow: () => tendrils.clearFlow(),
@@ -622,26 +591,6 @@ export default (canvas, settings, debug) => {
         for(let c in controllers) {
             controlsGUI.add(controllers, c);
         }
-
-
-        const cycleColor = () => {
-            if(controllers.cyclingColor) {
-                Object.assign(colorGUI, {
-                    alpha: 0.2,
-                    color: [
-                        Math.sin(Date.now()*0.009)*200,
-                        100+Math.sin(Date.now()*0.006)*155,
-                        200+Math.sin(Date.now()*0.003)*55
-                    ]
-                });
-
-                convertColor();
-            }
-
-            requestAnimationFrame(cycleColor);
-        }
-
-        cycleColor();
 
 
         // Presets
@@ -688,8 +637,7 @@ export default (canvas, settings, debug) => {
                         flowDecay: 0.0005,
                         forceWeight: 0.015,
                         wanderWeight: 0,
-                        speedAlpha: 0,
-                        respawnAmount: 0.03,
+                        speedAlpha: 0
                     });
 
                 Object.assign(resetSpawner.uniforms, {
@@ -736,15 +684,6 @@ export default (canvas, settings, debug) => {
                         alpha: 0.8,
                         color: [55, 155, 255]
                     });
-            },
-            'Mad styles'() {
-                Object.assign(state, {
-                        showFlow: false
-                    });
-
-                Object.assign(colorGUI);
-
-                controllers.cyclingColor = true;
             },
             'Ghostly'() {
                 Object.assign(state, {
@@ -807,20 +746,6 @@ export default (canvas, settings, debug) => {
                         alpha: 0.03,
                         color: [50, 255, 50]
                     });
-            },
-            'Hairy'() {
-                Object.assign(state, {
-                        flowDecay: 0.001,
-                        wanderWeight: 0.002,
-                        speedAlpha: 0
-                    });
-
-                Object.assign(colorGUI, {
-                        alpha: 0.9,
-                        color: [255, 150, 255],
-                        baseAlpha: 0.005,
-                        baseColor: [0, 0, 0]
-                    });
             }
         };
 
@@ -829,13 +754,12 @@ export default (canvas, settings, debug) => {
             Object.assign(resetSpawner.uniforms, resetSpawnerDefaults);
             Object.assign(flowPixelState, flowPixelDefaults);
             Object.assign(colorGUI, colorDefaults);
-            controllers.cyclingColor = false;
 
             presetter();
 
-            controllers.restart();
             updateGUI();
             convertColor();
+            restart();
         };
 
         for(let p in presetters) {
@@ -844,5 +768,260 @@ export default (canvas, settings, debug) => {
         }
 
         presetters['Rorschach']();
+
+
+        // Export
+
+        const fullState = () => ({
+                state,
+                respawn: {
+                    ...resetSpawner.uniforms,
+                    scale: flowPixelState.scale
+                },
+                time: reduce((acc, k) => {
+                        acc[k] = timer[k];
+
+                        return acc;
+                    },
+                    timeSettings, {}),
+                audio: audioState
+            });
+
+        const keyframe = (to = { ...state }) => sequencer.smoothTo({
+            to,
+            time: sequencer.timer.time,
+            ease: [0, 1, 1]
+        });
+
+        const exporters = {
+            keyframe,
+            showState: () =>
+                self.prompt('Current state:', JSON.stringify(fullState())),
+            showFrames: () =>
+                self.prompt('Animation sequence:',
+                    JSON.stringify(sequencer.timeline.frames))
+        };
+
+        each((f, e) => gui.add(exporters, e), exporters);
+
+
+        // Keyboard mash!
+        /**
+         * Assign modifiers to keys:
+         * - Hold down a letter key to select a setting:
+         *     - Up/down key to raise/lower it a little.
+         *     - Left/right key to raise/lower it a lot.
+         *     - Backspace to reset it to its default.
+         *     - Release it to record a frame.
+         * - Spacebar for cam.
+         * - Shift/ctrl/cmd for spawning.
+         * - Numbers for presets.
+         * - Symbols for smashing shapes/colours into the flow.
+         *
+         * Tween these with a default ease and duration (keyframe pair).
+         * Edit the timeline for each setting, saving the settings on each
+         * change into a keyframe (pair with default duration).
+         *
+         * @todo Playing with some functional stuff here, looks pretty mad.
+         * @todo Smash in some shapes, flow inputs, colour inputs (discrete forms).
+         * @todo Increment/decrement state values by various amounts.
+         * @todo Use the above to play the visuals and set keyframes in real time?
+         */
+        (() => {
+            // Quick track control
+
+            const togglePlay = (play = track.paused) =>
+                ((play)? track.play() : track.pause());
+
+            const scrub = (by) => {
+                track.currentTime += by;
+                togglePlay(true);
+            };
+
+
+            // Minimal keyframes.
+
+            const changed = (past, next) => reduce((diff, v, k) => {
+                    let out;
+
+                    if(v !== past[k]) {
+                        out = (diff || {});
+                        out[k] = v;
+                    }
+
+                    return (out || diff);
+                },
+                next, null);
+
+            const keyframeEdits = (edits, past, state) => {
+                const diff = changed(past, state);
+                let f = null;
+
+                if(diff) {
+                    f = keyframe(diff);
+                    Object.assign(past, diff);
+                }
+
+                return f;
+            };
+
+
+            // Invoke the functions for each setting being edited.
+            const resetEach = curry(each)((x) => (x.reset && x.reset()));
+            const adjustEach = curry((by, all) =>
+                    each((x) => (x.adjust && x.adjust(by)), all));
+
+
+            // Common case for editing a given setting.
+
+            const copy = (into, source, key) => into[key] = source[key];
+            const copier = curry(copy, copy.length+1);
+
+            const adjust = (into, key, scale, by) => into[key] += scale*by;
+            const adjuster = curry(adjust);
+
+            const flip = (into, key) => into[key] = !into[key];
+            const flipper = curry(flip, flip.length+1);
+
+
+            // Shorthands
+
+            const stateCopy = copier(state, defaultSettings);
+            const stateEdit = adjuster(state);
+            const stateFlip = flipper(state);
+
+            const stateBool = (key) => ({
+                reset: stateCopy(key),
+                go: stateFlip(key)
+            });
+
+            const stateNum = (key, scale) => ({
+                reset: stateCopy(key),
+                adjust: stateEdit(key, scale)
+            });
+
+
+            const editing = {};
+            const past = { ...state };
+
+            /**
+             * @todo Inputs for the other things in `fullState`, controls, and
+             *       presets.
+             */
+            const editMap = {
+                '<tab>': {
+                    reset: () => {
+                        tendrils.setup(defaultSettings.rootNum);
+                        restart();
+                    },
+                    adjust: (by) => {
+                        tendrils.setup(state.rootNum*Math.pow(2, by));
+                        restart();
+                    }
+                },
+
+                'P': stateBool('autoClearView'),
+                'O': stateBool('showFlow'),
+
+                'Z': stateNum('damping', 0.002),
+                'X': stateNum('minSpeed', 0.0001),
+                'C': stateNum('maxSpeed', 0.0001),
+
+                'Q': stateNum('forceWeight', 0.002),
+                'A': stateNum('flowWeight', 0.002),
+                'W': stateNum('wanderWeight', 0.002),
+
+                'S': stateNum('flowDecay', 0.002),
+                'D': stateNum('flowWidth', 0.002),
+
+                'E': stateNum('noiseScale', 0.002),
+                'R': stateNum('noiseSpeed', 0.002),
+
+                // 'V': stateNum('color', 0.002),
+                // 'B': stateNum('baseColor', 0.002),
+
+                'H': stateNum('fadeAlpha', 0.002),
+                'G': stateNum('speedAlpha', 0.002),
+                'F': stateNum('lineWidth', 0.002)
+            };
+
+            const callMap = {
+                // Adjust selected
+                '<up>': adjustEach(1),
+                '<down>': adjustEach(-1),
+                '<right>': adjustEach(5),
+                '<left>': adjustEach(-5),
+
+                // Reset selected back to defaults
+                '<backspace>': resetEach,
+                '<escape>': () => resetEach(editMap),
+
+                '<space>': () => togglePlay(),
+                ',': () => scrub(-2),
+                '.': () => scrub(2),
+
+                ']': keyframeEdits,
+                '<enter>': (editing, past, state) => {
+                    keyframeEdits(editing, past, state);
+                    scrub(-2);
+                }
+            };
+
+
+            // @todo Throttle so multiple states can go into one keyframe.
+            document.body.addEventListener('keydown', (e) => {
+                    const key = vkey[e.keyCode];
+                    const mapped = editMap[key];
+
+                    if(mapped && !editing[key]) {
+                        editing[key] = mapped;
+
+                        if(mapped.go) {
+                            mapped.go(editing, past, state);
+                        }
+                    }
+
+                    const call = callMap[key];
+
+                    if(call) {
+                        call(editing, past, state);
+                    }
+
+                    // if(key.match(/^<enter>$/)) {
+                    //     exporters.showFrames();
+                    // }
+                    // else if(key.match(/^<escape>$/)) {
+                    //     tendrils.reset();
+                    // }
+                    // else if(key.match(/^<space>$/)) {
+                    //     respawnCam();
+                    // }
+                    // else if(key.match(/^<backspace>$/)) {
+                    //     sequencer.timer.reset();
+                    // }
+                    // else if(key.match(/^[A-Z]$/)) {
+                    //     respawnFlow();
+                    // }
+                    // else if(key.match(/^[0-9]$/)) {
+                    //     respawnFastest();
+                    // }
+                    // else {
+                    //     restart();
+                    // }
+                },
+                false);
+
+            document.body.addEventListener('keyup', (e) => {
+                    const key = vkey[e.keyCode];
+                    const mapped = editMap[key];
+
+                    if(mapped && editing[key]) {
+                        keyframeEdits(editing, past, state);
+                        editing[key] = null;
+                        delete editing[key];
+                    }
+                },
+                false);
+        })();
     }
 };
