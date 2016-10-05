@@ -31,4 +31,10 @@ canvas { display: block; position: fixed; top: 0; left: 0; bottom: 0; right: 0; 
 /* Quick fix for a broken DAT.GUI style */
 .hue-field { width: 13px !important; }
 
+.npm-scb-wrap.open .npm-scb-now-playing { opacity: 0; }
+
+.npm-scb-wrap.open .npm-scb-inner { top: 0; }
+
+.track { margin: 1em; }
+
 /*# sourceMappingURL=tendrils.css.map */
