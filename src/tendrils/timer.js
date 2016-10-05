@@ -1,5 +1,5 @@
 export class Timer {
-    constructor(since, now) {
+    constructor(now, since) {
         this.time = 0;
         this.since = 0;
 
@@ -11,10 +11,10 @@ export class Timer {
         this.dt = 0;
 
         this.paused = false;
-        this.end = false;
+        this.end = -1;
         this.loop = false;
 
-        this.reset(since, now);
+        this.reset(now, since);
     }
 
     now(now = Date.now()) {
@@ -40,7 +40,7 @@ export class Timer {
             this.offset += dt;
             dt = 0;
         }
-        else if(this.end === false) {
+        else if(this.end < 0) {
             this.time = time;
         }
         else if(this.loop) {
@@ -54,13 +54,28 @@ export class Timer {
             }
         }
 
-        return this.dt = dt;
-        // return this.dt = Math.abs(dt);
+        this.dt = dt;
+
+        return this;
     }
 
-    reset(since = Date.now(), now = since) {
-        this.since = this.offset = since;
+    seek(to) {
+        this.offset = -to;
+
+        return this;
+    }
+
+    scrub(by) {
+        this.offset -= by;
+
+        return this;
+    }
+
+    reset(now = Date.now(), since = now) {
         this.time = this.now(now);
+        this.since = this.offset = since;
+
+        return this;
     }
 }
 
