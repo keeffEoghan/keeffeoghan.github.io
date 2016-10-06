@@ -37,8 +37,8 @@ export const within = (a, b, time) => {
  * An always time-sorted array of frames.
  */
 export class Timeline {
-    constructor(frames = [], symmetric = true) {
-        this.frames = sort([...frames]);
+    constructor(frames, symmetric = true) {
+        this.frames = this.setup(frames);
 
         // The playhead: time, current in-between position, and pair of frames
         // on the timeline (if valid).
@@ -57,6 +57,10 @@ export class Timeline {
 
 
     // Keyframes - changing and ordering
+
+    setup(frames = []) {
+        return this.frames = sort([...frames]);
+    }
 
     add(frame, ...rest) {
         if(rest.length) {
