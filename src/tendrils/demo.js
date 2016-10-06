@@ -38,18 +38,19 @@ import Sequencer from './animate';
 import { curry } from '../fp/partial';
 import each from '../fp/each';
 import reduce from '../fp/reduce';
+import filter from '../fp/filter';
 import { step } from '../utils';
-
-const queries = querystring.parse(location.search.slice(1));
-
-const defaultSettings = defaults().state;
 
 export default (canvas, settings, debug) => {
     if(redirect()) {
         return;
     }
 
-    const timer = new Timer();
+    const queries = querystring.parse(location.search.slice(1));
+    const defaultSettings = defaults();
+    const defaultState = defaultSettings.state;
+
+    const timer = defaultSettings.timer;
 
     let tendrils;
 
@@ -91,8 +92,7 @@ export default (canvas, settings, debug) => {
     // sequencer.timer.loop = true;
 
     const gl = glContext(canvas, glSettings, () => {
-            const now = Date.now();
-            const dt = timer.tick(now).dt;
+            const dt = timer.tick().dt;
 
             if(track && track.currentTime >= 0) {
                 sequencer.timer.tick(track.currentTime*1000);
@@ -357,7 +357,7 @@ export default (canvas, settings, debug) => {
     // Test sequence.
     // sequencer.smoothTo({
     //         to: {
-    //             ...defaultSettings,
+    //             ...defaultState,
     //             showFlow: false,
     //             noiseSpeed: 0.00001,
     //             noiseScale: 60,
@@ -417,7 +417,7 @@ export default (canvas, settings, debug) => {
     //     })
     //     .smoothTo({
     //         to: {
-    //             flowDecay: defaultSettings.flowDecay,
+    //             flowDecay: defaultState.flowDecay,
     //             flowWeight: 1,
     //             wanderWeight: 0.002,
     //             noiseSpeed: 0,
@@ -440,7 +440,7 @@ export default (canvas, settings, debug) => {
     //     })
     //     .smoothTo({
     //         to: {
-    //             ...defaultSettings,
+    //             ...defaultState,
     //             showFlow: true,
     //             flowWidth: 5,
     //             done: restart
@@ -455,8 +455,6 @@ export default (canvas, settings, debug) => {
 
         gui.domElement.addEventListener('keydown', (e) => e.stopPropagation());
 
-        gui.close();
-
         function updateGUI(node = gui) {
             if(node.__controllers) {
                 node.__controllers.forEach((control) => control.updateDisplay());
@@ -466,6 +464,85 @@ export default (canvas, settings, debug) => {
                 updateGUI(node.__folders[f]);
             }
         }
+
+        function toggleGUI(open, node = gui) {
+            ((open)? node.open() : node.close());
+
+            for(let f in node.__folders) {
+                toggleGUI(open, node.__folders[f]);
+            }
+        }
+
+
+        // Import/export
+
+        const timeSettings = ['paused', 'step', 'rate', 'end', 'loop'];
+
+        const full = {
+            get state() {
+                return {
+                        state,
+                        respawn: resetSpawner.uniforms,
+                        flow: {
+                            scale: flowPixelState.scale
+                        },
+                        time: filter((v, k) => k in timer, timeSettings, {}),
+                        audio: audioState
+                    };
+            },
+
+            set state(fullState) {
+                Object.assign(state, fullState.state);
+                Object.assign(resetSpawner.uniforms, fullState.respawn);
+                Object.assign(flowPixelState, fullState.flow);
+                Object.assign(timer, fullState.time);
+                Object.assign(audioState, fullState.audio);
+
+                return fullState;
+            }
+        };
+
+        // @todo Sequencers for full state
+        const keyframe = (to = { ...state }) => sequencer.smoothTo({
+            to,
+            time: sequencer.timer.time,
+            ease: [0, 1, 1]
+        });
+
+        const exporters = {
+            editState: () => {
+                const stateDef = JSON.stringify(full.state);
+                const nextDef = self.prompt('Current state:', stateDef);
+
+                if(nextDef && stateDef !== nextDef) {
+                    try {
+                        full.state = JSON.parse(nextDef);
+                    }
+                    catch(e) {
+                        alert("Couldn't import state, unknown definition:", e);
+                    }
+
+                    updateGUI();
+                }
+            },
+            editSequence: () => {
+                const framesDef = JSON.stringify(sequencer.timeline.frames);
+                const nextDef = self.prompt('Animation sequence:', framesDef);
+
+                if(nextDef && framesDef !== nextDef) {
+                    try {
+                        sequencer.timeline.setup(JSON.parse(nextDef));
+                        track.currentTime = 0;
+                    }
+                    catch(e) {
+                        alert("Couldn't import frames, unknown definition:", e);
+                    }
+                }
+            },
+            keyframe
+        };
+
+        each((f, e) => gui.add(exporters, e), exporters);
 
 
         // Settings
@@ -499,18 +576,18 @@ export default (canvas, settings, debug) => {
                 baseAlpha: state.baseColor[3]
             };
 
-        const colorGUI = {...colorDefaults};
+        const colorProxy = {...colorDefaults};
 
         const convertColor = () => Object.assign(state, {
-            color: [...colorGUI.color.map((c) => c/255), colorGUI.alpha],
-            baseColor: [...colorGUI.baseColor.map((c) => c/255), colorGUI.baseAlpha]
+            color: [...colorProxy.color.map((c) => c/255), colorProxy.alpha],
+            baseColor: [...colorProxy.baseColor.map((c) => c/255), colorProxy.baseAlpha]
         });
 
-        settingsGUI.addColor(colorGUI, 'color').onChange(convertColor);
-        settingsGUI.add(colorGUI, 'alpha').onChange(convertColor);
+        settingsGUI.addColor(colorProxy, 'color').onChange(convertColor);
+        settingsGUI.add(colorProxy, 'alpha').onChange(convertColor);
 
-        settingsGUI.addColor(colorGUI, 'baseColor').onChange(convertColor);
-        settingsGUI.add(colorGUI, 'baseAlpha').onChange(convertColor);
+        settingsGUI.addColor(colorProxy, 'baseColor').onChange(convertColor);
+        settingsGUI.add(colorProxy, 'baseAlpha').onChange(convertColor);
 
         convertColor();
 
@@ -530,13 +607,17 @@ export default (canvas, settings, debug) => {
             speed: 0.005
         };
 
-        respawnGUI.add(flowPixelState, 'scale', Object.keys(flowPixelScales));
+
+        // Respawn
+
+        const reflowGUI = gui.addFolder('reflow');
+
+        reflowGUI.add(flowPixelState, 'scale', Object.keys(flowPixelScales));
 
 
         // Time
 
         const timeGUI = gui.addFolder('time');
-        const timeSettings = ['paused', 'step', 'rate', 'end', 'loop'];
 
         timeSettings.forEach((t) => timeGUI.add(timer, t));
 
@@ -609,9 +690,11 @@ export default (canvas, settings, debug) => {
                         speed: 0.01
                     });
 
-                Object.assign(colorGUI, {
+                Object.assign(colorProxy, {
                         alpha: 0.01,
-                        color: [255, 255, 255]
+                        color: [255, 255, 255],
+                        baseAlpha: Math.max(state.flowDecay, 0.05),
+                        baseColor: [0, 0, 0]
                     });
             },
             'Wings'() {
@@ -620,14 +703,14 @@ export default (canvas, settings, debug) => {
                         speed: 0
                     });
 
-                Object.assign(colorGUI);
+                Object.assign(colorProxy);
             },
             'Fluid'() {
                 Object.assign(state, {
                         autoClearView: true
                     });
 
-                Object.assign(colorGUI, {
+                Object.assign(colorProxy, {
                         alpha: 0.2,
                         color: [255, 255, 255]
                     });
@@ -641,11 +724,11 @@ export default (canvas, settings, debug) => {
                     });
 
                 Object.assign(resetSpawner.uniforms, {
-                        radius: 0.25,
-                        speed: 0.015
+                        radius: 0.4,
+                        speed: 0.15
                     });
 
-                Object.assign(colorGUI, {
+                Object.assign(colorProxy, {
                         alpha: 0.8,
                         color: [100, 200, 255],
                         baseAlpha: 0.1,
@@ -660,28 +743,32 @@ export default (canvas, settings, debug) => {
                         speedAlpha: 0
                     });
 
-                Object.assign(colorGUI, {
-                        alpha: 0.01,
-                        color: [255, 150, 0]
+                Object.assign(colorProxy, {
+                        alpha: 0.1,
+                        color: [255, 150, 0],
+                        baseAlpha: 0.005,
+                        baseColor: [0, 0, 0]
                     });
             },
             'Sea'() {
                 Object.assign(state, {
                         flowWidth: 5,
-                        forceWeight: 0.015,
-                        wanderWeight: 0.0014,
-                        flowDecay: 0.001,
+                        forceWeight: 0.013,
+                        wanderWeight: 0.002,
+                        flowDecay: 0.005,
                         speedAlpha: 0
                     });
 
                 Object.assign(resetSpawner.uniforms, {
-                        radius: 1,
+                        radius: 1.5,
                         speed: 0
                     });
 
-                Object.assign(colorGUI, {
-                        alpha: 0.8,
-                        color: [55, 155, 255]
+                Object.assign(colorProxy, {
+                        alpha: 0.1,
+                        color: [55, 155, 255],
+                        baseAlpha: 0.3,
+                        baseColor: [0, 58, 90]
                     });
             },
             'Ghostly'() {
@@ -689,7 +776,7 @@ export default (canvas, settings, debug) => {
                         flowDecay: 0
                     });
 
-                Object.assign(colorGUI, {
+                Object.assign(colorProxy, {
                         alpha: 0.006,
                         color: [255, 255, 255]
                     });
@@ -703,8 +790,8 @@ export default (canvas, settings, debug) => {
                         speedAlpha: 0.000002
                     });
 
-                Object.assign(colorGUI, {
-                        alpha: 0.9,
+                Object.assign(colorProxy, {
+                        alpha: 0.8,
                         color: [255, 10, 10],
                         baseAlpha: 0.01,
                         baseColor: [0, 0, 0]
@@ -723,7 +810,7 @@ export default (canvas, settings, debug) => {
                     scale: 'mirror xy'
                 });
 
-                Object.assign(colorGUI, {
+                Object.assign(colorProxy, {
                         alpha: 1,
                         color: [0, 0, 0],
                         baseAlpha: 0.01,
@@ -741,7 +828,7 @@ export default (canvas, settings, debug) => {
                         lineWidth: 3
                     });
 
-                Object.assign(colorGUI, {
+                Object.assign(colorProxy, {
                         alpha: 0.03,
                         color: [50, 255, 50]
                     });
@@ -749,10 +836,10 @@ export default (canvas, settings, debug) => {
         };
 
         const wrapPresetter = (presetter) => {
-            Object.assign(state, defaultSettings);
+            Object.assign(state, defaultState);
             Object.assign(resetSpawner.uniforms, resetSpawnerDefaults);
             Object.assign(flowPixelState, flowPixelDefaults);
-            Object.assign(colorGUI, colorDefaults);
+            Object.assign(colorProxy, colorDefaults);
 
             presetter();
 
@@ -769,39 +856,9 @@ export default (canvas, settings, debug) => {
         presetters['Rorschach']();
 
 
-        // Export
+        // Open or close
 
-        const fullState = () => ({
-                state,
-                respawn: {
-                    ...resetSpawner.uniforms,
-                    scale: flowPixelState.scale
-                },
-                time: reduce((acc, k) => {
-                        acc[k] = timer[k];
-
-                        return acc;
-                    },
-                    timeSettings, {}),
-                audio: audioState
-            });
-
-        const keyframe = (to = { ...state }) => sequencer.smoothTo({
-            to,
-            time: sequencer.timer.time,
-            ease: [0, 1, 1]
-        });
-
-        const exporters = {
-            keyframe,
-            showState: () =>
-                self.prompt('Current state:', JSON.stringify(fullState())),
-            showFrames: () =>
-                self.prompt('Animation sequence:',
-                    JSON.stringify(sequencer.timeline.frames))
-        };
-
-        each((f, e) => gui.add(exporters, e), exporters);
+        toggleGUI(true, gui);
 
 
         // Keyboard mash!
@@ -867,13 +924,13 @@ export default (canvas, settings, debug) => {
 
             // Invoke the functions for each setting being edited.
             const resetEach = (all) => {
-                    updateGUI();
                     each((x) => (x.reset && x.reset()), all);
+                    updateGUI();
                 };
 
             const adjustEach = curry((by, all) => {
-                    updateGUI();
                     each((x) => (x.adjust && x.adjust(by)), all);
+                    updateGUI();
                 });
 
 
@@ -891,7 +948,7 @@ export default (canvas, settings, debug) => {
 
             // Shorthands
 
-            const stateCopy = copier(state, defaultSettings);
+            const stateCopy = copier(state, defaultState);
             const stateEdit = adjuster(state);
             const stateFlip = flipper(state);
 
@@ -910,13 +967,15 @@ export default (canvas, settings, debug) => {
             const past = { ...state };
 
             /**
-             * @todo Inputs for the other things in `fullState`, controls, and
+             * @todo Inputs for the other things in full state, controls, and
              *       presets.
              */
             const editMap = {
-                '<tab>': {
+                // Avoid using 'H'
+
+                '`': {
                     reset: () => {
-                        tendrils.setup(defaultSettings.rootNum);
+                        tendrils.setup(defaultState.rootNum);
                         restart();
                     },
                     adjust: (by) => {
@@ -933,10 +992,10 @@ export default (canvas, settings, debug) => {
                 'C': stateNum('maxSpeed', 0.0001),
 
                 'Q': stateNum('forceWeight', 0.01),
-                'A': stateNum('flowWeight', 0.1),
+                'A': stateNum('flowWeight', 0.02),
                 'W': stateNum('wanderWeight', 0.0002),
 
-                'S': stateNum('flowDecay', 0.5),
+                'S': stateNum('flowDecay', 0.005),
                 'D': stateNum('flowWidth', 1),
 
                 'E': stateNum('noiseScale', 1),
@@ -946,29 +1005,41 @@ export default (canvas, settings, debug) => {
                 // 'B': stateNum('baseColor', 0.002),
 
                 'G': stateNum('speedAlpha', 0.002),
-                'F': stateNum('lineWidth', 1)
+                'F': stateNum('lineWidth', 0.1)
             };
 
             const callMap = {
-                // Adjust selected
-                '<up>': adjustEach(1),
+                '-': adjustEach(-0.1),
+                '=': adjustEach(0.1),
                 '<down>': adjustEach(-1),
-                '<right>': adjustEach(5),
+                '<up>': adjustEach(1),
                 '<left>': adjustEach(-5),
+                '<right>': adjustEach(5),
 
-                // Reset selected back to defaults
-                '<backspace>': resetEach,
                 '<escape>': () => resetEach(editMap),
+                '<backspace>': resetEach,
 
                 '<space>': () => togglePlay(),
                 ',': () => scrub(-2),
                 '.': () => scrub(2),
 
+                '[': () => scrub(-2),
                 ']': keyframeEdits,
-                '<enter>': (editing, past, state) => {
-                    keyframeEdits(editing, past, state);
+                '<enter>': (...rest) => {
+                    keyframeEdits(...rest);
                     scrub(-2);
-                }
+                },
+
+                '1': presetters['Wings'],
+                '2': presetters['Fluid'],
+                '3': presetters['Flow only'] ,
+                '4': presetters['Noise only'] ,
+                '5': presetters['Sea'],
+                '6': presetters['Ghostly'],
+                '7': presetters['Turbulence'],
+                '8': presetters['Rorschach'],
+                '9': presetters['Roots'],
+                '0': presetters['Flow']
             };
 
 
@@ -982,6 +1053,7 @@ export default (canvas, settings, debug) => {
 
                         if(mapped.go) {
                             mapped.go(editing, past, state);
+                            updateGUI();
                         }
                     }
 
@@ -992,7 +1064,7 @@ export default (canvas, settings, debug) => {
                     }
 
                     // if(key.match(/^<enter>$/)) {
-                    //     exporters.showFrames();
+                    //     exporters.editSequence();
                     // }
                     // else if(key.match(/^<escape>$/)) {
                     //     tendrils.reset();

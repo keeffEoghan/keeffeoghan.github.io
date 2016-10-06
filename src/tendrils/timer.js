@@ -6,7 +6,7 @@ export class Timer {
         this.offset = 0;
 
         this.rate = 1;
-        this.step = 0;
+        this.step = -1;
 
         this.dt = 0;
 
@@ -25,7 +25,7 @@ export class Timer {
         let time = this.time;
         let dt = 0;
 
-        if(this.step > 0) {
+        if(this.step >= 0) {
             dt = this.step*this.rate;
             time += dt;
         }
@@ -72,8 +72,8 @@ export class Timer {
     }
 
     reset(now = Date.now(), since = now) {
-        this.time = this.now(now);
         this.since = this.offset = since;
+        this.time = this.now(now);
 
         return this;
     }
