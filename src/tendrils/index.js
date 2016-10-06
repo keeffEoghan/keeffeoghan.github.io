@@ -25,7 +25,7 @@ import screenVert from './screen/index.vert';
 import screenFrag from './screen/index.frag';
 
 // @todo Try drawing a semi-transparent block over the last frame?
-import copyFadeFrag from './screen/copy-fade.frag';
+import copyFrag from './screen/copy.frag';
 
 
 export const defaults = () => ({
@@ -54,18 +54,18 @@ export const defaults = () => ({
         // @todo Move this to another module, doesn't need to be here
         baseColor: [0, 0, 0, 0],
 
-        fadeAlpha: -1,
         speedAlpha: 0.000001,
         lineWidth: 1
     },
     timer: Object.assign(new Timer(), {
             step: 1000/60
         }),
+    numBuffers: 0,
     logicShader: null,
     renderShader: [renderVert, renderFrag],
     flowShader: [flowVert, flowFrag],
     flowScreenShader: [flowScreenVert, flowFrag],
-    fadeShader: [screenVert, copyFadeFrag]
+    copyShader: [screenVert, copyFrag]
 });
 
 export const glSettings = {
@@ -91,10 +91,7 @@ export class Tendrils {
         /**
          * @todo May need more buffers/passes later?
          */
-        this.buffers = [
-            FBO(this.gl, [1, 1]),
-            FBO(this.gl, [1, 1])
-        ];
+        this.buffers = [];
 
         this.baseShader = shader(this.gl, screenVert, screenFrag);
 
@@ -112,9 +109,9 @@ export class Tendrils {
                 shader(this.gl, ...params.flowScreenShader)
             :   params.flowScreenShader);
 
-        this.fadeShader = ((Array.isArray(params.fadeShader))?
-                shader(this.gl, ...params.fadeShader)
-            :   params.fadeShader);
+        this.copyShader = ((Array.isArray(params.copyShader))?
+                shader(this.gl, ...params.copyShader)
+            :   params.copyShader);
 
         this.uniforms = {
                 render: {},
@@ -141,12 +138,17 @@ export class Tendrils {
     }
 
     setup(...rest) {
+        this.setupBuffers();
         this.setupParticles(...rest);
         this.reset();
+
+        return this;
     }
 
     reset() {
         this.respawn();
+
+        return this;
     }
 
     // @todo
@@ -155,10 +157,28 @@ export class Tendrils {
 
         delete this.particles;
         delete this.spawnCache;
+
+        return this;
     }
 
 
-    setupParticles(rootNum = this.state.rootNum) {
+    setupBuffers(numBuffers = 0) {
+        // Add any needed new buffers
+        while(this.buffers.length < numBuffers) {
+            this.buffers.push(FBO(this.gl, [1, 1]));
+        }
+
+        // Remove any unneeded old buffers
+        while(this.buffers.length > numBuffers) {
+            this.buffers.pop().dispose();
+        }
+
+        return this;
+    }
+
+    setupParticles(rootNum = this.state.rootNum, numBuffers = 2) {
+        this.state.rootNum = rootNum;
+
         const shape = [rootNum, rootNum];
 
         this.particles = new Particles(this.gl, {
@@ -175,7 +195,9 @@ export class Tendrils {
 
         this.logicShader = this.particles.logic;
 
-        this.particles.setup(this.state.numBuffers || 2);
+        this.particles.setup(numBuffers);
+
+        return this;
     }
 
 
@@ -184,6 +206,8 @@ export class Tendrils {
     clear() {
         this.clearView();
         this.clearFlow();
+
+        return this;
     }
 
     clearView() {
@@ -194,22 +218,26 @@ export class Tendrils {
 
         this.gl.bindFramebuffer(this.gl.FRAMEBUFFER, null);
         this.gl.clear(this.gl.COLOR_BUFFER_BIT);
+
+        return this;
     }
 
     clearFlow() {
         this.flow.bind();
         this.gl.clear(this.gl.COLOR_BUFFER_BIT);
+
+        return this;
     }
 
     restart() {
         this.clear();
         this.reset();
+
+        return this;
     }
 
     draw() {
-        const directDraw = this.directDraw();
-
-        this.resize(directDraw);
+        this.resize();
 
 
         // Physics
@@ -294,7 +322,7 @@ export class Tendrils {
         this.particles.render = this.renderShader;
         this.gl.lineWidth(Math.max(0, this.state.lineWidth));
 
-        if(directDraw) {
+        if(this.buffers.length === 0) {
             // Render the particles directly to the screen
 
             this.gl.bindFramebuffer(this.gl.FRAMEBUFFER, null);
@@ -311,12 +339,11 @@ export class Tendrils {
             this.buffers[0].bind();
             this.gl.clear(this.gl.COLOR_BUFFER_BIT);
 
-            // Copy and fade the last buffer into the current buffer
+            // Copy the last buffer into the current buffer
 
-            this.fadeShader.bind();
+            this.copyShader.bind();
 
-            Object.assign(this.fadeShader.uniforms, {
-                    opacity: this.state.fadeAlpha,
+            Object.assign(this.copyShader.uniforms, {
                     view: this.buffers[1].color[0].bind(1),
                     viewRes: this.viewRes
                 });
@@ -328,27 +355,22 @@ export class Tendrils {
             this.particles.draw(this.uniforms.render, this.gl.LINES);
 
 
-            // Copy and fade the current buffer to the screen
+            // Copy the current buffer to the screen
 
             this.gl.bindFramebuffer(this.gl.FRAMEBUFFER, null);
             this.gl.clear(this.gl.COLOR_BUFFER_BIT);
-
-            this.fadeShader.bind();
-
-            Object.assign(this.fadeShader.uniforms, {
-                    opacity: 1,
-                    view: this.buffers[0].color[0].bind(2),
-                    viewRes: this.viewRes
-                });
-
+            this.copyShader.bind();
+            this.copyShader.uniforms.view = this.buffers[0].color[0].bind(2);
             this.screen.render();
 
             // Step buffers
             step(this.buffers);
         }
+
+        return this;
     }
 
-    resize(directDraw = this.directDraw()) {
+    resize() {
         this.viewRes[0] = this.gl.drawingBufferWidth;
         this.viewRes[1] = this.gl.drawingBufferHeight;
 
@@ -356,9 +378,7 @@ export class Tendrils {
 
         // this.pow2Res.fill(nextPow2(Math.max(...this.viewRes)));
 
-        if(!directDraw) {
-            this.buffers.forEach((buffer) => buffer.shape = this.viewRes);
-        }
+        this.buffers.forEach((buffer) => buffer.shape = this.viewRes);
 
         // this.flow.shape = this.pow2Res;
         this.flow.shape = this.viewRes;
@@ -369,12 +389,8 @@ export class Tendrils {
          */
         // this.gl.viewport(0, 0, 1, 1);
         this.gl.viewport(0, 0, this.viewRes[0], this.viewRes[1]);
-    }
 
-
-    // @todo More specific, or derived from properties?
-    directDraw(state = this.state) {
-        return (state.autoClearView || state.fadeAlpha < 0);
+        return this;
     }
 
 
@@ -383,6 +399,8 @@ export class Tendrils {
     // Populate the particles with the given spawn function
     respawn(spawn = spawner) {
         this.particles.spawn(spawn);
+
+        return this;
     }
 
     // Respawn on the GPU using a given shader
@@ -407,6 +425,8 @@ export class Tendrils {
 
         this.gl.enable(this.gl.BLEND);
         this.gl.blendFunc(this.gl.SRC_ALPHA, this.gl.ONE_MINUS_SRC_ALPHA);
+
+        return this;
     }
 }
 

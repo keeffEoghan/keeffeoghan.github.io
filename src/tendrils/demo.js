@@ -671,7 +671,6 @@ export default (canvas, settings, debug) => {
                         forceWeight: 0.015,
                         wanderWeight: 0.0014,
                         flowDecay: 0.001,
-                        fadeAlpha: 10,
                         speedAlpha: 0
                     });
 
@@ -867,9 +866,15 @@ export default (canvas, settings, debug) => {
 
 
             // Invoke the functions for each setting being edited.
-            const resetEach = curry(each)((x) => (x.reset && x.reset()));
-            const adjustEach = curry((by, all) =>
-                    each((x) => (x.adjust && x.adjust(by)), all));
+            const resetEach = (all) => {
+                    updateGUI();
+                    each((x) => (x.reset && x.reset()), all);
+                };
+
+            const adjustEach = curry((by, all) => {
+                    updateGUI();
+                    each((x) => (x.adjust && x.adjust(by)), all);
+                });
 
 
             // Common case for editing a given setting.
@@ -923,26 +928,25 @@ export default (canvas, settings, debug) => {
                 'P': stateBool('autoClearView'),
                 'O': stateBool('showFlow'),
 
-                'Z': stateNum('damping', 0.002),
+                'Z': stateNum('damping', 0.001),
                 'X': stateNum('minSpeed', 0.0001),
                 'C': stateNum('maxSpeed', 0.0001),
 
-                'Q': stateNum('forceWeight', 0.002),
-                'A': stateNum('flowWeight', 0.002),
-                'W': stateNum('wanderWeight', 0.002),
+                'Q': stateNum('forceWeight', 0.01),
+                'A': stateNum('flowWeight', 0.1),
+                'W': stateNum('wanderWeight', 0.0002),
 
-                'S': stateNum('flowDecay', 0.002),
-                'D': stateNum('flowWidth', 0.002),
+                'S': stateNum('flowDecay', 0.5),
+                'D': stateNum('flowWidth', 1),
 
-                'E': stateNum('noiseScale', 0.002),
+                'E': stateNum('noiseScale', 1),
                 'R': stateNum('noiseSpeed', 0.002),
 
                 // 'V': stateNum('color', 0.002),
                 // 'B': stateNum('baseColor', 0.002),
 
-                'H': stateNum('fadeAlpha', 0.002),
                 'G': stateNum('speedAlpha', 0.002),
-                'F': stateNum('lineWidth', 0.002)
+                'F': stateNum('lineWidth', 1)
             };
 
             const callMap = {
