@@ -38,7 +38,6 @@ import Sequencer from './animate';
 
 import { curry } from '../fp/partial';
 import each from '../fp/each';
-import reduce from '../fp/reduce';
 import filter from '../fp/filter';
 import { step } from '../utils';
 
@@ -95,7 +94,7 @@ export default (canvas, settings, debug) => {
     const gl = glContext(canvas, glSettings, () => {
             const dt = timer.tick().dt;
 
-            if(track && track.currentTime >= 0) {
+            if(track && track.currentTime >= 0 && !track.paused) {
                 sequencer.timer.tick(track.currentTime*1000);
                 sequencer.play(sequencer.timer.time, tendrils.state);
             }
