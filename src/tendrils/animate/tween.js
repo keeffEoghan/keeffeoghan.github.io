@@ -4,6 +4,13 @@ import isNumber from 'lodash/isNumber';
 
 import { map } from '../../fp/map';
 
+
+const tweenable = (k, values, defaults) => {
+    const v = (values && values[k]);
+
+    return ((isNumber(v))? v : (defaults && defaults[k]));
+};
+
 /**
  * Animating between 2 given numbers is just lerping, using `bezier.curve` with
  * the ease curve if given.
@@ -17,12 +24,13 @@ export const tweenValue = (a, b, t, ease) =>
  * tweened numbers in a given output object.
  */
 export const tweenProps = (a, b, t, ease, out = {}) => ((b)?
-        map((v1, k) => {
-                const v0 = ((a && k in a)? a[k] : out[k]);
+        map((v, k) => {
+                const va = tweenable(k, a, out);
+                const vb = tweenable(k, b, out);
 
-                return ((isNumber(v1))?
-                        tweenValue(v0, v1, t, ease)
-                    :   ((t < 1)? v0 : v1));
+                return ((isNumber(va) && isNumber(vb))?
+                        tweenValue(va, vb, t, ease)
+                    :   ((t < 1)? va : vb));
             },
             b, out)
     :   out);
