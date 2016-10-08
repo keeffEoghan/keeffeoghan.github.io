@@ -1,3 +1,5 @@
+import iterable from './iterable';
+
 /**
  * Reduce an array-like object.
  * Similar to native, but with iteratee-first arguments.
@@ -18,6 +20,6 @@ export const reduce = (f, any, out) =>
                 (acc, k, i, keys) =>
                     f(((i)? acc : any[acc]), any[k], k, any, i, keys)
             :   (acc, k, i, keys) => f(acc, any[k], k, any, i, keys)),
-        Object.keys(any), out);
+        iterable(any), out);
 
 export default reduce;

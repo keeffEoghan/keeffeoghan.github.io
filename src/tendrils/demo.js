@@ -12,6 +12,7 @@ import mapRange from 'range-fit';
 import mat3 from 'gl-matrix/src/gl-matrix/mat3';
 import vec2 from 'gl-matrix/src/gl-matrix/vec2';
 import querystring from 'querystring';
+import toSource from 'tosource';
 import dat from 'dat-gui';
 
 import redirect from '../utils/protocol-redirect';
@@ -354,102 +355,6 @@ export default (canvas, settings, debug) => {
     resetSpawner.respawn(tendrils);
 
 
-    // Test sequence.
-    // sequencer.smoothTo({
-    //         to: {
-    //             ...defaultState,
-    //             showFlow: false,
-    //             noiseSpeed: 0.00001,
-    //             noiseScale: 60,
-    //             forceWeight: 0.014,
-    //             wanderWeight: 0.0021,
-    //             speedAlpha: 0.000002,
-    //             color: [0, 0, 0, 0.1],
-    //             baseColor: [1, 1, 1, 0.01],
-    //         },
-    //         time: 3000,
-    //         ease: [0, 0.9, 1]
-    //     })
-    //     .smoothTo({
-    //         to: {
-    //             noiseSpeed: 0.00001,
-    //             noiseScale: 18,
-    //             forceWeight: 0.014,
-    //             wanderWeight: 0.0021,
-    //             speedAlpha: 0.000002
-    //         },
-    //         time: 5000,
-    //         ease: [0, 0.3, 1]
-    //     })
-    //     .smoothTo({
-    //         to: {
-    //             flowDecay: 0,
-    //             noiseSpeed: 0,
-    //             noiseScale: 18,
-    //             forceWeight: 0.015,
-    //             wanderWeight: 0.0023,
-    //             speedAlpha: 0.00005,
-    //             lineWidth: 3
-    //         },
-    //         time: 9000,
-    //         ease: [0, 1.1, 1]
-    //     })
-    //     .smoothTo({
-    //         to: {
-    //             flowWeight: 0,
-    //             wanderWeight: 0.002,
-    //             noiseSpeed: 0,
-    //             noiseScale: 20,
-    //             speedAlpha: 0
-    //         },
-    //         time: 11000,
-    //         ease: [0, 0.9, 1]
-    //     })
-    //     .smoothTo({
-    //         to: {
-    //             noiseSpeed: 0.00001,
-    //             noiseScale: 60,
-    //             forceWeight: 0.014,
-    //             wanderWeight: 0.0021,
-    //             speedAlpha: 0.000002
-    //         },
-    //         time: 15000
-    //     })
-    //     .smoothTo({
-    //         to: {
-    //             flowDecay: defaultState.flowDecay,
-    //             flowWeight: 1,
-    //             wanderWeight: 0.002,
-    //             noiseSpeed: 0,
-    //             noiseScale: 2.125,
-    //             speedAlpha: 0,
-    //             lineWidth: 1
-    //         },
-    //         time: 14000,
-    //         ease: [0, 0.9, 1]
-    //     })
-    //     .smoothTo({
-    //         to: {
-    //             wanderWeight: 0.002,
-    //             noiseSpeed: 0,
-    //             noiseScale: 2.125,
-    //             speedAlpha: 0
-    //         },
-    //         time: 17000,
-    //         ease: [0, 0.9, 1]
-    //     })
-    //     .smoothTo({
-    //         to: {
-    //             ...defaultState,
-    //             showFlow: true,
-    //             flowWidth: 5,
-    //             done: restart
-    //         },
-    //         time: 19000,
-    //         ease: [0, 0.9, 1]
-    //     });
-
-
     if(debug) {
         const gui = new dat.GUI();
 
@@ -486,7 +391,7 @@ export default (canvas, settings, debug) => {
                         flow: {
                             scale: flowPixelState.scale
                         },
-                        time: filter((v, k) => k in timer, timeSettings, {}),
+                        time: filter((k) => k in timer, timeSettings, {}),
                         audio: audioState
                     };
             },
@@ -503,42 +408,19 @@ export default (canvas, settings, debug) => {
         };
 
         // @todo Sequencers for full state
-        const keyframe = (to = { ...state }) => sequencer.smoothTo({
-            to,
-            time: sequencer.timer.time,
-            ease: [0, 1, 1]
-        });
+        const keyframe = (to = { ...state }, call = null) =>
+            sequencer.smoothTo({
+                to,
+                call,
+                time: sequencer.timer.time,
+                ease: [0, 1, 1]
+            });
 
         const exporters = {
-            editState: () => {
-                const stateDef = JSON.stringify(full.state);
-                const nextDef = self.prompt('Current state:', stateDef);
-
-                if(nextDef && stateDef !== nextDef) {
-                    try {
-                        full.state = JSON.parse(nextDef);
-                    }
-                    catch(e) {
-                        alert("Couldn't import state, unknown definition:", e);
-                    }
-
-                    updateGUI();
-                }
-            },
-            editSequence: () => {
-                const framesDef = JSON.stringify(sequencer.timeline.frames);
-                const nextDef = self.prompt('Animation sequence:', framesDef);
-
-                if(nextDef && framesDef !== nextDef) {
-                    try {
-                        sequencer.timeline.setup(JSON.parse(nextDef));
-                        track.currentTime = 0;
-                    }
-                    catch(e) {
-                        alert("Couldn't import frames, unknown definition:", e);
-                    }
-                }
-            },
+            showState: () => self.prompt('Current state:',
+                toSource(full.state)),
+            showSequence: () => self.prompt('Animation sequence:',
+                toSource(sequencer.timeline.frames)),
             keyframe
         };
 
@@ -845,15 +727,13 @@ export default (canvas, settings, debug) => {
 
             updateGUI();
             convertColor();
-            restart();
+            // restart();
         };
 
         for(let p in presetters) {
             presetters[p] = wrapPresetter.bind(null, presetters[p]);
             presetsGUI.add(presetters, p);
         }
-
-        presetters['Rorschach']();
 
 
         // Open or close
@@ -890,35 +770,15 @@ export default (canvas, settings, debug) => {
                 ((play)? track.play() : track.pause());
 
             const scrub = (by) => {
-                track.currentTime += by;
+                sequencer.timeline.seek(0);
+                sequencer.timeline.seek(track.currentTime += by);
                 togglePlay(true);
             };
 
 
-            // Minimal keyframes.
-
-            const changed = (past, next) => reduce((diff, v, k) => {
-                    let out;
-
-                    if(v !== past[k]) {
-                        out = (diff || {});
-                        out[k] = v;
-                    }
-
-                    return (out || diff);
-                },
-                next, null);
-
-            const keyframeEdits = (edits, past, state) => {
-                const diff = changed(past, state);
-                let f = null;
-
-                if(diff) {
-                    f = keyframe(diff);
-                    Object.assign(past, diff);
-                }
-
-                return f;
+            const keyframeCall = (...calls) => {
+                keyframe(null, calls);
+                each((call) => call(), calls);
             };
 
 
@@ -962,11 +822,20 @@ export default (canvas, settings, debug) => {
                 adjust: stateEdit(key, scale)
             });
 
+            const stateExtend = (assign = {}) => {
+                const resets = filter((v, k) => k in assign, defaultState);
+
+                return {
+                        reset: () => Object.assign(state, resets),
+                        go: () => Object.assign(state, assign)
+                    };
+            };
+
 
             const editing = {};
-            const past = { ...state };
 
             /**
+             * Anything that selects and may change a part of the state.
              * @todo Inputs for the other things in full state, controls, and
              *       presets.
              */
@@ -1005,7 +874,22 @@ export default (canvas, settings, debug) => {
                 // 'B': stateNum('baseColor', 0.002),
 
                 'G': stateNum('speedAlpha', 0.002),
-                'F': stateNum('lineWidth', 0.1)
+                'F': stateNum('lineWidth', 0.1),
+
+                '0': { go: presetters['Flow'] },
+                '1': { go: presetters['Wings'] },
+                '2': { go: presetters['Fluid'] },
+                '3': { go: presetters['Flow only'] },
+                '4': { go: presetters['Noise only'] },
+                '5': { go: presetters['Sea'] },
+                '6': { go: presetters['Ghostly'] },
+                '7': { go: presetters['Turbulence'] },
+                '8': { go: presetters['Rorschach'] },
+                '9': { go: presetters['Roots'] },
+
+                // <control> is a special case for re-assigning keys, see below
+                '<control>': (key, assign) =>
+                    editMap[key] = { go: () => Object.assign(state, assign) }
             };
 
             const callMap = {
@@ -1016,7 +900,10 @@ export default (canvas, settings, debug) => {
                 '<left>': adjustEach(-5),
                 '<right>': adjustEach(5),
 
-                '<escape>': () => resetEach(editMap),
+                '<escape>': (...rest) => {
+                    resetEach(editMap);
+                    keyframe(...rest);
+                },
                 '<backspace>': resetEach,
 
                 '<space>': () => togglePlay(),
@@ -1024,80 +911,178 @@ export default (canvas, settings, debug) => {
                 '.': () => scrub(2),
 
                 '[': () => scrub(-2),
-                ']': keyframeEdits,
+                ']': keyframe,
                 '<enter>': (...rest) => {
-                    keyframeEdits(...rest);
+                    keyframe(...rest);
                     scrub(-2);
                 },
 
-                '1': presetters['Wings'],
-                '2': presetters['Fluid'],
-                '3': presetters['Flow only'] ,
-                '4': presetters['Noise only'] ,
-                '5': presetters['Sea'],
-                '6': presetters['Ghostly'],
-                '7': presetters['Turbulence'],
-                '8': presetters['Rorschach'],
-                '9': presetters['Roots'],
-                '0': presetters['Flow']
+                '<shift>': () => keyframeCall(restart),
+                '/': () => keyframeCall(() => tendrils.reset()),
+                '\\': () => keyframeCall(respawnCam),
+                "'": () => keyframeCall(respawnFlow),
+                ';': () => keyframeCall(respawnFastest)
             };
 
 
             // @todo Throttle so multiple states can go into one keyframe.
             document.body.addEventListener('keydown', (e) => {
+                    // Control is a special case to assign the current state to
+                    // a key.
+                    const remap = editing['<control>'];
                     const key = vkey[e.keyCode];
                     const mapped = editMap[key];
+                    const call = callMap[key];
 
-                    if(mapped && !editing[key]) {
+                    if(remap) {
+                        remap(key, { ...state });
+                    }
+                    else if(mapped && !editing[key]) {
                         editing[key] = mapped;
 
                         if(mapped.go) {
-                            mapped.go(editing, past, state);
-                            updateGUI();
+                            mapped.go(editing, state);
                         }
                     }
-
-                    const call = callMap[key];
-
-                    if(call) {
-                        call(editing, past, state);
+                    else if(call) {
+                        call(editing, state);
                     }
 
-                    // if(key.match(/^<enter>$/)) {
-                    //     exporters.editSequence();
-                    // }
-                    // else if(key.match(/^<escape>$/)) {
-                    //     tendrils.reset();
-                    // }
-                    // else if(key.match(/^<space>$/)) {
-                    //     respawnCam();
-                    // }
-                    // else if(key.match(/^<backspace>$/)) {
-                    //     sequencer.timer.reset();
-                    // }
-                    // else if(key.match(/^[A-Z]$/)) {
-                    //     respawnFlow();
-                    // }
-                    // else if(key.match(/^[0-9]$/)) {
-                    //     respawnFastest();
-                    // }
-                    // else {
-                    //     restart();
-                    // }
+                    updateGUI();
+
+                    if(mapped || call) {
+                        e.preventDefault();
+                        e.stopPropagation();
+                    }
                 },
                 false);
 
             document.body.addEventListener('keyup', (e) => {
                     const key = vkey[e.keyCode];
                     const mapped = editMap[key];
+                    const call = callMap[key];
 
                     if(mapped && editing[key]) {
-                        keyframeEdits(editing, past, state);
+                        if(key !== '<control>' && !editing['<control>']) {
+                            keyframe({ ...state });
+                        }
+
                         editing[key] = null;
                         delete editing[key];
+                    }
+
+                    if(mapped || call) {
+                        e.preventDefault();
+                        e.stopPropagation();
                     }
                 },
                 false);
         })();
+
+
+        presetters['Rorschach']();
+
+        // Filler frames to reset the state on sequence start, and validate the
+        // sequence.
+        sequencer.smoothTo({
+                to: { ...state },
+                call: [restart],
+                time: 1000/30
+            });
+
+        // Test sequence.
+        // sequencer.smoothTo({
+        //         to: {
+        //             ...defaultState,
+        //             showFlow: false,
+        //             noiseSpeed: 0.00001,
+        //             noiseScale: 60,
+        //             forceWeight: 0.014,
+        //             wanderWeight: 0.0021,
+        //             speedAlpha: 0.000002,
+        //             color: [0, 0, 0, 0.1],
+        //             baseColor: [1, 1, 1, 0.01],
+        //         },
+        //         time: 3000,
+        //         ease: [0, 0.9, 1]
+        //     })
+        //     .smoothTo({
+        //         to: {
+        //             noiseSpeed: 0.00001,
+        //             noiseScale: 18,
+        //             forceWeight: 0.014,
+        //             wanderWeight: 0.0021,
+        //             speedAlpha: 0.000002
+        //         },
+        //         time: 5000,
+        //         ease: [0, 0.3, 1]
+        //     })
+        //     .smoothTo({
+        //         to: {
+        //             flowDecay: 0,
+        //             noiseSpeed: 0,
+        //             noiseScale: 18,
+        //             forceWeight: 0.015,
+        //             wanderWeight: 0.0023,
+        //             speedAlpha: 0.00005,
+        //             lineWidth: 3
+        //         },
+        //         time: 9000,
+        //         ease: [0, 1.1, 1]
+        //     })
+        //     .smoothTo({
+        //         to: {
+        //             flowWeight: 0,
+        //             wanderWeight: 0.002,
+        //             noiseSpeed: 0,
+        //             noiseScale: 20,
+        //             speedAlpha: 0
+        //         },
+        //         time: 11000,
+        //         ease: [0, 0.9, 1]
+        //     })
+        //     .smoothTo({
+        //         to: {
+        //             noiseSpeed: 0.00001,
+        //             noiseScale: 60,
+        //             forceWeight: 0.014,
+        //             wanderWeight: 0.0021,
+        //             speedAlpha: 0.000002
+        //         },
+        //         time: 15000
+        //     })
+        //     .smoothTo({
+        //         to: {
+        //             flowDecay: defaultState.flowDecay,
+        //             flowWeight: 1,
+        //             wanderWeight: 0.002,
+        //             noiseSpeed: 0,
+        //             noiseScale: 2.125,
+        //             speedAlpha: 0,
+        //             lineWidth: 1
+        //         },
+        //         time: 14000,
+        //         ease: [0, 0.9, 1]
+        //     })
+        //     .smoothTo({
+        //         to: {
+        //             wanderWeight: 0.002,
+        //             noiseSpeed: 0,
+        //             noiseScale: 2.125,
+        //             speedAlpha: 0
+        //         },
+        //         time: 17000,
+        //         ease: [0, 0.9, 1]
+        //     })
+        //     .smoothTo({
+        //         to: {
+        //             ...defaultState,
+        //             showFlow: true,
+        //             flowWidth: 5,
+        //             done: restart
+        //         },
+        //         time: 19000,
+        //         ease: [0, 0.9, 1]
+        //     });
     }
 };
