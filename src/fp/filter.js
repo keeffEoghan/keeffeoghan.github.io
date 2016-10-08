@@ -1,8 +1,9 @@
 import { reduceList } from './reduce';
+import iterable from './iterable';
 
 export const filterList = (f, x, out = []) => reduceList((acc, v, i) => {
         if(f(v, i, x)) {
-            acc[i] = v;
+            acc.push(v);
         }
 
         return acc;
@@ -14,16 +15,16 @@ export const filterList = (f, x, out = []) => reduceList((acc, v, i) => {
  * Same as above signature, but iterates over all the given object's own
  * properties.
  */
-export const filter = (f, any, out) => reduceList((acc, k, i, keys) => {
+export const filter = (f, any, out = null) => reduceList((acc, k, i, keys) => {
         const v = any[k];
 
         if(f(v, k, any, i, keys)) {
-            acc[k] = v;
+            (acc || (acc = {}))[k] = v;
         }
 
         return acc;
     },
-    Object.keys(any), out);
+    iterable(any), out);
 
 
 export default filter;

@@ -2,12 +2,11 @@
  * A convenience class that wraps the timeline, tween, and ease-joining
  * utilities into a single package.
  */
-import isFunction from 'lodash/isFunction';
 
 import Timeline from './timeline';
 import tween from './tween';
 import joinCurve from './join-curve';
-import map from '../../fp/map';
+import each from '../../fp/each';
 
 export class Sequencer {
     constructor(frames) {
@@ -18,13 +17,9 @@ export class Sequencer {
         const span = this.timeline.play(time);
 
         if(span) {
-            if(this.timeline.within(time)) {
-                tween(span, out);
-            }
-
-            if(span.apply) {
-                map((v) => ((isFunction(v))? v() : v), span.apply, out);
-            }
+            Object.assign(out, span.apply);
+            tween(span, out);
+            each((f) => f(out, time, span), span.call);
         }
 
         return out;
@@ -47,11 +42,11 @@ export class Sequencer {
     }
 
     smoothOver(duration, ...frame) {
-        return this.easeOver(1, ...frame);
+        return this.easeOver(duration, 1, ...frame);
     }
 
     flipOver(duration, ...frame) {
-        return this.easeOver(-1, ...frame);
+        return this.easeOver(duration, -1, ...frame);
     }
 
     // If there's a previous frame, ease smoothly from it.
