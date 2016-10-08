@@ -7,38 +7,52 @@ import clamp from 'clamp';
 import isNumber from 'lodash/isNumber';
 
 import each from '../../fp/each';
+import filter from '../../fp/filter';
+import iterable from '../../fp/iterable';
 
 
-export const makeFrame = (to, time, ease) => ({ to, time, ease });
+export function makeFrame(to, time, ease, call) {
+    return ((arguments.length > 1)? { to, time, ease, call } : to);
+}
 
-export const fromTo = (start, to, duration, offset = 0, ...rest) => [
-        makeFrame(start, offset),
-        makeFrame(to, offset+duration, ...rest)
-    ];
-
-export const order = (a, b) => a.time-b.time;
+export const order = (a, b) => ((a.time > b.time)? 1 : -1);
 export const sort = (frames) => frames.sort(order);
 
-export const range = (a, b) => [Math.min(a, b), Math.max(a, b)];
-
 export const offset = (a, b, time) => {
-    const [min, max] = range(a.time, b.time);
+    const min = Math.min(a.time, b.time);
 
-    return clamp((time-min)/(max-min), 0, 1);
+    return clamp(((time-min)/(Math.max(a.time, b.time)-min) || 0), 0, 1);
 };
 
-export const within = (a, b, time) => {
-    const [min, max] = range(a.time, b.time);
+export const within = (a, b, time) =>
+    (Math.min(a.time, b.time) < time && time <= Math.max(a.time, b.time));
 
-    return (min < time && time <= max);
+
+export const changed = (past, next) =>
+    ((past === next)?
+        null
+    : ((iterable(past).length && iterable(next).length)?
+        filter((v, k) => v !== past[k], next)
+    :   next));
+
+const accumulate = (frame, out = {}) => {
+    if(!isNumber(frame.to)) {
+        out.apply = Object.assign((out.apply || {}), frame.to);
+    }
+
+    if(frame.call && frame.call.length) {
+        (out.call || (out.call = [])).push(...frame.call);
+    }
+
+    return out;
 };
 
 /**
  * An always time-sorted array of frames.
  */
 export class Timeline {
-    constructor(frames = [], symmetric = true) {
-        this.frames = sort([...frames]);
+    constructor(frames, infinite, symmetric = true) {
+        this.frames = this.setup(frames, infinite);
 
         // The playhead: time, current in-between position, and pair of frames
         // on the timeline (if valid).
@@ -58,43 +72,65 @@ export class Timeline {
 
     // Keyframes - changing and ordering
 
-    add(frame, ...rest) {
-        if(rest.length) {
-            return this.add(makeFrame(frame, ...rest));
-        }
-        else {
-            const next = this.frames.findIndex((f) => order(f, frame) > 0);
-            const f = ((next < 0)? this.frames.length : next-1);
-
-            this.frames.splice(f, 0, frame);
-
-            return f;
-        }
-    }
-
-    addSpan(duration, ...rest) {
-        const f = this.add(...rest);
-
-        if(duration) {
-            this.add(null, this.frames[f].time-duration);
-        }
-
-        return f;
+    setup(frames = [], infinite = true) {
+        return this.frames = sort((infinite)?
+                [{ time: -Infinity }, ...frames, { time: Infinity }]
+            :   [...frames]);
     }
 
     splice(frames) {
         return each((frame) => this.add(frame), frames);
     }
 
+    indexOf(frame) {
+        const next = this.frames.findIndex((other) => order(other, frame) > 0);
+
+        return ((next < 0)? this.frames.length : next);
+    }
+
+    insertFrame(f, frame) {
+        this.frames.splice(f, 0, frame);
+
+        return this;
+    }
+
+
+    // Adding frames (and creating, if needed)
+
+    add(...frame) {
+        const adding = makeFrame(...frame);
+        const f = this.indexOf(adding);
+
+        this.insertFrame(f, adding);
+
+        return f;
+    }
+
+    // Adds a null frame before the added frame, to define the start point of
+    // its transition.
+    // Note that this will only be correct if the position of this frame or any
+    // within `duration` time before don't change.
+    addSpan(duration, ...frame) {
+        const f = this.add(...frame);
+        const t0 = this.frames[f].time-duration;
+        const past = this.frames[f-1];
+
+        if(duration && (!past || past.time < t0)) {
+            this.add(null, t0);
+        }
+
+        return f;
+    }
+
 
     // Playback - changing state
 
     seek(time) {
-        if(this.valid() && within(this.span.a, this.span.b, time)) {
-            this.span.t = offset(this.span.a, this.span.b, time);
+        if(this.valid() && within(this.span.past, this.span.next, time)) {
+            this.span.t = offset(this.span.past, this.span.next, time);
         }
         else {
-            this.setSpanGapAt(time);
+            this.setTime(time);
         }
 
         return this.span;
@@ -104,48 +140,42 @@ export class Timeline {
     // if we're dealing with an animation of multiple properties.
     play(time) {
         const gap0 = Math.max(this.gap, 0.5);
-        const t0 = ((this.span)? this.span.t : 0);
 
         let span = this.seek(time);
 
-        if(this.valid() && !isNumber(span.b)) {
-            const apply = {};
+        if(this.valid()) {
+            const accumulated = {};
 
             const passed = this.gap-gap0;
             const skipped = Math.abs(passed);
 
+            // Accumulate properties of any skipped frames
             if(skipped > 0) {
                 const dir = Math.sign(passed);
                 const side = ((dir < 0)? Math.floor : Math.ceil);
 
                 for(let f = 0; f < skipped; ++f) {
-                    Object.assign(apply, this.frames[side(gap0+(f*dir))].to);
+                    accumulate(this.frames[side(gap0+(f*dir))], accumulated);
                 }
-            }
-
-            if(this.gap < 1 && span.t < t0 && span.t <= 0) {
-                Object.assign(apply, this.frames[0].to);
-            }
-            else if(this.gap > this.frames.length-2 &&
-                    span.t > t0 && span.t >= 1) {
-                Object.assign(apply, this.frames[this.frames.length-1].to);
             }
 
             span = {
                 ...span,
-                apply
+                ...accumulated
             };
         }
 
         return span;
     }
 
-    setSpanGapAt(time) {
+    setTime(time) {
         const gap = this.gapAt(time);
 
         this.span = this.spanGapAt(time, gap, this.span);
         this.gap = gap;
         this.time = time;
+
+        return this;
     }
 
 
@@ -166,20 +196,28 @@ export class Timeline {
 
     spanGapAt(time, gap = this.gapAt(time), out = {}) {
         if(gap >= 0) {
-            let a = this.frames[Math.floor(gap)];
-            let b = this.frames[Math.ceil(gap)];
+            let past = this.frames[Math.floor(gap)];
+            let next = this.frames[Math.ceil(gap)];
+            let ease = next.ease;
 
-            if(!this.symmetric && time < this.time) {
-                let swap = a;
+            // Swap if we're going in reverse
+            if(time < this.time) {
+                if(!this.symmetric) {
+                    ease = past.ease;
+                }
 
-                a = b;
-                b = swap;
+                let swap = past;
+
+                past = next;
+                next = swap;
             }
 
-            out.a = a.to;
-            out.b = b.to;
-            out.t = offset(a, b, time);
-            out.ease = b.ease;
+            out.past = past;
+            out.next = next;
+            out.a = past.to;
+            out.b = next.to;
+            out.t = offset(past, next, time);
+            out.ease = ease;
         }
         else {
             out = undefined;
@@ -190,6 +228,33 @@ export class Timeline {
 
     valid(gap = this.gap, span = this.span) {
         return (gap > 0 && span);
+    }
+
+    // Returns the minimum amount of changed data for a given frame, by diffing
+    // the frame with the ones adjacent.
+    // Note that this will only be correct if the adjacent frames don't change
+    // later.
+    minFrame(...frame) {
+        const full = makeFrame(...frame);
+        const f = this.indexOf(full);
+
+        const past = this.frames[f-1];
+        const diffPast = ((past && past.to)? changed(past, full.to) : null);
+
+        const next = this.frames[f+1];
+        const diffNext = ((next && next.to)? changed(next, full.to) : null);
+
+        const diff = ((iterable(diffPast).length || iterable(diffNext).length)?
+                {
+                    ...diffPast,
+                    ...diffNext
+                }
+            :   diffPast);
+
+        return {
+                ...full,
+                to: diff
+            };
     }
 
 
@@ -206,12 +271,6 @@ export class Timeline {
 
     duration() {
         return this.start()-this.end();
-    }
-
-    within(time) {
-        return ((this.frames.length < 2)?
-                false
-            :   within(this.frames[0], this.frames[this.frames.length-1], time));
     }
 }
 

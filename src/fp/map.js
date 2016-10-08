@@ -1,4 +1,5 @@
 import { reduceList } from './reduce';
+import iterable from './iterable';
 
 /**
  * Map an array-like object.
@@ -22,6 +23,6 @@ export const map = (f, any, out) => reduceList((acc, k, i, keys) => {
 
         return acc;
     },
-    Object.keys(any), out);
+    iterable(any), out);
 
 export default map;
