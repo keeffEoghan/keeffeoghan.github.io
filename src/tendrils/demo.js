@@ -78,7 +78,7 @@ export default (canvas, settings, debug) => {
         micLoudAt: 5
     };
 
-    let track;
+    const track = new Audio();
 
     const audioState = {...audioDefaults};
 
@@ -291,13 +291,11 @@ export default (canvas, settings, debug) => {
     // Track setup
 
     const setupTrack = (src, el = document.body) => {
-        track = Object.assign(new Audio(), {
-                crossOrigin: 'Anonymous',
+        Object.assign(track, {
                 src: src,
-                controls: true
+                controls: true,
+                className: 'track'
             });
-
-        track.classList.add('track');
 
         // @todo Stereo: true
 
@@ -330,6 +328,7 @@ export default (canvas, settings, debug) => {
                     throw e;
                 }
                 else {
+                    track.crossOrigin = 'anonymous';
                     setupTrack(src, el.querySelector('.npm-scb-info'));
                     el.querySelector('.npm-scb-wrap').classList.add('open');
                 }
@@ -664,10 +663,10 @@ export default (canvas, settings, debug) => {
             },
             'Turbulence'() {
                 Object.assign(state, {
-                        noiseSpeed: 0.00001,
-                        noiseScale: 18,
+                        noiseSpeed: 0.00005,
+                        noiseScale: 10,
                         forceWeight: 0.014,
-                        wanderWeight: 0.0021,
+                        wanderWeight: 0.003,
                         speedAlpha: 0.000002
                     });
 

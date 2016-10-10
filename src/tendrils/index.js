@@ -35,13 +35,13 @@ export const defaults = () => ({
         autoClearView: false,
         showFlow: false,
 
-        damping: 0.045,
+        damping: 0.043,
         minSpeed: 0.000001,
         maxSpeed: 0.01,
 
-        forceWeight: 0.015,
+        forceWeight: 0.017,
         flowWeight: 1,
-        wanderWeight: 0.001,
+        wanderWeight: 0.002,
 
         flowDecay: 0.005,
         flowWidth: 5,
