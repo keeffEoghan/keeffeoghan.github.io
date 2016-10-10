@@ -290,7 +290,7 @@ export default (canvas, settings, debug) => {
 
     // Track setup
 
-    const setupTrack = (src, el = document.body) => {
+    const setupTrack = (src, el = canvas.parentElement) => {
         Object.assign(track, {
                 crossOrigin: 'anonymous',
                 src: src,
@@ -334,8 +334,12 @@ export default (canvas, settings, debug) => {
                 }
             });
     }
+    else if(audioState.trackURL.match(/^(https)?(:\/\/)?(www\.)?dropbox\.com\/s\//gi)) {
+        setupTrack(audioState.trackURL.replace(/^((https)?(:\/\/)?(www\.)?)dropbox\.com\/s\/(.*)\?dl=(0)$/gi,
+            'https://dl.dropboxusercontent.com/s/$5?dl=1&raw=1'));
+    }
     else {
-        setupTrack(audioState.trackURL, canvas.parentElement);
+        setupTrack(audioState.trackURL);
     }
 
 
