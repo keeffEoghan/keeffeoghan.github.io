@@ -83,6 +83,7 @@ export default (canvas, settings, debug) => {
     Object.assign(track, {
             crossOrigin: 'anonymous',
             controls: true,
+            autoplay: true,
             className: 'track'
         });
 
@@ -99,8 +100,6 @@ export default (canvas, settings, debug) => {
     const trackOrderLog = makeOrderLog(order, (size) =>
         makeLog(size, () => makeAudioData(trackAnalyser,
             ((size === order)? Uint8Array : Float32Array))));
-
-    canvas.parentElement.appendChild(track);
 
 
     // Mic refs
@@ -319,17 +318,27 @@ export default (canvas, settings, debug) => {
 
     // Track setup
 
-    const setupTrack = (src) => {
+    const setupTrack = (src, el = canvas.parentElement) => {
         if(track.src !== src) {
             track.src = src;
             track.currentTime = 0;
-            track.play();
+        }
+
+        if(track.parentElement !== el) {
+            el.appendChild(track);
         }
 
         return track;
     };
 
     const setupTrackURL = (trackURL = audioState.trackURL) => {
+        const old = document.querySelector('.npm-scb-white');
+
+        if(old) {
+            old.parentElement.removeChild(old);
+        }
+
+
         if(trackURL.match(/^(https?)?(\:\/\/)?(www\.)?soundcloud\.com\//gi)) {
             soundCloud({
                     client_id: '75aca2e2b815f9f5d4e92916c7b80846',
