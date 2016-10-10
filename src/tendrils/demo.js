@@ -53,14 +53,10 @@ export default (canvas, settings, debug) => {
     const timer = defaultSettings.timer;
 
     let tendrils;
-
     let flowInput;
 
-    let trackAnalyser;
-    let trackOrderLog;
 
-    let micAnalyser;
-    let micOrderLog;
+    // Audio init
 
     const audioDefaults = {
         trackURL: ((queries.track)?
@@ -78,13 +74,46 @@ export default (canvas, settings, debug) => {
         micLoudAt: 5
     };
 
-    const track = new Audio();
 
+    // Track and analyser init
+
+    const track = new Audio();
     const audioState = {...audioDefaults};
+
+    Object.assign(track, {
+            crossOrigin: 'anonymous',
+            controls: true,
+            className: 'track'
+        });
+
+    // @todo Stereo: true
+
+    const trackAnalyser = analyser(track, {
+            audible: audioState.audible
+        });
+
+    trackAnalyser.analyser.fftSize = Math.pow(2, 5);
+
+    const order = 3;
+
+    const trackOrderLog = makeOrderLog(order, (size) =>
+        makeLog(size, () => makeAudioData(trackAnalyser,
+            ((size === order)? Uint8Array : Float32Array))));
+
+    canvas.parentElement.appendChild(track);
+
+
+    // Mic refs
+    let micAnalyser;
+    let micOrderLog;
+
+
+    // Animation init
 
     const sequencer = new Sequencer();
 
     sequencer.timer = new Timer(0);
+
 
     // const frames = sequencer.timeline.frames;
     //
@@ -290,57 +319,43 @@ export default (canvas, settings, debug) => {
 
     // Track setup
 
-    const setupTrack = (src, el = canvas.parentElement) => {
-        Object.assign(track, {
-                crossOrigin: 'anonymous',
-                src: src,
-                controls: true,
-                className: 'track'
-            });
-
-        // @todo Stereo: true
-
-        trackAnalyser = analyser(track, {
-                audible: audioState.audible
-            });
-
-        trackAnalyser.analyser.fftSize = Math.pow(2, 5);
-
-        const order = 3;
-
-        trackOrderLog = makeOrderLog(order, (size) =>
-            makeLog(size, () => makeAudioData(trackAnalyser,
-                ((size === order)? Uint8Array : Float32Array))));
-
-        track.play();
-        el.appendChild(track);
+    const setupTrack = (src) => {
+        if(track.src !== src) {
+            track.src = src;
+            track.currentTime = 0;
+            track.play();
+        }
 
         return track;
     };
 
-    if(audioState.trackURL.match(/^(https?)?(\:\/\/)?(www\.)?soundcloud\.com\//gi)) {
-        soundCloud({
-                client_id: '75aca2e2b815f9f5d4e92916c7b80846',
-                song: audioState.trackURL,
-                dark: false
-            },
-            (e, src, data, el) => {
-                if(e) {
-                    throw e;
-                }
-                else {
-                    setupTrack(src, el.querySelector('.npm-scb-info'));
-                    el.querySelector('.npm-scb-wrap').classList.add('open');
-                }
-            });
-    }
-    else if(audioState.trackURL.match(/^(https)?(:\/\/)?(www\.)?dropbox\.com\/s\//gi)) {
-        setupTrack(audioState.trackURL.replace(/^((https)?(:\/\/)?(www\.)?)dropbox\.com\/s\/(.*)\?dl=(0)$/gi,
-            'https://dl.dropboxusercontent.com/s/$5?dl=1&raw=1'));
-    }
-    else {
-        setupTrack(audioState.trackURL);
-    }
+    const setupTrackURL = (trackURL = audioState.trackURL) => {
+        if(trackURL.match(/^(https?)?(\:\/\/)?(www\.)?soundcloud\.com\//gi)) {
+            soundCloud({
+                    client_id: '75aca2e2b815f9f5d4e92916c7b80846',
+                    song: trackURL,
+                    dark: false
+                },
+                (e, src, data, el) => {
+                    if(e) {
+                        throw e;
+                    }
+                    else {
+                        setupTrack(src, el.querySelector('.npm-scb-info'));
+                        el.querySelector('.npm-scb-wrap').classList.add('open');
+                    }
+                });
+        }
+        else if(trackURL.match(/^(https)?(:\/\/)?(www\.)?dropbox\.com\/s\//gi)) {
+            setupTrack(trackURL.replace(/^((https)?(:\/\/)?(www\.)?)dropbox\.com\/s\/(.*)\?dl=(0)$/gi,
+                'https://dl.dropboxusercontent.com/s/$5?dl=1&raw=1'));
+        }
+        else {
+            setupTrack(trackURL);
+        }
+    };
+
+    setupTrackURL();
 
 
     function resize() {
@@ -514,11 +529,7 @@ export default (canvas, settings, debug) => {
             const control = audioGUI.add(audioState, s);
 
             if(s === 'trackURL') {
-                control.onFinishChange((v) =>
-                    location.search = querystring.encode({
-                            ...queries,
-                            track: encodeURIComponent(v)
-                        }));
+                control.onFinishChange(setupTrackURL);
             }
 
             if(s === 'audible') {
