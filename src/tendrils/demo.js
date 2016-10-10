@@ -292,6 +292,7 @@ export default (canvas, settings, debug) => {
 
     const setupTrack = (src, el = document.body) => {
         Object.assign(track, {
+                crossOrigin: 'anonymous',
                 src: src,
                 controls: true,
                 className: 'track'
@@ -328,7 +329,6 @@ export default (canvas, settings, debug) => {
                     throw e;
                 }
                 else {
-                    track.crossOrigin = 'anonymous';
                     setupTrack(src, el.querySelector('.npm-scb-info'));
                     el.querySelector('.npm-scb-wrap').classList.add('open');
                 }
