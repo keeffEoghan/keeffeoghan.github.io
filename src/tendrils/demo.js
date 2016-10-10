@@ -63,13 +63,13 @@ export default (canvas, settings, debug) => {
                 decodeURIComponent(queries.track)
             :   'https://soundcloud.com/max-cooper/waves-1'),
 
-        audible: !('mute' in queries),
+        audible: (''+queries.mute !== 'true'),
 
-        track: !('track_off' in queries),
+        track: (''+queries.track_off !== 'true'),
         trackBeatAt: 0.1,
         trackLoudAt: 9,
 
-        mic: !('mic_off' in queries),
+        mic: (''+queries.mic_off !== 'true'),
         micBeatAt: 1,
         micLoudAt: 5
     };
@@ -443,6 +443,14 @@ export default (canvas, settings, debug) => {
             });
 
         const exporters = {
+            showLink: () => self.prompt('Link:',
+                location.href.replace(location.search.slice(1), querystring.encode({
+                        ...queries,
+                        track: encodeURIComponent(audioState.trackURL),
+                        mute: !audioState.audible,
+                        track_off: !audioState.track,
+                        mic_off: !audioState.mic
+                    }))),
             showState: () => self.prompt('Current state:',
                 toSource(full.state)),
             showSequence: () => self.prompt('Animation sequence:',
