@@ -51,7 +51,7 @@ const accumulate = (frame, out = {}) => {
  * An always time-sorted array of frames.
  */
 export class Timeline {
-    constructor(frames, infinite, symmetric = true) {
+    constructor(frames, infinite, rewind = false, symmetric = true) {
         this.frames = this.setup(frames, infinite);
 
         // The playhead: time, current in-between position, and pair of frames
@@ -67,6 +67,8 @@ export class Timeline {
          * the destination frame's ease is used.
          */
         this.symmetric = symmetric;
+
+        this.rewind = rewind;
     }
 
 
@@ -201,7 +203,7 @@ export class Timeline {
             let ease = next.ease;
 
             // Swap if we're going in reverse
-            if(time < this.time) {
+            if(this.rewind) {
                 if(!this.symmetric) {
                     ease = past.ease;
                 }
