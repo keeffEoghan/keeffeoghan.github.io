@@ -6,11 +6,11 @@
 #pragma glslify: random = require(glsl-random)
 
 #pragma glslify: tau = require(../../../const/tau)
-#pragma glslify: angleToPos = require(../../../utils/angle-to-pos)
+#pragma glslify: angleToVec = require(../../../utils/angle-to-pos)
 
 vec4 apply(vec2 uv, vec2 pos, vec4 pixel) {
     return vec4(pos,
-        angleToPos(mod(random(uv*dot(pixel.rg, pixel.ba)), 1.0)*tau)*
+        angleToVec(mod(random(uv*dot(pixel.rg, pixel.ba)), 1.0)*tau)*
             luma(pixel)*pixel.a);
 }
 

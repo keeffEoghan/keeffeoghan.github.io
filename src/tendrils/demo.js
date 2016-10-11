@@ -20,8 +20,9 @@ import Timer from './timer';
 import { Tendrils, defaults, glSettings } from './';
 
 import * as spawnPixels from './spawn/pixels';
-import spawnPixelsFlowFrag from './spawn/pixels/flow.frag';
-import spawnPixelsSimpleFrag from './spawn/pixels/data.frag';
+import bestSampleFrag from './spawn/pixels/best-sample.frag';
+import flowSampleFrag from './spawn/pixels/flow-sample.frag';
+import dataSampleFrag from './spawn/pixels/data-sample.frag';
 
 import spawnReset from './spawn/ball';
 
@@ -108,7 +109,7 @@ export default (canvas, settings, debug) => {
 
     const audioReact = [
         () => {
-            respawnCam();
+            respawnSampleCam();
             console.log('track beat 0');
         },
         () => {
@@ -116,7 +117,7 @@ export default (canvas, settings, debug) => {
             console.log('track beat 1');
         },
         () => {
-            respawnCam();
+            respawnSampleCam();
             console.log('mic beat 0');
         },
         () => {
@@ -256,7 +257,7 @@ export default (canvas, settings, debug) => {
         flow[0] = mapRange(flow[0], 0, tendrils.viewRes[0], -1, 1);
         flow[1] = mapRange(flow[1], 0, tendrils.viewRes[1], 1, -1);
 
-        flowInputs.get(e.pointerId).add(timer.now(), flow);
+        flowInputs.get(e.pointerId).add(timer.time, flow);
     };
 
     canvas.addEventListener('pointermove', pointerFlow, false);
@@ -269,7 +270,7 @@ export default (canvas, settings, debug) => {
      */
 
     const flowPixelSpawner = new spawnPixels.SpawnPixels(gl, {
-            shader: [spawnPixels.defaults().shader[0], spawnPixelsFlowFrag],
+            shader: [spawnPixels.defaults().shader[0], flowSampleFrag],
             buffer: tendrils.flow
         });
 
@@ -297,7 +298,7 @@ export default (canvas, settings, debug) => {
     // Spawn on fastest particles.
 
     const simplePixelSpawner = new spawnPixels.SpawnPixels(gl, {
-            shader: [spawnPixels.defaults().shader[0], spawnPixelsSimpleFrag],
+            shader: [spawnPixels.defaults().shader[0], dataSampleFrag],
             buffer: null
         });
 
@@ -314,16 +315,27 @@ export default (canvas, settings, debug) => {
      *       start, then seamlessly flow into the visuals.
      */
 
-    const camPixelSpawner = new spawnPixels.SpawnPixels(gl);
-
     let video = null;
 
-    function respawnCam() {
+    const camSpawners = {
+        direct: new spawnPixels.SpawnPixels(gl, {
+                speed: 0.01
+            }),
+        sample: new spawnPixels.SpawnPixels(gl, {
+                shader: [spawnPixels.defaults().shader[0], bestSampleFrag]
+            })
+    };
+
+    function spawnCam(camSpawner) {
         if(video) {
-            camPixelSpawner.setPixels(video);
-            camPixelSpawner.respawn(tendrils);
+            camSpawner.setPixels(video);
+            camSpawner.respawn(tendrils);
         }
     }
+
+    const respawnCam = () => spawnCam(camSpawners.direct);
+    const respawnSampleCam = () => spawnCam(camSpawners.sample);
+
 
     getUserMedia({
             video: true,
@@ -339,15 +351,16 @@ export default (canvas, settings, debug) => {
                 video.muted = true;
                 video.src = self.URL.createObjectURL(stream);
                 video.play();
-                video.addEventListener('canplay', () => {
-                    camPixelSpawner.buffer.shape = [
-                        video.videoWidth,
-                        video.videoHeight
-                    ];
+                video.addEventListener('canplay', () => each((camSpawner) => {
+                        camSpawner.buffer.shape = [
+                            video.videoWidth,
+                            video.videoHeight
+                        ];
 
-                    mat3.scale(camPixelSpawner.spawnMatrix,
-                        camPixelSpawner.spawnMatrix, [-1, 1]);
-                });
+                        mat3.scale(camSpawner.spawnMatrix,
+                            mat3.identity(camSpawner.spawnMatrix), [-1, 1]);
+                    },
+                    camSpawners));
 
 
                 // Trying out audio analyser.
@@ -568,6 +581,7 @@ export default (canvas, settings, debug) => {
                 clearFlow: () => tendrils.clearFlow(),
                 respawn,
                 respawnCam,
+                respawnSampleCam,
                 respawnFlow,
                 respawnFastest,
                 reset: () => tendrils.reset(),
@@ -933,23 +947,19 @@ export default (canvas, settings, debug) => {
                 '<backspace>': resetEach,
 
                 '<space>': () => togglePlay(),
-                ',': () => scrub(-2),
-                '.': () => scrub(2),
 
                 '[': () => scrub(-2),
-                ']': keyframe,
-                '<enter>': (...rest) => {
-                    keyframe(...rest);
-                    scrub(-2);
-                },
+                ']': () => scrub(2),
+                '<enter>': keyframe,
+
+                '\\': () => keyframeCall(() => tendrils.reset()),
+                "'": () => keyframeCall(respawnFlow),
+                ';': () => keyframeCall(respawnFastest),
 
                 '<shift>': () => keyframeCall(restart),
-                '/': () => keyframeCall(() => tendrils.reset()),
-                '\\': () => keyframeCall(respawnCam),
-                "'": () => keyframeCall(respawnFlow),
-                ';': () => keyframeCall(respawnFastest)
+                '/': () => keyframeCall(respawnSampleCam),
+                '.': () => keyframeCall(respawnCam)
             };
-
 
             // @todo Throttle so multiple states can go into one keyframe.
             document.body.addEventListener('keydown', (e) => {

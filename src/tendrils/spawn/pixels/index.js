@@ -17,7 +17,10 @@ export const defaults = () => ({
     shader: [vert, frag],
     // buffer: [[1, 1]]
     buffer: [[1, 1], { float: true }],
-    spawnSize: [1, 1]
+    spawnSize: [1, 1],
+    jitterRad: 2,
+    speed: 1,
+    bias: 1
 });
 
 export class SpawnPixels {
@@ -37,7 +40,10 @@ export class SpawnPixels {
                 FBO(this.gl, ...params.buffer)
             :   params.buffer);
 
-        this.jitterRad = 4;
+        this.speed = params.speed;
+        this.bias = params.bias;
+
+        this.jitterRad = params.jitterRad;
         this.jitter = vec2.create();
 
         this.spawnSize = params.spawnSize;
@@ -49,8 +55,9 @@ export class SpawnPixels {
                 spawnData: this.buffer.color[0].bind(1),
                 spawnSize: this.spawnSize,
                 spawnMatrix: this.spawnMatrix,
+                speed: this.speed,
                 jitter: aspect(this.jitter, uniforms.viewRes, this.jitterRad),
-                bias: 1
+                bias: this.bias
             });
     }
 
