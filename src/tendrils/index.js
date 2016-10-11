@@ -43,7 +43,7 @@ export const defaults = () => ({
         flowWeight: 1,
         wanderWeight: 0.002,
 
-        flowDecay: 0.005,
+        flowDecay: 0.003,
         flowWidth: 5,
 
         noiseScale: 2.125,
@@ -269,7 +269,6 @@ export class Tendrils {
         Object.assign(this.uniforms.render, this.state, {
                 time: this.timer.time,
                 previous: this.particles.buffers[1].color[0].bind(2),
-                dataRes: this.particles.shape,
                 viewSize: this.viewSize,
                 viewRes: this.viewRes
             });
@@ -405,7 +404,7 @@ export class Tendrils {
 
     // Respawn on the GPU using a given shader
     respawnShader(spawnShader, update) {
-        this.resize(false);
+        this.resize();
         this.timer.tick();
 
         this.particles.logic = spawnShader;
