@@ -195,6 +195,57 @@ export default (canvas, settings, debug) => {
     const state = tendrils.state;
 
 
+    // Track setup
+
+    const setupTrack = (src, el = canvas.parentElement) => {
+        if(track.src !== src) {
+            track.src = src;
+            track.currentTime = 0;
+        }
+
+        if(track.parentElement !== el) {
+            el.appendChild(track);
+        }
+
+        return track;
+    };
+
+    const setupTrackURL = (trackURL = audioState.trackURL) => {
+        const old = document.querySelector('.npm-scb-white');
+
+        if(old) {
+            old.parentElement.removeChild(old);
+        }
+
+
+        if(trackURL.match(/^(https?)?(\:\/\/)?(www\.)?soundcloud\.com\//gi)) {
+            soundCloud({
+                    client_id: '75aca2e2b815f9f5d4e92916c7b80846',
+                    song: trackURL,
+                    dark: false
+                },
+                (e, src, data, el) => {
+                    if(e) {
+                        throw e;
+                    }
+                    else {
+                        setupTrack(src, el.querySelector('.npm-scb-info'));
+                        el.querySelector('.npm-scb-wrap').classList.add('open');
+                    }
+                });
+        }
+        else if(trackURL.match(/^(https)?(:\/\/)?(www\.)?dropbox\.com\/s\//gi)) {
+            setupTrack(trackURL.replace(/^((https)?(:\/\/)?(www\.)?)dropbox\.com\/s\/(.*)\?dl=(0)$/gi,
+                'https://dl.dropboxusercontent.com/s/$5?dl=1&raw=1'));
+        }
+        else {
+            setupTrack(trackURL);
+        }
+    };
+
+    setupTrackURL();
+
+
     // Flow inputs
 
     flowInputs = new FlowLines(gl);
@@ -310,57 +361,6 @@ export default (canvas, settings, debug) => {
                 micTrigger = new AudioTrigger(micAnalyser, 2);
             }
         });
-
-
-    // Track setup
-
-    const setupTrack = (src, el = canvas.parentElement) => {
-        if(track.src !== src) {
-            track.src = src;
-            track.currentTime = 0;
-        }
-
-        if(track.parentElement !== el) {
-            el.appendChild(track);
-        }
-
-        return track;
-    };
-
-    const setupTrackURL = (trackURL = audioState.trackURL) => {
-        const old = document.querySelector('.npm-scb-white');
-
-        if(old) {
-            old.parentElement.removeChild(old);
-        }
-
-
-        if(trackURL.match(/^(https?)?(\:\/\/)?(www\.)?soundcloud\.com\//gi)) {
-            soundCloud({
-                    client_id: '75aca2e2b815f9f5d4e92916c7b80846',
-                    song: trackURL,
-                    dark: false
-                },
-                (e, src, data, el) => {
-                    if(e) {
-                        throw e;
-                    }
-                    else {
-                        setupTrack(src, el.querySelector('.npm-scb-info'));
-                        el.querySelector('.npm-scb-wrap').classList.add('open');
-                    }
-                });
-        }
-        else if(trackURL.match(/^(https)?(:\/\/)?(www\.)?dropbox\.com\/s\//gi)) {
-            setupTrack(trackURL.replace(/^((https)?(:\/\/)?(www\.)?)dropbox\.com\/s\/(.*)\?dl=(0)$/gi,
-                'https://dl.dropboxusercontent.com/s/$5?dl=1&raw=1'));
-        }
-        else {
-            setupTrack(trackURL);
-        }
-    };
-
-    setupTrackURL();
 
 
     function resize() {
