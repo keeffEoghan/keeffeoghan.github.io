@@ -256,7 +256,7 @@ export default (canvas, settings, debug) => {
         flow[0] = mapRange(flow[0], 0, tendrils.viewRes[0], -1, 1);
         flow[1] = mapRange(flow[1], 0, tendrils.viewRes[1], 1, -1);
 
-        flowInputs.get(e.pointerId).add(timer.now(), flow);
+        flowInputs.get(e.pointerId).add(timer.time, flow);
     };
 
     canvas.addEventListener('pointermove', pointerFlow, false);
