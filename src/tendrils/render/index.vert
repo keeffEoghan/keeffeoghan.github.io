@@ -4,6 +4,7 @@ uniform sampler2D previous;
 uniform sampler2D particles;
 
 uniform vec2 dataRes;
+uniform vec2 geomRes;
 
 uniform vec2 viewSize;
 
@@ -11,7 +12,11 @@ uniform float speedAlpha;
 
 attribute vec2 uv;
 
+
+varying vec2 vUV;
+
 varying float speedRate;
+
 
 #pragma glslify: inert = require(../const/inert)
 #pragma glslify: length2 = require(../utils/length-2)
@@ -25,4 +30,6 @@ void main() {
 
         gl_Position = vec4(state.xy*viewSize, 0.0, 1.0);
     }
+
+    vUV = uv*geomRes/dataRes;
 }
