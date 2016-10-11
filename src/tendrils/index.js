@@ -49,17 +49,14 @@ export const defaults = () => ({
         noiseScale: 2.125,
         noiseSpeed: 0.00025,
 
-        // @todo Make this a texture lookup instead
-        color: [1, 1, 1, 0.05],
         // @todo Move this to another module, doesn't need to be here
         baseColor: [0, 0, 0, 0],
 
+        alpha: 1,
         speedAlpha: 0.000001,
         lineWidth: 1
     },
-    timer: Object.assign(new Timer(), {
-            step: 1000/60
-        }),
+    timer: Object.assign(new Timer(), { step: 1000/60 }),
     numBuffers: 0,
     logicShader: null,
     renderShader: [renderVert, renderFrag],
@@ -81,7 +78,12 @@ export class Tendrils {
         };
 
         this.gl = gl;
+
         this.state = params.state;
+
+        if(!this.state.colors) {
+            this.state.colors = FBO(this.gl, [1, 1], { float: true });
+        }
 
         this.screen = new Screen(this.gl);
 
@@ -270,7 +272,9 @@ export class Tendrils {
                 time: this.timer.time,
                 previous: this.particles.buffers[1].color[0].bind(2),
                 viewSize: this.viewSize,
-                viewRes: this.viewRes
+                viewRes: this.viewRes,
+                colors: this.state.colors.color[0].bind(3),
+                colorsRes: this.state.colors.shape
             });
 
         this.particles.render = this.flowShader;
