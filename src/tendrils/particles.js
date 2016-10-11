@@ -126,6 +126,7 @@ export class Particles {
 
         Particles.applyUpdate(Object.assign(this.logic.uniforms, {
                 dataRes: this.shape,
+                geomRes: this.geomShape,
                 particles: this.buffers[1].color[0].bind(0)
             }),
             update);
@@ -139,9 +140,13 @@ export class Particles {
 
     draw(update, mode = this.gl.POINTS) {
         this.geom.bind(this.render);
-        this.render.uniforms.particles = this.buffers[0].color[0].bind(0);
 
-        Particles.applyUpdate(this.render.uniforms, update);
+        Particles.applyUpdate(Object.assign(this.render.uniforms, {
+                dataRes: this.shape,
+                geomRes: this.geomShape,
+                particles: this.buffers[0].color[0].bind(0)
+            }),
+            update);
 
         this.geom.draw(mode);
     }
