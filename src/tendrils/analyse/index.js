@@ -34,13 +34,11 @@ export function orderLogRates(orderLog, dt = 1) {
 // Interpret from that info.
 
 export const peak = (data) =>
-    reduceList((max, v) => Math.max(Math.abs(v), max), data, -1);
+    reduceList((max, v) => ((Math.abs(v) > Math.abs(max))? v : max), data, 0);
 
 export const peakPos = (data) => reduceList((max, v, i) => {
-        let h = Math.abs(v);
-
-        if(h > max.peak) {
-            max.peak = h;
+        if(Math.abs(v) > Math.abs(max.peak)) {
+            max.peak = v;
             max.pos = i;
         }
 
@@ -48,18 +46,18 @@ export const peakPos = (data) => reduceList((max, v, i) => {
     },
     data,
     {
-        peak: -1,
+        peak: 0,
         pos: -1
     });
 
 export const sum = (data) => reduceList((sum, v) => sum+Math.abs(v), data, 0);
 
-export const weightedSum = (data, fulcrum) =>
+export const weightedSum = (data, fulcrum = 0.5) =>
     reduceList((sum, v, i) =>
-            sum+Math.abs(v*(1-(Math.abs(i-fulcrum)/(data.length-1)))),
+            sum+Math.abs(v*(1-Math.abs((i/(data.length-1))-fulcrum))),
         data, 0);
 
 export const mean = (data) => sum(data)/data.length;
 
-export const weightedMean = (data, fulcrum) =>
+export const weightedMean = (data, fulcrum = 0.5) =>
     weightedSum(data, fulcrum)/data.length;

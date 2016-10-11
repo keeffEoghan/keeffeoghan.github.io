@@ -1,8 +1,8 @@
 #pragma glslify: import(./frag/head)
 
-#pragma glslify: applyID = require(./apply/identity)
+#pragma glslify: applier = require(./apply/identity)
 #pragma glslify: vignette = require(../../filter/pass/vignette)
-#pragma glslify: apply = require(./apply/compose-filter, apply = applyID, pass = vignette)
+#pragma glslify: apply = require(./apply/compose-filter, apply = applier, pass = vignette)
 
 #pragma glslify: test = require(./test/particles)
 

@@ -6,6 +6,9 @@ export function step(array) {
     return next;
 }
 
+export const wrapIndex = (index, array) =>
+    array[(array.length+index)%array.length];
+
 
 const invLog2 = 1/Math.log(2);
 

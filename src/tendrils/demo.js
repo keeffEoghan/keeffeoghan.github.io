@@ -1,5 +1,3 @@
-/* global Uint8Array, Float32Array */
-
 import 'pepjs';
 import glContext from 'gl-context';
 import vkey from 'vkey';
@@ -21,25 +19,22 @@ import Timer from './timer';
 
 import { Tendrils, defaults, glSettings } from './';
 
-
 import * as spawnPixels from './spawn/pixels';
 import spawnPixelsFlowFrag from './spawn/pixels/flow.frag';
 import spawnPixelsSimpleFrag from './spawn/pixels/data.frag';
 
 import spawnReset from './spawn/ball';
 
-import FlowLine from './flow-line/';
+import AudioTrigger from './audio';
+import { peak, sum, mean, weightedMean } from './analyse';
 
-import makeAudioData from './audio/data';
-import { makeLog, makeOrderLog } from './data-log';
-import { orderLogRates, peak, sum, mean, weightedMean } from './analyse';
+import FlowLines from './flow-line/multi';
 
 import Sequencer from './animate';
 
 import { curry } from '../fp/partial';
 import each from '../fp/each';
 import filter from '../fp/filter';
-import { step } from '../utils';
 
 export default (canvas, settings, debug) => {
     if(redirect()) {
@@ -53,7 +48,7 @@ export default (canvas, settings, debug) => {
     const timer = defaultSettings.timer;
 
     let tendrils;
-    let flowInput;
+    let flowInputs;
 
 
     // Audio init
@@ -89,22 +84,46 @@ export default (canvas, settings, debug) => {
 
     // @todo Stereo: true
 
-    const trackAnalyser = analyser(track, {
-            audible: audioState.audible
-        });
+    const trackAnalyser = analyser(track, { audible: audioState.audible });
 
     trackAnalyser.analyser.fftSize = Math.pow(2, 5);
 
-    const order = 3;
-
-    const trackOrderLog = makeOrderLog(order, (size) =>
-        makeLog(size, () => makeAudioData(trackAnalyser,
-            ((size === order)? Uint8Array : Float32Array))));
-
+    const trackTrigger = new AudioTrigger(trackAnalyser, 3);
 
     // Mic refs
     let micAnalyser;
-    let micOrderLog;
+    let micTrigger;
+
+
+    // Audio test and react
+
+    const audioTest = [
+        (trigger) => mean(trigger.nthOrderData(-1)) > audioState.trackBeatAt,
+        (trigger) => sum(trigger.nthOrderData(1)) > audioState.trackLoudAt,
+        (trigger) =>
+            weightedMean(trigger.nthOrderData(-1), 0.2) > audioState.micBeatAt,
+        (trigger) =>
+            Math.abs(peak(trigger.nthOrderData(1))) > audioState.micLoudAt
+    ];
+
+    const audioReact = [
+        () => {
+            respawnCam();
+            console.log('track beat 0');
+        },
+        () => {
+            respawnFlow();
+            console.log('track beat 1');
+        },
+        () => {
+            respawnCam();
+            console.log('mic beat 0');
+        },
+        () => {
+            respawnFastest();
+            console.log('mic beat 1');
+        }
+    ];
 
 
     // Animation init
@@ -129,55 +148,37 @@ export default (canvas, settings, debug) => {
 
             tendrils.draw();
 
+
+            // Draw inputs to flow
+
             gl.viewport(0, 0, ...tendrils.flow.shape);
 
             tendrils.flow.bind();
-            Object.assign(flowInput.line.uniforms, tendrils.state);
 
-            // @todo Kill old flow lines once empty
-            flowInput
-                .trimOld((1/tendrils.state.flowDecay)+100, timer.now())
-                .update().draw();
+            flowInputs.trim(1/tendrils.state.flowDecay, timer.time);
+
+            each((flowLine) => {
+                    Object.assign(flowLine.line.uniforms, tendrils.state);
+                    flowLine.update().draw();
+                },
+                flowInputs.active);
 
 
-            // React to sound
+            // React to sound - from highest reaction to lowest
 
-            let soundInput = null;
+            (trackTrigger && trackTrigger.sample(dt));
+            (micTrigger && micTrigger.sample(dt));
 
-            if(audioState.track && trackAnalyser && trackOrderLog) {
-                trackAnalyser.frequencies(step(trackOrderLog[0]));
-                orderLogRates(trackOrderLog, dt);
+            let soundOutput = false;
 
-                if(mean(trackOrderLog[trackOrderLog.length-1][0]) >
-                        audioState.trackBeatAt) {
-                    soundInput = respawnCam;
-                    console.log('track beat');
-                }
-                else if(sum(trackOrderLog[1][0]) > audioState.trackLoudAt) {
-                    soundInput = respawnFlow;
-                    console.log('track volume');
-                }
+            if(audioState.track && !track.paused) {
+                soundOutput = ((trackTrigger.fire(audioReact[0], audioTest[0]))
+                    || (trackTrigger.fire(audioReact[1], audioTest[1])));
             }
 
-            if(!soundInput && audioState.mic && micAnalyser && micOrderLog) {
-                micAnalyser.frequencies(step(micOrderLog[0]));
-                orderLogRates(micOrderLog, dt);
-
-                const beats = micOrderLog[micOrderLog.length-1][0];
-
-                if(weightedMean(beats, beats.length*0.2) >
-                        audioState.micBeatAt) {
-                    soundInput = respawnCam;
-                    console.log('mic beat');
-                }
-                else if(peak(micOrderLog[1][0]) > audioState.micLoudAt) {
-                    soundInput = respawnFlow();
-                    console.log('mic volume');
-                }
-            }
-
-            if(soundInput) {
-                soundInput();
+            if(!soundOutput && audioState.mic && micTrigger) {
+                soundOutput = ((micTrigger.fire(audioReact[2], audioTest[2]))
+                    || (micTrigger.fire(audioReact[3], audioTest[3])));
             }
         });
 
@@ -194,20 +195,17 @@ export default (canvas, settings, debug) => {
     const state = tendrils.state;
 
 
-    // Flow line
+    // Flow inputs
 
-    // @todo New flow lines for new pointers
-    flowInput = new FlowLine(gl);
+    flowInputs = new FlowLines(gl);
 
     const pointerFlow = (e) => {
-        flowInput.times.push(timer.now());
-
         const flow = offset(e, canvas, vec2.create());
 
         flow[0] = mapRange(flow[0], 0, tendrils.viewRes[0], -1, 1);
         flow[1] = mapRange(flow[1], 0, tendrils.viewRes[1], 1, -1);
 
-        flowInput.line.path.push(flow);
+        flowInputs.get(e.pointerId).add(timer.now(), flow);
     };
 
     canvas.addEventListener('pointermove', pointerFlow, false);
@@ -276,12 +274,6 @@ export default (canvas, settings, debug) => {
         }
     }
 
-    function respawnVideo() {
-        camPixelSpawner.buffer.shape = [video.videoWidth, video.videoHeight];
-        mat3.scale(camPixelSpawner.spawnMatrix,
-            camPixelSpawner.spawnMatrix, [-1, 1]);
-    }
-
     getUserMedia({
             video: true,
             audio: true
@@ -296,7 +288,15 @@ export default (canvas, settings, debug) => {
                 video.muted = true;
                 video.src = self.URL.createObjectURL(stream);
                 video.play();
-                video.addEventListener('canplay', respawnVideo);
+                video.addEventListener('canplay', () => {
+                    camPixelSpawner.buffer.shape = [
+                        video.videoWidth,
+                        video.videoHeight
+                    ];
+
+                    mat3.scale(camPixelSpawner.spawnMatrix,
+                        camPixelSpawner.spawnMatrix, [-1, 1]);
+                });
 
 
                 // Trying out audio analyser.
@@ -305,13 +305,9 @@ export default (canvas, settings, debug) => {
                         audible: false
                     });
 
-                micAnalyser.analyser.fftSize = Math.pow(2, 8);
+                micAnalyser.analyser.fftSize = Math.pow(2, 7);
 
-                const order = 2;
-
-                micOrderLog = makeOrderLog(order, (size) =>
-                    makeLog(size, () => makeAudioData(micAnalyser,
-                        ((size === order)? Uint8Array : Float32Array))));
+                micTrigger = new AudioTrigger(micAnalyser, 2);
             }
         });
 
@@ -997,6 +993,7 @@ export default (canvas, settings, debug) => {
                             keyframe({ ...state });
                         }
 
+                        // @todo Needed?
                         editing[key] = null;
                         delete editing[key];
                     }
@@ -1019,100 +1016,5 @@ export default (canvas, settings, debug) => {
                 call: [restart],
                 time: 1000/30
             });
-
-        // Test sequence.
-        // sequencer.smoothTo({
-        //         to: {
-        //             ...defaultState,
-        //             showFlow: false,
-        //             noiseSpeed: 0.00001,
-        //             noiseScale: 60,
-        //             forceWeight: 0.014,
-        //             wanderWeight: 0.0021,
-        //             speedAlpha: 0.000002,
-        //             color: [0, 0, 0, 0.1],
-        //             baseColor: [1, 1, 1, 0.01],
-        //         },
-        //         time: 3000,
-        //         ease: [0, 0.9, 1]
-        //     })
-        //     .smoothTo({
-        //         to: {
-        //             noiseSpeed: 0.00001,
-        //             noiseScale: 18,
-        //             forceWeight: 0.014,
-        //             wanderWeight: 0.0021,
-        //             speedAlpha: 0.000002
-        //         },
-        //         time: 5000,
-        //         ease: [0, 0.3, 1]
-        //     })
-        //     .smoothTo({
-        //         to: {
-        //             flowDecay: 0,
-        //             noiseSpeed: 0,
-        //             noiseScale: 18,
-        //             forceWeight: 0.015,
-        //             wanderWeight: 0.0023,
-        //             speedAlpha: 0.00005,
-        //             lineWidth: 3
-        //         },
-        //         time: 9000,
-        //         ease: [0, 1.1, 1]
-        //     })
-        //     .smoothTo({
-        //         to: {
-        //             flowWeight: 0,
-        //             wanderWeight: 0.002,
-        //             noiseSpeed: 0,
-        //             noiseScale: 20,
-        //             speedAlpha: 0
-        //         },
-        //         time: 11000,
-        //         ease: [0, 0.9, 1]
-        //     })
-        //     .smoothTo({
-        //         to: {
-        //             noiseSpeed: 0.00001,
-        //             noiseScale: 60,
-        //             forceWeight: 0.014,
-        //             wanderWeight: 0.0021,
-        //             speedAlpha: 0.000002
-        //         },
-        //         time: 15000
-        //     })
-        //     .smoothTo({
-        //         to: {
-        //             flowDecay: defaultState.flowDecay,
-        //             flowWeight: 1,
-        //             wanderWeight: 0.002,
-        //             noiseSpeed: 0,
-        //             noiseScale: 2.125,
-        //             speedAlpha: 0,
-        //             lineWidth: 1
-        //         },
-        //         time: 14000,
-        //         ease: [0, 0.9, 1]
-        //     })
-        //     .smoothTo({
-        //         to: {
-        //             wanderWeight: 0.002,
-        //             noiseSpeed: 0,
-        //             noiseScale: 2.125,
-        //             speedAlpha: 0
-        //         },
-        //         time: 17000,
-        //         ease: [0, 0.9, 1]
-        //     })
-        //     .smoothTo({
-        //         to: {
-        //             ...defaultState,
-        //             showFlow: true,
-        //             flowWidth: 5,
-        //             done: restart
-        //         },
-        //         time: 19000,
-        //         ease: [0, 0.9, 1]
-        //     });
     }
 };

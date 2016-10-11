@@ -38,7 +38,6 @@ export class SpawnPixels {
             :   params.buffer);
 
         this.jitterRad = 4;
-
         this.jitter = vec2.create();
 
         this.spawnSize = params.spawnSize;

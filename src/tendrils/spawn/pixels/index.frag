@@ -10,10 +10,12 @@
 
 #pragma glslify: import(./frag/head)
 
-#pragma glslify: applyColor = require(./apply/color)
+// #pragma glslify: applier = require(./apply/color)
+#pragma glslify: applier = require(./apply/brightest)
 #pragma glslify: vignette = require(../../filter/pass/vignette)
-#pragma glslify: apply = require(./apply/compose-filter, apply = applyColor, pass = vignette)
+#pragma glslify: apply = require(./apply/compose-filter, apply = applier, pass = vignette)
 // #pragma glslify: apply = require(./apply/color)
+// #pragma glslify: apply = require(./apply/brightest)
 
 #pragma glslify: test = require(./test/particles)
 
