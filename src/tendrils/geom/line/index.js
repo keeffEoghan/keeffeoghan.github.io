@@ -7,8 +7,8 @@
 import geom from 'gl-geometry';
 import lineNormals from 'polyline-normals';
 import shader from 'gl-shader';
-import forOwn from 'lodash/forOwn';
 
+import each from '../../../fp/each';
 import vert from './vert/index.vert';
 import frag from './frag/index.frag';
 
@@ -70,7 +70,7 @@ export class Line {
         this.geom = geom(gl);
     }
 
-    update(each = this.setAttributes) {
+    update(setAttributes = this.setAttributes) {
         this.drawnPath = this.path;
         this.drawnNormals = lineNormals(this.drawnPath, this.closed);
 
@@ -104,13 +104,14 @@ export class Line {
                 index.vert = v;
                 index.data = index.point+v;
 
-                each(values, index, attributes, this);
+                setAttributes(values, index, attributes, this);
             }
         }
 
         // Bind to geometry attributes
-        forOwn(attributes, (attribute, name) =>
-            this.geom.attr(name, attribute.data, { size: attribute.size }));
+        each((attribute, name) =>
+                this.geom.attr(name, attribute.data, { size: attribute.size }),
+            attributes);
 
         return this;
     }
@@ -127,21 +128,21 @@ export class Line {
 
     initAttributes() {
         const num = this.drawnPath.length*this.vertNum;
-        const attributes = this.attributes;
 
-        forOwn(attributes, (attribute) => {
-            // Cache any computed sizes.
-            if(attribute.getSize) {
-                attribute.size = attribute.getSize(this);
-            }
+        each((attribute) => {
+                // Cache any computed sizes.
+                if(attribute.getSize) {
+                    attribute.size = attribute.getSize(this);
+                }
 
-            // Initialise new data if needed.
-            const length = num*attribute.size;
+                // Initialise new data if needed.
+                const length = num*attribute.size;
 
-            if(!attribute.data || attribute.data.length !== length) {
-                attribute.data = new Float32Array(length);
-            }
-        });
+                if(!attribute.data || attribute.data.length !== length) {
+                    attribute.data = new Float32Array(length);
+                }
+            },
+            this.attributes);
 
         return this;
     }
