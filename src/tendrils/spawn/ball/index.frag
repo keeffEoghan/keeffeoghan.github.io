@@ -5,7 +5,7 @@ uniform float speed;
 
 #pragma glslify: random = require(glsl-random)
 
-#pragma glslify: angleToVec = require(../../utils/angle-to-pos)
+#pragma glslify: angleToVec = require(../../utils/angle-to-vec)
 #pragma glslify: tau = require(../../const/tau)
 
 void main() {

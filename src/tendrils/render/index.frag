@@ -1,9 +1,7 @@
 precision highp float;
 
-uniform vec4 color;
-
-varying float speedRate;
+varying vec4 color;
 
 void main() {
-    gl_FragColor = vec4(color.rgb, color.a*speedRate);
+    gl_FragColor = color;
 }

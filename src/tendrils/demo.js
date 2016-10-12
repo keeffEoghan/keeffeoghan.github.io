@@ -11,6 +11,7 @@ import mat3 from 'gl-matrix/src/gl-matrix/mat3';
 import vec2 from 'gl-matrix/src/gl-matrix/vec2';
 import querystring from 'querystring';
 import toSource from 'tosource';
+import shader from 'gl-shader';
 import dat from 'dat-gui';
 
 import redirect from '../utils/protocol-redirect';
@@ -20,6 +21,7 @@ import Timer from './timer';
 import { Tendrils, defaults, glSettings } from './';
 
 import * as spawnPixels from './spawn/pixels';
+import pixelsFrag from './spawn/pixels/index.frag';
 import bestSampleFrag from './spawn/pixels/best-sample.frag';
 import flowSampleFrag from './spawn/pixels/flow-sample.frag';
 import dataSampleFrag from './spawn/pixels/data-sample.frag';
@@ -193,6 +195,8 @@ export default (canvas, settings, debug) => {
         respawn();
     };
 
+    const colorMaps = { main: tendrils.state.colorMap };
+
     const state = tendrils.state;
 
 
@@ -310,31 +314,39 @@ export default (canvas, settings, debug) => {
 
 
     // Cam
-    /**
-     * @todo Use image as color LUT values - to show the cam feed clearly at the
-     *       start, then seamlessly flow into the visuals.
-     */
 
     let video = null;
 
-    const camSpawners = {
-        direct: new spawnPixels.SpawnPixels(gl, {
-                speed: 0.01
-            }),
-        sample: new spawnPixels.SpawnPixels(gl, {
-                shader: [spawnPixels.defaults().shader[0], bestSampleFrag]
-            })
+    const camShaders = {
+        direct: shader(gl, spawnPixels.defaults().shader[0], pixelsFrag),
+        sample: shader(gl, spawnPixels.defaults().shader[0], bestSampleFrag)
     };
 
-    function spawnCam(camSpawner) {
+    const camSpawner = new spawnPixels.SpawnPixels(gl, {
+            shader: camShaders.direct
+        });
+
+    colorMaps.cam = camSpawner.buffer;
+
+    const respawnCam = () => {
         if(video) {
+            tendrils.state.colorMap = colorMaps.cam;
+            camSpawner.shader = camShaders.direct;
+            camSpawner.speed = 0.00001;
             camSpawner.setPixels(video);
             camSpawner.respawn(tendrils);
         }
-    }
+    };
 
-    const respawnCam = () => spawnCam(camSpawners.direct);
-    const respawnSampleCam = () => spawnCam(camSpawners.sample);
+    const respawnSampleCam = () => {
+        if(video) {
+            tendrils.state.colorMap = colorMaps.main;
+            camSpawner.shader = camShaders.sample;
+            camSpawner.speed = 1;
+            camSpawner.setPixels(video);
+            camSpawner.respawn(tendrils);
+        }
+    };
 
 
     getUserMedia({
@@ -351,7 +363,7 @@ export default (canvas, settings, debug) => {
                 video.muted = true;
                 video.src = self.URL.createObjectURL(stream);
                 video.play();
-                video.addEventListener('canplay', () => each((camSpawner) => {
+                video.addEventListener('canplay', () => {
                         camSpawner.buffer.shape = [
                             video.videoWidth,
                             video.videoHeight
@@ -359,8 +371,7 @@ export default (canvas, settings, debug) => {
 
                         mat3.scale(camSpawner.spawnMatrix,
                             mat3.identity(camSpawner.spawnMatrix), [-1, 1]);
-                    },
-                    camSpawners));
+                    });
 
 
                 // Trying out audio analyser.
@@ -476,7 +487,7 @@ export default (canvas, settings, debug) => {
         const settingsGUI = gui.addFolder('settings');
 
         for(let s in state) {
-            if(!(typeof state[s]).match(/(object|array)/gi)) {
+            if(!(typeof state[s]).match(/(object|array|undefined|null)/gi)) {
                 const control = settingsGUI.add(state, s);
 
                 // Some special cases
@@ -494,27 +505,43 @@ export default (canvas, settings, debug) => {
         // DAT.GUI's color controllers are a bit fucked.
 
         const colorDefaults = {
-                color: state.color.slice(0, 3).map((c) => c*255),
-                alpha: state.color[3],
+                flowColor: state.flowColor.slice(0, 3).map((c) => c*255),
+                flowAlpha: state.flowColor[3],
 
                 baseColor: state.baseColor.slice(0, 3).map((c) => c*255),
-                baseAlpha: state.baseColor[3]
+                baseAlpha: state.baseColor[3],
+
+                fadeColor: state.fadeColor.slice(0, 3).map((c) => c*255),
+                fadeAlpha: state.fadeColor[3]
             };
 
         const colorProxy = {...colorDefaults};
 
-        const convertColor = () => Object.assign(state, {
-            color: [...colorProxy.color.map((c) => c/255), colorProxy.alpha],
-            baseColor: [...colorProxy.baseColor.map((c) => c/255), colorProxy.baseAlpha]
+        const convertColors = () => Object.assign(state, {
+            flowColor: [
+                ...colorProxy.flowColor.map((c) => c/255),
+                colorProxy.flowAlpha
+            ],
+            baseColor: [
+                ...colorProxy.baseColor.map((c) => c/255),
+                colorProxy.baseAlpha
+            ],
+            fadeColor: [
+                ...colorProxy.fadeColor.map((c) => c/255),
+                colorProxy.fadeAlpha
+            ]
         });
 
-        settingsGUI.addColor(colorProxy, 'color').onChange(convertColor);
-        settingsGUI.add(colorProxy, 'alpha').onChange(convertColor);
+        settingsGUI.addColor(colorProxy, 'flowColor').onChange(convertColors);
+        settingsGUI.add(colorProxy, 'flowAlpha').onChange(convertColors);
 
-        settingsGUI.addColor(colorProxy, 'baseColor').onChange(convertColor);
-        settingsGUI.add(colorProxy, 'baseAlpha').onChange(convertColor);
+        settingsGUI.addColor(colorProxy, 'baseColor').onChange(convertColors);
+        settingsGUI.add(colorProxy, 'baseAlpha').onChange(convertColors);
 
-        convertColor();
+        settingsGUI.addColor(colorProxy, 'fadeColor').onChange(convertColors);
+        settingsGUI.add(colorProxy, 'fadeAlpha').onChange(convertColors);
+
+        convertColors();
 
 
         // Respawn
@@ -522,7 +549,7 @@ export default (canvas, settings, debug) => {
         const respawnGUI = gui.addFolder('respawn');
 
         for(let s in resetSpawner.uniforms) {
-            if(!(typeof resetSpawner.uniforms[s]).match(/(object|array)/gi)) {
+            if(!(typeof resetSpawner.uniforms[s]).match(/(object|array|undefined|null)/gi)) {
                 respawnGUI.add(resetSpawner.uniforms, s);
             }
         }
@@ -603,8 +630,8 @@ export default (canvas, settings, debug) => {
         const presetters = {
             'Flow'() {
                 Object.assign(state, {
-                        showFlow: true,
-                        flowWidth: 5
+                        flowWidth: 5,
+                        colorMapAlpha: 0
                     });
 
                 Object.assign(resetSpawner.uniforms, {
@@ -613,16 +640,23 @@ export default (canvas, settings, debug) => {
                     });
 
                 Object.assign(colorProxy, {
-                        alpha: 0.01,
-                        color: [255, 255, 255],
-                        baseAlpha: Math.max(state.flowDecay, 0.05),
-                        baseColor: [0, 0, 0]
+                        flowAlpha: 1,
+                        flowColor: [255, 255, 255],
+                        baseAlpha: 0,
+                        fadeAlpha: Math.max(state.flowDecay, 0.05),
+                        fadeColor: [0, 0, 0]
                     });
             },
             'Wings'() {
                 Object.assign(resetSpawner.uniforms, {
                         radius: 0.1,
-                        speed: 0
+                        speed: 0,
+                        colorMapAlpha: 0
+                    });
+
+                Object.assign(colorProxy, {
+                        flowAlpha: 0.01,
+                        baseAlpha: 0.2
                     });
 
                 Object.assign(colorProxy);
@@ -633,8 +667,7 @@ export default (canvas, settings, debug) => {
                     });
 
                 Object.assign(colorProxy, {
-                        alpha: 0.2,
-                        color: [255, 255, 255]
+                        fadeAlpha: 0
                     });
             },
             'Flow only'() {
@@ -651,10 +684,10 @@ export default (canvas, settings, debug) => {
                     });
 
                 Object.assign(colorProxy, {
-                        alpha: 0.8,
-                        color: [100, 200, 255],
-                        baseAlpha: 0.1,
-                        baseColor: [0, 0, 0]
+                        baseAlpha: 0.8,
+                        baseColor: [100, 200, 255],
+                        fadeAlpha: 0.1,
+                        fadeColor: [0, 0, 0]
                     });
             },
             'Noise only'() {
@@ -666,10 +699,10 @@ export default (canvas, settings, debug) => {
                     });
 
                 Object.assign(colorProxy, {
-                        alpha: 0.1,
-                        color: [255, 150, 0],
-                        baseAlpha: 0.005,
-                        baseColor: [0, 0, 0]
+                        baseAlpha: 0.1,
+                        baseColor: [255, 150, 0],
+                        fadeAlpha: 0.005,
+                        fadeColor: [0, 0, 0]
                     });
             },
             'Sea'() {
@@ -678,7 +711,8 @@ export default (canvas, settings, debug) => {
                         forceWeight: 0.013,
                         wanderWeight: 0.002,
                         flowDecay: 0.005,
-                        speedAlpha: 0
+                        speedAlpha: 0,
+                        colorMapAlpha: 0.4
                     });
 
                 Object.assign(resetSpawner.uniforms, {
@@ -687,20 +721,15 @@ export default (canvas, settings, debug) => {
                     });
 
                 Object.assign(colorProxy, {
-                        alpha: 0.1,
-                        color: [55, 155, 255],
-                        baseAlpha: 0.3,
-                        baseColor: [0, 58, 90]
+                        baseAlpha: 0.8,
+                        baseColor: [55, 155, 255],
+                        fadeAlpha: 0.3,
+                        fadeColor: [0, 58, 90]
                     });
             },
             'Ghostly'() {
                 Object.assign(state, {
                         flowDecay: 0
-                    });
-
-                Object.assign(colorProxy, {
-                        alpha: 0.006,
-                        color: [255, 255, 255]
                     });
             },
             'Turbulence'() {
@@ -709,14 +738,15 @@ export default (canvas, settings, debug) => {
                         noiseScale: 10,
                         forceWeight: 0.014,
                         wanderWeight: 0.003,
-                        speedAlpha: 0.000002
+                        speedAlpha: 0.000002,
+                        colorMapAlpha: 0.3
                     });
 
                 Object.assign(colorProxy, {
-                        alpha: 0.8,
-                        color: [255, 10, 10],
-                        baseAlpha: 0.01,
-                        baseColor: [0, 0, 0]
+                        baseAlpha: 0.8,
+                        baseColor: [255, 10, 10],
+                        fadeAlpha: 0.01,
+                        fadeColor: [0, 0, 0]
                     });
             },
             'Rorschach'() {
@@ -725,7 +755,8 @@ export default (canvas, settings, debug) => {
                         noiseScale: 60,
                         forceWeight: 0.014,
                         wanderWeight: 0.0021,
-                        speedAlpha: 0.000002
+                        speedAlpha: 0.000002,
+                        colorMapAlpha: 0.2
                     });
 
                 Object.assign(flowPixelState, {
@@ -733,10 +764,10 @@ export default (canvas, settings, debug) => {
                 });
 
                 Object.assign(colorProxy, {
-                        alpha: 1,
-                        color: [0, 0, 0],
-                        baseAlpha: 0.01,
-                        baseColor: [255, 255, 255]
+                        baseAlpha: 0.9,
+                        baseColor: [0, 0, 0],
+                        fadeAlpha: 0.01,
+                        fadeColor: [255, 255, 255]
                     });
             },
             'Roots'() {
@@ -747,12 +778,14 @@ export default (canvas, settings, debug) => {
                         forceWeight: 0.015,
                         wanderWeight: 0.0023,
                         speedAlpha: 0.00005,
-                        lineWidth: 3
+                        lineWidth: 3,
+                        colorMapAlpha: 0.0001
                     });
 
                 Object.assign(colorProxy, {
-                        alpha: 0.03,
-                        color: [50, 255, 50]
+                        flowAlpha: 0.01,
+                        baseAlpha: 0.02,
+                        baseColor: [50, 255, 50]
                     });
             }
         };
@@ -766,8 +799,8 @@ export default (canvas, settings, debug) => {
             presetter();
 
             updateGUI();
-            convertColor();
-            // restart();
+            convertColors();
+            restart();
         };
 
         for(let p in presetters) {
@@ -894,7 +927,6 @@ export default (canvas, settings, debug) => {
                 },
 
                 'P': stateBool('autoClearView'),
-                'O': stateBool('showFlow'),
 
                 'Z': stateNum('damping', 0.001),
                 'X': stateNum('minSpeed', 0.0001),
@@ -909,9 +941,6 @@ export default (canvas, settings, debug) => {
 
                 'E': stateNum('noiseScale', 1),
                 'R': stateNum('noiseSpeed', 0.002),
-
-                // 'V': stateNum('color', 0.002),
-                // 'B': stateNum('baseColor', 0.002),
 
                 'G': stateNum('speedAlpha', 0.002),
                 'F': stateNum('lineWidth', 0.1),
