@@ -643,7 +643,6 @@ export default (canvas, settings, debug) => {
                         flowAlpha: 1,
                         flowColor: [255, 255, 255],
                         baseAlpha: 0,
-                        baseColor: [0, 0, 0],
                         fadeAlpha: Math.max(state.flowDecay, 0.05),
                         fadeColor: [0, 0, 0]
                     });
@@ -651,7 +650,13 @@ export default (canvas, settings, debug) => {
             'Wings'() {
                 Object.assign(resetSpawner.uniforms, {
                         radius: 0.1,
-                        speed: 0
+                        speed: 0,
+                        colorMapAlpha: 0
+                    });
+
+                Object.assign(colorProxy, {
+                        flowAlpha: 0.01,
+                        baseAlpha: 0.2
                     });
 
                 Object.assign(colorProxy);
@@ -659,6 +664,10 @@ export default (canvas, settings, debug) => {
             'Fluid'() {
                 Object.assign(state, {
                         autoClearView: true
+                    });
+
+                Object.assign(colorProxy, {
+                        fadeAlpha: 0
                     });
             },
             'Flow only'() {
@@ -702,7 +711,8 @@ export default (canvas, settings, debug) => {
                         forceWeight: 0.013,
                         wanderWeight: 0.002,
                         flowDecay: 0.005,
-                        speedAlpha: 0
+                        speedAlpha: 0,
+                        colorMapAlpha: 0.4
                     });
 
                 Object.assign(resetSpawner.uniforms, {
@@ -711,7 +721,7 @@ export default (canvas, settings, debug) => {
                     });
 
                 Object.assign(colorProxy, {
-                        baseAlpha: 0.1,
+                        baseAlpha: 0.8,
                         baseColor: [55, 155, 255],
                         fadeAlpha: 0.3,
                         fadeColor: [0, 58, 90]
@@ -728,7 +738,8 @@ export default (canvas, settings, debug) => {
                         noiseScale: 10,
                         forceWeight: 0.014,
                         wanderWeight: 0.003,
-                        speedAlpha: 0.000002
+                        speedAlpha: 0.000002,
+                        colorMapAlpha: 0.3
                     });
 
                 Object.assign(colorProxy, {
@@ -744,7 +755,8 @@ export default (canvas, settings, debug) => {
                         noiseScale: 60,
                         forceWeight: 0.014,
                         wanderWeight: 0.0021,
-                        speedAlpha: 0.000002
+                        speedAlpha: 0.000002,
+                        colorMapAlpha: 0.2
                     });
 
                 Object.assign(flowPixelState, {
@@ -766,11 +778,13 @@ export default (canvas, settings, debug) => {
                         forceWeight: 0.015,
                         wanderWeight: 0.0023,
                         speedAlpha: 0.00005,
-                        lineWidth: 3
+                        lineWidth: 3,
+                        colorMapAlpha: 0.0001
                     });
 
                 Object.assign(colorProxy, {
-                        baseAlpha: 0.003,
+                        flowAlpha: 0.01,
+                        baseAlpha: 0.02,
                         baseColor: [50, 255, 50]
                     });
             }
@@ -786,7 +800,7 @@ export default (canvas, settings, debug) => {
 
             updateGUI();
             convertColors();
-            // restart();
+            restart();
         };
 
         for(let p in presetters) {
