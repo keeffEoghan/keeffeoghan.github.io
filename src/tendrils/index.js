@@ -49,10 +49,10 @@ export const defaults = () => ({
 
         lineWidth: 1,
         speedAlpha: 0.000001,
-        colorMapAlpha: 0.4,
+        colorMapAlpha: 0.5,
 
-        flowColor: [1, 1, 1, 0.01],
-        baseColor: [0, 0, 0, 0.5],
+        flowColor: [1, 1, 1, 0.02],
+        baseColor: [1, 1, 1, 0.5],
         fadeColor: [0, 0, 0, 0]
     },
     timer: Object.assign(new Timer(), { step: 1000/60 }),
