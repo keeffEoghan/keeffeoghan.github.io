@@ -1,12 +1,12 @@
 import shader from 'gl-shader';
 import FBO from 'gl-fbo';
+import ndarray from 'ndarray';
 
 import Particles from './particles';
 import Timer from './timer';
 import { step/*, nextPow2*/ } from '../utils';
 import spawner from './spawn/init/cpu';
 import { maxAspect } from './utils/aspect';
-
 import Screen from './screen';
 
 
@@ -18,7 +18,6 @@ import renderVert from './render/index.vert';
 import renderFrag from './render/index.frag';
 
 import flowVert from './flow/index.vert';
-import flowScreenVert from './flow/screen.vert';
 import flowFrag from './flow/index.frag';
 
 import screenVert from './screen/index.vert';
@@ -33,7 +32,6 @@ export const defaults = () => ({
         rootNum: Math.pow(2, 9),
 
         autoClearView: false,
-        showFlow: false,
 
         damping: 0.043,
         minSpeed: 0.000001,
@@ -49,23 +47,21 @@ export const defaults = () => ({
         noiseScale: 2.125,
         noiseSpeed: 0.00025,
 
-        // @todo Make this a texture lookup instead
-        color: [1, 1, 1, 0.05],
-        // @todo Move this to another module, doesn't need to be here
-        baseColor: [0, 0, 0, 0],
-
+        lineWidth: 1,
         speedAlpha: 0.000001,
-        lineWidth: 1
+        colorMapAlpha: 0.5,
+
+        flowColor: [1, 1, 1, 0.02],
+        baseColor: [1, 1, 1, 0.5],
+        fadeColor: [0, 0, 0, 0]
     },
-    timer: Object.assign(new Timer(), {
-            step: 1000/60
-        }),
+    timer: Object.assign(new Timer(), { step: 1000/60 }),
     numBuffers: 0,
     logicShader: null,
     renderShader: [renderVert, renderFrag],
     flowShader: [flowVert, flowFrag],
-    flowScreenShader: [flowScreenVert, flowFrag],
-    copyShader: [screenVert, copyFrag]
+    copyShader: [screenVert, copyFrag],
+    colorMapData: ndarray([1, 1, 0, 0], [1, 1, 4])
 });
 
 export const glSettings = {
@@ -81,7 +77,16 @@ export class Tendrils {
         };
 
         this.gl = gl;
+
         this.state = params.state;
+
+        // A convenience for filling `colorMap`.
+        this.colorMapData = params.colorMapData;
+
+        if(!this.state.colorMap) {
+            this.state.colorMap = FBO(this.gl, [1, 1], { float: true });
+            this.fillColorMap();
+        }
 
         this.screen = new Screen(this.gl);
 
@@ -104,10 +109,6 @@ export class Tendrils {
         this.flowShader = ((Array.isArray(params.flowShader))?
                 shader(this.gl, ...params.flowShader)
             :   params.flowShader);
-
-        this.flowScreenShader = ((Array.isArray(params.flowScreenShader))?
-                shader(this.gl, ...params.flowScreenShader)
-            :   params.flowScreenShader);
 
         this.copyShader = ((Array.isArray(params.copyShader))?
                 shader(this.gl, ...params.copyShader)
@@ -270,7 +271,9 @@ export class Tendrils {
                 time: this.timer.time,
                 previous: this.particles.buffers[1].color[0].bind(2),
                 viewSize: this.viewSize,
-                viewRes: this.viewRes
+                viewRes: this.viewRes,
+                colorMap: this.state.colorMap.color[0].bind(3),
+                colorMapRes: this.state.colorMap.shape
             });
 
         this.particles.render = this.flowShader;
@@ -296,25 +299,11 @@ export class Tendrils {
         // Render to the view.
 
         // Overlay fade.
-        if(this.state.baseColor[3] > 0) {
+        if(this.state.fadeColor[3] > 0) {
             this.baseShader.bind();
-            this.baseShader.uniforms.color = this.state.baseColor;
+            this.baseShader.uniforms.color = this.state.fadeColor;
             this.gl.bindFramebuffer(this.gl.FRAMEBUFFER, null);
             this.screen.render();
-        }
-
-        // Show flow
-        if(this.state.showFlow) {
-            // @todo Surely just render the flow texture instead?
-            this.particles.render = this.flowScreenShader;
-
-            if(this.state.lineWidth > 0) {
-                this.gl.lineWidth(Math.max(0, this.state.lineWidth));
-            }
-
-            // Render the flow directly to the screen
-            this.gl.bindFramebuffer(this.gl.FRAMEBUFFER, null);
-            this.particles.draw(this.uniforms.render, this.gl.LINES);
         }
 
         // Set up the particles for rendering
@@ -426,6 +415,11 @@ export class Tendrils {
         this.gl.blendFunc(this.gl.SRC_ALPHA, this.gl.ONE_MINUS_SRC_ALPHA);
 
         return this;
+    }
+
+
+    fillColorMap(data = this.colorMapData, ...rest) {
+        this.state.colorMap.color[0].setPixels(this.colorMapData, ...rest);
     }
 }
 
