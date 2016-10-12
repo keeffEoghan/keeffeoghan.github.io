@@ -505,11 +505,11 @@ export default (canvas, settings, debug) => {
         // DAT.GUI's color controllers are a bit fucked.
 
         const colorDefaults = {
-                flowColor: state.flowColor.slice(0, 3).map((c) => c*255),
-                flowAlpha: state.flowColor[3],
-
                 baseColor: state.baseColor.slice(0, 3).map((c) => c*255),
                 baseAlpha: state.baseColor[3],
+
+                flowColor: state.flowColor.slice(0, 3).map((c) => c*255),
+                flowAlpha: state.flowColor[3],
 
                 fadeColor: state.fadeColor.slice(0, 3).map((c) => c*255),
                 fadeAlpha: state.fadeColor[3]
@@ -518,13 +518,13 @@ export default (canvas, settings, debug) => {
         const colorProxy = {...colorDefaults};
 
         const convertColors = () => Object.assign(state, {
-            flowColor: [
-                ...colorProxy.flowColor.map((c) => c/255),
-                colorProxy.flowAlpha
-            ],
             baseColor: [
                 ...colorProxy.baseColor.map((c) => c/255),
                 colorProxy.baseAlpha
+            ],
+            flowColor: [
+                ...colorProxy.flowColor.map((c) => c/255),
+                colorProxy.flowAlpha
             ],
             fadeColor: [
                 ...colorProxy.fadeColor.map((c) => c/255),
@@ -640,10 +640,10 @@ export default (canvas, settings, debug) => {
                     });
 
                 Object.assign(colorProxy, {
-                        flowAlpha: 1,
-                        flowColor: [255, 255, 255],
                         baseAlpha: 0,
                         fadeAlpha: Math.max(state.flowDecay, 0.05),
+                        flowAlpha: 1,
+                        flowColor: [255, 255, 255],
                         fadeColor: [0, 0, 0]
                     });
             },
@@ -702,7 +702,7 @@ export default (canvas, settings, debug) => {
                         baseAlpha: 0.1,
                         baseColor: [255, 150, 0],
                         fadeAlpha: 0.005,
-                        fadeColor: [0, 0, 0]
+                        fadeColor: [0, 0, 0],
                     });
             },
             'Sea'() {
@@ -729,7 +729,13 @@ export default (canvas, settings, debug) => {
             },
             'Ghostly'() {
                 Object.assign(state, {
-                        flowDecay: 0
+                        flowDecay: 0,
+                        colorMapAlpha: 0.005
+                    });
+
+                Object.assign(colorProxy, {
+                        baseAlpha: 0.01,
+                        flowAlpha: 0.005
                     });
             },
             'Turbulence'() {
@@ -766,6 +772,7 @@ export default (canvas, settings, debug) => {
                 Object.assign(colorProxy, {
                         baseAlpha: 0.9,
                         baseColor: [0, 0, 0],
+                        flowAlpha: 0.04,
                         fadeAlpha: 0.01,
                         fadeColor: [255, 255, 255]
                     });
@@ -783,9 +790,9 @@ export default (canvas, settings, debug) => {
                     });
 
                 Object.assign(colorProxy, {
-                        flowAlpha: 0.01,
                         baseAlpha: 0.02,
-                        baseColor: [50, 255, 50]
+                        baseColor: [50, 255, 50],
+                        flowAlpha: 0.01
                     });
             }
         };
