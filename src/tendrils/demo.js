@@ -111,19 +111,19 @@ export default (canvas, settings, debug) => {
 
     const audioReact = [
         () => {
-            respawnSampleCam();
+            spawnCam();
             console.log('track beat 0');
         },
         () => {
-            respawnFlow();
+            spawnFlow();
             console.log('track beat 1');
         },
         () => {
-            respawnSampleCam();
+            spawnCam();
             console.log('mic beat 0');
         },
         () => {
-            respawnFastest();
+            spawnFastest();
             console.log('mic beat 1');
         }
     ];
@@ -291,7 +291,7 @@ export default (canvas, settings, debug) => {
     };
     const flowPixelState = {...flowPixelDefaults};
 
-    function respawnFlow() {
+    function spawnFlow() {
         vec2.div(flowPixelSpawner.spawnSize,
             flowPixelScales[flowPixelState.scale], tendrils.viewSize);
 
@@ -306,7 +306,7 @@ export default (canvas, settings, debug) => {
             buffer: null
         });
 
-    function respawnFastest() {
+    function spawnFastest() {
         simplePixelSpawner.buffer = tendrils.particles.buffers[0];
         simplePixelSpawner.spawnSize = tendrils.particles.shape;
         simplePixelSpawner.respawn(tendrils);
@@ -316,6 +316,7 @@ export default (canvas, settings, debug) => {
     // Cam
 
     let video = null;
+    let mediaStream = null;
 
     const camShaders = {
         direct: shader(gl, spawnPixels.defaults().shader[0], pixelsFrag),
@@ -328,7 +329,7 @@ export default (canvas, settings, debug) => {
 
     colorMaps.cam = camSpawner.buffer;
 
-    const respawnCam = () => {
+    const spawnDirectCam = () => {
         if(video) {
             tendrils.state.colorMap = colorMaps.cam;
             camSpawner.shader = camShaders.direct;
@@ -338,7 +339,7 @@ export default (canvas, settings, debug) => {
         }
     };
 
-    const respawnSampleCam = () => {
+    const spawnCam = () => {
         if(video) {
             tendrils.state.colorMap = colorMaps.main;
             camSpawner.shader = camShaders.sample;
@@ -358,6 +359,8 @@ export default (canvas, settings, debug) => {
                 throw e;
             }
             else {
+                mediaStream = stream;
+
                 video = document.createElement('video');
 
                 video.muted = true;
@@ -385,6 +388,9 @@ export default (canvas, settings, debug) => {
                 micTrigger = new AudioTrigger(micAnalyser, 2);
             }
         });
+
+    const stopUserMedia = (stream = mediaStream) =>
+        (stream && each((track) => track.stop(), stream.getTracks()));
 
 
     function resize() {
@@ -607,10 +613,10 @@ export default (canvas, settings, debug) => {
                 clearView: () => tendrils.clearView(),
                 clearFlow: () => tendrils.clearFlow(),
                 respawn,
-                respawnCam,
-                respawnSampleCam,
-                respawnFlow,
-                respawnFastest,
+                spawnCam,
+                spawnDirectCam,
+                spawnFlow,
+                spawnFastest,
                 reset: () => tendrils.reset(),
                 restart
             };
@@ -641,9 +647,10 @@ export default (canvas, settings, debug) => {
 
                 Object.assign(colorProxy, {
                         baseAlpha: 0,
-                        fadeAlpha: Math.max(state.flowDecay, 0.05),
+                        baseColor: [0, 0, 0],
                         flowAlpha: 1,
                         flowColor: [255, 255, 255],
+                        fadeAlpha: Math.max(state.flowDecay, 0.05),
                         fadeColor: [0, 0, 0]
                     });
             },
@@ -749,8 +756,10 @@ export default (canvas, settings, debug) => {
                     });
 
                 Object.assign(colorProxy, {
-                        baseAlpha: 0.8,
-                        baseColor: [255, 10, 10],
+                        baseAlpha: 0.3,
+                        baseColor: [100, 0, 0],
+                        flowAlpha: 0.5,
+                        flowColor: [255, 10, 10],
                         fadeAlpha: 0.01,
                         fadeColor: [0, 0, 0]
                     });
@@ -989,12 +998,12 @@ export default (canvas, settings, debug) => {
                 '<enter>': keyframe,
 
                 '\\': () => keyframeCall(() => tendrils.reset()),
-                "'": () => keyframeCall(respawnFlow),
-                ';': () => keyframeCall(respawnFastest),
+                "'": () => keyframeCall(spawnFlow),
+                ';': () => keyframeCall(spawnFastest),
 
                 '<shift>': () => keyframeCall(restart),
-                '/': () => keyframeCall(respawnSampleCam),
-                '.': () => keyframeCall(respawnCam)
+                '/': () => keyframeCall(spawnCam),
+                '.': () => keyframeCall(spawnDirectCam)
             };
 
             // @todo Throttle so multiple states can go into one keyframe.
