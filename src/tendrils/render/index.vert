@@ -68,7 +68,7 @@ void main() {
         vec3 alignRGB = vec3(dot(vel, flowAxisR),
                 dot(vel, flowAxisG), dot(vel, flowAxisB));
 
-        vec3 flowAlign = map(mix(alignRGB, alignRGB.brg*(1.0-flowDecay),
+        vec3 flowAlign = map(mix(alignRGB, alignRGB.gbr*(1.0-flowDecay),
                     sin(time*flowDecay)),
                 minAlign.rgb, maxAlign.rgb, minColor.rgb, maxColor.rgb);
 
