@@ -379,10 +379,7 @@ export default (canvas, settings, debug) => {
 
                 // Trying out audio analyser.
 
-                micAnalyser = analyser(stream, {
-                        audible: false
-                    });
-
+                micAnalyser = analyser(stream, { audible: false });
                 micAnalyser.analyser.fftSize = Math.pow(2, 7);
 
                 micTrigger = new AudioTrigger(micAnalyser, 2);
@@ -478,7 +475,8 @@ export default (canvas, settings, debug) => {
                         mic_off: !audioState.mic
                     }))),
             showState: () => self.prompt('Current state:',
-                toSource(full.state)),
+                toSource(filter((v, k) => !k.match(/^(colorMap)$/gi),
+                    full.state))),
             showSequence: () => self.prompt('Animation sequence:',
                 toSource(sequencer.timeline.frames)),
             keyframe
@@ -493,7 +491,7 @@ export default (canvas, settings, debug) => {
         const settingsGUI = gui.addFolder('settings');
 
         for(let s in state) {
-            if(!(typeof state[s]).match(/(object|array|undefined|null)/gi)) {
+            if(!(typeof state[s]).match(/^(object|array|undefined|null)$/gi)) {
                 const control = settingsGUI.add(state, s);
 
                 // Some special cases
@@ -511,14 +509,14 @@ export default (canvas, settings, debug) => {
         // DAT.GUI's color controllers are a bit fucked.
 
         const colorDefaults = {
-                baseColor: state.baseColor.slice(0, 3).map((c) => c*255),
-                baseAlpha: state.baseColor[3],
+                baseColor: defaultState.baseColor.slice(0, 3).map((c) => c*255),
+                baseAlpha: defaultState.baseColor[3],
 
-                flowColor: state.flowColor.slice(0, 3).map((c) => c*255),
-                flowAlpha: state.flowColor[3],
+                flowColor: defaultState.flowColor.slice(0, 3).map((c) => c*255),
+                flowAlpha: defaultState.flowColor[3],
 
-                fadeColor: state.fadeColor.slice(0, 3).map((c) => c*255),
-                fadeAlpha: state.fadeColor[3]
+                fadeColor: defaultState.fadeColor.slice(0, 3).map((c) => c*255),
+                fadeAlpha: defaultState.fadeColor[3]
             };
 
         const colorProxy = {...colorDefaults};
@@ -555,7 +553,8 @@ export default (canvas, settings, debug) => {
         const respawnGUI = gui.addFolder('respawn');
 
         for(let s in resetSpawner.uniforms) {
-            if(!(typeof resetSpawner.uniforms[s]).match(/(object|array|undefined|null)/gi)) {
+            if(!(typeof resetSpawner.uniforms[s])
+                    .match(/^(object|array|undefined|null)$/gi)) {
                 respawnGUI.add(resetSpawner.uniforms, s);
             }
         }
@@ -743,6 +742,27 @@ export default (canvas, settings, debug) => {
                 Object.assign(colorProxy, {
                         baseAlpha: 0.01,
                         flowAlpha: 0.005
+                    });
+            },
+            'Petri'() {
+                Object.assign(state, {
+                        forceWeight: 0.0165,
+                        wanderWeight: 0.001,
+                        flowDecay: 0.001,
+                        noiseScale: 200,
+                        noiseSpeed: 0.0001
+                    });
+
+                Object.assign(colorProxy, {
+                        baseAlpha: 0.3,
+                        baseColor:[255, 203, 37],
+                        flowAlpha: 0.005,
+                        fadeAlpha: 0.01
+                    });
+
+                Object.assign(resetSpawner.uniforms, {
+                        radius: 1/Math.max(...tendrils.viewSize),
+                        speed: 0
                     });
             },
             'Turbulence'() {
@@ -967,7 +987,7 @@ export default (canvas, settings, debug) => {
                 '3': { go: presetters['Flow only'] },
                 '4': { go: presetters['Noise only'] },
                 '5': { go: presetters['Sea'] },
-                '6': { go: presetters['Ghostly'] },
+                '6': { go: presetters['Petri'] },
                 '7': { go: presetters['Turbulence'] },
                 '8': { go: presetters['Rorschach'] },
                 '9': { go: presetters['Roots'] },
@@ -978,6 +998,8 @@ export default (canvas, settings, debug) => {
             };
 
             const callMap = {
+                'O': () => keyframeCall(() => tendrils.clear()),
+
                 '-': adjustEach(-0.1),
                 '=': adjustEach(0.1),
                 '<down>': adjustEach(-1),
@@ -989,13 +1011,16 @@ export default (canvas, settings, debug) => {
                     resetEach(editMap);
                     keyframe(...rest);
                 },
-                '<backspace>': resetEach,
+                '<caps-lock>': resetEach,
 
                 '<space>': () => togglePlay(),
 
                 '[': () => scrub(-2),
                 ']': () => scrub(2),
                 '<enter>': keyframe,
+                '<backspace>': () => {
+                    sequencer.timeline.spliceAt(sequencer.timer.time);
+                },
 
                 '\\': () => keyframeCall(() => tendrils.reset()),
                 "'": () => keyframeCall(spawnFlow),
@@ -1069,7 +1094,7 @@ export default (canvas, settings, debug) => {
         sequencer.smoothTo({
                 to: { ...state },
                 call: [restart],
-                time: 1000/30
+                time: 100
             });
     }
 };

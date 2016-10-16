@@ -6,7 +6,7 @@ import Particles from './particles';
 import Timer from './timer';
 import { step/*, nextPow2*/ } from '../utils';
 import spawner from './spawn/init/cpu';
-import { maxAspect } from './utils/aspect';
+import { coverAspect } from './utils/aspect';
 import Screen from './screen';
 
 
@@ -362,7 +362,8 @@ export class Tendrils {
         this.viewRes[0] = this.gl.drawingBufferWidth;
         this.viewRes[1] = this.gl.drawingBufferHeight;
 
-        maxAspect(this.viewSize, this.viewRes);
+        // NDC dimensions in the range [-1, 1] -> [-(max radius), (max radius)]
+        coverAspect(this.viewSize, this.viewRes);
 
         // this.pow2Res.fill(nextPow2(Math.max(...this.viewRes)));
 
