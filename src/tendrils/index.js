@@ -6,7 +6,7 @@ import Particles from './particles';
 import Timer from './timer';
 import { step/*, nextPow2*/ } from '../utils';
 import spawner from './spawn/init/cpu';
-import { maxAspect } from './utils/aspect';
+import { coverAspect } from './utils/aspect';
 import Screen from './screen';
 
 
@@ -51,8 +51,8 @@ export const defaults = () => ({
         speedAlpha: 0.000001,
         colorMapAlpha: 0.5,
 
-        flowColor: [1, 1, 1, 0.02],
         baseColor: [1, 1, 1, 0.5],
+        flowColor: [1, 1, 1, 0.04],
         fadeColor: [0, 0, 0, 0]
     },
     timer: Object.assign(new Timer(), { step: 1000/60 }),
@@ -362,7 +362,8 @@ export class Tendrils {
         this.viewRes[0] = this.gl.drawingBufferWidth;
         this.viewRes[1] = this.gl.drawingBufferHeight;
 
-        maxAspect(this.viewSize, this.viewRes);
+        // NDC dimensions in the range [-1, 1] -> [-(max radius), (max radius)]
+        coverAspect(this.viewSize, this.viewRes);
 
         // this.pow2Res.fill(nextPow2(Math.max(...this.viewRes)));
 

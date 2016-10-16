@@ -36,9 +36,7 @@ export const changed = (past, next) =>
     :   next));
 
 const accumulate = (frame, out = {}) => {
-    if(!isNumber(frame.to)) {
-        out.apply = Object.assign((out.apply || {}), frame.to);
-    }
+    out.apply = Object.assign((out.apply || {}), frame.to);
 
     if(frame.call && frame.call.length) {
         (out.call || (out.call = [])).push(...frame.call);
@@ -68,6 +66,7 @@ export class Timeline {
          */
         this.symmetric = symmetric;
 
+        this.infinite = infinite;
         this.rewind = rewind;
     }
 
@@ -75,20 +74,17 @@ export class Timeline {
     // Keyframes - changing and ordering
 
     setup(frames = [], infinite = true) {
+        // Sandwich between Infinite end frames if needed, to make the timeline
+        // always playable
         return this.frames = sort((infinite)?
                 [{ time: -Infinity }, ...frames, { time: Infinity }]
             :   [...frames]);
     }
 
-    splice(frames) {
+    merge(frames) {
         return each((frame) => this.add(frame), frames);
     }
 
-    indexOf(frame) {
-        const next = this.frames.findIndex((other) => order(other, frame) > 0);
-
-        return ((next < 0)? this.frames.length : next);
-    }
 
     insertFrame(f, frame) {
         this.frames.splice(f, 0, frame);
@@ -150,10 +146,11 @@ export class Timeline {
 
             const passed = this.gap-gap0;
             const skipped = Math.abs(passed);
+            const dir = Math.sign(passed);
+            const onwards = (((this.reverse)? -dir : dir) > 0);
 
             // Accumulate properties of any skipped frames
-            if(skipped > 0) {
-                const dir = Math.sign(passed);
+            if(skipped > 0 && onwards) {
                 const side = ((dir < 0)? Math.floor : Math.ceil);
 
                 for(let f = 0; f < skipped; ++f) {
@@ -170,6 +167,12 @@ export class Timeline {
         return span;
     }
 
+    playFrom(time = this.time, start = 0) {
+        this.seek(start);
+
+        return this.play(time);
+    }
+
     setTime(time) {
         const gap = this.gapAt(time);
 
@@ -181,7 +184,13 @@ export class Timeline {
     }
 
 
-    // Querying state
+    // Querying state, retrieving frames
+
+    indexOf(frame) {
+        const next = this.frames.findIndex((other) => order(other, frame) > 0);
+
+        return ((next < 0)? this.frames.length : next);
+    }
 
     gapAt(time) {
         if(this.frames.length < 2) {
@@ -227,6 +236,56 @@ export class Timeline {
 
         return out;
     }
+
+
+    // Removing frames
+
+    splice(index = 0, num = 0, ...adding) {
+        let start = index;
+        let remove = num;
+
+        if(this.infinite) {
+            // Clamp `start` *between* the 2 Infinite end frames
+            const length = Math.max(0, this.frames.length-2);
+            const i = ((index < 0)? length+index : index);
+
+            start = Math.min(length, Math.max(1, i));
+
+            // Clamp `remove` below the last Infinite end frame, accommodating
+            // any shift in the index clamping above
+            remove = Math.min(num-Math.max(start-i, 0), length-start);
+        }
+
+        return this.frames.splice(start, remove, ...adding);
+    }
+
+    // Remove the frame at the given index
+    spliceIndex(index, ...adding) {
+        return this.splice(index, 1, ...adding)[0];
+    }
+
+    // Remove a frame adjacent to the given time (this accounts for `reverse` in
+    // getting the adjacent side, so `-1` is always `previous` to the time)
+    spliceAt(time, adjacent = -1, ...adding) {
+        const gap = this.gapAt(time);
+        const direction = ((this.reverse)? -1 : 1)*adjacent;
+        const index = ((direction > 0)? Math.ceil : Math.floor)(gap);
+
+        return this.splice(index, 1, ...adding)[0];
+    }
+
+    // Remove the frames within the time span of `start` till `durstion`
+    spliceSpan(duration, start = 0, ...adding) {
+        const a = this.gapAt(start);
+        const b = this.gapAt(start+duration);
+        const i = Math.min(a, b);
+
+        return this.splice(Math.ceil(i), Math.floor(Math.max(a, b)-i),
+                ...adding);
+    }
+
+
+    // Etc
 
     valid(gap = this.gap, span = this.span) {
         return (gap > 0 && span);
