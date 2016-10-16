@@ -27,14 +27,20 @@ varying vec4 color;
 #pragma glslify: map = require(glsl-map)
 
 #pragma glslify: inert = require(../const/inert)
-#pragma glslify: tau = require(../const/tau)
 #pragma glslify: length2 = require(../utils/length-2)
-#pragma glslify: angleToVec = require(../utils/angle-to-vec)
 #pragma glslify: preAlpha = require(../utils/pre-alpha)
 #pragma glslify: stateAtFrame = require(../state/state-at-frame)
 
 
-const vec3 flowColorAxis = vec3(tau/3.0, tau*2.0/3.0, tau);
+/**
+ * Pre-generated constants, equivalent to:
+ *     flowAxisR: `angleToVec(0)`
+ *     flowAxisG: `angleToVec(tau/3.0)`
+ *     flowAxisB: `angleToVec(tau*2.0/3.0)`
+ */
+const vec2 flowAxisR = vec2(1.0, 0.0);
+const vec2 flowAxisG = vec2(-0.5000000000000004, -0.8660254037844385);
+const vec2 flowAxisB = vec2(-0.4999999999999998, 0.8660254037844387);
 
 const vec4 minColor = vec4(0.0);
 const vec4 maxColor = vec4(1.0);
@@ -59,11 +65,10 @@ void main() {
 
         // Flow color
         
-        vec3 alignRGB = vec3(dot(vel, angleToVec(flowColorAxis.r)),
-                dot(vel, angleToVec(flowColorAxis.g)),
-                dot(vel, angleToVec(flowColorAxis.b)));
+        vec3 alignRGB = vec3(dot(vel, flowAxisR),
+                dot(vel, flowAxisG), dot(vel, flowAxisB));
 
-        vec3 flowAlign = map(mix(alignRGB, alignRGB.brg*(1.0-flowDecay),
+        vec3 flowAlign = map(mix(alignRGB, alignRGB.gbr*(1.0-flowDecay),
                     sin(time*flowDecay)),
                 minAlign.rgb, maxAlign.rgb, minColor.rgb, maxColor.rgb);
 

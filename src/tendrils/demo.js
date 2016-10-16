@@ -111,19 +111,19 @@ export default (canvas, settings, debug) => {
 
     const audioReact = [
         () => {
-            respawnSampleCam();
+            spawnCam();
             console.log('track beat 0');
         },
         () => {
-            respawnFlow();
+            spawnFlow();
             console.log('track beat 1');
         },
         () => {
-            respawnSampleCam();
+            spawnCam();
             console.log('mic beat 0');
         },
         () => {
-            respawnFastest();
+            spawnFastest();
             console.log('mic beat 1');
         }
     ];
@@ -291,7 +291,7 @@ export default (canvas, settings, debug) => {
     };
     const flowPixelState = {...flowPixelDefaults};
 
-    function respawnFlow() {
+    function spawnFlow() {
         vec2.div(flowPixelSpawner.spawnSize,
             flowPixelScales[flowPixelState.scale], tendrils.viewSize);
 
@@ -306,7 +306,7 @@ export default (canvas, settings, debug) => {
             buffer: null
         });
 
-    function respawnFastest() {
+    function spawnFastest() {
         simplePixelSpawner.buffer = tendrils.particles.buffers[0];
         simplePixelSpawner.spawnSize = tendrils.particles.shape;
         simplePixelSpawner.respawn(tendrils);
@@ -316,6 +316,7 @@ export default (canvas, settings, debug) => {
     // Cam
 
     let video = null;
+    let mediaStream = null;
 
     const camShaders = {
         direct: shader(gl, spawnPixels.defaults().shader[0], pixelsFrag),
@@ -328,7 +329,7 @@ export default (canvas, settings, debug) => {
 
     colorMaps.cam = camSpawner.buffer;
 
-    const respawnCam = () => {
+    const spawnDirectCam = () => {
         if(video) {
             tendrils.state.colorMap = colorMaps.cam;
             camSpawner.shader = camShaders.direct;
@@ -338,7 +339,7 @@ export default (canvas, settings, debug) => {
         }
     };
 
-    const respawnSampleCam = () => {
+    const spawnCam = () => {
         if(video) {
             tendrils.state.colorMap = colorMaps.main;
             camSpawner.shader = camShaders.sample;
@@ -358,6 +359,8 @@ export default (canvas, settings, debug) => {
                 throw e;
             }
             else {
+                mediaStream = stream;
+
                 video = document.createElement('video');
 
                 video.muted = true;
@@ -376,15 +379,15 @@ export default (canvas, settings, debug) => {
 
                 // Trying out audio analyser.
 
-                micAnalyser = analyser(stream, {
-                        audible: false
-                    });
-
+                micAnalyser = analyser(stream, { audible: false });
                 micAnalyser.analyser.fftSize = Math.pow(2, 7);
 
                 micTrigger = new AudioTrigger(micAnalyser, 2);
             }
         });
+
+    const stopUserMedia = (stream = mediaStream) =>
+        (stream && each((track) => track.stop(), stream.getTracks()));
 
 
     function resize() {
@@ -472,7 +475,8 @@ export default (canvas, settings, debug) => {
                         mic_off: !audioState.mic
                     }))),
             showState: () => self.prompt('Current state:',
-                toSource(full.state)),
+                toSource(filter((v, k) => !k.match(/^(colorMap)$/gi),
+                    full.state))),
             showSequence: () => self.prompt('Animation sequence:',
                 toSource(sequencer.timeline.frames)),
             keyframe
@@ -487,7 +491,7 @@ export default (canvas, settings, debug) => {
         const settingsGUI = gui.addFolder('settings');
 
         for(let s in state) {
-            if(!(typeof state[s]).match(/(object|array|undefined|null)/gi)) {
+            if(!(typeof state[s]).match(/^(object|array|undefined|null)$/gi)) {
                 const control = settingsGUI.add(state, s);
 
                 // Some special cases
@@ -505,26 +509,26 @@ export default (canvas, settings, debug) => {
         // DAT.GUI's color controllers are a bit fucked.
 
         const colorDefaults = {
-                flowColor: state.flowColor.slice(0, 3).map((c) => c*255),
-                flowAlpha: state.flowColor[3],
+                baseColor: defaultState.baseColor.slice(0, 3).map((c) => c*255),
+                baseAlpha: defaultState.baseColor[3],
 
-                baseColor: state.baseColor.slice(0, 3).map((c) => c*255),
-                baseAlpha: state.baseColor[3],
+                flowColor: defaultState.flowColor.slice(0, 3).map((c) => c*255),
+                flowAlpha: defaultState.flowColor[3],
 
-                fadeColor: state.fadeColor.slice(0, 3).map((c) => c*255),
-                fadeAlpha: state.fadeColor[3]
+                fadeColor: defaultState.fadeColor.slice(0, 3).map((c) => c*255),
+                fadeAlpha: defaultState.fadeColor[3]
             };
 
         const colorProxy = {...colorDefaults};
 
         const convertColors = () => Object.assign(state, {
-            flowColor: [
-                ...colorProxy.flowColor.map((c) => c/255),
-                colorProxy.flowAlpha
-            ],
             baseColor: [
                 ...colorProxy.baseColor.map((c) => c/255),
                 colorProxy.baseAlpha
+            ],
+            flowColor: [
+                ...colorProxy.flowColor.map((c) => c/255),
+                colorProxy.flowAlpha
             ],
             fadeColor: [
                 ...colorProxy.fadeColor.map((c) => c/255),
@@ -549,7 +553,8 @@ export default (canvas, settings, debug) => {
         const respawnGUI = gui.addFolder('respawn');
 
         for(let s in resetSpawner.uniforms) {
-            if(!(typeof resetSpawner.uniforms[s]).match(/(object|array|undefined|null)/gi)) {
+            if(!(typeof resetSpawner.uniforms[s])
+                    .match(/^(object|array|undefined|null)$/gi)) {
                 respawnGUI.add(resetSpawner.uniforms, s);
             }
         }
@@ -607,10 +612,10 @@ export default (canvas, settings, debug) => {
                 clearView: () => tendrils.clearView(),
                 clearFlow: () => tendrils.clearFlow(),
                 respawn,
-                respawnCam,
-                respawnSampleCam,
-                respawnFlow,
-                respawnFastest,
+                spawnCam,
+                spawnDirectCam,
+                spawnFlow,
+                spawnFastest,
                 reset: () => tendrils.reset(),
                 restart
             };
@@ -640,9 +645,10 @@ export default (canvas, settings, debug) => {
                     });
 
                 Object.assign(colorProxy, {
+                        baseAlpha: 0,
+                        baseColor: [0, 0, 0],
                         flowAlpha: 1,
                         flowColor: [255, 255, 255],
-                        baseAlpha: 0,
                         fadeAlpha: Math.max(state.flowDecay, 0.05),
                         fadeColor: [0, 0, 0]
                     });
@@ -702,7 +708,7 @@ export default (canvas, settings, debug) => {
                         baseAlpha: 0.1,
                         baseColor: [255, 150, 0],
                         fadeAlpha: 0.005,
-                        fadeColor: [0, 0, 0]
+                        fadeColor: [0, 0, 0],
                     });
             },
             'Sea'() {
@@ -729,7 +735,34 @@ export default (canvas, settings, debug) => {
             },
             'Ghostly'() {
                 Object.assign(state, {
-                        flowDecay: 0
+                        flowDecay: 0,
+                        colorMapAlpha: 0.005
+                    });
+
+                Object.assign(colorProxy, {
+                        baseAlpha: 0.01,
+                        flowAlpha: 0.005
+                    });
+            },
+            'Petri'() {
+                Object.assign(state, {
+                        forceWeight: 0.0165,
+                        wanderWeight: 0.001,
+                        flowDecay: 0.001,
+                        noiseScale: 200,
+                        noiseSpeed: 0.0001
+                    });
+
+                Object.assign(colorProxy, {
+                        baseAlpha: 0.3,
+                        baseColor:[255, 203, 37],
+                        flowAlpha: 0.005,
+                        fadeAlpha: 0.01
+                    });
+
+                Object.assign(resetSpawner.uniforms, {
+                        radius: 1/Math.max(...tendrils.viewSize),
+                        speed: 0
                     });
             },
             'Turbulence'() {
@@ -743,8 +776,10 @@ export default (canvas, settings, debug) => {
                     });
 
                 Object.assign(colorProxy, {
-                        baseAlpha: 0.8,
-                        baseColor: [255, 10, 10],
+                        baseAlpha: 0.3,
+                        baseColor: [100, 0, 0],
+                        flowAlpha: 0.5,
+                        flowColor: [255, 10, 10],
                         fadeAlpha: 0.01,
                         fadeColor: [0, 0, 0]
                     });
@@ -766,6 +801,7 @@ export default (canvas, settings, debug) => {
                 Object.assign(colorProxy, {
                         baseAlpha: 0.9,
                         baseColor: [0, 0, 0],
+                        flowAlpha: 0.04,
                         fadeAlpha: 0.01,
                         fadeColor: [255, 255, 255]
                     });
@@ -783,9 +819,9 @@ export default (canvas, settings, debug) => {
                     });
 
                 Object.assign(colorProxy, {
-                        flowAlpha: 0.01,
                         baseAlpha: 0.02,
-                        baseColor: [50, 255, 50]
+                        baseColor: [50, 255, 50],
+                        flowAlpha: 0.01
                     });
             }
         };
@@ -843,8 +879,9 @@ export default (canvas, settings, debug) => {
                 ((play)? track.play() : track.pause());
 
             const scrub = (by) => {
-                sequencer.timeline.seek(0);
-                sequencer.timeline.seek(track.currentTime += by);
+                track.currentTime += by*0.001;
+                sequencer.playFrom(track.currentTime*1000, 0, state);
+                // sequencer.timeline.seek(0);
                 togglePlay(true);
             };
 
@@ -945,23 +982,29 @@ export default (canvas, settings, debug) => {
                 'G': stateNum('speedAlpha', 0.002),
                 'F': stateNum('lineWidth', 0.1),
 
-                '0': { go: presetters['Flow'] },
-                '1': { go: presetters['Wings'] },
-                '2': { go: presetters['Fluid'] },
-                '3': { go: presetters['Flow only'] },
-                '4': { go: presetters['Noise only'] },
-                '5': { go: presetters['Sea'] },
-                '6': { go: presetters['Ghostly'] },
-                '7': { go: presetters['Turbulence'] },
-                '8': { go: presetters['Rorschach'] },
-                '9': { go: presetters['Roots'] },
-
                 // <control> is a special case for re-assigning keys, see below
-                '<control>': (key, assign) =>
-                    editMap[key] = { go: () => Object.assign(state, assign) }
+                '<control>': (key, assign) => {
+                    delete editMap[key];
+                    delete callMap[key];
+
+                    editMap[key] = { go: () => Object.assign(state, assign) };
+                }
             };
 
             const callMap = {
+                'O': () => keyframeCall(() => tendrils.clear()),
+
+                '0': () => keyframeCall(presetters['Flow']),
+                '1': () => keyframeCall(presetters['Wings']),
+                '2': () => keyframeCall(presetters['Fluid']),
+                '3': () => keyframeCall(presetters['Flow only']),
+                '4': () => keyframeCall(presetters['Noise only']),
+                '5': () => keyframeCall(presetters['Sea']),
+                '6': () => keyframeCall(presetters['Petri']),
+                '7': () => keyframeCall(presetters['Turbulence']),
+                '8': () => keyframeCall(presetters['Rorschach']),
+                '9': () => keyframeCall(presetters['Roots']),
+
                 '-': adjustEach(-0.1),
                 '=': adjustEach(0.1),
                 '<down>': adjustEach(-1),
@@ -973,21 +1016,24 @@ export default (canvas, settings, debug) => {
                     resetEach(editMap);
                     keyframe(...rest);
                 },
-                '<backspace>': resetEach,
+                '<caps-lock>': resetEach,
 
                 '<space>': () => togglePlay(),
 
-                '[': () => scrub(-2),
-                ']': () => scrub(2),
+                '[': () => scrub(-2000),
+                ']': () => scrub(2000),
                 '<enter>': keyframe,
+                '<backspace>': () => {
+                    sequencer.timeline.spliceAt(sequencer.timer.time);
+                },
 
                 '\\': () => keyframeCall(() => tendrils.reset()),
-                "'": () => keyframeCall(respawnFlow),
-                ';': () => keyframeCall(respawnFastest),
+                "'": () => keyframeCall(spawnFlow),
+                ';': () => keyframeCall(spawnFastest),
 
                 '<shift>': () => keyframeCall(restart),
-                '/': () => keyframeCall(respawnSampleCam),
-                '.': () => keyframeCall(respawnCam)
+                '/': () => keyframeCall(spawnCam),
+                '.': () => keyframeCall(spawnDirectCam)
             };
 
             // @todo Throttle so multiple states can go into one keyframe.
@@ -1053,7 +1099,7 @@ export default (canvas, settings, debug) => {
         sequencer.smoothTo({
                 to: { ...state },
                 call: [restart],
-                time: 1000/30
+                time: 100
             });
     }
 };
