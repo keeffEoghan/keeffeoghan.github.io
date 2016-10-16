@@ -879,8 +879,9 @@ export default (canvas, settings, debug) => {
                 ((play)? track.play() : track.pause());
 
             const scrub = (by) => {
-                sequencer.timeline.seek(0);
-                sequencer.timeline.seek(track.currentTime += by);
+                track.currentTime += by*0.001;
+                sequencer.playFrom(track.currentTime*1000, 0, state);
+                // sequencer.timeline.seek(0);
                 togglePlay(true);
             };
 
@@ -981,24 +982,28 @@ export default (canvas, settings, debug) => {
                 'G': stateNum('speedAlpha', 0.002),
                 'F': stateNum('lineWidth', 0.1),
 
-                '0': { go: presetters['Flow'] },
-                '1': { go: presetters['Wings'] },
-                '2': { go: presetters['Fluid'] },
-                '3': { go: presetters['Flow only'] },
-                '4': { go: presetters['Noise only'] },
-                '5': { go: presetters['Sea'] },
-                '6': { go: presetters['Petri'] },
-                '7': { go: presetters['Turbulence'] },
-                '8': { go: presetters['Rorschach'] },
-                '9': { go: presetters['Roots'] },
-
                 // <control> is a special case for re-assigning keys, see below
-                '<control>': (key, assign) =>
-                    editMap[key] = { go: () => Object.assign(state, assign) }
+                '<control>': (key, assign) => {
+                    delete editMap[key];
+                    delete callMap[key];
+
+                    editMap[key] = { go: () => Object.assign(state, assign) };
+                }
             };
 
             const callMap = {
                 'O': () => keyframeCall(() => tendrils.clear()),
+
+                '0': () => keyframeCall(presetters['Flow']),
+                '1': () => keyframeCall(presetters['Wings']),
+                '2': () => keyframeCall(presetters['Fluid']),
+                '3': () => keyframeCall(presetters['Flow only']),
+                '4': () => keyframeCall(presetters['Noise only']),
+                '5': () => keyframeCall(presetters['Sea']),
+                '6': () => keyframeCall(presetters['Petri']),
+                '7': () => keyframeCall(presetters['Turbulence']),
+                '8': () => keyframeCall(presetters['Rorschach']),
+                '9': () => keyframeCall(presetters['Roots']),
 
                 '-': adjustEach(-0.1),
                 '=': adjustEach(0.1),
@@ -1015,8 +1020,8 @@ export default (canvas, settings, debug) => {
 
                 '<space>': () => togglePlay(),
 
-                '[': () => scrub(-2),
-                ']': () => scrub(2),
+                '[': () => scrub(-2000),
+                ']': () => scrub(2000),
                 '<enter>': keyframe,
                 '<backspace>': () => {
                     sequencer.timeline.spliceAt(sequencer.timer.time);

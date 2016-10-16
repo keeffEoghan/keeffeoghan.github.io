@@ -13,16 +13,22 @@ export class Sequencer {
         this.timeline = new Timeline(frames);
     }
 
-    play(time, out = {}) {
-        const span = this.timeline.play(time);
-
+    apply(span, out = {}) {
         if(span) {
             Object.assign(out, span.apply);
             tween(span, out);
-            each((f) => f(out, time, span), span.call);
+            each((f) => f(out, span), span.call);
         }
 
         return out;
+    }
+
+    play(time, out) {
+        return this.apply(this.timeline.play(time), out);
+    }
+
+    playFrom(time, start, out) {
+        return this.apply(this.timeline.playFrom(time, start), out);
     }
 
     easeTo(align, ...frame) {

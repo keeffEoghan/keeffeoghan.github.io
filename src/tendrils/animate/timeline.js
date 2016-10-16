@@ -36,9 +36,7 @@ export const changed = (past, next) =>
     :   next));
 
 const accumulate = (frame, out = {}) => {
-    if(!isNumber(frame.to)) {
-        out.apply = Object.assign((out.apply || {}), frame.to);
-    }
+    out.apply = Object.assign((out.apply || {}), frame.to);
 
     if(frame.call && frame.call.length) {
         (out.call || (out.call = [])).push(...frame.call);
@@ -149,7 +147,7 @@ export class Timeline {
             const passed = this.gap-gap0;
             const skipped = Math.abs(passed);
             const dir = Math.sign(passed);
-            const onwards = (((this.reverse)? dir : -dir) > 0);
+            const onwards = (((this.reverse)? -dir : dir) > 0);
 
             // Accumulate properties of any skipped frames
             if(skipped > 0 && onwards) {
@@ -167,6 +165,12 @@ export class Timeline {
         }
 
         return span;
+    }
+
+    playFrom(time = this.time, start = 0) {
+        this.seek(start);
+
+        return this.play(time);
     }
 
     setTime(time) {
