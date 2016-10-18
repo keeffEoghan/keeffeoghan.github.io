@@ -1,6 +1,6 @@
 /**
  * Stupid little class for conveniently wrapping up things to be passed to the
- * Tendrils `respawnShader` function.
+ * Tendrils `spawnShader` function.
  */
 
 import FBO from 'gl-fbo';
@@ -23,14 +23,11 @@ export const defaults = () => ({
     bias: 1
 });
 
-export class SpawnPixels {
+export class PixelSpawner {
     constructor(gl, options) {
         this.gl = gl;
 
-        const params = {
-                ...defaults(),
-                ...options
-            };
+        const params = Object.assign(defaults(), options);
 
         this.shader = ((Array.isArray(params.shader))?
                 shader(this.gl, ...params.shader)
@@ -61,8 +58,8 @@ export class SpawnPixels {
             });
     }
 
-    respawn(tendrils, update = this.update.bind(this)) {
-        return tendrils.respawnShader(this.shader, update);
+    spawn(tendrils, update = this.update.bind(this)) {
+        return tendrils.spawnShader(this.shader, update);
     }
 
     setPixels(pixels) {
@@ -70,4 +67,4 @@ export class SpawnPixels {
     }
 }
 
-export default SpawnPixels;
+export default PixelSpawner;
