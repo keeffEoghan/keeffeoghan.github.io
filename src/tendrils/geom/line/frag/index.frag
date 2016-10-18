@@ -1,4 +1,8 @@
-#pragma glslify: import(./head)
+/**
+ * For a smooth line, check distance from line per-fragment.
+ */
+
+#pragma glslify: import(../../frag/head)
 
 varying float sdf;
 

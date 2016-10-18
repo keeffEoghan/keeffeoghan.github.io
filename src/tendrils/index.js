@@ -5,7 +5,7 @@ import ndarray from 'ndarray';
 import Particles from './particles';
 import Timer from './timer';
 import { step/*, nextPow2*/ } from '../utils';
-import spawner from './spawn/init/cpu';
+import initSpawner from './spawn/init/cpu';
 import { coverAspect } from './utils/aspect';
 import Screen from './screen';
 
@@ -130,12 +130,6 @@ export class Tendrils {
         this.timer = params.timer;
 
         this.tempData = [];
-
-        this.respawnOffset = [0, 0];
-        this.respawnShape = [0, 0];
-
-        this.spawnCache = null;
-        this.spawnCacheOffset = 0;
     }
 
     setup(...rest) {
@@ -147,7 +141,7 @@ export class Tendrils {
     }
 
     reset() {
-        this.respawn();
+        this.spawn();
 
         return this;
     }
@@ -157,7 +151,6 @@ export class Tendrils {
         this.particles.dispose();
 
         delete this.particles;
-        delete this.spawnCache;
 
         return this;
     }
@@ -386,18 +379,18 @@ export class Tendrils {
     // Respawn
 
     // Populate the particles with the given spawn function
-    respawn(spawn = spawner) {
-        this.particles.spawn(spawn);
+    spawn(spawner = initSpawner) {
+        this.particles.spawn(spawner);
 
         return this;
     }
 
     // Respawn on the GPU using a given shader
-    respawnShader(spawnShader, update) {
+    spawnShader(shader, update) {
         this.resize();
         this.timer.tick();
 
-        this.particles.logic = spawnShader;
+        this.particles.logic = shader;
 
         // Disabling blending here is important
         this.gl.disable(this.gl.BLEND);

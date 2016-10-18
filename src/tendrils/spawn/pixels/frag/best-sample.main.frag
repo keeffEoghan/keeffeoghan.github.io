@@ -27,6 +27,7 @@ void main() {
      * @todo This was needed in `./direct.main.frag` - is it needed here too?
      */
     vec2 uv = gl_FragCoord.xy/dataRes;
+    // vec2 uv = gl_FragCoord.xy*geomRes/dataRes;
     // vec2 uv = (gl_FragCoord.xy/dataRes)*(geomRes/dataRes);
     
     vec4 state = texture2D(particles, uv);
@@ -41,5 +42,5 @@ void main() {
             apply(spawnUV, spawnToPos(spawnUV), texture2D(spawnData, spawnUV)));
     }
 
-    gl_FragColor = state;
+    gl_FragColor = vec4(state.xy, state.yz*speed);
 }
