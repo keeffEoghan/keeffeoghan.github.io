@@ -40,6 +40,9 @@ import { curry } from '../fp/partial';
 import each from '../fp/each';
 import filter from '../fp/filter';
 
+toSource.defaultFnFormatter = (depth, f) => f.name;
+// toSource.defaultFnFormatter = toSource.simpleFnFormatter;
+
 export default (canvas, settings, debug) => {
     if(redirect()) {
         return;
@@ -422,28 +425,36 @@ export default (canvas, settings, debug) => {
                 wanderWeight: 0.0021
             },
             time: 6000,
-            ease: [0, 0.9, 1]
+            ease: [0, 0.95, 1]
         })
         .smoothTo({
             to: {
                 speedLimit: 0.01
             },
             time: 9000,
-            ease: [0, 0.9, 1]
+            ease: [0, 0.95, 1]
         })
         .smoothTo({
             to: {
                 noiseScale: 60
             },
             time: 12000,
-            ease: [0, 0.9, 1]
+            ease: [0, 0.95, 1]
         })
         .smoothTo({
             to: {
-                noiseScale: 20
+                noiseScale: 10
             },
             time: 15500,
-            ease: [0, 0.9, 1]
+            ease: [0, 0.95, 1]
+        })
+        .smoothTo({ time: 20000 })
+        .smoothTo({
+            to: {
+                noiseScale: 2.125
+            },
+            time: 25000,
+            ease: [0, 0.95, 1]
         });
 
 
@@ -556,7 +567,7 @@ export default (canvas, settings, debug) => {
                 to,
                 call,
                 time: sequencer.timer.time,
-                ease: [0, 0.9, 1]
+                ease: [0, 0.95, 1]
             });
 
         const showExport = ((queries.consoleShow)?
