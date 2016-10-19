@@ -41,12 +41,12 @@ gh-pages:
 	$(eval BRANCH := `git rev-parse --abbrev-ref HEAD`)
 	@echo "Switching to 'gh-pages' from '$(BRANCH)'"
 	git checkout gh-pages
-    git fetch origin develop
-    git merge FETCH_HEAD
-    make dist
-    git add -f build
-    git commit
-    git push
+	git fetch origin develop
+	git merge FETCH_HEAD
+	make dist
+	git add -f build
+	git commit
+	git push
 	git checkout $(BRANCH)
 
 # makefile ettiquette; mark rules without on-disk targets as PHONY
