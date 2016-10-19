@@ -12,6 +12,9 @@ import vec2 from 'gl-matrix/src/gl-matrix/vec2';
 import * as spawnPixels from '../pixels';
 
 import frag from '../pixels/bright-sample.frag';
+// @todo Would like to direct with color, but doesn't seem to work with white...
+// import frag from '../pixels/color-sample.frag';
+
 import geometryVert from '../../geom/vert/index.vert';
 import geometryFrag from '../../geom/frag/index.frag';
 

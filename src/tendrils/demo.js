@@ -293,7 +293,7 @@ export default (canvas, settings, debug) => {
         if(video) {
             tendrils.state.colorMap = colorMaps.cam;
             camSpawner.shader = camShaders.direct;
-            camSpawner.speed = 0.00001;
+            camSpawner.speed = 0.07;
             camSpawner.setPixels(video);
             camSpawner.spawn(tendrils);
         }
@@ -352,7 +352,12 @@ export default (canvas, settings, debug) => {
 
     // Respawn from geometry (platonic forms)
 
-    const geometrySpawner = new GeometrySpawner(gl, { speed: 0.01 });
+    const geometrySpawner = new GeometrySpawner(gl, {
+            speed: 0.02,
+            bias: 1.5
+        });
+
+    const spawnForm = () => geometrySpawner.shuffle().spawn(tendrils);
 
 
     // Go
@@ -629,7 +634,7 @@ export default (canvas, settings, debug) => {
                 spawnDirectCam,
                 spawnFlow,
                 spawnFastest,
-                spawnForm: () => geometrySpawner.shuffle().spawn(tendrils),
+                spawnForm,
                 reset: () => tendrils.reset(),
                 restart
             };
@@ -1047,7 +1052,8 @@ export default (canvas, settings, debug) => {
 
                 '<shift>': () => keyframeCall(restart),
                 '/': () => keyframeCall(spawnCam),
-                '.': () => keyframeCall(spawnDirectCam)
+                '.': () => keyframeCall(spawnDirectCam),
+                ',': () => keyframeCall(spawnForm)
             };
 
             // @todo Throttle so multiple states can go into one keyframe.
