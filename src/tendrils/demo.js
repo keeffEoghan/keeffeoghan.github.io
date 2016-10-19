@@ -27,6 +27,7 @@ import flowSampleFrag from './spawn/pixels/flow-sample.frag';
 import dataSampleFrag from './spawn/pixels/data-sample.frag';
 
 import spawnReset from './spawn/ball';
+import GeometrySpawner from './spawn/geometry';
 
 import AudioTrigger from './audio';
 import { peak, sum, mean, weightedMean } from './analyse';
@@ -48,10 +49,29 @@ export default (canvas, settings, debug) => {
     const defaultSettings = defaults();
     const defaultState = defaultSettings.state;
 
+
+    // Main init
+
+    const gl = glContext(canvas, glSettings, render);
+
     const timer = defaultSettings.timer;
 
-    let tendrils;
-    let flowInputs;
+
+    // Tendrils init
+
+    const tendrils = new Tendrils(gl, { timer });
+
+    const resetSpawner = spawnReset(gl);
+
+    const respawn = () => resetSpawner.spawn(tendrils);
+    const restart = () => {
+        tendrils.clear();
+        respawn();
+    };
+
+    const colorMaps = { main: tendrils.state.colorMap };
+
+    const state = tendrils.state;
 
 
     // Audio init
@@ -141,64 +161,6 @@ export default (canvas, settings, debug) => {
     // sequencer.timer.end = frames[frames.length-1].time+2000;
     // sequencer.timer.loop = true;
 
-    const gl = glContext(canvas, glSettings, () => {
-            const dt = timer.tick().dt;
-
-            if(track && track.currentTime >= 0 && !track.paused) {
-                sequencer.timer.tick(track.currentTime*1000);
-                sequencer.play(sequencer.timer.time, tendrils.state);
-            }
-
-            tendrils.draw();
-
-
-            // Draw inputs to flow
-
-            gl.viewport(0, 0, ...tendrils.flow.shape);
-
-            tendrils.flow.bind();
-
-            flowInputs.trim(1/tendrils.state.flowDecay, timer.time);
-
-            each((flowLine) => {
-                    Object.assign(flowLine.line.uniforms, tendrils.state);
-                    flowLine.update().draw();
-                },
-                flowInputs.active);
-
-
-            // React to sound - from highest reaction to lowest
-
-            (trackTrigger && trackTrigger.sample(dt));
-            (micTrigger && micTrigger.sample(dt));
-
-            let soundOutput = false;
-
-            if(audioState.track && !track.paused) {
-                soundOutput = ((trackTrigger.fire(audioReact[0], audioTest[0]))
-                    || (trackTrigger.fire(audioReact[1], audioTest[1])));
-            }
-
-            if(!soundOutput && audioState.mic && micTrigger) {
-                soundOutput = ((micTrigger.fire(audioReact[2], audioTest[2]))
-                    || (micTrigger.fire(audioReact[3], audioTest[3])));
-            }
-        });
-
-    tendrils = new Tendrils(gl, { timer });
-
-    const resetSpawner = spawnReset(gl);
-
-    const respawn = () => resetSpawner.respawn(tendrils);
-    const restart = () => {
-        tendrils.clear();
-        respawn();
-    };
-
-    const colorMaps = { main: tendrils.state.colorMap };
-
-    const state = tendrils.state;
-
 
     // Track setup
 
@@ -253,7 +215,7 @@ export default (canvas, settings, debug) => {
 
     // Flow inputs
 
-    flowInputs = new FlowLines(gl);
+    const flowInputs = new FlowLines(gl);
 
     const pointerFlow = (e) => {
         const flow = offset(e, canvas, vec2.create());
@@ -267,13 +229,13 @@ export default (canvas, settings, debug) => {
     canvas.addEventListener('pointermove', pointerFlow, false);
 
 
-    // Feedback loop from flow
+    // Spwan feedback loop from flow
     /**
      * @todo The aspect ratio might be wrong here - always seems to converge on
      *       horizontal/vertical lines, like it were stretched.
      */
 
-    const flowPixelSpawner = new spawnPixels.SpawnPixels(gl, {
+    const flowPixelSpawner = new spawnPixels.PixelSpawner(gl, {
             shader: [spawnPixels.defaults().shader[0], flowSampleFrag],
             buffer: tendrils.flow
         });
@@ -295,13 +257,13 @@ export default (canvas, settings, debug) => {
         vec2.div(flowPixelSpawner.spawnSize,
             flowPixelScales[flowPixelState.scale], tendrils.viewSize);
 
-        flowPixelSpawner.respawn(tendrils);
+        flowPixelSpawner.spawn(tendrils);
     }
 
 
     // Spawn on fastest particles.
 
-    const simplePixelSpawner = new spawnPixels.SpawnPixels(gl, {
+    const simplePixelSpawner = new spawnPixels.PixelSpawner(gl, {
             shader: [spawnPixels.defaults().shader[0], dataSampleFrag],
             buffer: null
         });
@@ -309,11 +271,11 @@ export default (canvas, settings, debug) => {
     function spawnFastest() {
         simplePixelSpawner.buffer = tendrils.particles.buffers[0];
         simplePixelSpawner.spawnSize = tendrils.particles.shape;
-        simplePixelSpawner.respawn(tendrils);
+        simplePixelSpawner.spawn(tendrils);
     }
 
 
-    // Cam
+    // Cam and mic
 
     let video = null;
     let mediaStream = null;
@@ -323,9 +285,7 @@ export default (canvas, settings, debug) => {
         sample: shader(gl, spawnPixels.defaults().shader[0], bestSampleFrag)
     };
 
-    const camSpawner = new spawnPixels.SpawnPixels(gl, {
-            shader: camShaders.direct
-        });
+    const camSpawner = new spawnPixels.PixelSpawner(gl, { shader: null });
 
     colorMaps.cam = camSpawner.buffer;
 
@@ -333,9 +293,9 @@ export default (canvas, settings, debug) => {
         if(video) {
             tendrils.state.colorMap = colorMaps.cam;
             camSpawner.shader = camShaders.direct;
-            camSpawner.speed = 0.00001;
+            camSpawner.speed = 0.07;
             camSpawner.setPixels(video);
-            camSpawner.respawn(tendrils);
+            camSpawner.spawn(tendrils);
         }
     };
 
@@ -345,7 +305,7 @@ export default (canvas, settings, debug) => {
             camSpawner.shader = camShaders.sample;
             camSpawner.speed = 1;
             camSpawner.setPixels(video);
-            camSpawner.respawn(tendrils);
+            camSpawner.spawn(tendrils);
         }
     };
 
@@ -390,6 +350,18 @@ export default (canvas, settings, debug) => {
         (stream && each((track) => track.stop(), stream.getTracks()));
 
 
+    // Respawn from geometry (platonic forms)
+
+    const geometrySpawner = new GeometrySpawner(gl, {
+            speed: 0.02,
+            bias: 1.5
+        });
+
+    const spawnForm = () => geometrySpawner.shuffle().spawn(tendrils);
+
+
+    // Go
+
     function resize() {
         canvas.width = self.innerWidth;
         canvas.height = self.innerHeight;
@@ -401,7 +373,53 @@ export default (canvas, settings, debug) => {
 
 
     tendrils.setup();
-    resetSpawner.respawn(tendrils);
+    resetSpawner.spawn(tendrils);
+
+
+    // The main loop
+    function render() {
+        const dt = timer.tick().dt;
+
+        if(track && track.currentTime >= 0 && !track.paused) {
+            sequencer.timer.tick(track.currentTime*1000);
+            sequencer.play(sequencer.timer.time, tendrils.state);
+        }
+
+        tendrils.draw();
+
+
+        // Draw inputs to flow
+
+        gl.viewport(0, 0, ...tendrils.flow.shape);
+
+        tendrils.flow.bind();
+
+        flowInputs.trim(1/tendrils.state.flowDecay, timer.time);
+
+        each((flowLine) => {
+                Object.assign(flowLine.line.uniforms, tendrils.state);
+                flowLine.update().draw();
+            },
+            flowInputs.active);
+
+
+        // React to sound - from highest reaction to lowest
+
+        (trackTrigger && trackTrigger.sample(dt));
+        (micTrigger && micTrigger.sample(dt));
+
+        let soundOutput = false;
+
+        if(audioState.track && !track.paused) {
+            soundOutput = ((trackTrigger.fire(audioReact[0], audioTest[0]))
+                || (trackTrigger.fire(audioReact[1], audioTest[1])));
+        }
+
+        if(!soundOutput && audioState.mic && micTrigger) {
+            soundOutput = ((micTrigger.fire(audioReact[2], audioTest[2]))
+                || (micTrigger.fire(audioReact[3], audioTest[3])));
+        }
+    }
 
 
     if(debug) {
@@ -550,12 +568,12 @@ export default (canvas, settings, debug) => {
 
         // Respawn
 
-        const respawnGUI = gui.addFolder('respawn');
+        const spawnGUI = gui.addFolder('spawn');
 
         for(let s in resetSpawner.uniforms) {
             if(!(typeof resetSpawner.uniforms[s])
                     .match(/^(object|array|undefined|null)$/gi)) {
-                respawnGUI.add(resetSpawner.uniforms, s);
+                spawnGUI.add(resetSpawner.uniforms, s);
             }
         }
 
@@ -616,6 +634,7 @@ export default (canvas, settings, debug) => {
                 spawnDirectCam,
                 spawnFlow,
                 spawnFastest,
+                spawnForm,
                 reset: () => tendrils.reset(),
                 restart
             };
@@ -1033,7 +1052,8 @@ export default (canvas, settings, debug) => {
 
                 '<shift>': () => keyframeCall(restart),
                 '/': () => keyframeCall(spawnCam),
-                '.': () => keyframeCall(spawnDirectCam)
+                '.': () => keyframeCall(spawnDirectCam),
+                ',': () => keyframeCall(spawnForm)
             };
 
             // @todo Throttle so multiple states can go into one keyframe.
@@ -1099,7 +1119,7 @@ export default (canvas, settings, debug) => {
         sequencer.smoothTo({
                 to: { ...state },
                 call: [restart],
-                time: 100
+                time: 50
             });
     }
 };

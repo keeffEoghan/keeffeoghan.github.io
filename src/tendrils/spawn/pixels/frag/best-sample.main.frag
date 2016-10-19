@@ -41,5 +41,5 @@ void main() {
             apply(spawnUV, spawnToPos(spawnUV), texture2D(spawnData, spawnUV)));
     }
 
-    gl_FragColor = state;
+    gl_FragColor = vec4(state.xy, state.zw*speed);
 }

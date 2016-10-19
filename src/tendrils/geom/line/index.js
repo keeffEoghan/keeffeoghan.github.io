@@ -4,7 +4,7 @@
 
 /* global Float32Array */
 
-import geom from 'gl-geometry';
+import geometry from 'gl-geometry';
 import lineNormals from 'polyline-normals';
 import shader from 'gl-shader';
 
@@ -67,7 +67,7 @@ export class Line {
         // Drawn properties, derived from the above on `update`.
         this.drawnPath = this.drawnNormals = null;
 
-        this.geom = geom(gl);
+        this.geometry = geometry(gl);
     }
 
     update(setAttributes = this.setAttributes) {
@@ -110,7 +110,7 @@ export class Line {
 
         // Bind to geometry attributes
         each((attribute, name) =>
-                this.geom.attr(name, attribute.data, { size: attribute.size }),
+                this.geometry.attr(name, attribute.data, { size: attribute.size }),
             attributes);
 
         return this;
@@ -118,9 +118,9 @@ export class Line {
 
     draw(mode = this.gl.TRIANGLE_STRIP, ...rest) {
         if(this.path.length > 0) {
-            this.geom.bind(this.shader);
+            this.geometry.bind(this.shader);
             Object.assign(this.shader.uniforms, this.uniforms);
-            this.geom.draw(mode, ...rest);
+            this.geometry.draw(mode, ...rest);
         }
 
         return this;
