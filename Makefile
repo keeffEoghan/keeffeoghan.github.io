@@ -1,6 +1,5 @@
 APP_NAME = tendrils
 ARGS = 
-runner = npm run gulp
 
 help:
 	@echo "tendrils"
@@ -48,7 +47,7 @@ gh-pages:
 	git push
 
 deploy:
-	$(eval BRANCH := `git rev-parse --abbrev-ref HEAD`)
+	$(eval BRANCH = $(shell git rev-parse --abbrev-ref HEAD))
 	@echo "Switching to 'gh-pages' from '$(BRANCH)'"
 	-make gh-pages
 	@echo "Switching to '$(BRANCH)' from 'gh-pages'"
