@@ -353,8 +353,8 @@ export default (canvas, settings, debug) => {
     // Respawn from geometry (platonic forms)
 
     const geometrySpawner = new GeometrySpawner(gl, {
-            speed: 0.02,
-            bias: 1.5
+            speed: 0.005,
+            bias: 100/0.005
         });
 
     const spawnForm = () => geometrySpawner.shuffle().spawn(tendrils);
