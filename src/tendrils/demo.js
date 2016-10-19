@@ -10,7 +10,7 @@ import mapRange from 'range-fit';
 import mat3 from 'gl-matrix/src/gl-matrix/mat3';
 import vec2 from 'gl-matrix/src/gl-matrix/vec2';
 import querystring from 'querystring';
-import toSource from 'tosource';
+import toSource from 'to-source';
 import shader from 'gl-shader';
 import dat from 'dat-gui';
 
@@ -407,18 +407,19 @@ export default (canvas, settings, debug) => {
             to: {
                 ...state,
                 speedLimit: 0.0001,
+                wanderWeight: 0
             },
             call: [reset],
-            time: 0
+            time: 50
         })
         .smoothTo({
             call: [respawn],
-            time: 100
+            time: 120
         })
         .smoothTo({
             to: {
-                speedLimit: 0.0005,
-                noiseScale: 60
+                speedLimit: 0.0003,
+                wanderWeight: 0.0021
             },
             time: 6000,
             ease: [0, 0.9, 1]
@@ -427,7 +428,21 @@ export default (canvas, settings, debug) => {
             to: {
                 speedLimit: 0.01
             },
-            time: 10000,
+            time: 9000,
+            ease: [0, 0.9, 1]
+        })
+        .smoothTo({
+            to: {
+                noiseScale: 60
+            },
+            time: 12000,
+            ease: [0, 0.9, 1]
+        })
+        .smoothTo({
+            to: {
+                noiseScale: 20
+            },
+            time: 15500,
             ease: [0, 0.9, 1]
         });
 
@@ -541,11 +556,15 @@ export default (canvas, settings, debug) => {
                 to,
                 call,
                 time: sequencer.timer.time,
-                ease: [0, 1, 1]
+                ease: [0, 0.9, 1]
             });
 
+        const showExport = ((queries.consoleShow)?
+                (...rest) => self.promt(...rest)
+            :   (...rest) => console.log(...rest));
+
         const exporters = {
-            showLink: () => self.prompt('Link:',
+            showLink: () => showExport('Link:',
                 location.href.replace(location.search.slice(1), querystring.encode({
                         ...queries,
                         track: encodeURIComponent(audioState.trackURL),
@@ -553,10 +572,8 @@ export default (canvas, settings, debug) => {
                         track_off: !audioState.track,
                         mic_off: !audioState.mic
                     }))),
-            showState: () => self.prompt('Current state:',
-                toSource(filter((v, k) => !k.match(/^(colorMap)$/gi),
-                    full.state))),
-            showSequence: () => self.prompt('Animation sequence:',
+            showState: () => showExport('Current state:', full.state),
+            showSequence: () => showExport('Animation sequence:',
                 toSource(sequencer.timeline.frames)),
             keyframe
         };
