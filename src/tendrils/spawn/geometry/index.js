@@ -45,11 +45,15 @@ export class GeometrySpawner extends spawnPixels.PixelSpawner {
     shuffle() {
         const positions = this.positions;
         const size = 2;
+        const total = 1;
+        const range = 0.8;
+        const offset = total-range;
 
         // Skipping every third vertex, so it's always in the center
         for(let i = positions.length-1; i >= 0;
                 i = ((Math.floor((i-1)/size)%3)? i-1 : i-1-size)) {
-            positions[i] = (Math.random()*2)-1;
+            positions[i] = ((Math.random()*range))+
+                ((Math.random() < 0.5)? offset : -total);
         }
 
         this.geometry.attr('position', this.positions, { size });
