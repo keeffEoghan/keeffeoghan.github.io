@@ -1,7 +1,7 @@
 #pragma glslify: import(../geom/line/vert/head)
 
 uniform float speed;
-uniform float maxSpeed;
+uniform float speedLimit;
 // uniform float time;
 
 attribute vec2 previous;
@@ -27,7 +27,7 @@ void main() {
     vec2 vel = (position-previous)*rate;
     // vec2 vel = perp(normal, true)*length(position-previous)*rate;
 
-    values = flow(vel, maxSpeed);
+    values = flow(vel, speedLimit);
 
     crest = normal*miter;
 

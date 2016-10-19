@@ -63,11 +63,18 @@ export default (canvas, settings, debug) => {
 
     const resetSpawner = spawnReset(gl);
 
+
+    // Some convenient shorthands
+
     const respawn = () => resetSpawner.spawn(tendrils);
+    const reset = () => tendrils.reset();
     const restart = () => {
         tendrils.clear();
         respawn();
     };
+    const clear = () => tendrils.clear();
+    const clearView = () => tendrils.clearView();
+    const clearFlow = () => tendrils.clearFlow();
 
     const colorMaps = { main: tendrils.state.colorMap };
 
@@ -116,37 +123,6 @@ export default (canvas, settings, debug) => {
     // Mic refs
     let micAnalyser;
     let micTrigger;
-
-
-    // Audio test and react
-
-    const audioTest = [
-        (trigger) => mean(trigger.nthOrderData(-1)) > audioState.trackBeatAt,
-        (trigger) => sum(trigger.nthOrderData(1)) > audioState.trackLoudAt,
-        (trigger) =>
-            weightedMean(trigger.nthOrderData(-1), 0.2) > audioState.micBeatAt,
-        (trigger) =>
-            Math.abs(peak(trigger.nthOrderData(1))) > audioState.micLoudAt
-    ];
-
-    const audioReact = [
-        () => {
-            spawnCam();
-            console.log('track beat 0');
-        },
-        () => {
-            spawnFlow();
-            console.log('track beat 1');
-        },
-        () => {
-            spawnCam();
-            console.log('mic beat 0');
-        },
-        () => {
-            spawnFastest();
-            console.log('mic beat 1');
-        }
-    ];
 
 
     // Animation init
@@ -293,7 +269,7 @@ export default (canvas, settings, debug) => {
         if(video) {
             tendrils.state.colorMap = colorMaps.cam;
             camSpawner.shader = camShaders.direct;
-            camSpawner.speed = 0.07;
+            camSpawner.speed = 0.3;
             camSpawner.setPixels(video);
             camSpawner.spawn(tendrils);
         }
@@ -346,8 +322,8 @@ export default (canvas, settings, debug) => {
             }
         });
 
-    const stopUserMedia = (stream = mediaStream) =>
-        (stream && each((track) => track.stop(), stream.getTracks()));
+    // const stopUserMedia = (stream = mediaStream) =>
+    //     (stream && each((track) => track.stop(), stream.getTracks()));
 
 
     // Respawn from geometry (platonic forms)
@@ -374,6 +350,86 @@ export default (canvas, settings, debug) => {
 
     tendrils.setup();
     resetSpawner.spawn(tendrils);
+
+
+    // Starting state
+
+    Object.assign(state, {
+            noiseSpeed: 0.00001,
+            noiseScale: 100,
+            forceWeight: 0.014,
+            wanderWeight: 0.0021,
+            speedAlpha: 0.000002,
+            colorMapAlpha: 0.2,
+            baseColor: [0, 0, 0, 0.9],
+            flowColor: [1, 1, 1, 0.05],
+            fadeColor: [1, 1, 1, 0.05]
+        });
+
+    Object.assign(flowPixelState, {
+        scale: 'mirror xy'
+    });
+
+    Object.assign(resetSpawner.uniforms, {
+            radius: (1/Math.max(...tendrils.viewSize))+0.1,
+            speed: 0
+        });
+
+    respawn();
+
+
+    // Audio `react` and `test` function pairs - for `AudioTrigger.fire`
+
+    const audioFire = {
+        form: [
+            spawnForm,
+            (trigger) => mean(trigger.dataOrder(-1)) > audioState.trackBeatAt
+        ],
+        flow: [
+            spawnFlow,
+            (trigger) => sum(trigger.dataOrder(1)) > audioState.trackLoudAt
+        ],
+        cam: [
+            spawnCam,
+            (trigger) =>
+                weightedMean(trigger.dataOrder(-1), 0.2) > audioState.micBeatAt
+        ],
+        fast: [
+            spawnFastest,
+            (trigger) =>
+                Math.abs(peak(trigger.dataOrder(1))) > audioState.micLoudAt
+        ]
+    };
+
+
+    // @todo Test sequence - move to own file?
+    sequencer.smoothTo({
+            to: {
+                ...state,
+                speedLimit: 0.0001,
+            },
+            call: [reset],
+            time: 0
+        })
+        .smoothTo({
+            call: [respawn],
+            time: 100
+        })
+        .smoothTo({
+            to: {
+                speedLimit: 0.0005,
+                noiseScale: 60
+            },
+            time: 6000,
+            ease: [0, 0.9, 1]
+        })
+        .smoothTo({
+            to: {
+                speedLimit: 0.01
+            },
+            time: 10000,
+            ease: [0, 0.9, 1]
+        });
 
 
     // The main loop
@@ -411,23 +467,28 @@ export default (canvas, settings, debug) => {
         let soundOutput = false;
 
         if(audioState.track && !track.paused) {
-            soundOutput = ((trackTrigger.fire(audioReact[0], audioTest[0]))
-                || (trackTrigger.fire(audioReact[1], audioTest[1])));
+            soundOutput = ((trackTrigger.fire(...audioFire.form))
+                || (trackTrigger.fire(...audioFire.flow)));
         }
 
         if(!soundOutput && audioState.mic && micTrigger) {
-            soundOutput = ((micTrigger.fire(audioReact[2], audioTest[2]))
-                || (micTrigger.fire(audioReact[3], audioTest[3])));
+            soundOutput = ((micTrigger.fire(...audioFire.cam))
+                || (micTrigger.fire(...audioFire.fast)));
         }
     }
 
 
     if(debug) {
-        const gui = new dat.GUI();
+        const gui = {
+            main: new dat.GUI()
+        };
 
-        gui.domElement.addEventListener('keydown', (e) => e.stopPropagation());
+        const preventKeyClash = (e) => e.stopPropagation();
 
-        function updateGUI(node = gui) {
+        gui.main.domElement.addEventListener('keydown', preventKeyClash);
+        gui.main.domElement.addEventListener('keyup', preventKeyClash);
+
+        function updateGUI(node = gui.main) {
             if(node.__controllers) {
                 node.__controllers.forEach((control) => control.updateDisplay());
             }
@@ -437,7 +498,7 @@ export default (canvas, settings, debug) => {
             }
         }
 
-        function toggleGUI(open, node = gui) {
+        function toggleGUI(open, node = gui.main) {
             ((open)? node.open() : node.close());
 
             for(let f in node.__folders) {
@@ -500,17 +561,17 @@ export default (canvas, settings, debug) => {
             keyframe
         };
 
-        each((f, e) => gui.add(exporters, e), exporters);
+        each((f, e) => gui.main.add(exporters, e), exporters);
 
 
         // Settings
 
 
-        const settingsGUI = gui.addFolder('settings');
+        gui.settings = gui.main.addFolder('settings');
 
         for(let s in state) {
             if(!(typeof state[s]).match(/^(object|array|undefined|null)$/gi)) {
-                const control = settingsGUI.add(state, s);
+                const control = gui.settings.add(state, s);
 
                 // Some special cases
 
@@ -554,26 +615,26 @@ export default (canvas, settings, debug) => {
             ]
         });
 
-        settingsGUI.addColor(colorProxy, 'flowColor').onChange(convertColors);
-        settingsGUI.add(colorProxy, 'flowAlpha').onChange(convertColors);
+        gui.settings.addColor(colorProxy, 'flowColor').onChange(convertColors);
+        gui.settings.add(colorProxy, 'flowAlpha').onChange(convertColors);
 
-        settingsGUI.addColor(colorProxy, 'baseColor').onChange(convertColors);
-        settingsGUI.add(colorProxy, 'baseAlpha').onChange(convertColors);
+        gui.settings.addColor(colorProxy, 'baseColor').onChange(convertColors);
+        gui.settings.add(colorProxy, 'baseAlpha').onChange(convertColors);
 
-        settingsGUI.addColor(colorProxy, 'fadeColor').onChange(convertColors);
-        settingsGUI.add(colorProxy, 'fadeAlpha').onChange(convertColors);
+        gui.settings.addColor(colorProxy, 'fadeColor').onChange(convertColors);
+        gui.settings.add(colorProxy, 'fadeAlpha').onChange(convertColors);
 
         convertColors();
 
 
         // Respawn
 
-        const spawnGUI = gui.addFolder('spawn');
+        gui.spawn = gui.main.addFolder('spawn');
 
         for(let s in resetSpawner.uniforms) {
             if(!(typeof resetSpawner.uniforms[s])
                     .match(/^(object|array|undefined|null)$/gi)) {
-                spawnGUI.add(resetSpawner.uniforms, s);
+                gui.spawn.add(resetSpawner.uniforms, s);
             }
         }
 
@@ -585,24 +646,24 @@ export default (canvas, settings, debug) => {
 
         // Respawn
 
-        const reflowGUI = gui.addFolder('reflow');
+        gui.reflow = gui.main.addFolder('reflow');
 
-        reflowGUI.add(flowPixelState, 'scale', Object.keys(flowPixelScales));
+        gui.reflow.add(flowPixelState, 'scale', Object.keys(flowPixelScales));
 
 
         // Time
 
-        const timeGUI = gui.addFolder('time');
+        gui.time = gui.main.addFolder('time');
 
-        timeSettings.forEach((t) => timeGUI.add(timer, t));
+        timeSettings.forEach((t) => gui.time.add(timer, t));
 
 
         // Audio
 
-        const audioGUI = gui.addFolder('audio');
+        gui.audio = gui.main.addFolder('audio');
 
         for(let s in audioState) {
-            const control = audioGUI.add(audioState, s);
+            const control = gui.audio.add(audioState, s);
 
             if(s === 'trackURL') {
                 control.onFinishChange(setupTrackURL);
@@ -626,30 +687,30 @@ export default (canvas, settings, debug) => {
         // Controls
 
         const controllers = {
-                clear: () => tendrils.clear(),
-                clearView: () => tendrils.clearView(),
-                clearFlow: () => tendrils.clearFlow(),
+                clear,
+                clearView,
+                clearFlow,
                 respawn,
                 spawnCam,
                 spawnDirectCam,
                 spawnFlow,
                 spawnFastest,
                 spawnForm,
-                reset: () => tendrils.reset(),
+                reset,
                 restart
             };
 
 
-        const controlsGUI = gui.addFolder('controls');
+        gui.controls = gui.main.addFolder('controls');
 
         for(let c in controllers) {
-            controlsGUI.add(controllers, c);
+            gui.controls.add(controllers, c);
         }
 
 
         // Presets
 
-        const presetsGUI = gui.addFolder('presets');
+        gui.presets = gui.main.addFolder('presets');
 
         const presetters = {
             'Flow'() {
@@ -726,7 +787,7 @@ export default (canvas, settings, debug) => {
                 Object.assign(colorProxy, {
                         baseAlpha: 0.1,
                         baseColor: [255, 150, 0],
-                        fadeAlpha: 0.005,
+                        fadeAlpha: 0.05,
                         fadeColor: [0, 0, 0],
                     });
             },
@@ -735,7 +796,7 @@ export default (canvas, settings, debug) => {
                         flowWidth: 5,
                         forceWeight: 0.013,
                         wanderWeight: 0.002,
-                        flowDecay: 0.005,
+                        flowDecay: 0.05,
                         speedAlpha: 0,
                         colorMapAlpha: 0.4
                     });
@@ -760,7 +821,7 @@ export default (canvas, settings, debug) => {
 
                 Object.assign(colorProxy, {
                         baseAlpha: 0.01,
-                        flowAlpha: 0.005
+                        flowAlpha: 0.05
                     });
             },
             'Petri'() {
@@ -775,7 +836,7 @@ export default (canvas, settings, debug) => {
                 Object.assign(colorProxy, {
                         baseAlpha: 0.3,
                         baseColor:[255, 203, 37],
-                        flowAlpha: 0.005,
+                        flowAlpha: 0.05,
                         fadeAlpha: 0.01
                     });
 
@@ -820,7 +881,7 @@ export default (canvas, settings, debug) => {
                 Object.assign(colorProxy, {
                         baseAlpha: 0.9,
                         baseColor: [0, 0, 0],
-                        flowAlpha: 0.04,
+                        flowAlpha: 0.05,
                         fadeAlpha: 0.01,
                         fadeColor: [255, 255, 255]
                     });
@@ -840,7 +901,7 @@ export default (canvas, settings, debug) => {
                 Object.assign(colorProxy, {
                         baseAlpha: 0.02,
                         baseColor: [50, 255, 50],
-                        flowAlpha: 0.01
+                        flowAlpha: 0.05
                     });
             }
         };
@@ -860,13 +921,16 @@ export default (canvas, settings, debug) => {
 
         for(let p in presetters) {
             presetters[p] = wrapPresetter.bind(null, presetters[p]);
-            presetsGUI.add(presetters, p);
+            gui.presets.add(presetters, p);
         }
 
 
         // Open or close
 
-        toggleGUI(true, gui);
+        toggleGUI(false);
+
+        gui.main.open();
+        gui.settings.open();
 
 
         // Keyboard mash!
@@ -881,6 +945,7 @@ export default (canvas, settings, debug) => {
          * - Shift/ctrl/cmd for spawning.
          * - Numbers for presets.
          * - Symbols for smashing shapes/colours into the flow.
+         * - Avoid using 'H' - clashes with DAT.GUI
          *
          * Tween these with a default ease and duration (keyframe pair).
          * Edit the timeline for each setting, saving the settings on each
@@ -900,7 +965,6 @@ export default (canvas, settings, debug) => {
             const scrub = (by) => {
                 track.currentTime += by*0.001;
                 sequencer.playFrom(track.currentTime*1000, 0, state);
-                // sequencer.timeline.seek(0);
                 togglePlay(true);
             };
 
@@ -969,7 +1033,6 @@ export default (canvas, settings, debug) => {
              *       presets.
              */
             const editMap = {
-                // Avoid using 'H'
 
                 '`': {
                     reset: () => {
@@ -984,10 +1047,6 @@ export default (canvas, settings, debug) => {
 
                 'P': stateBool('autoClearView'),
 
-                'Z': stateNum('damping', 0.001),
-                'X': stateNum('minSpeed', 0.0001),
-                'C': stateNum('maxSpeed', 0.0001),
-
                 'Q': stateNum('forceWeight', 0.01),
                 'A': stateNum('flowWeight', 0.02),
                 'W': stateNum('wanderWeight', 0.0002),
@@ -998,8 +1057,11 @@ export default (canvas, settings, debug) => {
                 'E': stateNum('noiseScale', 1),
                 'R': stateNum('noiseSpeed', 0.002),
 
-                'G': stateNum('speedAlpha', 0.002),
-                'F': stateNum('lineWidth', 0.1),
+                'Z': stateNum('damping', 0.001),
+                'X': stateNum('speedLimit', 0.0001),
+
+                'N': stateNum('speedAlpha', 0.002),
+                'M': stateNum('lineWidth', 0.1),
 
                 // <control> is a special case for re-assigning keys, see below
                 '<control>': (key, assign) => {
@@ -1110,16 +1172,5 @@ export default (canvas, settings, debug) => {
                 },
                 false);
         })();
-
-
-        presetters['Rorschach']();
-
-        // Filler frames to reset the state on sequence start, and validate the
-        // sequence.
-        sequencer.smoothTo({
-                to: { ...state },
-                call: [restart],
-                time: 50
-            });
     }
 };
