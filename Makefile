@@ -54,4 +54,4 @@ deploy:
 	git checkout $(BRANCH)
 
 # makefile ettiquette; mark rules without on-disk targets as PHONY
-.PHONY: default help setup assets build custom-deps html images jscs lint scripts server styles test watch gh-pages
+.PHONY: default help setup assets build custom-deps html images jscs lint scripts server styles test watch gh-pages deploy
