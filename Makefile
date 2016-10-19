@@ -48,6 +48,7 @@ gh-pages:
 	git add -f build
 	git commit
 	git push
+	@echo "Switching to '$(BRANCH)' from 'gh-pages'"
 	git checkout $(BRANCH)
 
 # makefile ettiquette; mark rules without on-disk targets as PHONY
