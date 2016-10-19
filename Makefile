@@ -39,8 +39,6 @@ node_modules/.bin: package.json
 # running any build tasks...
 # This is still an interactive command - it still requires user input.
 gh-pages:
-	$(eval BRANCH := `git rev-parse --abbrev-ref HEAD`)
-	@echo "Switching to 'gh-pages' from '$(BRANCH)'"
 	git checkout gh-pages
 	git fetch origin develop
 	git merge FETCH_HEAD
@@ -48,6 +46,11 @@ gh-pages:
 	git add -f build
 	git commit
 	git push
+
+deploy:
+	$(eval BRANCH := `git rev-parse --abbrev-ref HEAD`)
+	@echo "Switching to 'gh-pages' from '$(BRANCH)'"
+	-make gh-pages
 	@echo "Switching to '$(BRANCH)' from 'gh-pages'"
 	git checkout $(BRANCH)
 
