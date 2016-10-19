@@ -36,10 +36,11 @@ void main() {
     for(float n = 0.0; n < samples; n += 1.0) {
         vec4 seed = baseSeed+vec4(n);
         vec2 spawnUV = mod(vec2(random(seed.xy), random(seed.zw)), 1.0);
+        vec4 other = apply(spawnUV, spawnToPos(spawnUV),
+                texture2D(spawnData, spawnUV));
 
-        state = pick(state,
-            apply(spawnUV, spawnToPos(spawnUV), texture2D(spawnData, spawnUV)));
+        state = pick(state, vec4(other.xy, other.zw*speed));
     }
 
-    gl_FragColor = vec4(state.xy, state.zw*speed);
+    gl_FragColor = state;
 }
