@@ -3,11 +3,9 @@
  * Pushes a point along its normal by its radius.
  */
 
-precision highp float;
+#pragma glslify: import(../../vert/head)
 
-attribute vec2 position;
 attribute vec2 normal;
 attribute float miter;
 
 uniform float rad;
-uniform vec2 viewSize;
