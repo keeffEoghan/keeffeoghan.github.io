@@ -31,8 +31,16 @@ export class Sequencer {
         return this.apply(this.timeline.playFrom(time, start), out);
     }
 
+    to(...frame) {
+        this.timeline.add(...frame);
+
+        return this;
+    }
+
     easeTo(align, ...frame) {
-        return this.easeJoin(this.timeline.add(...frame), align);
+        this.easeJoin(this.timeline.add(...frame), align);
+
+        return this;
     }
 
     smoothTo(...frame) {
@@ -44,7 +52,9 @@ export class Sequencer {
     }
 
     easeOver(duration, align, ...frame) {
-        return this.easeJoin(this.timeline.addSpan(duration, ...frame), align);
+        this.easeJoin(this.timeline.addSpan(duration, ...frame), align);
+
+        return this;
     }
 
     smoothOver(duration, ...frame) {
@@ -57,17 +67,19 @@ export class Sequencer {
 
     // If there's a previous frame, ease smoothly from it.
     easeJoin(f, align) {
+        let ease = null;
+
         if(f > 0) {
             const frame = this.timeline.frames[f];
 
-            const ease = ((frame.ease && frame.ease.length)?
+            ease = ((frame.ease && frame.ease.length)?
                     frame.ease : [0, 1]);
 
             ease.splice(1, 0, joinCurve(this.timeline.frames[f-1].ease, align));
             frame.ease = ease;
         }
 
-        return this;
+        return ease;
     }
 }
 
