@@ -12,6 +12,7 @@ import vec2 from 'gl-matrix/src/gl-matrix/vec2';
 import querystring from 'querystring';
 import toSource from 'to-source';
 import shader from 'gl-shader';
+import prefixes from 'prefixes';
 import dat from 'dat-gui';
 
 import redirect from '../utils/protocol-redirect';
@@ -406,7 +407,8 @@ export default (canvas, settings, debug) => {
 
 
     // @todo Test sequence - move to own file?
-    sequencer.smoothTo({
+    sequencer
+        .smoothTo({
             to: {
                 ...state,
                 speedLimit: 0.0001,
@@ -415,7 +417,7 @@ export default (canvas, settings, debug) => {
             call: [reset],
             time: 50
         })
-        .smoothTo({
+        .to({
             call: [respawn],
             time: 120
         })
@@ -448,14 +450,201 @@ export default (canvas, settings, debug) => {
             time: 15500,
             ease: [0, 0.95, 1]
         })
-        .smoothTo({ time: 20000 })
+        .to({ time: 20000 })
         .smoothTo({
             to: {
                 noiseScale: 2.125
             },
             time: 25000,
             ease: [0, 0.95, 1]
+        })
+        .to({
+            call: [spawnCam],
+            time: 28645
+        })
+        //...
+            .to({
+                call: [spawnCam],
+                time: 29429
+            })
+            .to({
+                call: [spawnCam],
+                time: 30362
+            })
+            .to({
+                call: [spawnCam],
+                time: 30828
+            })
+            .to({
+                call: [spawnCam],
+                time: 31145
+            })
+            .to({
+                call: [spawnCam],
+                time: 33496
+            })
+            .to({
+                call: [spawnCam],
+                time: 35829
+            })
+            .to({
+                call: [spawnCam],
+                time: 39530
+            })
+            .to({
+                call: [spawnCam],
+                time: 41579
+            })
+            .to({
+                call: [spawnCam],
+                time: 48014
+            })
+            .to({
+                call: [spawnCam],
+                time: 48914
+            })
+            .to({
+                call: [spawnCam],
+                time: 49281
+            })
+            .to({
+                call: [spawnCam],
+                time: 49698
+            })
+            .to({
+                call: [spawnCam],
+                time: 49880
+            })
+            .to({
+                call: [spawnCam],
+                time: 50031
+            })
+            .to({
+                call: [spawnCam],
+                time: 50198
+            })
+            .to({
+                call: [spawnCam],
+                time: 50495
+            })
+            .to({
+                call: [spawnCam],
+                time: 50646
+            })
+            .to({
+                call: [spawnCam],
+                time: 51163
+            })
+            .to({
+                call: [spawnCam],
+                time: 52000
+            })
+            .to({
+                call: [spawnCam],
+                time: 52615
+            })
+            .to({
+                call: [spawnCam],
+                time: 52748
+            })
+            .to({
+                call: [spawnCam],
+                time: 52895
+            })
+            .to({
+                call: [spawnCam],
+                time: 52900
+            })
+        .smoothTo({
+            to: {
+                noiseScale: 1.8,
+                colorMapAlpha: 0.6
+            },
+            time: 52900,
+            ease: [0, 0.95, 1]
+        })
+        .to({
+            call: [spawnDirectCam],
+            time: 52980
+        })
+        //...
+            .to({
+                call: [spawnDirectCam],
+                time: 53313
+            })
+            .to({
+                call: [spawnDirectCam],
+                time: 53447
+            })
+            .to({
+                call: [spawnDirectCam],
+                time: 53598
+            })
+        // @todo Bassy audio response with cam until 1:40?
+        .smoothTo({
+            to: {
+                wanderWeight: 0.0021,
+                noiseScale: 1.5,
+                noiseSpeed: 0.0002,
+                colorMapAlpha: 0.6
+            },
+            time: 25000,
+            ease: [0, 0.95, 1]
+        })
+        // Outro (artefact)
+        .to({
+            call: [respawn],
+            time: 213000
+        })
+        .smoothTo({
+            to: {
+                noiseScale: 1.8,
+                noiseSpeed: 0.0002,
+                speedAlpha: 0.000002
+            },
+            time: 215000,
+            ease: [0, 0.95, 1]
+        })
+        .to({
+            call: [respawn],
+            time: 216500
+        })
+        .smoothTo({
+            to: {
+                forceWeight: 0.017,
+                flowWeight: 0.1,
+                wanderWeight: 0.002,
+                noiseScale: 2.125,
+                noiseSpeed: 0.00001,
+                speedAlpha: 0.0000005,
+                colorMapAlpha: 0.4,
+                baseColor: [1, 0.6, 0, 0.1],
+                fadeColor: [0, 0, 0, 0.1]
+            },
+            time: 217100,
+            ease: [0, 0.95, 1]
+        })
+        .to({
+            call: [respawn],
+            time: 224000
+        })
+        .to({
+            call: [respawn],
+            time: 225500
+        })
+        .to({
+            call: [spawnCam],
+            time: 226000
+        })
+        .to({
+            call: [spawnCam],
+            time: 228000
+        })
+        .to({
+            call: [spawnDirectCam],
+            time: 228500
         });
+
 
 
     // The main loop
@@ -542,9 +731,7 @@ export default (canvas, settings, debug) => {
                 return {
                         state,
                         respawn: resetSpawner.uniforms,
-                        flow: {
-                            scale: flowPixelState.scale
-                        },
+                        flow: { scale: flowPixelState.scale },
                         time: filter((k) => k in timer, timeSettings, {}),
                         audio: audioState
                     };
@@ -574,20 +761,32 @@ export default (canvas, settings, debug) => {
                 (...rest) => self.promt(...rest)
             :   (...rest) => console.log(...rest));
 
-        const exporters = {
-            showLink: () => showExport('Link:',
-                location.href.replace(location.search.slice(1), querystring.encode({
-                        ...queries,
-                        track: encodeURIComponent(audioState.trackURL),
-                        mute: !audioState.audible,
-                        track_off: !audioState.track,
-                        mic_off: !audioState.mic
-                    }))),
-            showState: () => showExport('Current state:', full.state),
-            showSequence: () => showExport('Animation sequence:',
-                toSource(sequencer.timeline.frames)),
-            keyframe
-        };
+        const exporters = {};
+
+        const requestFullscreen = prefixes('requestFullscreen', canvas).name;
+        // Needs to be called this way because calling the below is an Illegal
+        // Invocation
+        // const fullscreen = prefixes('requestFullscreen', canvas);
+
+        if(requestFullscreen) {
+            exporters.fullScreen = () => canvas[requestFullscreen]();
+        }
+
+        Object.assign(exporters, {
+                showLink: () => showExport('Link:',
+                    location.href.replace(location.search.slice(1), querystring.encode({
+                            ...queries,
+                            track: encodeURIComponent(audioState.trackURL),
+                            mute: !audioState.audible,
+                            track_off: !audioState.track,
+                            mic_off: !audioState.mic
+                        }))),
+                showState: () => showExport('Current state:',
+                    toSource(full.state)),
+                showSequence: () => showExport('Animation sequence:',
+                    toSource(sequencer.timeline.frames)),
+                keyframe
+            });
 
         each((f, e) => gui.main.add(exporters, e), exporters);
 
@@ -1002,6 +1201,8 @@ export default (canvas, settings, debug) => {
                 each((call) => call(), calls);
             };
 
+            const keyframeCaller = (...calls) => () => keyframeCall(...calls);
+
 
             // Invoke the functions for each setting being edited.
             const resetEach = (all) => {
@@ -1096,23 +1297,24 @@ export default (canvas, settings, debug) => {
                     delete editMap[key];
                     delete callMap[key];
 
-                    editMap[key] = { go: () => Object.assign(state, assign) };
+                    callMap[key] = keyframeCaller(() =>
+                            Object.assign(state, assign));
                 }
             };
 
             const callMap = {
-                'O': () => keyframeCall(() => tendrils.clear()),
+                'O': keyframeCaller(() => tendrils.clear()),
 
-                '0': () => keyframeCall(presetters['Flow']),
-                '1': () => keyframeCall(presetters['Wings']),
-                '2': () => keyframeCall(presetters['Fluid']),
-                '3': () => keyframeCall(presetters['Flow only']),
-                '4': () => keyframeCall(presetters['Noise only']),
-                '5': () => keyframeCall(presetters['Sea']),
-                '6': () => keyframeCall(presetters['Petri']),
-                '7': () => keyframeCall(presetters['Turbulence']),
-                '8': () => keyframeCall(presetters['Rorschach']),
-                '9': () => keyframeCall(presetters['Roots']),
+                '0': keyframeCaller(presetters['Flow']),
+                '1': keyframeCaller(presetters['Wings']),
+                '2': keyframeCaller(presetters['Fluid']),
+                '3': keyframeCaller(presetters['Flow only']),
+                '4': keyframeCaller(presetters['Noise only']),
+                '5': keyframeCaller(presetters['Sea']),
+                '6': keyframeCaller(presetters['Petri']),
+                '7': keyframeCaller(presetters['Turbulence']),
+                '8': keyframeCaller(presetters['Rorschach']),
+                '9': keyframeCaller(presetters['Roots']),
 
                 '-': adjustEach(-0.1),
                 '=': adjustEach(0.1),
@@ -1136,14 +1338,14 @@ export default (canvas, settings, debug) => {
                     sequencer.timeline.spliceAt(sequencer.timer.time);
                 },
 
-                '\\': () => keyframeCall(() => tendrils.reset()),
-                "'": () => keyframeCall(spawnFlow),
-                ';': () => keyframeCall(spawnFastest),
+                '\\': keyframeCaller(() => tendrils.reset()),
+                "'": keyframeCaller(spawnFlow),
+                ';': keyframeCaller(spawnFastest),
 
-                '<shift>': () => keyframeCall(restart),
-                '/': () => keyframeCall(spawnCam),
-                '.': () => keyframeCall(spawnDirectCam),
-                ',': () => keyframeCall(spawnForm)
+                '<shift>': keyframeCaller(restart),
+                '/': keyframeCaller(spawnCam),
+                '.': keyframeCaller(spawnDirectCam),
+                ',': keyframeCaller(spawnForm)
             };
 
             // @todo Throttle so multiple states can go into one keyframe.
