@@ -12,6 +12,6 @@ void main() {
 
     if(state.xy != inert) {
         gl_Position = vec4(state.xy*viewSize, 1.0, 1.0);
-        color = flow(state.zw, maxSpeed);
+        color = flow(state.zw, speedLimit);
     }
 }

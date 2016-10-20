@@ -16,7 +16,7 @@ uniform vec2 viewSize;
 uniform float time;
 uniform float speedAlpha;
 uniform float colorMapAlpha;
-uniform float maxSpeed;
+uniform float speedLimit;
 uniform float flowDecay;
 
 attribute vec2 uv;
@@ -52,7 +52,7 @@ void main() {
     vec4 state = stateAtFrame(uv, dataRes, previous, particles);
 
     if(state.xy != inert) {
-        vec2 vel = state.zw/maxSpeed;
+        vec2 vel = state.zw/speedLimit;
         float speedRate = min(length2(vel)/speedAlpha, 1.0);
 
 

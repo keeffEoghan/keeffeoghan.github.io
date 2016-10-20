@@ -34,8 +34,7 @@ export const defaults = () => ({
         autoClearView: false,
 
         damping: 0.043,
-        minSpeed: 0.000001,
-        maxSpeed: 0.01,
+        speedLimit: 0.01,
 
         forceWeight: 0.017,
         flowWeight: 1,

@@ -51,11 +51,12 @@
     "ndarray": "^1.0.18",
     "pepjs": "^0.4.1",
     "polyline-normals": "^2.0.2",
+    "prefixes": "^1.0.1",
     "querystring": "^0.2.0",
     "range-fit": "^0.1.1",
     "reset.css": "^2.0.2",
     "soundcloud-badge": "^1.1.0",
-    "tosource": "^1.0.0",
+    "to-source": "^2.0.3",
     "vkey": "^1.0.0",
     "web-audio-analyser": "^2.0.1"
   },
