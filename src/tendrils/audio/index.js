@@ -13,7 +13,7 @@ import { orderLogRates, peak } from '../analyse';
 
 
 export const defaultTest = (trigger) =>
-    peak(trigger.nthOrderData(-1)) > trigger.limit;
+    peak(trigger.dataOrder(-1)) > trigger.limit;
 
 export class AudioTrigger {
     constructor(analyser, orders, limit = 200, test = null, react = null) {
@@ -40,7 +40,7 @@ export class AudioTrigger {
 
     // The most recet sample at the nth-order log. Negative `nth` indexes in
     // reverse (highest-lowest).
-    nthOrderData(nth) {
+    dataOrder(nth) {
         return wrapIndex(nth, this.orderLog)[0];
     }
 

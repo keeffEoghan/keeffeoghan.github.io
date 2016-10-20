@@ -10,8 +10,7 @@ uniform vec2 viewSize;
 uniform float time;
 uniform float dt;
 
-uniform float minSpeed;
-uniform float maxSpeed;
+uniform float speedLimit;
 uniform float damping;
 
 uniform float flowDecay;
@@ -69,7 +68,7 @@ void main() {
          */
         float speed = length(newVel);
 
-        newVel *= min(speed, maxSpeed)/speed;
+        newVel *= min(speed, speedLimit)/speed;
 
         // Integrate motion
         newPos = pos+newVel;
