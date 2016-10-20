@@ -591,6 +591,7 @@ export default (canvas, settings, debug) => {
             time: 25000,
             ease: [0, 0.95, 1]
         })
+        // @todo Middle bit!
         // Outro (artefact)
         .to({
             call: [respawn],
@@ -621,7 +622,7 @@ export default (canvas, settings, debug) => {
                 baseColor: [1, 0.6, 0, 0.1],
                 fadeColor: [0, 0, 0, 0.1]
             },
-            time: 217100,
+            time: 217000,
             ease: [0, 0.95, 1]
         })
         .to({
