@@ -49,20 +49,27 @@ export class GeometrySpawner extends spawnPixels.PixelSpawner {
         const tau = Math.PI*2;
 
         let rad;
-        const radius = () => 0.3+(Math.random()*1.5);
+        const radius = () => 0.25+(Math.random()*1.3);
 
         // Triangles, one vertex always in the center
         for(let t = this.positions.length-1; t >= 0; t -= step) {
-            const a = Math.random()*tau;
-            const o = (0.01+(Math.random()*0.03))*tau;
+            const angle = tau*Math.random();
+
+            const range = tau*
+                    // Minimum range offset
+                    (0.01+
+                        // Acute or obtuse?
+                        (Math.round(Math.random())*0.25)+
+                        // Range of size
+                        (Math.random()*0.03));
 
             rad = radius();
-            this.positions[t-3] = Math.cos(a-o)*rad;
-            this.positions[t-2] = Math.sin(a-o)*rad;
+            this.positions[t-3] = Math.cos(angle-range)*rad;
+            this.positions[t-2] = Math.sin(angle-range)*rad;
 
             rad = radius();
-            this.positions[t-1] = Math.cos(a+o)*rad;
-            this.positions[t-0] = Math.sin(a+o)*rad;
+            this.positions[t-1] = Math.cos(angle+range)*rad;
+            this.positions[t-0] = Math.sin(angle+range)*rad;
 
             // Skipping the center vertex, stays at [0, 0]
         }
