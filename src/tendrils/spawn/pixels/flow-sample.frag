@@ -7,4 +7,4 @@ uniform float flowDecay;
 
 const float samples = 5.0;
 
-#pragma glslify: import(./frag/best-sample.main)
+#pragma glslify: import(./frag/best-sample-main)

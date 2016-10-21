@@ -24,7 +24,7 @@ vec4 pick(vec4 current, vec4 next) {
 
 void main() {
     /**
-     * @todo This was needed in `./direct.main.frag` - is it needed here too?
+     * @todo This was needed in `./direct-main.frag` - is it needed here too?
      */
     vec2 uv = gl_FragCoord.xy/dataRes;
     // vec2 uv = (gl_FragCoord.xy/dataRes)*(geomRes/dataRes);

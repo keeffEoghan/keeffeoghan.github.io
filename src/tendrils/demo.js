@@ -326,8 +326,8 @@ export default (canvas, settings, debug) => {
             }
         });
 
-    // const stopUserMedia = (stream = mediaStream) =>
-    //     (stream && each((track) => track.stop(), stream.getTracks()));
+    const stopUserMedia = (stream = mediaStream) =>
+        (stream && each((track) => track.stop(), stream.getTracks()));
 
 
     // Respawn from geometry (platonic forms)
@@ -637,14 +637,32 @@ export default (canvas, settings, debug) => {
             call: [spawnCam],
             time: 226000
         })
-        .to({
-            call: [spawnCam],
-            time: 228000
-        })
+        //...
+            .to({
+                call: [spawnCam],
+                time: 228000
+            })
         .to({
             call: [spawnDirectCam],
             time: 228500
-        });
+        })
+        //...
+            .to({
+                call: [spawnDirectCam],
+                time: 228700
+            })
+            .to({
+                call: [spawnDirectCam],
+                time: 228850
+            })
+            .to({
+                call: [spawnDirectCam],
+                time: 228950
+            })
+            .to({
+                call: [spawnDirectCam],
+                time: 229000
+            });
 
 
 
