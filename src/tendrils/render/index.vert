@@ -28,6 +28,7 @@ varying vec4 color;
 
 #pragma glslify: inert = require(../const/inert)
 #pragma glslify: length2 = require(../utils/length-2)
+#pragma glslify: vignette = require(../filter/vignette)
 #pragma glslify: preAlpha = require(../utils/pre-alpha)
 #pragma glslify: stateAtFrame = require(../state/state-at-frame)
 
@@ -52,6 +53,7 @@ void main() {
     vec4 state = stateAtFrame(uv, dataRes, previous, particles);
 
     if(state.xy != inert) {
+        vec2 pos = state.xy;
         vec2 vel = state.zw/speedLimit;
         float speedRate = min(length2(vel)/speedAlpha, 1.0);
 
@@ -59,7 +61,7 @@ void main() {
         // Color map
 
         vec4 mappedColor = texture2D(colorMap, uv*geomRes/dataRes);
-        
+
         mappedColor.a *= colorMapAlpha;
 
 
@@ -79,10 +81,13 @@ void main() {
             preAlpha(flowColor.rgb*flowAlign, flowColor.a)+
             baseColor;
 
-        color = clamp(vec4(color.rgb, color.a*speedRate), minColor, maxColor);
+        color.a *= speedRate*max(0.1,
+                vignette(pos, vec2(0.0), 1.0, vec3(0.1, 1.0, 1.0)));
+
+        color = clamp(color, minColor, maxColor);
 
 
         // Position
-        gl_Position = vec4(state.xy*viewSize, 0.0, 1.0);
+        gl_Position = vec4(pos*viewSize, 0.0, 1.0);
     }
 }
