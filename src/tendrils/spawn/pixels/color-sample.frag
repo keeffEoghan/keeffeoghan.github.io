@@ -5,4 +5,4 @@
 
 const float samples = 3.0;
 
-#pragma glslify: import(./frag/best-sample.main)
+#pragma glslify: import(./frag/best-sample-main)
