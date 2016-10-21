@@ -43,17 +43,28 @@ export class GeometrySpawner extends spawnPixels.PixelSpawner {
     }
 
     shuffle() {
-        const positions = this.positions;
         const size = 2;
-        const total = 1;
-        const range = 0.8;
-        const offset = total-range;
+        const num = 3;
+        const step = size*num;
+        const tau = Math.PI*2;
 
-        // Skipping every third vertex, so it's always in the center
-        for(let i = positions.length-1; i >= 0;
-                i = ((Math.floor((i-1)/size)%3)? i-1 : i-1-size)) {
-            positions[i] = ((Math.random()*range))+
-                ((Math.random() < 0.5)? offset : -total);
+        let rad;
+        const radius = () => 0.3+(Math.random()*1.5);
+
+        // Triangles, one vertex always in the center
+        for(let t = this.positions.length-1; t >= 0; t -= step) {
+            const a = Math.random()*tau;
+            const o = (0.01+(Math.random()*0.03))*tau;
+
+            rad = radius();
+            this.positions[t-3] = Math.cos(a-o)*rad;
+            this.positions[t-2] = Math.sin(a-o)*rad;
+
+            rad = radius();
+            this.positions[t-1] = Math.cos(a+o)*rad;
+            this.positions[t-0] = Math.sin(a+o)*rad;
+
+            // Skipping the center vertex, stays at [0, 0]
         }
 
         this.geometry.attr('position', this.positions, { size });

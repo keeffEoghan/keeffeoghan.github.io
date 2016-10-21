@@ -619,7 +619,7 @@ export default (canvas, settings, debug) => {
                 noiseSpeed: 0.00001,
                 speedAlpha: 0.0000005,
                 colorMapAlpha: 0.4,
-                baseColor: [1, 0.6, 0, 0.1],
+                baseColor: [1, 0.69, 0.255, 0.1],
                 fadeColor: [0, 0, 0, 0.1]
             },
             time: 217000,
