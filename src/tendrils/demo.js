@@ -594,13 +594,13 @@ export default (canvas, settings, debug) => {
                 forceWeight: 0.017,
                 flowWeight: 0.1,
                 wanderWeight: 0.002,
-                noiseScale: 2.125,
+                noiseScale: 1.8,
                 noiseSpeed: 0.00001,
                 speedAlpha: 0.0000005,
                 colorMapAlpha: 0.4,
                 baseColor: [1, 0.69, 0.255, 0.1],
                 flowColor: [1, 0.69, 0.255, 0.3],
-                fadeColor: [0, 0, 0, 0.1]
+                fadeColor: [0.1333, 0.1333, 0.1333, 0.1]
             },
             time: 217000,
             ease: [0, 0.95, 1]
@@ -931,8 +931,7 @@ export default (canvas, settings, debug) => {
                         baseColor: [0, 0, 0],
                         flowAlpha: 1,
                         flowColor: [255, 255, 255],
-                        fadeAlpha: Math.max(state.flowDecay, 0.05),
-                        fadeColor: [0, 0, 0]
+                        fadeAlpha: Math.max(state.flowDecay, 0.05)
                     });
             },
             'Wings'() {
@@ -974,8 +973,7 @@ export default (canvas, settings, debug) => {
                 Object.assign(colorProxy, {
                         baseAlpha: 0.8,
                         baseColor: [100, 200, 255],
-                        fadeAlpha: 0.1,
-                        fadeColor: [0, 0, 0]
+                        fadeAlpha: 0.1
                     });
             },
             'Noise only'() {
@@ -989,8 +987,7 @@ export default (canvas, settings, debug) => {
                 Object.assign(colorProxy, {
                         baseAlpha: 0.1,
                         baseColor: [255, 150, 0],
-                        fadeAlpha: 0.05,
-                        fadeColor: [0, 0, 0],
+                        fadeAlpha: 0.05
                     });
             },
             'Sea'() {
@@ -1105,6 +1102,29 @@ export default (canvas, settings, debug) => {
                         baseColor: [50, 255, 50],
                         flowAlpha: 0.05
                     });
+            },
+            'Mirror'() {
+                Object.assign(state, {
+                        forceWeight: 0.0165,
+                        flowWeight: 1,
+                        wanderWeight: 0.0015,
+                        flowDecay: 0.001,
+                        flowWidth: 8,
+                        noiseScale: 1.8,
+                        noiseSpeed: 0.0001,
+                        speedAlpha: 0.00002,
+                        colorMapAlpha: 1
+                    });
+
+                Object.assign(colorProxy, {
+                        baseAlpha: 0,
+                        baseColor: [0, 0, 0],
+                        flowAlpha: 0.05,
+                        fadeAlpha: 0.05,
+                        fadeColor: [0, 0, 0]
+                    });
+
+                spawnDirectCam();
             }
         };
 
@@ -1118,7 +1138,7 @@ export default (canvas, settings, debug) => {
 
             updateGUI();
             convertColors();
-            restart();
+            // restart();
         };
 
         for(let p in presetters) {
@@ -1289,7 +1309,7 @@ export default (canvas, settings, debug) => {
                 '6': keyframeCaller(presetters['Petri']),
                 '7': keyframeCaller(presetters['Turbulence']),
                 '8': keyframeCaller(presetters['Rorschach']),
-                '9': keyframeCaller(presetters['Roots']),
+                '9': keyframeCaller(presetters['Mirror']),
 
                 '-': adjustEach(-0.1),
                 '=': adjustEach(0.1),

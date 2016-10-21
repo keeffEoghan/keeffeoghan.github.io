@@ -52,7 +52,7 @@ export const defaults = () => ({
 
         baseColor: [1, 1, 1, 0.5],
         flowColor: [1, 1, 1, 0.04],
-        fadeColor: [0, 0, 0, 0]
+        fadeColor: [0.1333, 0.1333, 0.1333, 0]
     },
     timer: Object.assign(new Timer(), { step: 1000/60 }),
     numBuffers: 0,
