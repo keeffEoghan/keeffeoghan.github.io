@@ -38,6 +38,7 @@ import FlowLines from './flow-line/multi';
 import Sequencer from './animate';
 
 import { curry } from '../fp/partial';
+import reduce from '../fp/reduce';
 import each from '../fp/each';
 import filter from '../fp/filter';
 
@@ -406,25 +407,87 @@ export default (canvas, settings, debug) => {
     };
 
 
+    // Flattened full state (for tweening on one sequencer)
+
+    const rekey = (any, prefix, out = {}) =>
+        reduce((out, v, k) => {
+                out[prefix+k] = v;
+
+                return out;
+            },
+            any, out);
+
+    const dekey = (any, prefix, out = {}) =>
+        reduce((out, v, k) => {
+                out[k.replace(prefix)] = v;
+
+                return out;
+            },
+            any, out);
+
+    const timeSettings = ['paused', 'step', 'rate', 'end', 'loop'];
+
+    const full = {
+        get state() {
+            return {
+                    ...rekey(state, 'state.'),
+                    ...rekey(resetSpawner.uniforms, 'respawn.'),
+                    ['flow.scale']: flowPixelState.scale,
+
+                    ...reduce((filtered, v, k) => {
+                            if(k in timeSettings) {
+                                filtered['time.'+k] = v;
+                            }
+
+                            return filtered;
+                        },
+                        timer, {}),
+
+                    ...rekey(audioState, 'audio.')
+                };
+        },
+
+        set state(fullState) {
+            dekey(fullState.state, 'state.', state);
+            dekey(fullState.respawn, 'respawn.', resetSpawner.uniforms);
+            dekey(fullState.flow, 'flow.', flowPixelState);
+            dekey(fullState.time, 'timer.', timer);
+            dekey(fullState.audio, 'audio.', audioState);
+
+            return fullState;
+        }
+    };
+
+
     // @todo Test sequence - move to own file?
     sequencer
         .smoothTo({
             to: {
                 ...state,
-                speedLimit: 0.0001,
-                wanderWeight: 0
+                colorMapAlpha: 0.4,
+                baseColor: [1, 1, 1, 0.5],
+                flowColor: [1, 1, 1, 0.6],
+                fadeColor: [0, 0, 0, 0.1]
             },
             call: [reset],
             time: 50
         })
         .to({
+            to: {
+                speedLimit: 0.0001,
+                wanderWeight: 0
+            },
             call: [respawn],
             time: 120
         })
         .smoothTo({
             to: {
                 speedLimit: 0.0003,
-                wanderWeight: 0.0021
+                wanderWeight: 0.0021,
+                colorMapAlpha: 0.2,
+                baseColor: [0, 0, 0, 0.9],
+                flowColor: [1, 1, 1, 0.05],
+                fadeColor: [1, 1, 1, 0.05]
             },
             time: 6000,
             ease: [0, 0.95, 1]
@@ -460,93 +523,9 @@ export default (canvas, settings, debug) => {
         })
         .to({
             call: [spawnCam],
-            time: 28645
+            time: 52748
         })
         //...
-            .to({
-                call: [spawnCam],
-                time: 29429
-            })
-            .to({
-                call: [spawnCam],
-                time: 30362
-            })
-            .to({
-                call: [spawnCam],
-                time: 30828
-            })
-            .to({
-                call: [spawnCam],
-                time: 31145
-            })
-            .to({
-                call: [spawnCam],
-                time: 33496
-            })
-            .to({
-                call: [spawnCam],
-                time: 35829
-            })
-            .to({
-                call: [spawnCam],
-                time: 39530
-            })
-            .to({
-                call: [spawnCam],
-                time: 41579
-            })
-            .to({
-                call: [spawnCam],
-                time: 48014
-            })
-            .to({
-                call: [spawnCam],
-                time: 48914
-            })
-            .to({
-                call: [spawnCam],
-                time: 49281
-            })
-            .to({
-                call: [spawnCam],
-                time: 49698
-            })
-            .to({
-                call: [spawnCam],
-                time: 49880
-            })
-            .to({
-                call: [spawnCam],
-                time: 50031
-            })
-            .to({
-                call: [spawnCam],
-                time: 50198
-            })
-            .to({
-                call: [spawnCam],
-                time: 50495
-            })
-            .to({
-                call: [spawnCam],
-                time: 50646
-            })
-            .to({
-                call: [spawnCam],
-                time: 51163
-            })
-            .to({
-                call: [spawnCam],
-                time: 52000
-            })
-            .to({
-                call: [spawnCam],
-                time: 52615
-            })
-            .to({
-                call: [spawnCam],
-                time: 52748
-            })
             .to({
                 call: [spawnCam],
                 time: 52895
@@ -743,30 +722,6 @@ export default (canvas, settings, debug) => {
 
 
         // Import/export
-
-        const timeSettings = ['paused', 'step', 'rate', 'end', 'loop'];
-
-        const full = {
-            get state() {
-                return {
-                        state,
-                        respawn: resetSpawner.uniforms,
-                        flow: { scale: flowPixelState.scale },
-                        time: filter((k) => k in timer, timeSettings, {}),
-                        audio: audioState
-                    };
-            },
-
-            set state(fullState) {
-                Object.assign(state, fullState.state);
-                Object.assign(resetSpawner.uniforms, fullState.respawn);
-                Object.assign(flowPixelState, fullState.flow);
-                Object.assign(timer, fullState.time);
-                Object.assign(audioState, fullState.audio);
-
-                return fullState;
-            }
-        };
 
         // @todo Sequencers for full state
         const keyframe = (to = { ...state }, call = null) =>
