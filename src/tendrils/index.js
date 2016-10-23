@@ -36,19 +36,27 @@ export const defaults = () => ({
         damping: 0.043,
         speedLimit: 0.01,
 
-        forceWeight: 0.017,
+        forceWeight: 0.016,
+        varyForce: -0.1,
+
         flowWeight: 1,
-        wanderWeight: 0.002,
+        varyFlow: 0.2,
+
+        noiseWeight: 0.002,
+        varyNoise: 0.3,
 
         flowDecay: 0.003,
         flowWidth: 5,
 
         noiseScale: 2.125,
+        varyNoiseScale: 0.5,
+
         noiseSpeed: 0.00025,
+        varyNoiseSpeed: 0.1,
 
         lineWidth: 1,
         speedAlpha: 0.000001,
-        colorMapAlpha: 0.5,
+        colorMapAlpha: 0.4,
 
         baseColor: [1, 1, 1, 0.5],
         flowColor: [1, 1, 1, 0.04],
@@ -60,7 +68,9 @@ export const defaults = () => ({
     renderShader: [renderVert, renderFrag],
     flowShader: [flowVert, flowFrag],
     copyShader: [screenVert, copyFrag],
-    colorMapData: ndarray([1, 1, 0, 0], [1, 1, 4])
+
+    colorMap: null,
+    colorMapData: ndarray([0, 0, 0, 0], [1, 1, 4])
 });
 
 export const glSettings = {
@@ -82,8 +92,8 @@ export class Tendrils {
         // A convenience for filling `colorMap`.
         this.colorMapData = params.colorMapData;
 
-        if(!this.state.colorMap) {
-            this.state.colorMap = FBO(this.gl, [1, 1], { float: true });
+        if(!(this.colorMap = params.colorMap)) {
+            this.colorMap = FBO(this.gl, [1, 1], { float: true });
             this.fillColorMap();
         }
 
@@ -229,6 +239,10 @@ export class Tendrils {
         return this;
     }
 
+    /**
+     * @todo Find a way to use free texture bind units without having to
+     *       manually remember them
+     */
     draw() {
         this.resize();
 
@@ -264,8 +278,11 @@ export class Tendrils {
                 previous: this.particles.buffers[1].color[0].bind(2),
                 viewSize: this.viewSize,
                 viewRes: this.viewRes,
-                colorMap: this.state.colorMap.color[0].bind(3),
-                colorMapRes: this.state.colorMap.shape
+                colorMap: ((this.colorMap.color && this.colorMap.color[0])?
+                            this.colorMap.color[0]
+                        :   this.colorMap)
+                    .bind(3),
+                colorMapRes: this.colorMap.shape
             });
 
         this.particles.render = this.flowShader;
@@ -412,7 +429,7 @@ export class Tendrils {
 
 
     fillColorMap(data = this.colorMapData, ...rest) {
-        this.state.colorMap.color[0].setPixels(this.colorMapData, ...rest);
+        this.colorMap.color[0].setPixels(this.colorMapData, ...rest);
     }
 }
 

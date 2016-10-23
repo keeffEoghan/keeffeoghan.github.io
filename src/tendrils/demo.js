@@ -31,6 +31,7 @@ import spawnReset from './spawn/ball';
 import GeometrySpawner from './spawn/geometry';
 
 import AudioTrigger from './audio';
+import AudioTexture from './audio/data-texture';
 import { peak, sum, mean, weightedMean } from './analyse';
 
 import FlowLines from './flow-line/multi';
@@ -84,9 +85,12 @@ export default (canvas, settings, debug) => {
     const clearView = () => tendrils.clearView();
     const clearFlow = () => tendrils.clearFlow();
 
-    const colorMaps = { main: tendrils.state.colorMap };
-
     const state = tendrils.state;
+
+    const colorMaps = {
+        main: tendrils.colorMap,
+        flow: tendrils.flow
+    };
 
 
     // Audio init
@@ -127,6 +131,7 @@ export default (canvas, settings, debug) => {
     trackAnalyser.analyser.fftSize = Math.pow(2, 5);
 
     const trackTrigger = new AudioTrigger(trackAnalyser, 3);
+
 
     // Mic refs
     let micAnalyser;
@@ -189,12 +194,12 @@ export default (canvas, settings, debug) => {
     const flowInputs = new FlowLines(gl);
 
     const pointerFlow = (e) => {
-        const flow = offset(e, canvas, vec2.create());
+        const pos = offset(e, canvas, vec2.create());
 
-        flow[0] = mapRange(flow[0], 0, tendrils.viewRes[0], -1, 1);
-        flow[1] = mapRange(flow[1], 0, tendrils.viewRes[1], 1, -1);
+        pos[0] = mapRange(pos[0], 0, tendrils.viewRes[0], -1, 1);
+        pos[1] = mapRange(pos[1], 0, tendrils.viewRes[1], 1, -1);
 
-        flowInputs.get(e.pointerId).add(timer.tendrils.time, flow);
+        flowInputs.get(e.pointerId).add(timer.tendrils.time, pos);
     };
 
     canvas.addEventListener('pointermove', pointerFlow, false);
@@ -260,9 +265,8 @@ export default (canvas, settings, debug) => {
 
     colorMaps.cam = camSpawner.buffer;
 
-    const spawnDirectCam = () => {
+    const spawnCam = () => {
         if(video) {
-            tendrils.state.colorMap = colorMaps.cam;
             camSpawner.shader = camShaders.direct;
             camSpawner.speed = 0.3;
             camSpawner.setPixels(video);
@@ -270,9 +274,8 @@ export default (canvas, settings, debug) => {
         }
     };
 
-    const spawnCam = () => {
+    const spawnSampleCam = () => {
         if(video) {
-            tendrils.state.colorMap = colorMaps.main;
             camSpawner.shader = camShaders.sample;
             camSpawner.speed = 1;
             camSpawner.setPixels(video);
@@ -343,6 +346,12 @@ export default (canvas, settings, debug) => {
     resize();
 
 
+
+    const audioTexture = new AudioTexture(gl,
+            trackAnalyser.analyser.frequencyBinCount);
+
+    tendrils.colorMap = colorMaps.audio = audioTexture.texture;
+
     tendrils.setup();
     resetSpawner.spawn(tendrils);
 
@@ -359,7 +368,7 @@ export default (canvas, settings, debug) => {
             (trigger) => sum(trigger.dataOrder(1)) > audioState.trackLoudAt
         ],
         cam: [
-            spawnCam,
+            spawnSampleCam,
             (trigger) =>
                 weightedMean(trigger.dataOrder(-1), 0.2) > audioState.micBeatAt
         ],
@@ -426,15 +435,16 @@ export default (canvas, settings, debug) => {
     // Starting state
 
     Object.assign(state, {
+            speedLimit: 0.0004,
             noiseSpeed: 0.00001,
             noiseScale: 100,
             forceWeight: 0.014,
-            wanderWeight: 0.0021,
+            noiseWeight: 0.0021,
             speedAlpha: 0.000002,
-            colorMapAlpha: 0.2,
-            baseColor: [0, 0, 0, 0.9],
+            colorMapAlpha: 0.4,
+            baseColor: [1, 1, 1, 0.9],
             flowColor: [1, 1, 1, 0.05],
-            fadeColor: [1, 1, 1, 0.05]
+            fadeColor: [0, 0, 0, 0.05]
         });
 
     Object.assign(flowPixelState, {
@@ -452,7 +462,12 @@ export default (canvas, settings, debug) => {
     // Animation setup
 
     const player = new Player({
-        tendrils: []
+        tendrils: [],
+        baseColor: [],
+        flowColor: [],
+        fadeColor: [],
+        spawn: [],
+        audio: []
     });
 
     // timer.player.end = player.end()+2000;
@@ -461,197 +476,17 @@ export default (canvas, settings, debug) => {
 
     // @todo Test sequence - move to own file?
     // @todo Split this into parallel tracks where needed
+
     player.tracks.tendrils
         .to({
-            to: {
-                ...state,
-                colorMapAlpha: 0.4,
-                baseColor: [1, 1, 1, 0.5],
-                flowColor: [1, 1, 1, 0.6],
-                fadeColor: [0, 0, 0, 0.1]
-            },
+            to: { ...state },
             call: [reset],
             time: 50
         })
         .to({
-            to: {
-                speedLimit: 0.0004,
-                wanderWeight: 0
-            },
             call: [respawn],
             time: 120
-        })
-        .smoothTo({
-            to: {
-                wanderWeight: 0.0021,
-                colorMapAlpha: 0.2,
-                baseColor: [0, 0, 0, 0.9],
-                flowColor: [1, 1, 1, 0.05],
-                fadeColor: [1, 1, 1, 0.05]
-            },
-            time: 6000,
-            ease: [0, 0.95, 1]
-        })
-        .smoothTo({
-            to: {
-                speedLimit: 0.001
-            },
-            time: 9000,
-            ease: [0, 0.95, 1]
-        })
-        .smoothTo({
-            to: {
-                speedLimit: 0.01,
-                noiseScale: 60
-            },
-            time: 12000,
-            ease: [0, 0.95, 1]
-        })
-        .smoothTo({
-            to: {
-                noiseScale: 10
-            },
-            time: 15500,
-            ease: [0, 0.95, 1]
-        })
-        .to({ time: 20000 })
-        .smoothTo({
-            to: {
-                noiseScale: 2.125
-            },
-            time: 25000,
-            ease: [0, 0.95, 1]
-        })
-        .to({
-            call: [spawnCam],
-            time: 52748
-        })
-        //...
-            .to({
-                call: [spawnCam],
-                time: 52895
-            })
-            .to({
-                call: [spawnCam],
-                time: 52900
-            })
-        .smoothTo({
-            to: {
-                noiseScale: 1.8,
-                colorMapAlpha: 0.6
-            },
-            time: 52900,
-            ease: [0, 0.95, 1]
-        })
-        .to({
-            call: [spawnDirectCam],
-            time: 52980
-        })
-        //...
-            .to({
-                call: [spawnDirectCam],
-                time: 53313
-            })
-            .to({
-                call: [spawnDirectCam],
-                time: 53447
-            })
-            .to({
-                call: [spawnDirectCam],
-                time: 53598
-            })
-        .smoothTo({
-            to: {
-                colorMapAlpha: 0.3
-            },
-            time: 52900,
-            ease: [0, 0.95, 1]
-        })
-        // @todo Bassy audio response with cam until 1:40?
-        .smoothTo({
-            to: {
-                wanderWeight: 0.0021,
-                noiseScale: 1.5,
-                noiseSpeed: 0.0002,
-                colorMapAlpha: 0.6
-            },
-            time: 25000,
-            ease: [0, 0.95, 1]
-        })
-        // @todo Middle bit!
-        // Outro (artefact)
-        .to({
-            call: [respawn],
-            time: 213000
-        })
-        .smoothTo({
-            to: {
-                noiseScale: 1.8,
-                noiseSpeed: 0.0002,
-                speedAlpha: 0.000002
-            },
-            time: 215000,
-            ease: [0, 0.95, 1]
-        })
-        .to({
-            call: [respawn],
-            time: 216500
-        })
-        .smoothTo({
-            to: {
-                forceWeight: 0.017,
-                flowWeight: 0.1,
-                wanderWeight: 0.002,
-                noiseScale: 1.8,
-                noiseSpeed: 0.00001,
-                speedAlpha: 0.0000005,
-                colorMapAlpha: 0.4,
-                baseColor: [1, 0.69, 0.255, 0.1],
-                flowColor: [1, 0.69, 0.255, 0.3],
-                fadeColor: [0.1333, 0.1333, 0.1333, 0.1]
-            },
-            time: 217000,
-            ease: [0, 0.95, 1]
-        })
-        .to({
-            call: [respawn],
-            time: 224000
-        })
-        .to({
-            call: [respawn],
-            time: 225500
-        })
-        .to({
-            call: [spawnCam],
-            time: 226000
-        })
-        //...
-            .to({
-                call: [spawnCam],
-                time: 228000
-            })
-        .to({
-            call: [spawnDirectCam],
-            time: 228500
-        })
-        //...
-            .to({
-                call: [spawnDirectCam],
-                time: 228700
-            })
-            .to({
-                call: [spawnDirectCam],
-                time: 228850
-            })
-            .to({
-                call: [spawnDirectCam],
-                time: 228950
-            })
-            .to({
-                call: [spawnDirectCam],
-                time: 229000
-            });
-
+        });
 
 
     // The main loop
@@ -661,6 +496,11 @@ export default (canvas, settings, debug) => {
         if(track && track.currentTime >= 0 && !track.paused) {
             timer.player.tick(track.currentTime*1000);
             player.play(timer.player.time, tendrils.state);
+        }
+
+        if(tendrils.colorMap === colorMaps.audio) {
+            // @todo Frequencies on x-axis, waveform on y
+            audioTexture.frequency(trackTrigger.dataOrder(0)).apply();
         }
 
         tendrils.draw();
@@ -794,6 +634,11 @@ export default (canvas, settings, debug) => {
             }
         }
 
+        const colorMapState = { colorMap: 'main' };
+
+        gui.settings.add(colorMapState, 'colorMap', Object.keys(colorMaps))
+            .onFinishChange((v) => tendrils.colorMap = colorMaps[v]);
+
 
         // DAT.GUI's color controllers are a bit fucked.
 
@@ -901,8 +746,8 @@ export default (canvas, settings, debug) => {
                 clearView,
                 clearFlow,
                 respawn,
+                spawnSampleCam,
                 spawnCam,
-                spawnDirectCam,
                 spawnFlow,
                 spawnFastest,
                 spawnForm,
@@ -967,9 +812,9 @@ export default (canvas, settings, debug) => {
             },
             'Flow only'() {
                 Object.assign(state, {
-                        flowDecay: 0.0005,
-                        forceWeight: 0.015,
-                        wanderWeight: 0,
+                        flowDecay: 0.001,
+                        forceWeight: 0.014,
+                        noiseWeight: 0,
                         speedAlpha: 0
                     });
 
@@ -987,8 +832,10 @@ export default (canvas, settings, debug) => {
             'Noise only'() {
                 Object.assign(state, {
                         flowWeight: 0,
-                        wanderWeight: 0.002,
-                        noiseSpeed: 0,
+                        noiseWeight: 0.002,
+                        noiseSpeed: 0.00001,
+                        noiseScale: 3,
+                        varyNoiseScale: -3,
                         speedAlpha: 0
                     });
 
@@ -1002,7 +849,7 @@ export default (canvas, settings, debug) => {
                 Object.assign(state, {
                         flowWidth: 5,
                         forceWeight: 0.013,
-                        wanderWeight: 0.002,
+                        noiseWeight: 0.002,
                         flowDecay: 0.01,
                         speedAlpha: 0,
                         colorMapAlpha: 0.4
@@ -1033,8 +880,8 @@ export default (canvas, settings, debug) => {
             },
             'Petri'() {
                 Object.assign(state, {
-                        forceWeight: 0.0165,
-                        wanderWeight: 0.001,
+                        forceWeight: 0.015,
+                        noiseWeight: 0.001,
                         flowDecay: 0.001,
                         noiseScale: 200,
                         noiseSpeed: 0.0001
@@ -1057,7 +904,7 @@ export default (canvas, settings, debug) => {
                         noiseSpeed: 0.00005,
                         noiseScale: 10,
                         forceWeight: 0.014,
-                        wanderWeight: 0.003,
+                        noiseWeight: 0.003,
                         speedAlpha: 0.000002,
                         colorMapAlpha: 0.3
                     });
@@ -1073,10 +920,12 @@ export default (canvas, settings, debug) => {
             },
             'Rorschach'() {
                 Object.assign(state, {
+                        noiseScale: 40,
+                        varyNoiseScale: 0.1,
                         noiseSpeed: 0.00001,
-                        noiseScale: 60,
+                        varyNoiseSpeed: 0.01,
                         forceWeight: 0.014,
-                        wanderWeight: 0.0021,
+                        noiseWeight: 0.0021,
                         speedAlpha: 0.000002,
                         colorMapAlpha: 0.2
                     });
@@ -1089,7 +938,7 @@ export default (canvas, settings, debug) => {
                         baseAlpha: 0.9,
                         baseColor: [0, 0, 0],
                         flowAlpha: 0.05,
-                        fadeAlpha: 0.01,
+                        fadeAlpha: 0.05,
                         fadeColor: [255, 255, 255]
                     });
             },
@@ -1099,7 +948,7 @@ export default (canvas, settings, debug) => {
                         noiseSpeed: 0,
                         noiseScale: 18,
                         forceWeight: 0.015,
-                        wanderWeight: 0.0023,
+                        noiseWeight: 0.0023,
                         speedAlpha: 0.00005,
                         lineWidth: 3,
                         colorMapAlpha: 0.0001
@@ -1111,28 +960,33 @@ export default (canvas, settings, debug) => {
                         flowAlpha: 0.05
                     });
             },
-            'Mirror'() {
+            'Funhouse'() {
                 Object.assign(state, {
                         forceWeight: 0.0165,
+                        varyForce: 0.3,
                         flowWeight: 1,
-                        wanderWeight: 0.0015,
+                        varyFlow: -2,
+                        noiseWeight: 0.0015,
+                        varyNoise: 1,
+                        noiseScale: 0.5,
+                        varyNoiseScale: -30,
+                        noiseSpeed: 0.0001,
+                        varyNoiseSpeed: -3,
                         flowDecay: 0.001,
                         flowWidth: 8,
-                        noiseScale: 1.8,
-                        noiseSpeed: 0.0001,
                         speedAlpha: 0.00002,
                         colorMapAlpha: 1
                     });
 
                 Object.assign(colorProxy, {
-                        baseAlpha: 0,
+                        baseAlpha: 0.2,
                         baseColor: [0, 0, 0],
                         flowAlpha: 0.05,
                         fadeAlpha: 0.05,
                         fadeColor: [0, 0, 0]
                     });
 
-                spawnDirectCam();
+                spawnCam();
             }
         };
 
@@ -1281,7 +1135,7 @@ export default (canvas, settings, debug) => {
 
                 'Q': stateNum('forceWeight', 0.01),
                 'A': stateNum('flowWeight', 0.02),
-                'W': stateNum('wanderWeight', 0.0002),
+                'W': stateNum('noiseWeight', 0.0002),
 
                 'S': stateNum('flowDecay', 0.005),
                 'D': stateNum('flowWidth', 1),
@@ -1317,7 +1171,7 @@ export default (canvas, settings, debug) => {
                 '6': keyframeCaller(presetters['Petri']),
                 '7': keyframeCaller(presetters['Turbulence']),
                 '8': keyframeCaller(presetters['Rorschach']),
-                '9': keyframeCaller(presetters['Mirror']),
+                '9': keyframeCaller(presetters['Funhouse']),
 
                 '-': adjustEach(-0.1),
                 '=': adjustEach(0.1),
@@ -1347,8 +1201,8 @@ export default (canvas, settings, debug) => {
                 ';': keyframeCaller(spawnFastest),
 
                 '<shift>': keyframeCaller(restart),
-                '/': keyframeCaller(spawnCam),
-                '.': keyframeCaller(spawnDirectCam),
+                '/': keyframeCaller(spawnSampleCam),
+                '.': keyframeCaller(spawnCam),
                 ',': keyframeCaller(spawnForm)
             };
 
