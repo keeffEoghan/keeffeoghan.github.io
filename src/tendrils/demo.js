@@ -35,7 +35,7 @@ import { peak, sum, mean, weightedMean } from './analyse';
 
 import FlowLines from './flow-line/multi';
 
-import Sequencer from './animate';
+import Player from './animate';
 
 import { curry } from '../fp/partial';
 import reduce from '../fp/reduce';
@@ -59,12 +59,15 @@ export default (canvas, settings, debug) => {
 
     const gl = glContext(canvas, glSettings, render);
 
-    const timer = defaultSettings.timer;
+    const timer = {
+        tendrils: defaultSettings.timer,
+        player: new Timer(0)
+    };
 
 
     // Tendrils init
 
-    const tendrils = new Tendrils(gl, { timer });
+    const tendrils = new Tendrils(gl, { timer: timer.tendrils });
 
     const resetSpawner = spawnReset(gl);
 
@@ -91,7 +94,7 @@ export default (canvas, settings, debug) => {
     const audioDefaults = {
         trackURL: ((queries.track)?
                 decodeURIComponent(queries.track)
-            :   'https://soundcloud.com/max-cooper/waves-1'),
+            :   'https://soundcloud.com/max-cooper/trust-feat-kathrin-deboer'),
 
         audible: (''+queries.mute !== 'true'),
 
@@ -128,19 +131,6 @@ export default (canvas, settings, debug) => {
     // Mic refs
     let micAnalyser;
     let micTrigger;
-
-
-    // Animation init
-
-    const sequencer = new Sequencer();
-
-    sequencer.timer = new Timer(0);
-
-
-    // const frames = sequencer.timeline.frames;
-    //
-    // sequencer.timer.end = frames[frames.length-1].time+2000;
-    // sequencer.timer.loop = true;
 
 
     // Track setup
@@ -204,7 +194,7 @@ export default (canvas, settings, debug) => {
         flow[0] = mapRange(flow[0], 0, tendrils.viewRes[0], -1, 1);
         flow[1] = mapRange(flow[1], 0, tendrils.viewRes[1], 1, -1);
 
-        flowInputs.get(e.pointerId).add(timer.time, flow);
+        flowInputs.get(e.pointerId).add(timer.tendrils.time, flow);
     };
 
     canvas.addEventListener('pointermove', pointerFlow, false);
@@ -357,32 +347,6 @@ export default (canvas, settings, debug) => {
     resetSpawner.spawn(tendrils);
 
 
-    // Starting state
-
-    Object.assign(state, {
-            noiseSpeed: 0.00001,
-            noiseScale: 100,
-            forceWeight: 0.014,
-            wanderWeight: 0.0021,
-            speedAlpha: 0.000002,
-            colorMapAlpha: 0.2,
-            baseColor: [0, 0, 0, 0.9],
-            flowColor: [1, 1, 1, 0.05],
-            fadeColor: [1, 1, 1, 0.05]
-        });
-
-    Object.assign(flowPixelState, {
-        scale: 'mirror xy'
-    });
-
-    Object.assign(resetSpawner.uniforms, {
-            radius: (1/Math.max(...tendrils.viewSize))+0.1,
-            speed: 0
-        });
-
-    respawn();
-
-
     // Audio `react` and `test` function pairs - for `AudioTrigger.fire`
 
     const audioFire = {
@@ -407,7 +371,7 @@ export default (canvas, settings, debug) => {
     };
 
 
-    // Flattened full state (for tweening on one sequencer)
+    // Flattened full state (for tweening on one player)
 
     const rekey = (any, prefix, out = {}) =>
         reduce((out, v, k) => {
@@ -441,7 +405,7 @@ export default (canvas, settings, debug) => {
 
                             return filtered;
                         },
-                        timer, {}),
+                        timer.tendrils, {}),
 
                     ...rekey(audioState, 'audio.')
                 };
@@ -451,7 +415,7 @@ export default (canvas, settings, debug) => {
             dekey(fullState.state, 'state.', state);
             dekey(fullState.respawn, 'respawn.', resetSpawner.uniforms);
             dekey(fullState.flow, 'flow.', flowPixelState);
-            dekey(fullState.time, 'timer.', timer);
+            dekey(fullState.time, 'timer.', timer.tendrils);
             dekey(fullState.audio, 'audio.', audioState);
 
             return fullState;
@@ -459,9 +423,46 @@ export default (canvas, settings, debug) => {
     };
 
 
+    // Starting state
+
+    Object.assign(state, {
+            noiseSpeed: 0.00001,
+            noiseScale: 100,
+            forceWeight: 0.014,
+            wanderWeight: 0.0021,
+            speedAlpha: 0.000002,
+            colorMapAlpha: 0.2,
+            baseColor: [0, 0, 0, 0.9],
+            flowColor: [1, 1, 1, 0.05],
+            fadeColor: [1, 1, 1, 0.05]
+        });
+
+    Object.assign(flowPixelState, {
+        scale: 'mirror xy'
+    });
+
+    Object.assign(resetSpawner.uniforms, {
+            radius: (1/Math.max(...tendrils.viewSize))+0.1,
+            speed: 0
+        });
+
+    respawn();
+
+
+    // Animation setup
+
+    const player = new Player({
+        tendrils: []
+    });
+
+    // timer.player.end = player.end()+2000;
+    // timer.player.loop = true;
+
+
     // @todo Test sequence - move to own file?
-    sequencer
-        .smoothTo({
+    // @todo Split this into parallel tracks where needed
+    player.tracks.tendrils
+        .to({
             to: {
                 ...state,
                 colorMapAlpha: 0.4,
@@ -474,7 +475,7 @@ export default (canvas, settings, debug) => {
         })
         .to({
             to: {
-                speedLimit: 0.0001,
+                speedLimit: 0.0004,
                 wanderWeight: 0
             },
             call: [respawn],
@@ -482,7 +483,6 @@ export default (canvas, settings, debug) => {
         })
         .smoothTo({
             to: {
-                speedLimit: 0.0003,
                 wanderWeight: 0.0021,
                 colorMapAlpha: 0.2,
                 baseColor: [0, 0, 0, 0.9],
@@ -494,13 +494,14 @@ export default (canvas, settings, debug) => {
         })
         .smoothTo({
             to: {
-                speedLimit: 0.01
+                speedLimit: 0.001
             },
             time: 9000,
             ease: [0, 0.95, 1]
         })
         .smoothTo({
             to: {
+                speedLimit: 0.01,
                 noiseScale: 60
             },
             time: 12000,
@@ -559,6 +560,13 @@ export default (canvas, settings, debug) => {
                 call: [spawnDirectCam],
                 time: 53598
             })
+        .smoothTo({
+            to: {
+                colorMapAlpha: 0.3
+            },
+            time: 52900,
+            ease: [0, 0.95, 1]
+        })
         // @todo Bassy audio response with cam until 1:40?
         .smoothTo({
             to: {
@@ -648,11 +656,11 @@ export default (canvas, settings, debug) => {
 
     // The main loop
     function render() {
-        const dt = timer.tick().dt;
+        const dt = timer.tendrils.tick().dt;
 
         if(track && track.currentTime >= 0 && !track.paused) {
-            sequencer.timer.tick(track.currentTime*1000);
-            sequencer.play(sequencer.timer.time, tendrils.state);
+            timer.player.tick(track.currentTime*1000);
+            player.play(timer.player.time, tendrils.state);
         }
 
         tendrils.draw();
@@ -664,7 +672,7 @@ export default (canvas, settings, debug) => {
 
         tendrils.flow.bind();
 
-        flowInputs.trim(1/tendrils.state.flowDecay, timer.time);
+        flowInputs.trim(1/tendrils.state.flowDecay, timer.tendrils.time);
 
         each((flowLine) => {
                 Object.assign(flowLine.line.uniforms, tendrils.state);
@@ -723,12 +731,12 @@ export default (canvas, settings, debug) => {
 
         // Import/export
 
-        // @todo Sequencers for full state
         const keyframe = (to = { ...state }, call = null) =>
-            sequencer.smoothTo({
+            // @todo Apply full state to each player track
+            player.tracks.tendrils.smoothTo({
                 to,
                 call,
-                time: sequencer.timer.time,
+                time: timer.player.time,
                 ease: [0, 0.95, 1]
             });
 
@@ -759,7 +767,7 @@ export default (canvas, settings, debug) => {
                 showState: () => showExport('Current state:',
                     toSource(full.state)),
                 showSequence: () => showExport('Animation sequence:',
-                    toSource(sequencer.timeline.frames)),
+                    toSource(player.tracks())),
                 keyframe
             });
 
@@ -857,7 +865,7 @@ export default (canvas, settings, debug) => {
 
         gui.time = gui.main.addFolder('time');
 
-        timeSettings.forEach((t) => gui.time.add(timer, t));
+        timeSettings.forEach((t) => gui.time.add(timer.tendrils, t));
 
 
         // Audio
@@ -995,7 +1003,7 @@ export default (canvas, settings, debug) => {
                         flowWidth: 5,
                         forceWeight: 0.013,
                         wanderWeight: 0.002,
-                        flowDecay: 0.05,
+                        flowDecay: 0.01,
                         speedAlpha: 0,
                         colorMapAlpha: 0.4
                     });
@@ -1186,7 +1194,7 @@ export default (canvas, settings, debug) => {
 
             const scrub = (by) => {
                 track.currentTime += by*0.001;
-                sequencer.playFrom(track.currentTime*1000, 0, state);
+                player.playFrom(track.currentTime*1000, 0, state);
                 togglePlay(true);
             };
 
@@ -1329,9 +1337,10 @@ export default (canvas, settings, debug) => {
                 '[': () => scrub(-2000),
                 ']': () => scrub(2000),
                 '<enter>': keyframe,
-                '<backspace>': () => {
-                    sequencer.timeline.spliceAt(sequencer.timer.time);
-                },
+                // @todo Update this to match the new Player API
+                '<backspace>': () =>
+                    player.trackAt(timer.player.time)
+                        .spliceAt(timer.player.time),
 
                 '\\': keyframeCaller(() => tendrils.reset()),
                 "'": keyframeCaller(spawnFlow),
