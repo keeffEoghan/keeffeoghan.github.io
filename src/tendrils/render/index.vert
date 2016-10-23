@@ -49,6 +49,9 @@ const vec4 maxColor = vec4(1.0);
 const vec4 minAlign = vec4(-1.0);
 const vec4 maxAlign = vec4(1.0);
 
+const vec2 center = vec2(0.0);
+const vec3 curve = vec3(0.1, 1.0, 1.0);
+
 void main() {
     vec4 state = stateAtFrame(uv, dataRes, previous, particles);
 
@@ -81,8 +84,7 @@ void main() {
             preAlpha(flowColor.rgb*flowAlign, flowColor.a)+
             baseColor;
 
-        color.a *= speedRate*max(0.1,
-                vignette(pos, vec2(0.0), 1.0, vec3(0.1, 1.0, 1.0)));
+        color.a *= speedRate*clamp(vignette(pos, center, 1.0, curve), 0.1, 1.0);
 
         color = clamp(color, minColor, maxColor);
 

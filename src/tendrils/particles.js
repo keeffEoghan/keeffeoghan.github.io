@@ -116,6 +116,10 @@ export class Particles {
             buffer.color[0].setPixels(pixels, offset));
     }
 
+    /**
+     * @todo Find a way to use free texture bind units without having to
+     *       manually remember them
+     */
     step(update) {
         step(this.buffers);
 
