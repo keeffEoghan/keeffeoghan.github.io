@@ -44,8 +44,14 @@ export class Player {
         return this;
     }
 
+    each(f) {
+        each(f, this.tracks);
+
+        return this;
+    }
+
     apply(f, out = {}) {
-        each((track) => apply(f(track, out), out), this.tracks);
+        this.each((track) => apply(f(track, out), out));
 
         return this;
     }
