@@ -1,86 +1,102 @@
 /**
- * A convenience class that wraps the timeline, tween, and ease-joining
- * utilities into a single package.
+ * A convenience class that wraps the timeline and tween utilities.
+ * Players and timelines can be combined, nested, and played in parallel.
  */
 
 import Timeline from './timeline';
 import tween from './tween';
-import joinCurve from './join-curve';
 import each from '../../fp/each';
+import reduce from '../../fp/reduce';
+import map from '../../fp/map';
 
-export class Sequencer {
-    constructor(frames) {
-        this.timeline = new Timeline(frames);
+
+export function apply(span, out = {}) {
+    if(span) {
+        Object.assign(out, span.apply);
+        tween(span, out);
+        each((f) => f(out, span), span.call);
     }
 
-    apply(span, out = {}) {
-        if(span) {
-            Object.assign(out, span.apply);
-            tween(span, out);
-            each((f) => f(out, span), span.call);
-        }
+    return out;
+}
 
-        return out;
+export class Player {
+    constructor(tracks) {
+        // Allow the collection type to be defined elsewhere - any iterable.
+        this.tracks = tracks;
+
+        // Convert them in-place into timelines.
+        this.add(this.tracks);
+    }
+
+    add(tracks) {
+        map((track) =>
+                ((track instanceof Timeline)? track : new Timeline(track)),
+            tracks, this.tracks);
+
+        return this;
+    }
+
+    import(players) {
+        each((player) => each((track) => this.add(track), player.tracks),
+            players);
+
+        return this;
+    }
+
+    apply(f, out = {}) {
+        each((track) => apply(f(track, out), out), this.tracks);
+
+        return this;
+    }
+
+    seek(time, out) {
+        return this.apply((track) => track.seek(time), out);
     }
 
     play(time, out) {
-        return this.apply(this.timeline.play(time), out);
+        return this.apply((track) => track.play(time), out);
     }
 
     playFrom(time, start, out) {
-        return this.apply(this.timeline.playFrom(time, start), out);
+        return this.apply((track) => track.playFrom(time, start), out);
     }
 
-    to(...frame) {
-        this.timeline.add(...frame);
-
-        return this;
+    frames(out = []) {
+        return map((track) => track.frames, this.tracks, out);
     }
 
-    easeTo(align, ...frame) {
-        this.easeJoin(this.timeline.add(...frame), align);
 
-        return this;
+    // @todo Finding a timelines, spans, frames by time
+
+    // Find a timeline by the frame closest to a given time
+    // trackAt(time, adjacent = -1) {
+    // }
+
+    // Find the frame closest to a given time
+    // frameAt(time, adjacent = -1) {
+    // }
+
+    // Find the frames within the time span of `start` till `duration`
+    // spanAt(duration, start = 0) {
+    // }
+
+
+    // Time
+
+    start() {
+        return reduce((start, track) => Math.min(track.start(), start),
+                this.tracks, null);
     }
 
-    smoothTo(...frame) {
-        return this.easeTo(1, ...frame);
+    end() {
+        return reduce((end, track) => Math.min(track.end(), end),
+                this.tracks, null);
     }
 
-    flipTo(...frame) {
-        return this.easeTo(-1, ...frame);
-    }
-
-    easeOver(duration, align, ...frame) {
-        this.easeJoin(this.timeline.addSpan(duration, ...frame), align);
-
-        return this;
-    }
-
-    smoothOver(duration, ...frame) {
-        return this.easeOver(duration, 1, ...frame);
-    }
-
-    flipOver(duration, ...frame) {
-        return this.easeOver(duration, -1, ...frame);
-    }
-
-    // If there's a previous frame, ease smoothly from it.
-    easeJoin(f, align) {
-        let ease = null;
-
-        if(f > 0) {
-            const frame = this.timeline.frames[f];
-
-            ease = ((frame.ease && frame.ease.length)?
-                    frame.ease : [0, 1]);
-
-            ease.splice(1, 0, joinCurve(this.timeline.frames[f-1].ease, align));
-            frame.ease = ease;
-        }
-
-        return ease;
+    duration() {
+        return (this.end() || 0)-(this.start() || 0);
     }
 }
 
-export default Sequencer;
+export default Player;

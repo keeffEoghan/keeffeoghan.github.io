@@ -1,6 +1,5 @@
 import shader from 'gl-shader';
 import FBO from 'gl-fbo';
-import ndarray from 'ndarray';
 
 import Particles from './particles';
 import Timer from './timer';
@@ -23,44 +22,52 @@ import flowFrag from './flow/index.frag';
 import screenVert from './screen/index.vert';
 import screenFrag from './screen/index.frag';
 
-// @todo Try drawing a semi-transparent block over the last frame?
 import copyFrag from './screen/copy.frag';
 
 
 export const defaults = () => ({
     state: {
-        rootNum: Math.pow(2, 9),
+        rootNum: Math.pow(2, 10),
 
         autoClearView: false,
 
         damping: 0.043,
         speedLimit: 0.01,
 
-        forceWeight: 0.017,
+        forceWeight: 0.016,
+        varyForce: -0.1,
+
         flowWeight: 1,
-        wanderWeight: 0.002,
+        varyFlow: 0.2,
+
+        noiseWeight: 0.002,
+        varyNoise: 0.3,
 
         flowDecay: 0.003,
         flowWidth: 5,
 
         noiseScale: 2.125,
+        varyNoiseScale: 0.5,
+
         noiseSpeed: 0.00025,
+        varyNoiseSpeed: 0.1,
 
         lineWidth: 1,
         speedAlpha: 0.000001,
-        colorMapAlpha: 0.5,
+        colorMapAlpha: 0.4,
 
         baseColor: [1, 1, 1, 0.5],
         flowColor: [1, 1, 1, 0.04],
-        fadeColor: [0, 0, 0, 0]
+        fadeColor: [0.1333, 0.1333, 0.1333, 0]
     },
     timer: Object.assign(new Timer(), { step: 1000/60 }),
     numBuffers: 0,
     logicShader: null,
     renderShader: [renderVert, renderFrag],
     flowShader: [flowVert, flowFrag],
+    fadeShader: [screenVert, screenFrag],
     copyShader: [screenVert, copyFrag],
-    colorMapData: ndarray([1, 1, 0, 0], [1, 1, 4])
+    colorMap: null
 });
 
 export const glSettings = {
@@ -79,12 +86,8 @@ export class Tendrils {
 
         this.state = params.state;
 
-        // A convenience for filling `colorMap`.
-        this.colorMapData = params.colorMapData;
-
-        if(!this.state.colorMap) {
-            this.state.colorMap = FBO(this.gl, [1, 1], { float: true });
-            this.fillColorMap();
+        if(!(this.colorMap = params.colorMap)) {
+            this.colorMap = FBO(this.gl, [1, 1], { float: true });
         }
 
         this.screen = new Screen(this.gl);
@@ -92,12 +95,9 @@ export class Tendrils {
         this.flow = FBO(this.gl, [1, 1], { float: true });
 
         // Multiple bufferring
-        /**
-         * @todo May need more buffers/passes later?
-         */
         this.buffers = [];
+        this.setupBuffers(params.numBuffers);
 
-        this.baseShader = shader(this.gl, screenVert, screenFrag);
 
         this.logicShader = null;
 
@@ -112,6 +112,11 @@ export class Tendrils {
         this.copyShader = ((Array.isArray(params.copyShader))?
                 shader(this.gl, ...params.copyShader)
             :   params.copyShader);
+
+        this.fadeShader = ((Array.isArray(params.fadeShader))?
+                shader(this.gl, ...params.fadeShader)
+            :   params.fadeShader);
+
 
         this.uniforms = {
                 render: {},
@@ -229,6 +234,10 @@ export class Tendrils {
         return this;
     }
 
+    /**
+     * @todo Find a way to use free texture bind units without having to
+     *       manually remember them
+     */
     draw() {
         this.resize();
 
@@ -264,8 +273,10 @@ export class Tendrils {
                 previous: this.particles.buffers[1].color[0].bind(2),
                 viewSize: this.viewSize,
                 viewRes: this.viewRes,
-                colorMap: this.state.colorMap.color[0].bind(3),
-                colorMapRes: this.state.colorMap.shape
+
+                colorMap: ((this.colorMap.color && this.colorMap.color[0])?
+                        this.colorMap.color[0] : this.colorMap).bind(3),
+                colorMapRes: this.colorMap.shape
             });
 
         this.particles.render = this.flowShader;
@@ -292,8 +303,8 @@ export class Tendrils {
 
         // Overlay fade.
         if(this.state.fadeColor[3] > 0) {
-            this.baseShader.bind();
-            this.baseShader.uniforms.color = this.state.fadeColor;
+            this.fadeShader.bind();
+            this.fadeShader.uniforms.color = this.state.fadeColor;
             this.gl.bindFramebuffer(this.gl.FRAMEBUFFER, null);
             this.screen.render();
         }
@@ -408,11 +419,6 @@ export class Tendrils {
         this.gl.blendFunc(this.gl.SRC_ALPHA, this.gl.ONE_MINUS_SRC_ALPHA);
 
         return this;
-    }
-
-
-    fillColorMap(data = this.colorMapData, ...rest) {
-        this.state.colorMap.color[0].setPixels(this.colorMapData, ...rest);
     }
 }
 

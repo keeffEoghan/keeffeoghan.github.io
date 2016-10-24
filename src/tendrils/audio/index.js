@@ -38,7 +38,7 @@ export class AudioTrigger {
         return this;
     }
 
-    // The most recet sample at the nth-order log. Negative `nth` indexes in
+    // The most recent sample at the nth-order log. Negative `nth` indexes in
     // reverse (highest-lowest).
     dataOrder(nth) {
         return wrapIndex(nth, this.orderLog)[0];

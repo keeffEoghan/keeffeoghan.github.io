@@ -7,25 +7,29 @@
 
 /* global Float32Array */
 
-import texture from 'gl-texture2d';
+import makeTexture from 'gl-texture2d';
 import ndarray from 'ndarray';
+import isNumber from 'lodash/isNumber';
 
 import { mapList } from '../../fp/map';
 import { waveformMap, frequencyMap } from './utils';
 
 export class AudioTexture {
-    constructor(gl, size) {
-        this.array = ndarray(new Float32Array(size), [size, 1]);
-        this.texture = texture(gl, this.array, { float: true });
+    constructor(gl, array, texture) {
         this.gl = gl;
+
+        this.array = ((isNumber(array))?
+                ndarray(new Float32Array(array), [array, 1])
+            :   array);
+
+        this.texture = (texture ||
+            makeTexture(gl, this.array, { float: true }));
     }
 
-    bind(unit) {
-        let bound = this.texture.bind(unit);
-
+    apply() {
         this.texture.setPixels(this.array);
 
-        return bound;
+        return this;
     }
 
     /**
