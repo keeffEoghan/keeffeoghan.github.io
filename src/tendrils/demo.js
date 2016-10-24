@@ -38,6 +38,8 @@ import FlowLines from './flow-line/multi';
 
 import Player from './animate';
 
+import Blend from './screen/blend';
+
 import { curry } from '../fp/partial';
 import reduce from '../fp/reduce';
 import each from '../fp/each';
@@ -87,11 +89,6 @@ export default (canvas, settings, debug) => {
 
     const state = tendrils.state;
 
-    const colorMaps = {
-        main: tendrils.colorMap,
-        flow: tendrils.flow
-    };
-
 
     // Audio init
 
@@ -103,8 +100,8 @@ export default (canvas, settings, debug) => {
         audible: (''+queries.mute !== 'true'),
 
         track: (''+queries.track_off !== 'true'),
-        trackBeatAt: 0.1,
-        trackLoudAt: 9,
+        trackBeatAt: 0.07,
+        trackLoudAt: 100,
 
         mic: (''+queries.mic_off !== 'true'),
         micBeatAt: 1,
@@ -128,7 +125,7 @@ export default (canvas, settings, debug) => {
 
     const trackAnalyser = analyser(track, { audible: audioState.audible });
 
-    trackAnalyser.analyser.fftSize = Math.pow(2, 5);
+    trackAnalyser.analyser.fftSize = Math.pow(2, 8);
 
     const trackTrigger = new AudioTrigger(trackAnalyser, 3);
 
@@ -263,7 +260,8 @@ export default (canvas, settings, debug) => {
 
     const camSpawner = new spawnPixels.PixelSpawner(gl, { shader: null });
 
-    colorMaps.cam = camSpawner.buffer;
+    mat3.scale(camSpawner.spawnMatrix,
+        mat3.identity(camSpawner.spawnMatrix), [-1, 1]);
 
     const spawnCam = () => {
         if(video) {
@@ -300,15 +298,11 @@ export default (canvas, settings, debug) => {
                 video.muted = true;
                 video.src = self.URL.createObjectURL(stream);
                 video.play();
-                video.addEventListener('canplay', () => {
-                        camSpawner.buffer.shape = [
-                            video.videoWidth,
-                            video.videoHeight
-                        ];
-
-                        mat3.scale(camSpawner.spawnMatrix,
-                            mat3.identity(camSpawner.spawnMatrix), [-1, 1]);
-                    });
+                video.addEventListener('canplay', () =>
+                    camSpawner.buffer.shape = tendrils.colorMap.shape = [
+                        video.videoWidth,
+                        video.videoHeight
+                    ]);
 
 
                 // Trying out audio analyser.
@@ -334,6 +328,17 @@ export default (canvas, settings, debug) => {
     const spawnForm = () => geometrySpawner.shuffle().spawn(tendrils);
 
 
+    // Color map blending
+
+    const audioTexture = new AudioTexture(gl,
+            trackAnalyser.analyser.frequencyBinCount);
+
+    const blend = new Blend(gl, {
+            views: [audioTexture.texture, camSpawner.buffer],
+            alphas: [0.3, 0.8]
+        });
+
+
     // Go
 
     function resize() {
@@ -344,13 +349,6 @@ export default (canvas, settings, debug) => {
     self.addEventListener('resize', throttle(resize, 200), false);
 
     resize();
-
-
-
-    const audioTexture = new AudioTexture(gl,
-            trackAnalyser.analyser.frequencyBinCount);
-
-    tendrils.colorMap = colorMaps.audio = audioTexture.texture;
 
     tendrils.setup();
     resetSpawner.spawn(tendrils);
@@ -498,11 +496,14 @@ export default (canvas, settings, debug) => {
             player.play(timer.player.time, tendrils.state);
         }
 
-        if(tendrils.colorMap === colorMaps.audio) {
-            // @todo Frequencies on x-axis, waveform on y
-            audioTexture.frequency(trackTrigger.dataOrder(0)).apply();
-        }
+        // @todo Frequencies on x-axis, waveform on y
+        audioTexture.frequency(trackTrigger.dataOrder(0)).apply();
 
+        // Blend the color maps into tendrils one
+        // @todo Only do this if necessary (skip if none or only one has alpha)
+        blend.draw(tendrils.colorMap);
+
+        // The main event
         tendrils.draw();
 
 
@@ -634,11 +635,6 @@ export default (canvas, settings, debug) => {
             }
         }
 
-        const colorMapState = { colorMap: 'main' };
-
-        gui.settings.add(colorMapState, 'colorMap', Object.keys(colorMaps))
-            .onFinishChange((v) => tendrils.colorMap = colorMaps[v]);
-
 
         // DAT.GUI's color controllers are a bit fucked.
 
@@ -682,6 +678,24 @@ export default (canvas, settings, debug) => {
         convertColors();
 
 
+        // Color map blend
+
+        gui.blend = gui.main.addFolder('blend');
+
+        const blendKeys = ['audio', 'cam'];
+        const blendProxy = reduce((out, k, i) => {
+                out[k] = blend.alphas[i];
+
+                return out;
+            },
+            blendKeys, {});
+
+        for(let b = 0; b < blendKeys.length-1; ++b) {
+            gui.blend.add(blendProxy, blendKeys[b])
+                .onChange((v) => blend.alphas[b] = v);
+        }
+
+
         // Respawn
 
         gui.spawn = gui.main.addFolder('spawn');
@@ -699,7 +713,7 @@ export default (canvas, settings, debug) => {
         };
 
 
-        // Respawn
+        // Reflow
 
         gui.reflow = gui.main.addFolder('reflow');
 
@@ -832,14 +846,15 @@ export default (canvas, settings, debug) => {
             'Noise only'() {
                 Object.assign(state, {
                         flowWeight: 0,
-                        noiseWeight: 0.002,
-                        noiseSpeed: 0.00001,
-                        noiseScale: 3,
-                        varyNoiseScale: -3,
+                        noiseWeight: 0.003,
+                        noiseSpeed: 0.0005,
+                        noiseScale: 0.5,
+                        varyNoiseScale: 20,
                         speedAlpha: 0
                     });
 
                 Object.assign(colorProxy, {
+                        colorMapAlpha: 0.1,
                         baseAlpha: 0.1,
                         baseColor: [255, 150, 0],
                         fadeAlpha: 0.05
@@ -964,12 +979,12 @@ export default (canvas, settings, debug) => {
                 Object.assign(state, {
                         forceWeight: 0.0165,
                         varyForce: 0.3,
-                        flowWeight: 1,
-                        varyFlow: -2,
+                        flowWeight: 0.5,
+                        varyFlow: 1,
                         noiseWeight: 0.0015,
                         varyNoise: 1,
-                        noiseScale: 0.5,
-                        varyNoiseScale: -30,
+                        noiseScale: 40,
+                        varyNoiseScale: -4,
                         noiseSpeed: 0.0001,
                         varyNoiseSpeed: -3,
                         flowDecay: 0.001,
