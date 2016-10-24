@@ -101,19 +101,27 @@ export default (canvas, settings, debug) => {
         audible: (''+queries.mute !== 'true'),
 
         track: (''+queries.track_off !== 'true'),
-        trackBeatAt: 0.07,
-        trackLoudAt: 100,
+        trackFlowAt: 100,
+        trackFastAt: 0,
+        trackFormAt: 0.07,
+        trackSampleAt: 130,
+        trackSpawnAt: 0,
+        trackCamAt: 0,
 
         mic: (''+queries.mic_off !== 'true'),
-        micBeatAt: 1,
-        micLoudAt: 5
+        micFlowAt: 0,
+        micFastAt: 0,
+        micFormAt: 0,
+        micSampleAt: 5,
+        micSpawnAt: 0,
+        micCamAt: 1
     };
 
 
     // Track and analyser init
 
     const track = new Audio();
-    const audioState = {...audioDefaults};
+    const audioState = { ...audioDefaults };
 
     Object.assign(track, {
             crossOrigin: 'anonymous',
@@ -357,25 +365,87 @@ export default (canvas, settings, debug) => {
 
     // Audio `react` and `test` function pairs - for `AudioTrigger.fire`
 
-    const audioFire = {
-        form: [
-            spawnForm,
-            (trigger) => mean(trigger.dataOrder(-1)) > audioState.trackBeatAt
-        ],
-        flow: [
+    const trackFire = [
+        [
             spawnFlow,
-            (trigger) => sum(trigger.dataOrder(1)) > audioState.trackLoudAt
+            (trigger) => ((audioState.trackFlowAt) &&
+                sum(trigger.dataOrder(1)) > audioState.trackFlowAt)
         ],
-        cam: [
-            spawnSampleCam,
-            (trigger) =>
-                weightedMean(trigger.dataOrder(-1), 0.2) > audioState.micBeatAt
-        ],
-        fast: [
+        [
             spawnFastest,
-            (trigger) =>
-                Math.abs(peak(trigger.dataOrder(1))) > audioState.micLoudAt
+            (trigger) => ((audioState.trackFastAt) &&
+                sum(trigger.dataOrder(1)) > audioState.trackFastAt)
+        ],
+        [
+            spawnForm,
+            (trigger) => ((audioState.trackFormAt) &&
+                mean(trigger.dataOrder(-1)) > audioState.trackFormAt)
+        ],
+        [
+            spawnSampleCam,
+            (trigger) => ((audioState.trackSampleAt) &&
+                mean(trigger.dataOrder(-1)) > audioState.trackSampleAt)
+        ],
+        [
+            respawn,
+            (trigger) => ((audioState.trackSpawnAt) &&
+                mean(trigger.dataOrder(-1)) > audioState.trackSpawnAt)
+        ],
+        [
+            spawnCam,
+            (trigger) => ((audioState.trackCamAt) &&
+                mean(trigger.dataOrder(-1)) > audioState.trackCamAt)
         ]
+    ];
+
+    const micFire = [
+        [
+            spawnFlow,
+            (trigger) => ((audioState.micFlowAt) &&
+                Math.abs(peak(trigger.dataOrder(1))) > audioState.micFlowAt)
+        ],
+        [
+            spawnFastest,
+            (trigger) => ((audioState.micFastAt) &&
+                sum(trigger.dataOrder(1)) > audioState.micFastAt)
+        ],
+        [
+            spawnForm,
+            (trigger) => ((audioState.micFormAt) &&
+                mean(trigger.dataOrder(-1)) > audioState.micFormAt)
+        ],
+        [
+            spawnSampleCam,
+            (trigger) => ((audioState.micSampleAt) &&
+                mean(trigger.dataOrder(-1)) > audioState.micSampleAt)
+        ],
+        [
+            respawn,
+            (trigger) => ((audioState.micSpawnAt) &&
+                mean(trigger.dataOrder(-1)) > audioState.micSpawnAt)
+        ],
+        [
+            spawnCam,
+            (trigger) => ((audioState.micCamAt) &&
+                weightedMean(trigger.dataOrder(-1), 0.2) > audioState.micCamAt)
+        ]
+    ];
+
+    // Returns a function to be executed for each `fire` pair (as above)
+    const audioResponder = (trigger) => (fire) => trigger.fire(...fire);
+
+    const audioResponse = () => {
+        let soundOutput = false;
+
+        if(audioState.track && !track.paused) {
+            soundOutput = trackFire.some(audioResponder(trackTrigger));
+        }
+
+        if(!soundOutput && audioState.mic && micTrigger) {
+            soundOutput = micFire.some(audioResponder(micTrigger));
+        }
+
+        return soundOutput;
     };
 
 
@@ -485,7 +555,7 @@ export default (canvas, settings, debug) => {
     // @todo Split this into parallel tracks where needed
 
     player.tracks.tendrils
-        // Restart, clean slate; begin with the inert - flow only
+        // Restart, clean slate; begin with the inert, big bang - flow only
             .to({
                 to: { ...state },
                 call: [reset],
@@ -533,22 +603,12 @@ export default (canvas, settings, debug) => {
             flowInputs.active);
 
 
-        // React to sound - from highest reaction to lowest
+        // React to sound - from highest reaction to lowest, max one per frame
 
         (trackTrigger && trackTrigger.sample(dt));
         (micTrigger && micTrigger.sample(dt));
 
-        let soundOutput = false;
-
-        if(audioState.track && !track.paused) {
-            soundOutput = ((trackTrigger.fire(...audioFire.form))
-                || (trackTrigger.fire(...audioFire.flow)));
-        }
-
-        if(!soundOutput && audioState.mic && micTrigger) {
-            soundOutput = ((micTrigger.fire(...audioFire.cam))
-                || (micTrigger.fire(...audioFire.fast)));
-        }
+        audioResponse();
     }
 
 

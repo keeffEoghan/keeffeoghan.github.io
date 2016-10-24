@@ -6,6 +6,8 @@ import iterable from './iterable';
  */
 export const eachList = (f, x) => {
     Array.prototype.forEach.call(x, f);
+    // @todo
+    // Array.prototype.some.call(x, f);
 
     return x;
 };
