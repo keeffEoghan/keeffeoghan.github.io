@@ -3,34 +3,26 @@ precision highp float;
 uniform sampler2D previous;
 uniform sampler2D particles;
 
-uniform sampler2D colorMap;
-
-uniform vec4 flowColor;
-uniform vec4 baseColor;
-
 uniform vec2 dataRes;
 uniform vec2 geomRes;
 
 uniform vec2 viewSize;
 
-uniform float time;
-uniform float speedAlpha;
+uniform sampler2D colorMap;
 uniform float colorMapAlpha;
+
+uniform vec4 flowColor;
+uniform vec4 baseColor;
+
+uniform float time;
 uniform float speedLimit;
 uniform float flowDecay;
+
+uniform float speedAlpha;
 
 attribute vec2 uv;
 
 varying vec4 color;
-
-
-#pragma glslify: map = require(glsl-map)
-
-#pragma glslify: inert = require(../const/inert)
-#pragma glslify: length2 = require(../utils/length-2)
-#pragma glslify: vignette = require(../filter/vignette)
-#pragma glslify: preAlpha = require(../utils/pre-alpha)
-#pragma glslify: stateAtFrame = require(../state/state-at-frame)
 
 
 /**
@@ -49,6 +41,18 @@ const vec4 maxColor = vec4(1.0);
 const vec4 minAlign = vec4(-1.0);
 const vec4 maxAlign = vec4(1.0);
 
+const vec2 center = vec2(0.0);
+const vec3 curve = vec3(0.1, 1.0, 1.0);
+
+
+#pragma glslify: map = require(glsl-map)
+
+#pragma glslify: inert = require(../const/inert)
+#pragma glslify: length2 = require(../utils/length-2)
+#pragma glslify: vignette = require(../filter/vignette)
+#pragma glslify: preAlpha = require(../utils/pre-alpha)
+#pragma glslify: stateAtFrame = require(../state/state-at-frame)
+
 void main() {
     vec4 state = stateAtFrame(uv, dataRes, previous, particles);
 
@@ -58,11 +62,15 @@ void main() {
         float speedRate = min(length2(vel)/speedAlpha, 1.0);
 
 
+        // Accumulate colors (anything on top of base has pre-multiplied alpha
+        // so they don't cross over)
+
+
         // Color map
 
         vec4 mappedColor = texture2D(colorMap, uv*geomRes/dataRes);
 
-        mappedColor.a *= colorMapAlpha;
+        mappedColor = preAlpha(mappedColor.rgb, mappedColor.a*colorMapAlpha);
 
 
         // Flow color
@@ -74,15 +82,14 @@ void main() {
                     sin(time*flowDecay)),
                 minAlign.rgb, maxAlign.rgb, minColor.rgb, maxColor.rgb);
 
+        vec4 flowAlignColor = preAlpha(flowColor.rgb*flowAlign, flowColor.a);
 
-        // Color summation (pre-multiplying alpha so they don't cross over)
 
-        color = preAlpha(mappedColor)+
-            preAlpha(flowColor.rgb*flowAlign, flowColor.a)+
-            baseColor;
+        // Color summation
 
-        color.a *= speedRate*max(0.1,
-                vignette(pos, vec2(0.0), 1.0, vec3(0.1, 1.0, 1.0)));
+        color = mappedColor+flowAlignColor+baseColor;
+
+        color.a *= speedRate*clamp(vignette(pos, center, 1.0, curve), 0.1, 1.0);
 
         color = clamp(color, minColor, maxColor);
 

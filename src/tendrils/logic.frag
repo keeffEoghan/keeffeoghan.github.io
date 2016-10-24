@@ -13,20 +13,30 @@ uniform float dt;
 uniform float speedLimit;
 uniform float damping;
 
+uniform float forceWeight;
+uniform float flowWeight;
+uniform float noiseWeight;
+
 uniform float flowDecay;
 
 uniform float noiseSpeed;
 uniform float noiseScale;
 
-uniform float forceWeight;
-uniform float flowWeight;
-uniform float wanderWeight;
+// These are scaled by the values they correspond to
+uniform float varyForce;
+uniform float varyFlow;
+uniform float varyNoise;
+uniform float varyNoiseScale;
+uniform float varyNoiseSpeed;
 
 #pragma glslify: noise = require(glsl-noise/simplex/3d)
 
 #pragma glslify: inert = require(./const/inert)
 #pragma glslify: flowAtScreenPos = require(./flow/flow-at-screen-pos, levels = 1.0, stride = 1.0)
 
+float vary(float base, float offset, float variance) {
+    return base+(offset*variance*base);
+}
 
 void main() {
     vec2 uv = gl_FragCoord.xy/dataRes;
@@ -39,10 +49,14 @@ void main() {
     vec2 newVel = vel;
 
     if(pos != inert) {
+        // The 1D index offset of this pixel
+        float i = (gl_FragCoord.x+(gl_FragCoord.y*dataRes.x))/
+                (dataRes.x*dataRes.y);
+
         // Wander force
 
-        vec2 noisePos = pos*noiseScale;
-        float noiseTime = time*noiseSpeed;
+        vec2 noisePos = pos*vary(noiseScale, i, varyNoiseScale);
+        float noiseTime = time*vary(noiseSpeed, i, varyNoiseSpeed);
 
         vec2 wanderForce = vec2(noise(vec3(noisePos, uv.x+noiseTime)),
                 noise(vec3(noisePos, uv.y+noiseTime+1234.5678)));
@@ -57,9 +71,9 @@ void main() {
 
         // Accumulate weighted forces and damping
         newVel = (vel*damping*dt)+
-            (forceWeight*
-                ((flowForce*flowWeight*dt)+
-                    (wanderForce*wanderWeight*dt)));
+            (vary(forceWeight, i, varyForce)*
+                ((flowForce*dt*vary(flowWeight, i, varyFlow))+
+                (wanderForce*dt*vary(noiseWeight, i, varyNoise))));
         
         // Normalize and clamp the velocity
         /**

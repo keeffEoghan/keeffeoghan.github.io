@@ -1,19 +1,17 @@
 /**
  * A timeline, time-sorted keyframes compatible with (but not dependent on)
  * `./tween`.
+ * Also uses ease-joining from `./join-curve`.
  */
 
 import clamp from 'clamp';
-import isNumber from 'lodash/isNumber';
 
+import makeFrame from './frame';
+import joinCurve from './join-curve';
 import each from '../../fp/each';
 import filter from '../../fp/filter';
 import iterable from '../../fp/iterable';
 
-
-export function makeFrame(to, time, ease, call) {
-    return ((arguments.length > 1)? { to, time, ease, call } : to);
-}
 
 export const order = (a, b) => ((a.time > b.time)? 1 : -1);
 export const sort = (frames) => frames.sort(order);
@@ -49,7 +47,7 @@ const accumulate = (frame, out = {}) => {
  * An always time-sorted array of frames.
  */
 export class Timeline {
-    constructor(frames, infinite, rewind = false, symmetric = true) {
+    constructor(frames, infinite = false, rewind = false, symmetric = true) {
         this.frames = this.setup(frames, infinite);
 
         // The playhead: time, current in-between position, and pair of frames
@@ -274,7 +272,7 @@ export class Timeline {
         return this.splice(index, 1, ...adding)[0];
     }
 
-    // Remove the frames within the time span of `start` till `durstion`
+    // Remove the frames within the time span of `start` till `duration`
     spliceSpan(duration, start = 0, ...adding) {
         const a = this.gapAt(start);
         const b = this.gapAt(start+duration);
@@ -282,6 +280,60 @@ export class Timeline {
 
         return this.splice(Math.ceil(i), Math.floor(Math.max(a, b)-i),
                 ...adding);
+    }
+
+
+    // Joining new frames to those before
+
+    to(...frame) {
+        this.add(...frame);
+
+        return this;
+    }
+
+    easeTo(align, ...frame) {
+        this.easeJoin(this.add(...frame), align);
+
+        return this;
+    }
+
+    smoothTo(...frame) {
+        return this.easeTo(1, ...frame);
+    }
+
+    flipTo(...frame) {
+        return this.easeTo(-1, ...frame);
+    }
+
+    easeOver(duration, align, ...frame) {
+        this.easeJoin(this.addSpan(duration, ...frame), align);
+
+        return this;
+    }
+
+    smoothOver(duration, ...frame) {
+        return this.easeOver(duration, 1, ...frame);
+    }
+
+    flipOver(duration, ...frame) {
+        return this.easeOver(duration, -1, ...frame);
+    }
+
+    // If there's a previous frame, ease smoothly from it.
+    easeJoin(f, align) {
+        let ease = null;
+
+        if(f > 0) {
+            const frame = this.frames[f];
+
+            ease = ((frame.ease && frame.ease.length)?
+                    frame.ease : [0, 1]);
+
+            ease.splice(1, 0, joinCurve(this.frames[f-1].ease, align));
+            frame.ease = ease;
+        }
+
+        return ease;
     }
 
 
@@ -295,6 +347,7 @@ export class Timeline {
     // the frame with the ones adjacent.
     // Note that this will only be correct if the adjacent frames don't change
     // later.
+    // @todo Split this out to minimise all the frames.
     minFrame(...frame) {
         const full = makeFrame(...frame);
         const f = this.indexOf(full);
@@ -322,16 +375,16 @@ export class Timeline {
     // Time
 
     start() {
-        return ((this.frames.length)? this.frames[0].time : 0);
+        return ((this.frames.length)? this.frames[0].time : null);
     }
 
     end() {
         return ((this.frames.length)?
-            this.frames[this.frames.length-1].time : 0);
+            this.frames[this.frames.length-1].time : null);
     }
 
     duration() {
-        return this.start()-this.end();
+        return (this.end() || 0)-(this.start() || 0);
     }
 }
 

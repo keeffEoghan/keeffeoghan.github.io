@@ -18,12 +18,12 @@
 import geom from 'gl-geometry';
 import shader from 'gl-shader';
 import FBO from 'gl-fbo';
-import triangle from 'gl-big-triangle';
 import ndarray from 'ndarray';
 import isFunction from 'lodash/isFunction';
 
 import { step } from '../utils';
 
+import Screen from './screen';
 import logicVert from './screen/index.vert';
 
 
@@ -49,7 +49,7 @@ export class Particles {
 
         this.gl = gl;
 
-        this.triangle = triangle(this.gl);
+        this.screen = new Screen(this.gl);
 
         // The dimensions of the state data FBOs. Can be 1:1 with the number of
         // particle vertices, or
@@ -116,6 +116,10 @@ export class Particles {
             buffer.color[0].setPixels(pixels, offset));
     }
 
+    /**
+     * @todo Find a way to use free texture bind units without having to
+     *       manually remember them
+     */
     step(update) {
         step(this.buffers);
 
@@ -131,10 +135,7 @@ export class Particles {
             }),
             update);
 
-        this.triangle.bind();
-        this.triangle.draw();
-        this.triangle.unbind();
-
+        this.screen.render();
         this.gl.bindFramebuffer(this.gl.FRAMEBUFFER, null);
     }
 

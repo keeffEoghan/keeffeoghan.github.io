@@ -1,5 +1,8 @@
 /**
  * Draw forms into a tendrils flow FBO.
+ *
+ * @todo Improve the smoothness of this - currently very uneven and jagged,
+ *       especially over short gaps.
  */
 
 import Line, { defaults } from '../geom/line';
