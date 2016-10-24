@@ -42,6 +42,7 @@ import Blend from './screen/blend';
 
 import { curry } from '../fp/partial';
 import reduce from '../fp/reduce';
+import map from '../fp/map';
 import each from '../fp/each';
 import filter from '../fp/filter';
 
@@ -379,6 +380,10 @@ export default (canvas, settings, debug) => {
 
 
     // Flattened full state (for tweening on one player)
+    /**
+     * @todo Get rid of this, no longer needed wth the new player - stick to the
+     *       consistent notation.
+     */
 
     const rekey = (any, prefix, out = {}) =>
         reduce((out, v, k) => {
@@ -430,6 +435,25 @@ export default (canvas, settings, debug) => {
     };
 
 
+    // Animation setup
+
+    const tracks = {
+        tendrils: tendrils.state,
+        tendrils1: tendrils.state,
+        baseColor: tendrils.state.baseColor,
+        flowColor: tendrils.state.flowColor,
+        fadeColor: tendrils.state.fadeColor,
+        spawn: resetSpawner.uniforms,
+        audio: audioState,
+        blend: blend.alphas
+    };
+
+    const player = new Player(map(() => [], tracks, {}), tracks);
+
+    // timer.player.end = player.end()+2000;
+    // timer.player.loop = true;
+
+
     // Starting state
 
     Object.assign(state, {
@@ -457,21 +481,6 @@ export default (canvas, settings, debug) => {
     respawn();
 
 
-    // Animation setup
-
-    const player = new Player({
-        tendrils: [],
-        baseColor: [],
-        flowColor: [],
-        fadeColor: [],
-        spawn: [],
-        audio: []
-    });
-
-    // timer.player.end = player.end()+2000;
-    // timer.player.loop = true;
-
-
     // @todo Test sequence - move to own file?
     // @todo Split this into parallel tracks where needed
 
@@ -480,14 +489,13 @@ export default (canvas, settings, debug) => {
             .to({
                 to: { ...state },
                 call: [reset],
-                time: 50
+                time: 60
             })
             .to({
                 call: [respawn],
                 time: 120
             });
-        // Isolated areas of activity
-        //
+        // Isolated areas of activity - high scale noise, low flow
 
 
     // The main loop
@@ -496,7 +504,7 @@ export default (canvas, settings, debug) => {
 
         if(track && track.currentTime >= 0 && !track.paused) {
             timer.player.tick(track.currentTime*1000);
-            player.play(timer.player.time, tendrils.state);
+            player.play(timer.player.time);
         }
 
         // @todo Frequencies on x-axis, waveform on y
@@ -580,7 +588,7 @@ export default (canvas, settings, debug) => {
             player.tracks.tendrils.smoothTo({
                 to,
                 call,
-                time: timer.player.time+1,
+                time: timer.player.time,
                 ease: [0, 0.95, 1]
             });
 
@@ -611,7 +619,7 @@ export default (canvas, settings, debug) => {
                 showState: () => showExport('Current state:',
                     toSource(full.state)),
                 showSequence: () => showExport('Animation sequence:',
-                    toSource(player.tracks())),
+                    toSource(player.frames({}))),
                 keyframe
             });
 
@@ -654,20 +662,19 @@ export default (canvas, settings, debug) => {
 
         const colorProxy = {...colorDefaults};
 
-        const convertColors = () => Object.assign(state, {
-            baseColor: [
-                ...colorProxy.baseColor.map((c) => c/255),
-                colorProxy.baseAlpha
-            ],
-            flowColor: [
-                ...colorProxy.flowColor.map((c) => c/255),
-                colorProxy.flowAlpha
-            ],
-            fadeColor: [
-                ...colorProxy.fadeColor.map((c) => c/255),
-                colorProxy.fadeAlpha
-            ]
-        });
+        const convertColors = () => {
+            state.baseColor[3] = colorProxy.baseAlpha;
+            Object.assign(state.baseColor,
+                    colorProxy.baseColor.map((c) => c/255));
+
+            state.flowColor[3] = colorProxy.flowAlpha;
+            Object.assign(state.flowColor,
+                colorProxy.flowColor.map((c) => c/255));
+
+            state.fadeColor[3] = colorProxy.fadeAlpha;
+            Object.assign(state.fadeColor,
+                colorProxy.fadeColor.map((c) => c/255));
+        };
 
         gui.settings.addColor(colorProxy, 'flowColor').onChange(convertColors);
         gui.settings.add(colorProxy, 'flowAlpha').onChange(convertColors);
