@@ -476,15 +476,18 @@ export default (canvas, settings, debug) => {
     // @todo Split this into parallel tracks where needed
 
     player.tracks.tendrils
-        .to({
-            to: { ...state },
-            call: [reset],
-            time: 50
-        })
-        .to({
-            call: [respawn],
-            time: 120
-        });
+        // Restart, clean slate; begin with the inert - flow only
+            .to({
+                to: { ...state },
+                call: [reset],
+                time: 50
+            })
+            .to({
+                call: [respawn],
+                time: 120
+            });
+        // Isolated areas of activity
+        //
 
 
     // The main loop
@@ -577,7 +580,7 @@ export default (canvas, settings, debug) => {
             player.tracks.tendrils.smoothTo({
                 to,
                 call,
-                time: timer.player.time,
+                time: timer.player.time+1,
                 ease: [0, 0.95, 1]
             });
 
@@ -683,16 +686,24 @@ export default (canvas, settings, debug) => {
         gui.blend = gui.main.addFolder('blend');
 
         const blendKeys = ['audio', 'cam'];
-        const blendProxy = reduce((out, k, i) => {
-                out[k] = blend.alphas[i];
+        const blendProxy = reduce((proxy, k, i) => {
+                proxy[k] = blend.alphas[i];
 
-                return out;
+                return proxy;
             },
             blendKeys, {});
 
-        for(let b = 0; b < blendKeys.length-1; ++b) {
-            gui.blend.add(blendProxy, blendKeys[b])
-                .onChange((v) => blend.alphas[b] = v);
+        const blendDefaults = { ...blendProxy };
+
+        const convertBlend = () => reduce((alphas, v, k, proxy, i) => {
+                alphas[i] = v;
+
+                return alphas;
+            },
+            blendProxy, blend.alphas);
+
+        for(let b = 0; b < blendKeys.length; ++b) {
+            gui.blend.add(blendProxy, blendKeys[b]).onChange(convertBlend);
         }
 
 
@@ -850,6 +861,7 @@ export default (canvas, settings, debug) => {
                         noiseSpeed: 0.0005,
                         noiseScale: 0.5,
                         varyNoiseScale: 20,
+                        varyNoiseSpeed: 0.05,
                         speedAlpha: 0
                     });
 
@@ -858,6 +870,11 @@ export default (canvas, settings, debug) => {
                         baseAlpha: 0.1,
                         baseColor: [255, 150, 0],
                         fadeAlpha: 0.05
+                    });
+
+                Object.assign(blendProxy, {
+                        audio: 0.9,
+                        cam: 0.4
                     });
             },
             'Sea'() {
@@ -1010,11 +1027,13 @@ export default (canvas, settings, debug) => {
             Object.assign(resetSpawner.uniforms, resetSpawnerDefaults);
             Object.assign(flowPixelState, flowPixelDefaults);
             Object.assign(colorProxy, colorDefaults);
+            Object.assign(blendProxy, blendDefaults);
 
             presetter();
 
             updateGUI();
             convertColors();
+            convertBlend();
             // restart();
         };
 
