@@ -42,6 +42,7 @@ import Blend from './screen/blend';
 
 import { curry } from '../fp/partial';
 import reduce from '../fp/reduce';
+import map from '../fp/map';
 import each from '../fp/each';
 import filter from '../fp/filter';
 
@@ -100,19 +101,27 @@ export default (canvas, settings, debug) => {
         audible: (''+queries.mute !== 'true'),
 
         track: (''+queries.track_off !== 'true'),
-        trackBeatAt: 0.07,
-        trackLoudAt: 100,
+        trackFlowAt: 100,
+        trackFastAt: 0,
+        trackFormAt: 0.07,
+        trackSampleAt: 130,
+        trackSpawnAt: 0,
+        trackCamAt: 0,
 
         mic: (''+queries.mic_off !== 'true'),
-        micBeatAt: 1,
-        micLoudAt: 5
+        micFlowAt: 0,
+        micFastAt: 0,
+        micFormAt: 0,
+        micSampleAt: 5,
+        micSpawnAt: 0,
+        micCamAt: 1
     };
 
 
     // Track and analyser init
 
     const track = new Audio();
-    const audioState = {...audioDefaults};
+    const audioState = { ...audioDefaults };
 
     Object.assign(track, {
             crossOrigin: 'anonymous',
@@ -356,29 +365,95 @@ export default (canvas, settings, debug) => {
 
     // Audio `react` and `test` function pairs - for `AudioTrigger.fire`
 
-    const audioFire = {
-        form: [
-            spawnForm,
-            (trigger) => mean(trigger.dataOrder(-1)) > audioState.trackBeatAt
-        ],
-        flow: [
+    const trackFire = [
+        [
             spawnFlow,
-            (trigger) => sum(trigger.dataOrder(1)) > audioState.trackLoudAt
+            (trigger) => ((audioState.trackFlowAt) &&
+                sum(trigger.dataOrder(1)) > audioState.trackFlowAt)
         ],
-        cam: [
-            spawnSampleCam,
-            (trigger) =>
-                weightedMean(trigger.dataOrder(-1), 0.2) > audioState.micBeatAt
-        ],
-        fast: [
+        [
             spawnFastest,
-            (trigger) =>
-                Math.abs(peak(trigger.dataOrder(1))) > audioState.micLoudAt
+            (trigger) => ((audioState.trackFastAt) &&
+                sum(trigger.dataOrder(1)) > audioState.trackFastAt)
+        ],
+        [
+            spawnForm,
+            (trigger) => ((audioState.trackFormAt) &&
+                mean(trigger.dataOrder(-1)) > audioState.trackFormAt)
+        ],
+        [
+            spawnSampleCam,
+            (trigger) => ((audioState.trackSampleAt) &&
+                mean(trigger.dataOrder(-1)) > audioState.trackSampleAt)
+        ],
+        [
+            respawn,
+            (trigger) => ((audioState.trackSpawnAt) &&
+                mean(trigger.dataOrder(-1)) > audioState.trackSpawnAt)
+        ],
+        [
+            spawnCam,
+            (trigger) => ((audioState.trackCamAt) &&
+                mean(trigger.dataOrder(-1)) > audioState.trackCamAt)
         ]
+    ];
+
+    const micFire = [
+        [
+            spawnFlow,
+            (trigger) => ((audioState.micFlowAt) &&
+                Math.abs(peak(trigger.dataOrder(1))) > audioState.micFlowAt)
+        ],
+        [
+            spawnFastest,
+            (trigger) => ((audioState.micFastAt) &&
+                sum(trigger.dataOrder(1)) > audioState.micFastAt)
+        ],
+        [
+            spawnForm,
+            (trigger) => ((audioState.micFormAt) &&
+                mean(trigger.dataOrder(-1)) > audioState.micFormAt)
+        ],
+        [
+            spawnSampleCam,
+            (trigger) => ((audioState.micSampleAt) &&
+                mean(trigger.dataOrder(-1)) > audioState.micSampleAt)
+        ],
+        [
+            respawn,
+            (trigger) => ((audioState.micSpawnAt) &&
+                mean(trigger.dataOrder(-1)) > audioState.micSpawnAt)
+        ],
+        [
+            spawnCam,
+            (trigger) => ((audioState.micCamAt) &&
+                weightedMean(trigger.dataOrder(-1), 0.2) > audioState.micCamAt)
+        ]
+    ];
+
+    // Returns a function to be executed for each `fire` pair (as above)
+    const audioResponder = (trigger) => (fire) => trigger.fire(...fire);
+
+    const audioResponse = () => {
+        let soundOutput = false;
+
+        if(audioState.track && !track.paused) {
+            soundOutput = trackFire.some(audioResponder(trackTrigger));
+        }
+
+        if(!soundOutput && audioState.mic && micTrigger) {
+            soundOutput = micFire.some(audioResponder(micTrigger));
+        }
+
+        return soundOutput;
     };
 
 
     // Flattened full state (for tweening on one player)
+    /**
+     * @todo Get rid of this, no longer needed wth the new player - stick to the
+     *       consistent notation.
+     */
 
     const rekey = (any, prefix, out = {}) =>
         reduce((out, v, k) => {
@@ -430,6 +505,25 @@ export default (canvas, settings, debug) => {
     };
 
 
+    // Animation setup
+
+    const tracks = {
+        tendrils: tendrils.state,
+        tendrils1: tendrils.state,
+        baseColor: tendrils.state.baseColor,
+        flowColor: tendrils.state.flowColor,
+        fadeColor: tendrils.state.fadeColor,
+        spawn: resetSpawner.uniforms,
+        audio: audioState,
+        blend: blend.alphas
+    };
+
+    const player = new Player(map(() => [], tracks, {}), tracks);
+
+    // timer.player.end = player.end()+2000;
+    // timer.player.loop = true;
+
+
     // Starting state
 
     Object.assign(state, {
@@ -457,34 +551,21 @@ export default (canvas, settings, debug) => {
     respawn();
 
 
-    // Animation setup
-
-    const player = new Player({
-        tendrils: [],
-        baseColor: [],
-        flowColor: [],
-        fadeColor: [],
-        spawn: [],
-        audio: []
-    });
-
-    // timer.player.end = player.end()+2000;
-    // timer.player.loop = true;
-
-
     // @todo Test sequence - move to own file?
     // @todo Split this into parallel tracks where needed
 
     player.tracks.tendrils
-        .to({
-            to: { ...state },
-            call: [reset],
-            time: 50
-        })
-        .to({
-            call: [respawn],
-            time: 120
-        });
+        // Restart, clean slate; begin with the inert, big bang - flow only
+            .to({
+                to: { ...state },
+                call: [reset],
+                time: 60
+            })
+            .to({
+                call: [respawn],
+                time: 120
+            });
+        // Isolated areas of activity - high scale noise, low flow
 
 
     // The main loop
@@ -493,7 +574,7 @@ export default (canvas, settings, debug) => {
 
         if(track && track.currentTime >= 0 && !track.paused) {
             timer.player.tick(track.currentTime*1000);
-            player.play(timer.player.time, tendrils.state);
+            player.play(timer.player.time);
         }
 
         // @todo Frequencies on x-axis, waveform on y
@@ -522,22 +603,12 @@ export default (canvas, settings, debug) => {
             flowInputs.active);
 
 
-        // React to sound - from highest reaction to lowest
+        // React to sound - from highest reaction to lowest, max one per frame
 
         (trackTrigger && trackTrigger.sample(dt));
         (micTrigger && micTrigger.sample(dt));
 
-        let soundOutput = false;
-
-        if(audioState.track && !track.paused) {
-            soundOutput = ((trackTrigger.fire(...audioFire.form))
-                || (trackTrigger.fire(...audioFire.flow)));
-        }
-
-        if(!soundOutput && audioState.mic && micTrigger) {
-            soundOutput = ((micTrigger.fire(...audioFire.cam))
-                || (micTrigger.fire(...audioFire.fast)));
-        }
+        audioResponse();
     }
 
 
@@ -608,7 +679,7 @@ export default (canvas, settings, debug) => {
                 showState: () => showExport('Current state:',
                     toSource(full.state)),
                 showSequence: () => showExport('Animation sequence:',
-                    toSource(player.tracks())),
+                    toSource(player.frames({}))),
                 keyframe
             });
 
@@ -651,20 +722,19 @@ export default (canvas, settings, debug) => {
 
         const colorProxy = {...colorDefaults};
 
-        const convertColors = () => Object.assign(state, {
-            baseColor: [
-                ...colorProxy.baseColor.map((c) => c/255),
-                colorProxy.baseAlpha
-            ],
-            flowColor: [
-                ...colorProxy.flowColor.map((c) => c/255),
-                colorProxy.flowAlpha
-            ],
-            fadeColor: [
-                ...colorProxy.fadeColor.map((c) => c/255),
-                colorProxy.fadeAlpha
-            ]
-        });
+        const convertColors = () => {
+            state.baseColor[3] = colorProxy.baseAlpha;
+            Object.assign(state.baseColor,
+                    colorProxy.baseColor.map((c) => c/255));
+
+            state.flowColor[3] = colorProxy.flowAlpha;
+            Object.assign(state.flowColor,
+                colorProxy.flowColor.map((c) => c/255));
+
+            state.fadeColor[3] = colorProxy.fadeAlpha;
+            Object.assign(state.fadeColor,
+                colorProxy.fadeColor.map((c) => c/255));
+        };
 
         gui.settings.addColor(colorProxy, 'flowColor').onChange(convertColors);
         gui.settings.add(colorProxy, 'flowAlpha').onChange(convertColors);
@@ -683,16 +753,24 @@ export default (canvas, settings, debug) => {
         gui.blend = gui.main.addFolder('blend');
 
         const blendKeys = ['audio', 'cam'];
-        const blendProxy = reduce((out, k, i) => {
-                out[k] = blend.alphas[i];
+        const blendProxy = reduce((proxy, k, i) => {
+                proxy[k] = blend.alphas[i];
 
-                return out;
+                return proxy;
             },
             blendKeys, {});
 
-        for(let b = 0; b < blendKeys.length-1; ++b) {
-            gui.blend.add(blendProxy, blendKeys[b])
-                .onChange((v) => blend.alphas[b] = v);
+        const blendDefaults = { ...blendProxy };
+
+        const convertBlend = () => reduce((alphas, v, k, proxy, i) => {
+                alphas[i] = v;
+
+                return alphas;
+            },
+            blendProxy, blend.alphas);
+
+        for(let b = 0; b < blendKeys.length; ++b) {
+            gui.blend.add(blendProxy, blendKeys[b]).onChange(convertBlend);
         }
 
 
@@ -850,6 +928,7 @@ export default (canvas, settings, debug) => {
                         noiseSpeed: 0.0005,
                         noiseScale: 0.5,
                         varyNoiseScale: 20,
+                        varyNoiseSpeed: 0.05,
                         speedAlpha: 0
                     });
 
@@ -858,6 +937,11 @@ export default (canvas, settings, debug) => {
                         baseAlpha: 0.1,
                         baseColor: [255, 150, 0],
                         fadeAlpha: 0.05
+                    });
+
+                Object.assign(blendProxy, {
+                        audio: 0.9,
+                        cam: 0.4
                     });
             },
             'Sea'() {
@@ -1010,11 +1094,13 @@ export default (canvas, settings, debug) => {
             Object.assign(resetSpawner.uniforms, resetSpawnerDefaults);
             Object.assign(flowPixelState, flowPixelDefaults);
             Object.assign(colorProxy, colorDefaults);
+            Object.assign(blendProxy, blendDefaults);
 
             presetter();
 
             updateGUI();
             convertColors();
+            convertBlend();
             // restart();
         };
 

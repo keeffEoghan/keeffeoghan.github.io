@@ -21,9 +21,13 @@ export function apply(span, out = {}) {
 }
 
 export class Player {
-    constructor(tracks) {
+    constructor(tracks, outputs = {}) {
         // Allow the collection type to be defined elsewhere - any iterable.
         this.tracks = tracks;
+
+        // These may be defined to receive the outputs of each corresponding
+        // track - also any iterable.
+        this.outputs = outputs;
 
         // Convert them in-place into timelines.
         this.add(this.tracks);
@@ -44,8 +48,22 @@ export class Player {
         return this;
     }
 
-    apply(f, out = {}) {
-        each((track) => apply(f(track, out), out), this.tracks);
+    each(f) {
+        each(f, this.tracks);
+
+        return this;
+    }
+
+    // Apply the outputs of calling the given function on each track - into the
+    // `out` object if given, or the object in `outputs` corresponding to the
+    // track's key otherwise.
+    apply(f, out) {
+        this.each((track, key, ...rest) => {
+            const trackOut = (out || this.outputs[key] ||
+                    (this.outputs[key] = {}));
+
+            return apply(f(track, key, ...rest, trackOut), trackOut);
+        });
 
         return this;
     }
