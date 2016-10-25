@@ -24,7 +24,9 @@ main { min-height: 100%; }
 
 body { margin: 0; }
 
-canvas { display: block; position: fixed; top: 0; left: 0; bottom: 0; right: 0; cursor: cell; background: #000; }
+canvas { display: block; position: fixed; top: 0; left: 0; bottom: 0; right: 0; cursor: cell; background: #000; -webkit-transition: background-color 200ms ease-in-out; transition: background-color 200ms ease-in-out; }
+
+canvas.light { background: #fff; }
 
 /* Quick fix for a broken DAT.GUI style */
 .hue-field { width: 13px !important; }
@@ -34,5 +36,7 @@ canvas { display: block; position: fixed; top: 0; left: 0; bottom: 0; right: 0; 
 .npm-scb-wrap.open .npm-scb-inner { top: 0; }
 
 .track { margin: 1em; }
+
+.cam-stream { position: absolute; left: 1em; bottom: 1em; }
 
 /*# sourceMappingURL=index.css.map */
