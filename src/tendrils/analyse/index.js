@@ -52,12 +52,12 @@ export const peakPos = (data) => reduceList((max, v, i) => {
 
 export const sum = (data) => reduceList((sum, v) => sum+Math.abs(v), data, 0);
 
-export const weightedSum = (data, fulcrum = 0.5) =>
+export const sumWeight = (data, fulcrum = 0.5) =>
     reduceList((sum, v, i) =>
             sum+Math.abs(v*(1-Math.abs((i/(data.length-1))-fulcrum))),
         data, 0);
 
 export const mean = (data) => sum(data)/data.length;
 
-export const weightedMean = (data, fulcrum = 0.5) =>
-    weightedSum(data, fulcrum)/data.length;
+export const meanWeight = (data, fulcrum = 0.5) =>
+    sumWeight(data, fulcrum)/data.length;
