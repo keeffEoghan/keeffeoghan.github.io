@@ -27,7 +27,7 @@ import copyFrag from './screen/copy.frag';
 
 export const defaults = () => ({
     state: {
-        rootNum: Math.pow(2, 10),
+        rootNum: Math.pow(2, 9),
 
         autoClearView: false,
 
