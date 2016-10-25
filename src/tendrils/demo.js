@@ -32,7 +32,7 @@ import GeometrySpawner from './spawn/geometry';
 
 import AudioTrigger from './audio';
 import AudioTexture from './audio/data-texture';
-import { peak, mean, meanWeight } from './analyse';
+import { peak, meanWeight } from './analyse';
 
 import FlowLines from './flow-line/multi';
 
@@ -113,7 +113,7 @@ export default (canvas, settings, debug) => {
         micFastAt: 0.6,
         micFormAt: 0.4,
         micSampleAt: 0.5,
-        micCamAt: 0.03,
+        micCamAt: 0.042,
         micSpawnAt: 0.08
     };
 
@@ -662,19 +662,19 @@ export default (canvas, settings, debug) => {
         });
 
     player.tracks.baseColor
-        .over(25000-22900, {
+        .over(400, {
             to: [0, 0, 0, 0.9],
             time: 25000
         });
 
     player.tracks.flowColor
-        .over(25000-22900, {
+        .over(200, {
             to: [1, 1, 1, 0.07],
             time: 25000
         });
 
     player.tracks.fadeColor
-        .over(25000-22900, {
+        .over(300, {
             to: [1, 1, 1, 0.05],
             time: 25000
         });
@@ -816,8 +816,101 @@ export default (canvas, settings, debug) => {
     // 2:54-3:07-3:19 - big vocal build, drop, fade vocal
     // 3:20-3:42.5-4:15 - "reveal"-"before"-repeating
 
-    // To ratefact
-    // 4:17.5-4:29 - bassy outro, artefact
+
+    // To artefact - bassy outro, artefact
+
+    player.tracks.tendrils
+        .smoothOver(1000, {
+            to: {
+                forceWeight: 0.014,
+                flowWeight: -0.2,
+                speedAlpha: 0.0000005
+            },
+            time: 257500,
+            ease: [0, 0.95, 1]
+        })
+        .to({
+            to: {
+                colorMapAlpha: 0.6
+            },
+            time: 260000
+        });
+
+    player.tracks.tendrils2
+        .smoothOver(2000, {
+            to: {
+                noiseWeight: 0.003,
+                noiseScale: -1.2,
+                varyNoiseScale: -22,
+                noiseSpeed: 0.0001,
+                varyNoiseSpeed: 0.01
+            },
+            time: 260000,
+            ease: [0, -0.1, 0.95, 1]
+        })
+        .smoothTo({
+            to: {
+                noiseScale: 1.8,
+                varyNoiseScale: 3,
+                noiseSpeed: 0.00005,
+                varyNoiseSpeed: 0
+            },
+            time: 265000,
+            ease: [0, 0.95, 1]
+        });
+
+    player.tracks.baseColor
+        .over(400, {
+            to: [1, 0.69, 0.255, 0.05],
+            time: 258000
+        });
+
+    player.tracks.flowColor
+        .over(200, {
+            to: [1, 0.69, 0.255, 0.4],
+            time: 258000
+        });
+
+    player.tracks.fadeColor
+        .over(300, {
+            to: [0.13, 0.09, 0.03, 0.05],
+            time: 258000
+        });
+
+    player.tracks.blend
+        .over(400, {
+            to: [1, 0.5],
+            time: 258000
+        });
+
+    player.tracks.spawn
+        .over(50, {
+            to: {
+                radius: 0.25,
+                speed: 0
+            },
+            time: 258000
+        });
+
+    player.tracks.audio
+        .over(100, {
+            to: {
+                trackFlowAt: audioDefaults.trackFlowAt,
+                trackFastAt: audioDefaults.trackFastAt,
+                trackFormAt: 0,
+                trackSampleAt: 0,
+                trackCamAt: 0,
+                trackSpawnAt: 0,
+                micFlowAt: audioDefaults.micFlowAt*1.2,
+                micFastAt: audioDefaults.micFastAt*1.2,
+                micFormAt: 0,
+                micSampleAt: 0,
+                micCamAt: audioDefaults.micCamAt*1.2,
+                micSpawnAt: audioDefaults.micSpawnAt*1.2
+            },
+            time: 260000
+        })
+
 
 
     // The main loop
