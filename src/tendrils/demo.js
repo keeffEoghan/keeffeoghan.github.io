@@ -101,20 +101,20 @@ export default (canvas, settings, debug) => {
         audible: (''+queries.mute !== 'true'),
 
         track: (''+queries.track_off !== 'true'),
-        trackFlowAt: 1.5,
-        trackFastAt: 0.09,
-        trackFormAt: 0.03,
+        trackFlowAt: 1.3,
+        trackFastAt: 0.075,
+        trackFormAt: 0.04,
         trackSampleAt: 0.09,
         trackCamAt: 0.007,
-        trackSpawnAt: 0.35,
+        trackSpawnAt: 0.08,
 
         mic: (''+queries.mic_off !== 'true'),
-        micFlowAt: 20,
-        micFastAt: 1,
+        micFlowAt: 0.6,
+        micFastAt: 0.6,
         micFormAt: 0.4,
-        micSampleAt: 0.01,
-        micCamAt: 0.2,
-        micSpawnAt: 0.1
+        micSampleAt: 0.5,
+        micCamAt: 0.03,
+        micSpawnAt: 0.08
     };
 
 
@@ -131,6 +131,7 @@ export default (canvas, settings, debug) => {
         });
 
     // @todo Stereo: true
+    // @todo Delay node to compensate for wait in analysing values?
 
     const trackAnalyser = analyser(track, { audible: audioState.audible });
 
@@ -231,7 +232,7 @@ export default (canvas, settings, debug) => {
     };
 
     const flowPixelDefaults = {
-        scale: 'normal'
+        scale: 'mirror xy'
     };
     const flowPixelState = {...flowPixelDefaults};
 
@@ -302,19 +303,24 @@ export default (canvas, settings, debug) => {
             else {
                 mediaStream = stream;
 
-                video = document.createElement('video');
+                video = Object.assign(document.createElement('video'), {
+                        src: self.URL.createObjectURL(stream),
+                        controls: true,
+                        muted: true,
+                        className: 'cam-stream'
+                    });
 
-                video.muted = true;
-                video.src = self.URL.createObjectURL(stream);
-                video.play();
                 video.addEventListener('canplay', () =>
                     camSpawner.buffer.shape = tendrils.colorMap.shape = [
                         video.videoWidth,
                         video.videoHeight
                     ]);
 
+                video.play();
+                // canvas.parentElement.appendChild(video);
 
-                // Trying out audio analyser.
+
+                // @todo Gain node to control unpredictable audio environment?
 
                 micAnalyser = analyser(stream, { audible: false });
                 micAnalyser.analyser.fftSize = Math.pow(2, 7);
@@ -348,29 +354,14 @@ export default (canvas, settings, debug) => {
         });
 
 
-    // Go
-
-    function resize() {
-        canvas.width = self.innerWidth;
-        canvas.height = self.innerHeight;
-    }
-
-    self.addEventListener('resize', throttle(resize, 200), false);
-
-    resize();
-
-    tendrils.setup();
-    resetSpawner.spawn(tendrils);
-
-
     // Audio `react` and `test` function pairs - for `AudioTrigger.fire`
 
-    const trackFire = [
+    const trackFires = [
         [
             spawnFlow,
             (trigger) => ((audioState.trackFlowAt) &&
                 // Low end - velocity
-                meanWeight(trigger.dataOrder(1), 0.2) > audioState.trackFlowAt)
+                meanWeight(trigger.dataOrder(1), 0.25) > audioState.trackFlowAt)
         ],
         [
             spawnFastest,
@@ -397,19 +388,19 @@ export default (canvas, settings, debug) => {
                 meanWeight(trigger.dataOrder(-1), 0.5) > audioState.trackCamAt)
         ],
         [
-            respawn,
+            restart,
             (trigger) => ((audioState.trackSpawnAt) &&
-                // Sudden click/hit - acceleration
-                Math.abs(peak(trigger.dataOrder(2))) > audioState.trackSpawnAt)
+                // Low end - acceleration
+                meanWeight(trigger.dataOrder(2), 0.25) > audioState.trackSpawnAt)
         ]
     ];
 
-    const micFire = [
+    const micFires = [
         [
             spawnFlow,
             (trigger) => ((audioState.micFlowAt) &&
-                // Low end - values
-                meanWeight(trigger.dataOrder(0), 0.3) > audioState.micFlowAt)
+                // Low end - velocity
+                meanWeight(trigger.dataOrder(1), 0.3) > audioState.micFlowAt)
         ],
         [
             spawnFastest,
@@ -436,84 +427,34 @@ export default (canvas, settings, debug) => {
                 meanWeight(trigger.dataOrder(-1), 0.6) > audioState.micCamAt)
         ],
         [
-            respawn,
+            restart,
             (trigger) => ((audioState.micSpawnAt) &&
-                // High end - acceleration
-                meanWeight(trigger.dataOrder(-1), 0.8) > audioState.micSpawnAt)
+                // Low end - acceleration
+                meanWeight(trigger.dataOrder(-1), 0.25) > audioState.micSpawnAt)
         ]
     ];
 
     // Returns a function to be executed for each `fire` pair (as above)
     const audioResponder = (trigger) => (fire) => trigger.fire(...fire);
 
+    let trackResponder;
+    let micResponder;
+
     const audioResponse = () => {
+        // Sequential, and only one at a time, to calm the audio response
         let soundOutput = false;
 
         if(audioState.track && !track.paused) {
-            soundOutput = trackFire.some(audioResponder(trackTrigger));
+            soundOutput = trackFires.some(trackResponder ||
+                (trackResponder = audioResponder(trackTrigger)));
         }
 
         if(!soundOutput && audioState.mic && micTrigger) {
-            soundOutput = micFire.some(audioResponder(micTrigger));
+            soundOutput = micFires.some(micResponder ||
+                (micResponder = audioResponder(micTrigger)));
         }
 
         return soundOutput;
-    };
-
-
-    // Flattened full state (for tweening on one player)
-    /**
-     * @todo Get rid of this, no longer needed wth the new player - stick to the
-     *       consistent notation.
-     */
-
-    const rekey = (any, prefix, out = {}) =>
-        reduce((out, v, k) => {
-                out[prefix+k] = v;
-
-                return out;
-            },
-            any, out);
-
-    const dekey = (any, prefix, out = {}) =>
-        reduce((out, v, k) => {
-                out[k.replace(prefix)] = v;
-
-                return out;
-            },
-            any, out);
-
-    const timeSettings = ['paused', 'step', 'rate', 'end', 'loop'];
-
-    const full = {
-        get state() {
-            return {
-                    ...rekey(state, 'state.'),
-                    ...rekey(resetSpawner.uniforms, 'respawn.'),
-                    ['flow.scale']: flowPixelState.scale,
-
-                    ...reduce((filtered, v, k) => {
-                            if(k in timeSettings) {
-                                filtered['time.'+k] = v;
-                            }
-
-                            return filtered;
-                        },
-                        timer.tendrils, {}),
-
-                    ...rekey(audioState, 'audio.')
-                };
-        },
-
-        set state(fullState) {
-            dekey(fullState.state, 'state.', state);
-            dekey(fullState.respawn, 'respawn.', resetSpawner.uniforms);
-            dekey(fullState.flow, 'flow.', flowPixelState);
-            dekey(fullState.time, 'timer.', timer.tendrils);
-            dekey(fullState.audio, 'audio.', audioState);
-
-            return fullState;
-        }
     };
 
 
@@ -521,7 +462,7 @@ export default (canvas, settings, debug) => {
 
     const tracks = {
         tendrils: tendrils.state,
-        tendrils1: tendrils.state,
+        tendrils2: tendrils.state,
         baseColor: tendrils.state.baseColor,
         flowColor: tendrils.state.flowColor,
         fadeColor: tendrils.state.fadeColor,
@@ -536,48 +477,347 @@ export default (canvas, settings, debug) => {
     // timer.player.loop = true;
 
 
-    // Starting state
+    const tracksStart = {
+        tendrils: {
+            rootNum: 512,
+            autoClearView: false,
 
-    Object.assign(state, {
-            speedLimit: 0.0004,
-            noiseSpeed: 0.00001,
-            noiseScale: 100,
-            forceWeight: 0.014,
-            noiseWeight: 0.0021,
+            damping: 0.043,
+            speedLimit: 0.01,
+
+            forceWeight: 0.015,
+            varyForce: -0.1,
+
+            flowWeight: 1,
+            varyFlow: 0.25,
+
+            flowDecay: 0.002,
+            flowWidth: 5,
+
+            lineWidth: 1,
             speedAlpha: 0.000002,
-            colorMapAlpha: 0.4,
-            baseColor: [1, 1, 1, 0.9],
-            flowColor: [1, 1, 1, 0.05],
-            fadeColor: [0, 0, 0, 0.05]
-        });
+            colorMapAlpha: 0.8
+        },
+        tendrils2: {
+            noiseWeight: 0.0001,
+            varyNoise: 0.3,
 
-    Object.assign(flowPixelState, {
-        scale: 'mirror xy'
-    });
+            noiseScale: 1.5,
+            varyNoiseScale: 1,
 
-    Object.assign(resetSpawner.uniforms, {
-            radius: (1/Math.max(...tendrils.viewSize))+0.1,
-            speed: 0
-        });
-
-    respawn();
+            noiseSpeed: 0.0006,
+            varyNoiseSpeed: 0.1,
+        },
+        baseColor: [1, 1, 1, 0],
+        flowColor: [1, 1, 1, 0.4],
+        fadeColor: [0, 0, 0, 0.1],
+        spawn: {
+            radius: 0.9,
+            speed: 0.1
+        },
+        audio: {
+            trackFlowAt: 0,
+            trackFastAt: 0,
+            trackFormAt: 0,
+            trackSampleAt: 0,
+            trackCamAt: 0,
+            trackSpawnAt: 0,
+            micFlowAt: audioDefaults.micFlowAt,
+            micFastAt: audioDefaults.micFastAt,
+            micFormAt: 0,
+            micSampleAt: 0,
+            micCamAt: 0,
+            micSpawnAt: 0
+        },
+        blend: [1, 0]
+    };
 
 
     // @todo Test sequence - move to own file?
     // @todo Split this into parallel tracks where needed
 
+    // Restart, clean slate; begin with the inert, big bang - flow only
+
+    const trackStartTime = 200;
+
+    player.tracks.tendrils.to({
+            call: [reset],
+            time: 60
+        })
+        .to({
+            call: [restart, () => canvas.classList.remove('light')],
+            time: trackStartTime
+        });
+
+    player.apply((track, key) => {
+        const apply = tracksStart[key];
+
+        track.to({
+            to: apply,
+            time: trackStartTime
+        });
+
+        return { apply };
+    });
+
+
+    // Start off inert - broad wave, to isolated areas of activity
+
+    player.tracks.spawn
+        .to({
+            to: {
+                speed: 0.01
+            },
+            time: trackStartTime+1000
+        });
+
     player.tracks.tendrils
-        // Restart, clean slate; begin with the inert, big bang - flow only
-            .to({
-                to: { ...state },
-                call: [reset],
-                time: 60
-            })
-            .to({
-                call: [respawn],
-                time: 120
-            });
-        // Isolated areas of activity - high scale noise, low speed, low flow
+        .smoothTo({
+            to: {
+                forceWeight: 0.01,
+                flowWeight: 0.02,
+                flowDecay: 0.003
+            },
+            time: 13000,
+            ease: [0, 0.95, 1]
+        });
+
+    player.tracks.tendrils2
+        .smoothTo({
+            to: {
+                noiseWeight: 0.002,
+            },
+            time: 13000,
+            ease: [0, 0.95, 1]
+        })
+        .smoothTo({
+            to: {
+                noiseScale: 100,
+                varyNoiseScale: 0.05,
+                noiseSpeed: 0
+            },
+            time: 16000,
+            ease: [0, 0.95, 1]
+        });
+
+    player.tracks.audio
+        .over(100, {
+            to: {
+                micFlowAt: 0,
+                micFastAt: 0
+            },
+            time: 13000
+        });
+
+
+    // To primordial
+
+    // Start scaling, and suggest some life
+
+    player.tracks.tendrils
+        .smoothOver(22900-19000, {
+            to: {
+                forceWeight: 0.016,
+                flowWeight: 0.1
+            },
+            time: 22900,
+            ease: [0, 0.95, 1]
+        });
+
+    player.tracks.tendrils2
+        .smoothOver(22900-13000, {
+            to: {
+                noiseScale: 50,
+                varyNoiseScale: 0.1
+            },
+            time: 22900,
+            ease: [0, -0.1, 0.7, 1]
+        });
+
+
+    // Start the audio response, bit more life
+
+    player.tracks.audio
+        .over(100, {
+            to: {
+                trackFlowAt: audioDefaults.trackFlowAt,
+                trackFastAt: audioDefaults.trackFastAt,
+                micFlowAt: audioDefaults.micFlowAt,
+                micFastAt: audioDefaults.micFastAt
+            },
+            call: [spawnFastest, spawnFlow],
+            time: 23000
+        });
+
+
+    // Switch colors
+
+    player.tracks.tendrils
+        .over(200, {
+            to: {
+                colorMapAlpha: 0.05
+            },
+            time: 25000,
+            ease: [0, 0.95, 1]
+        });
+
+    player.tracks.baseColor
+        .over(25000-22900, {
+            to: [0, 0, 0, 0.9],
+            time: 25000
+        });
+
+    player.tracks.flowColor
+        .over(25000-22900, {
+            to: [1, 1, 1, 0.07],
+            time: 25000
+        });
+
+    player.tracks.fadeColor
+        .over(25000-22900, {
+            to: [1, 1, 1, 0.05],
+            time: 25000
+        });
+
+
+    // Give it some more flow
+
+    player.tracks.tendrils
+        .smoothOver(35000-26000, {
+            to: {
+                flowWeight: 1
+            },
+            call: [spawnFlow],
+            time: 35000,
+            ease: [0, -0.1, 0.95, 1]
+        });
+
+
+    // Get the percussion in
+
+    player.tracks.audio
+        .over(300, {
+            to: {
+                trackFormAt: audioDefaults.trackFormAt,
+                micFormAt: audioDefaults.micFormAt
+            },
+            call: [spawnForm],
+            time: 35000
+        });
+
+
+    // Scale up again for the next drop, and free things up
+
+    player.tracks.tendrils2
+        .smoothOver(60000-51000, {
+            to: {
+                noiseScale: 15,
+                noiseSpeed: 0.00025
+            },
+            time: 60000,
+            ease: [0, -0.1, 0.95, 1]
+        });
+
+
+    // Break to ovum, seed
+
+    player.tracks.tendrils2
+        .smoothOver(70000-63000, {
+            to: {
+                noiseScale: 2.5
+            },
+            time: 70000,
+            ease: [0, -0.1, 0.95, 1]
+        })
+        .smoothOver(94000-70000, {
+            to: {
+                noiseScale: 0.7
+            },
+            time: 94000,
+            ease: [0, -0.1, 0.95, 1]
+        })
+        .to({
+            to: {
+                noiseScale: 2
+            },
+            time: 94100
+        });
+
+    // Set up the circle seed spawn
+
+    player.tracks.spawn
+        .over(50, {
+            to: {
+                radius: 0.01,
+                speed: 0.2
+            },
+            time: 70000
+        })
+        .smoothTo({
+            to: {
+                radius: 0.9,
+                speed: 0.01
+            },
+            time: 94000,
+            ease: [0, 0.1, 0.95, 1]
+        });
+
+    player.tracks.fadeColor
+        .over(100, {
+            to: [1, 1, 1, 0],
+            call: [() => canvas.classList.add('light'), respawn],
+            time: 70100
+        })
+        .over(100, {
+            to: [1, 1, 1, 0.05],
+            call: [() => canvas.classList.remove('light'), respawn],
+            time: 94000
+        });
+
+
+    // More percussion
+
+    player.tracks.audio
+        .over(100, {
+            to: {
+                trackFlowAt: 0,
+                micFlowAt: 0,
+                trackFastAt: 0,
+                micFastAt: 0,
+                trackSpawnAt: audioDefaults.trackSpawnAt,
+                micSpawnAt: audioDefaults.micSpawnAt
+            },
+            time: 70100
+        })
+        .over(100, {
+            to: {
+                trackFlowAt: audioDefaults.trackFlowAt,
+                micFlowAt: audioDefaults.micFlowAt,
+                trackFastAt: audioDefaults.trackFastAt,
+                micFastAt: audioDefaults.micFastAt,
+                trackSpawnAt: 0,
+                micSpawnAt: 0
+            },
+            time: 94000
+        });
+
+
+    // To face
+
+    // 1:26-1:34 - bass transition
+    // 1:46-2:06 - vocal
+
+    // To community
+    // 2:08.5-2:17 - high vocal
+    // 2:08-2:22 - first use of "trust"
+    // 2:32-2:40-2:50 - quiet to vocal build
+
+    // To cohesive forms
+    // 2:54-3:07-3:19 - big vocal build, drop, fade vocal
+    // 3:20-3:42.5-4:15 - "reveal"-"before"-repeating
+
+    // To ratefact
+    // 4:17.5-4:29 - bassy outro, artefact
 
 
     // The main loop
@@ -589,7 +829,10 @@ export default (canvas, settings, debug) => {
             player.play(timer.player.time);
         }
 
-        // @todo Frequencies on x-axis, waveform on y
+        /**
+         * @todo Spectogram with frequencies on x-axis, waveform on y; or
+         *       something better than this 1D list.
+         */
         audioTexture.frequency(trackTrigger.dataOrder(0)).apply();
 
         // Blend the color maps into tendrils one
@@ -622,6 +865,21 @@ export default (canvas, settings, debug) => {
 
         audioResponse();
     }
+
+
+    function resize() {
+        canvas.width = self.innerWidth;
+        canvas.height = self.innerHeight;
+    }
+
+    // Go
+
+    self.addEventListener('resize', throttle(resize, 200), false);
+
+    resize();
+
+    tendrils.setup();
+    respawn();
 
 
     if(debug) {
@@ -689,7 +947,7 @@ export default (canvas, settings, debug) => {
                             mic_off: !audioState.mic
                         }))),
                 showState: () => showExport('Current state:',
-                    toSource(full.state)),
+                    timer.player.time, toSource(tracks)),
                 showSequence: () => showExport('Animation sequence:',
                     toSource(player.frames({}))),
                 keyframe
@@ -722,14 +980,14 @@ export default (canvas, settings, debug) => {
         // DAT.GUI's color controllers are a bit fucked.
 
         const colorDefaults = {
-                baseColor: defaultState.baseColor.slice(0, 3).map((c) => c*255),
-                baseAlpha: defaultState.baseColor[3],
+                baseColor: state.baseColor.slice(0, 3).map((c) => c*255),
+                baseAlpha: state.baseColor[3],
 
-                flowColor: defaultState.flowColor.slice(0, 3).map((c) => c*255),
-                flowAlpha: defaultState.flowColor[3],
+                flowColor: state.flowColor.slice(0, 3).map((c) => c*255),
+                flowAlpha: state.flowColor[3],
 
-                fadeColor: defaultState.fadeColor.slice(0, 3).map((c) => c*255),
-                fadeAlpha: defaultState.fadeColor[3]
+                fadeColor: state.fadeColor.slice(0, 3).map((c) => c*255),
+                fadeAlpha: state.fadeColor[3]
             };
 
         const colorProxy = {...colorDefaults};
@@ -813,6 +1071,8 @@ export default (canvas, settings, debug) => {
         // Time
 
         gui.time = gui.main.addFolder('time');
+
+        const timeSettings = ['paused', 'step', 'rate', 'end', 'loop'];
 
         timeSettings.forEach((t) => gui.time.add(timer.tendrils, t));
 
@@ -1048,7 +1308,7 @@ export default (canvas, settings, debug) => {
                 Object.assign(colorProxy, {
                         baseAlpha: 0.9,
                         baseColor: [0, 0, 0],
-                        flowAlpha: 0.05,
+                        flowAlpha: 0.1,
                         fadeAlpha: 0.05,
                         fadeColor: [255, 255, 255]
                     });
@@ -1161,7 +1421,7 @@ export default (canvas, settings, debug) => {
 
             const scrub = (by) => {
                 track.currentTime += by*0.001;
-                player.playFrom(track.currentTime*1000, 0, state);
+                player.playFrom(track.currentTime*1000, 0);
                 togglePlay(true);
             };
 

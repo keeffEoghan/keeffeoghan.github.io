@@ -42,8 +42,13 @@ const vec4 minAlign = vec4(-1.0);
 const vec4 maxAlign = vec4(1.0);
 
 const vec2 center = vec2(0.0);
-const vec2 curveRange = vec2(0.05, 1.0);
-const vec3 curve = vec3(curveRange.x, 1.0, curveRange.y);
+
+const vec2 falloffRange = vec2(0.05, 1.0);
+const float falloffGap = abs(falloffRange.y-falloffRange.x);
+
+const vec4 falloff = vec4(falloffRange.x,
+    0.85*falloffGap, falloffRange.y,
+    falloffRange.y);
 
 
 #pragma glslify: map = require(glsl-map)
@@ -87,11 +92,13 @@ void main() {
 
 
         // Color summation
+        // @todo Mixing instead of just summing?
 
         color = mappedColor+flowAlignColor+baseColor;
 
         color.a *= speedRate*
-            clamp(vignette(pos, center, 1.0, curve), curveRange.x, curveRange.y);
+            clamp(vignette(pos, center, 1.0, falloff),
+                falloffRange.x, falloffRange.y);
 
         color = clamp(color, minColor, maxColor);
 

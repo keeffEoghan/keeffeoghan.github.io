@@ -7,6 +7,11 @@ canvas {
     right: 0;
     cursor: cell;
     background: #000;
+    transition: background-color 200ms ease-in-out;
+
+    &.light {
+        background: #fff;
+    }
 }
 
 /* Quick fix for a broken DAT.GUI style */
@@ -26,4 +31,10 @@ canvas {
 
 .track {
     margin: 1em;
+}
+
+.cam-stream {
+    position: absolute;
+    left: 1em;
+    bottom: 1em;
 }
