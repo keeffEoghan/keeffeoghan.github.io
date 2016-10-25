@@ -42,7 +42,8 @@ const vec4 minAlign = vec4(-1.0);
 const vec4 maxAlign = vec4(1.0);
 
 const vec2 center = vec2(0.0);
-const vec3 curve = vec3(0.1, 1.0, 1.0);
+const vec2 curveRange = vec2(0.05, 1.0);
+const vec3 curve = vec3(curveRange.x, 1.0, curveRange.y);
 
 
 #pragma glslify: map = require(glsl-map)
@@ -89,7 +90,8 @@ void main() {
 
         color = mappedColor+flowAlignColor+baseColor;
 
-        color.a *= speedRate*clamp(vignette(pos, center, 1.0, curve), 0.1, 1.0);
+        color.a *= speedRate*
+            clamp(vignette(pos, center, 1.0, curve), curveRange.x, curveRange.y);
 
         color = clamp(color, minColor, maxColor);
 
