@@ -47,7 +47,7 @@ const accumulate = (frame, out = {}) => {
  * An always time-sorted array of frames.
  */
 export class Timeline {
-    constructor(frames, infinite = false, rewind = false, symmetric = true) {
+    constructor(frames, infinite = true, rewind = false, symmetric = true) {
         this.frames = this.setup(frames, infinite);
 
         // The playhead: time, current in-between position, and pair of frames
@@ -195,7 +195,7 @@ export class Timeline {
             return -1;
         }
         else {
-            const next = this.frames.findIndex((frame) => frame.time > time);
+            const next = this.frames.findIndex((frame) => frame.time >= time);
 
             // Always constrain the gap within the timeline, if the timeline is
             // valid (has 2 or more frames).
@@ -303,6 +303,12 @@ export class Timeline {
 
     flipTo(...frame) {
         return this.easeTo(-1, ...frame);
+    }
+
+    over(duration, ...frame) {
+        this.addSpan(duration, ...frame);
+
+        return this;
     }
 
     easeOver(duration, align, ...frame) {
