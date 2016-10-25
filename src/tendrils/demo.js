@@ -32,7 +32,7 @@ import GeometrySpawner from './spawn/geometry';
 
 import AudioTrigger from './audio';
 import AudioTexture from './audio/data-texture';
-import { peak, sum, mean, weightedMean } from './analyse';
+import { peak, mean, meanWeight } from './analyse';
 
 import FlowLines from './flow-line/multi';
 
@@ -101,20 +101,20 @@ export default (canvas, settings, debug) => {
         audible: (''+queries.mute !== 'true'),
 
         track: (''+queries.track_off !== 'true'),
-        trackFlowAt: 100,
-        trackFastAt: 0,
-        trackFormAt: 0.07,
-        trackSampleAt: 130,
-        trackSpawnAt: 0,
-        trackCamAt: 0,
+        trackFlowAt: 1.5,
+        trackFastAt: 0.09,
+        trackFormAt: 0.03,
+        trackSampleAt: 0.09,
+        trackCamAt: 0.007,
+        trackSpawnAt: 0.35,
 
         mic: (''+queries.mic_off !== 'true'),
-        micFlowAt: 0,
-        micFastAt: 0,
-        micFormAt: 0,
-        micSampleAt: 5,
-        micSpawnAt: 0,
-        micCamAt: 1
+        micFlowAt: 20,
+        micFastAt: 1,
+        micFormAt: 0.4,
+        micSampleAt: 0.01,
+        micCamAt: 0.2,
+        micSpawnAt: 0.1
     };
 
 
@@ -136,7 +136,7 @@ export default (canvas, settings, debug) => {
 
     trackAnalyser.analyser.fftSize = Math.pow(2, 8);
 
-    const trackTrigger = new AudioTrigger(trackAnalyser, 3);
+    const trackTrigger = new AudioTrigger(trackAnalyser, 4);
 
 
     // Mic refs
@@ -319,7 +319,7 @@ export default (canvas, settings, debug) => {
                 micAnalyser = analyser(stream, { audible: false });
                 micAnalyser.analyser.fftSize = Math.pow(2, 7);
 
-                micTrigger = new AudioTrigger(micAnalyser, 2);
+                micTrigger = new AudioTrigger(micAnalyser, 3);
             }
         });
 
@@ -369,32 +369,38 @@ export default (canvas, settings, debug) => {
         [
             spawnFlow,
             (trigger) => ((audioState.trackFlowAt) &&
-                sum(trigger.dataOrder(1)) > audioState.trackFlowAt)
+                // Low end - velocity
+                meanWeight(trigger.dataOrder(1), 0.2) > audioState.trackFlowAt)
         ],
         [
             spawnFastest,
             (trigger) => ((audioState.trackFastAt) &&
-                sum(trigger.dataOrder(1)) > audioState.trackFastAt)
+                // High end - acceleration
+                meanWeight(trigger.dataOrder(2), 0.8) > audioState.trackFastAt)
         ],
         [
             spawnForm,
             (trigger) => ((audioState.trackFormAt) &&
-                mean(trigger.dataOrder(-1)) > audioState.trackFormAt)
+                // Sudden click/hit - force/attack
+                Math.abs(peak(trigger.dataOrder(-1))) > audioState.trackFormAt)
         ],
         [
             spawnSampleCam,
             (trigger) => ((audioState.trackSampleAt) &&
-                mean(trigger.dataOrder(-1)) > audioState.trackSampleAt)
-        ],
-        [
-            respawn,
-            (trigger) => ((audioState.trackSpawnAt) &&
-                mean(trigger.dataOrder(-1)) > audioState.trackSpawnAt)
+                // Low end - acceleration
+                meanWeight(trigger.dataOrder(2), 0.3) > audioState.trackSampleAt)
         ],
         [
             spawnCam,
             (trigger) => ((audioState.trackCamAt) &&
-                mean(trigger.dataOrder(-1)) > audioState.trackCamAt)
+                // Mid - force/attack
+                meanWeight(trigger.dataOrder(-1), 0.5) > audioState.trackCamAt)
+        ],
+        [
+            respawn,
+            (trigger) => ((audioState.trackSpawnAt) &&
+                // Sudden click/hit - acceleration
+                Math.abs(peak(trigger.dataOrder(2))) > audioState.trackSpawnAt)
         ]
     ];
 
@@ -402,32 +408,38 @@ export default (canvas, settings, debug) => {
         [
             spawnFlow,
             (trigger) => ((audioState.micFlowAt) &&
-                Math.abs(peak(trigger.dataOrder(1))) > audioState.micFlowAt)
+                // Low end - values
+                meanWeight(trigger.dataOrder(0), 0.3) > audioState.micFlowAt)
         ],
         [
             spawnFastest,
             (trigger) => ((audioState.micFastAt) &&
-                sum(trigger.dataOrder(1)) > audioState.micFastAt)
+                // High end - velocity
+                meanWeight(trigger.dataOrder(1), 0.7) > audioState.micFastAt)
         ],
         [
             spawnForm,
             (trigger) => ((audioState.micFormAt) &&
-                mean(trigger.dataOrder(-1)) > audioState.micFormAt)
+                // Sudden click/hit - acceleration
+                Math.abs(peak(trigger.dataOrder(-1))) > audioState.micFormAt)
         ],
         [
             spawnSampleCam,
             (trigger) => ((audioState.micSampleAt) &&
-                mean(trigger.dataOrder(-1)) > audioState.micSampleAt)
-        ],
-        [
-            respawn,
-            (trigger) => ((audioState.micSpawnAt) &&
-                mean(trigger.dataOrder(-1)) > audioState.micSpawnAt)
+                // Mid - velocity
+                meanWeight(trigger.dataOrder(1), 0.4) > audioState.micSampleAt)
         ],
         [
             spawnCam,
             (trigger) => ((audioState.micCamAt) &&
-                weightedMean(trigger.dataOrder(-1), 0.2) > audioState.micCamAt)
+                // Mid - acceleration
+                meanWeight(trigger.dataOrder(-1), 0.6) > audioState.micCamAt)
+        ],
+        [
+            respawn,
+            (trigger) => ((audioState.micSpawnAt) &&
+                // High end - acceleration
+                meanWeight(trigger.dataOrder(-1), 0.8) > audioState.micSpawnAt)
         ]
     ];
 
@@ -565,7 +577,7 @@ export default (canvas, settings, debug) => {
                 call: [respawn],
                 time: 120
             });
-        // Isolated areas of activity - high scale noise, low flow
+        // Isolated areas of activity - high scale noise, low speed, low flow
 
 
     // The main loop
@@ -926,14 +938,14 @@ export default (canvas, settings, debug) => {
                         flowWeight: 0,
                         noiseWeight: 0.003,
                         noiseSpeed: 0.0005,
-                        noiseScale: 0.5,
-                        varyNoiseScale: 20,
+                        noiseScale: 1.5,
+                        varyNoiseScale: 10,
                         varyNoiseSpeed: 0.05,
-                        speedAlpha: 0
+                        speedAlpha: 0,
+                        colorMapAlpha: 0.8
                     });
 
                 Object.assign(colorProxy, {
-                        colorMapAlpha: 0.1,
                         baseAlpha: 0.1,
                         baseColor: [255, 150, 0],
                         fadeAlpha: 0.05
@@ -941,7 +953,7 @@ export default (canvas, settings, debug) => {
 
                 Object.assign(blendProxy, {
                         audio: 0.9,
-                        cam: 0.4
+                        cam: 0
                     });
             },
             'Sea'() {
