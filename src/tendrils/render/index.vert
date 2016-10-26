@@ -43,12 +43,11 @@ const vec4 maxAlign = vec4(1.0);
 
 const vec2 center = vec2(0.0);
 
-const vec2 falloffRange = vec2(0.05, 1.0);
-const float falloffGap = abs(falloffRange.y-falloffRange.x);
-
+const vec2 falloffRange = vec2(0.1, 1.0);
 const vec4 falloff = vec4(falloffRange.x,
-    0.85*falloffGap, falloffRange.y,
+    falloffRange.y, falloffRange.y,
     falloffRange.y);
+// const vec3 falloff = vec3(falloffRange.x, falloffRange.y, falloffRange.y);
 
 
 #pragma glslify: map = require(glsl-map)
@@ -94,7 +93,7 @@ void main() {
         // Color summation
         // @todo Mixing instead of just summing?
 
-        color = mappedColor+flowAlignColor+baseColor;
+        color = baseColor+mappedColor+flowAlignColor;
 
         color.a *= speedRate*
             clamp(vignette(pos, center, 1.0, falloff),
