@@ -63,6 +63,12 @@ export default (canvas, settings, debug) => {
 
     const gl = glContext(canvas, glSettings, render);
 
+    // Print out some GL parameters we depend on, for remote debugging
+    console.log('Maximum texture units',
+        '| vertex:', gl.getParameter(gl.MAX_VERTEX_TEXTURE_IMAGE_UNITS),
+        '| fragment:', gl.getParameter(gl.MAX_TEXTURE_IMAGE_UNITS),
+        '| combined:', gl.getParameter(gl.MAX_COMBINED_TEXTURE_IMAGE_UNITS));
+
     const timer = {
         tendrils: defaultSettings.timer,
         player: new Timer(0)
