@@ -16,6 +16,6 @@
 
 #pragma glslify: test = require(./test/particles)
 
-const float samples = 3.0;
+const float samples = 6.0;
 
 #pragma glslify: import(./frag/best-sample-main)
