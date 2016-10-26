@@ -264,6 +264,16 @@ export default (canvas, settings, debug) => {
     }
 
 
+    // Respawn from geometry (platonic forms)
+
+    const geometrySpawner = new GeometrySpawner(gl, {
+            speed: 0.005,
+            bias: 100/0.005
+        });
+
+    const spawnForm = () => geometrySpawner.shuffle().spawn(tendrils);
+
+
     // Cam and mic
 
     let video = null;
@@ -286,6 +296,9 @@ export default (canvas, settings, debug) => {
             camSpawner.setPixels(video);
             camSpawner.spawn(tendrils);
         }
+        else {
+            respawn();
+        }
     };
 
     const spawnSampleCam = () => {
@@ -294,6 +307,9 @@ export default (canvas, settings, debug) => {
             camSpawner.speed = 1;
             camSpawner.setPixels(video);
             camSpawner.spawn(tendrils);
+        }
+        else {
+            spawnForm();
         }
     };
 
@@ -316,11 +332,13 @@ export default (canvas, settings, debug) => {
                         className: 'cam-stream'
                     });
 
-                video.addEventListener('canplay', () =>
-                    camSpawner.buffer.shape = tendrils.colorMap.shape = [
-                        video.videoWidth,
-                        video.videoHeight
-                    ]);
+                video.addEventListener('canplay', () => {
+                    camSpawner.buffer.shape =
+                        tendrils.colorMap.shape =
+                            [video.videoWidth, video.videoHeight];
+
+                    camSpawner.setPixels(video);
+                });
 
                 video.play();
                 // canvas.parentElement.appendChild(video);
@@ -337,16 +355,6 @@ export default (canvas, settings, debug) => {
 
     const stopUserMedia = (stream = mediaStream) =>
         (stream && each((track) => track.stop(), stream.getTracks()));
-
-
-    // Respawn from geometry (platonic forms)
-
-    const geometrySpawner = new GeometrySpawner(gl, {
-            speed: 0.005,
-            bias: 100/0.005
-        });
-
-    const spawnForm = () => geometrySpawner.shuffle().spawn(tendrils);
 
 
     // Color map blending
@@ -1212,7 +1220,7 @@ export default (canvas, settings, debug) => {
             time: 187000
         })
         .to({
-            to: [0.15, 0.15, 0.18, 0.1],
+            to: [0.12, 0.18, 0.24, 0.1],
             time: 187400
         });
 
@@ -1256,28 +1264,28 @@ export default (canvas, settings, debug) => {
     // To artefact - bassy outro, artefact
 
     player.tracks.tendrils
-        .smoothOver(2000, {
+        .smoothOver(3000, {
             to: {
                 forceWeight: 0.014,
                 flowWeight: -0.2,
                 speedAlpha: 0.002,
-                colorMapAlpha: 0.75
+                colorMapAlpha: 1
             },
-            time: 258000,
+            time: 256000,
             ease: [0, 0.95, 1]
         });
 
     player.tracks.tendrils2
-        .smoothOver(2000, {
+        .smoothOver(3000, {
             to: {
                 noiseWeight: 0.003,
-                noiseScale: -1.2,
+                noiseScale: 1.2,
                 varyNoiseScale: -4,
                 noiseSpeed: 0.0001,
                 varyNoiseSpeed: 0.01
             },
-            time: 257500,
-            ease: [0, -0.1, 0.95, 1]
+            time: 256000,
+            ease: [0, 0.1, 0.95, 1]
         })
         .smoothTo({
             to: {
@@ -1286,8 +1294,8 @@ export default (canvas, settings, debug) => {
                 noiseSpeed: 0.00005,
                 varyNoiseSpeed: 0
             },
-            time: 262000,
-            ease: [0, 0.95, 1]
+            time: 270000,
+            ease: [0, -0.2, 1.2, 1]
         });
 
     player.tracks.audio
@@ -1319,14 +1327,14 @@ export default (canvas, settings, debug) => {
         });
 
     player.tracks.blend
-        .over(400, {
-            to: [1, 0.3],
+        .over(1000, {
+            to: [1, 0.05],
             time: 258000
         });
 
     player.tracks.baseColor
-        .over(400, {
-            to: [0.55, 0.4, 0.05, 0.01],
+        .over(1000, {
+            to: [0.55, 0.4, 0.05, 0],
             time: 258000
         })
         .over(400, {
@@ -1335,7 +1343,7 @@ export default (canvas, settings, debug) => {
         });
 
     player.tracks.flowColor
-        .over(200, {
+        .over(1500, {
             to: [1, 0.9, 0.1, 0.2],
             time: 258000
         })
@@ -1345,8 +1353,8 @@ export default (canvas, settings, debug) => {
         });
 
     player.tracks.fadeColor
-        .over(300, {
-            to: [0.1, 0.09, 0.01, 0.15],
+        .over(800, {
+            to: [1*0.12, 0.9*0.12, 0.1*0.12, 0.05],
             time: 258000
         })
         .over(600, {
