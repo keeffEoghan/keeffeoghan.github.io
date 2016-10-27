@@ -67,15 +67,11 @@ void main() {
         float speedRate = min(length2(vel)/speedAlpha, 1.0);
 
 
-        // Accumulate colors (anything on top of base has pre-multiplied alpha
-        // so they don't cross over)
-
-
         // Color map
 
         vec4 mappedColor = texture2D(colorMap, uv*geomRes/dataRes);
 
-        mappedColor = preAlpha(mappedColor.rgb, mappedColor.a*colorMapAlpha);
+        mappedColor *= colorMapAlpha;
 
 
         // Flow color
@@ -87,19 +83,18 @@ void main() {
                     sin(time*flowDecay)),
                 minAlign.rgb, maxAlign.rgb, minColor.rgb, maxColor.rgb);
 
-        vec4 flowAlignColor = preAlpha(flowColor.rgb*flowAlign, flowColor.a);
+        vec4 flowAlignedColor = vec4(flowColor.rgb*flowAlign, flowColor.a);
 
 
-        // Color summation
-        // @todo Mixing instead of just summing?
+        // Color summation, clamping and pre-multiplying alpha so they don't
+        // cross over
 
-        color = baseColor+mappedColor+flowAlignColor;
+        color = clamp(preAlpha(baseColor), minColor, maxColor)+
+            clamp(preAlpha(mappedColor), minColor, maxColor)+
+            clamp(preAlpha(flowAlignedColor), minColor, maxColor);
 
-        color.a *= speedRate*
-            clamp(vignette(pos, center, 1.0, falloff),
-                falloffRange.x, falloffRange.y);
-
-        color = clamp(color, minColor, maxColor);
+        color.a *= speedRate*clamp(vignette(pos, center, 1.0, falloff),
+                        falloffRange.x, falloffRange.y);
 
 
         // Position

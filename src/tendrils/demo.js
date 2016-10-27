@@ -369,6 +369,12 @@ export default (canvas, settings, debug) => {
 
 
     // Audio `react` and `test` function pairs - for `AudioTrigger.fire`
+    /**
+     * @todo URGENT: cache these results, rather than generating them multiple
+     *       times a frame! Just check against a WeakMap (key: array), and wrap
+     *       the result logic of the tests below in a function handling the
+     *       checks.
+     */
 
     const trackFires = [
         [
