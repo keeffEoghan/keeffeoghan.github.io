@@ -952,6 +952,10 @@ export default (canvas, settings, debug) => {
             ease: [0, 0.2, 1]
         });
 
+    /**
+     * @todo Animate the noise more at the peak of the cam capture, to show the
+     *       ripples rather than just a straight mirror
+     */
     player.tracks.tendrils2
         .smoothOver(128000-124000, {
             to: {
@@ -1004,8 +1008,8 @@ export default (canvas, settings, debug) => {
         })
         .to({
             to: {
-                trackCamAt: audioDefaults.trackCamAt*0.4,
-                micCamAt: audioDefaults.micCamAt*0.4
+                trackCamAt: audioDefaults.trackCamAt*0.5,
+                micCamAt: audioDefaults.micCamAt*0.5
             },
             time: 134000
         })
