@@ -111,16 +111,16 @@ export default (canvas, settings, debug) => {
         trackFastAt: 0.075,
         trackFormAt: 0.04,
         trackSampleAt: 0.08,
-        trackCamAt: 0.007,
+        trackCamAt: 0.008,
         trackSpawnAt: 0.1,
 
-        mic: parseFloat((queries.mic_in || 1), 10),
+        mic: parseFloat((queries.mic_in || 1.2), 10),
         micFlowAt: 0.5,
         micFastAt: 0.6,
         micFormAt: 0.4,
         micSampleAt: 0.4,
         micCamAt: 0.042,
-        micSpawnAt: 0.08
+        micSpawnAt: 0.09
     };
 
 
@@ -528,7 +528,7 @@ export default (canvas, settings, debug) => {
 
             lineWidth: 1,
             speedAlpha: 0.0005,
-            colorMapAlpha: 0.8
+            colorMapAlpha: 0.9
         },
         tendrils2: {
             noiseWeight: 0.0001,
@@ -540,12 +540,12 @@ export default (canvas, settings, debug) => {
             noiseSpeed: 0.0006,
             varyNoiseSpeed: 0.1,
         },
-        baseColor: [1, 1, 1, 0],
-        flowColor: [1, 1, 1, 0.4],
-        fadeColor: [0, 0, 0, 0.1],
+        baseColor: [1, 1, 1, 0.9],
+        flowColor: [1, 1, 1, 0.1],
+        fadeColor: [0, 0, 0, 0.05],
         spawn: {
             radius: 0.9,
-            speed: 0.1
+            speed: 0.05
         },
         audio: {
             trackFlowAt: 0,
@@ -595,14 +595,6 @@ export default (canvas, settings, debug) => {
 
     // Start off inert - broad wave, to isolated areas of activity
 
-    player.tracks.spawn
-        .to({
-            to: {
-                speed: 0.1
-            },
-            time: trackStartTime+1000
-        });
-
     player.tracks.tendrils
         .smoothTo({
             to: {
@@ -639,6 +631,13 @@ export default (canvas, settings, debug) => {
                 micFastAt: 0
             },
             time: 13000
+        });
+
+    player.tracks.baseColor
+        .to({
+            to: [1, 1, 1, 0.8],
+            time: 5000,
+            ease: [0, 0, 1]
         });
 
 
@@ -684,31 +683,30 @@ export default (canvas, settings, debug) => {
         });
 
 
-    // Switch colors
+    // Flip colors
 
     player.tracks.tendrils
-        .over(200, {
+        .over(300, {
             to: {
-                colorMapAlpha: 0.05
+                colorMapAlpha: 0.1
             },
-            time: 25000,
-            ease: [0, 0.95, 1]
+            time: 25000
         });
 
     player.tracks.baseColor
-        .over(400, {
-            to: [0, 0, 0, 0.9],
+        .over(300, {
+            to: [0, 0, 0, 0.85],
             time: 25000
         });
 
     player.tracks.flowColor
-        .over(200, {
-            to: [1, 1, 1, 0.05],
+        .over(300, {
+            to: [1, 1, 1, 0.08],
             time: 25000
         });
 
     player.tracks.fadeColor
-        .over(300, {
+        .over(500, {
             to: [1, 1, 1, 0.05],
             time: 25000
         });
@@ -815,27 +813,10 @@ export default (canvas, settings, debug) => {
             ease: [0, 0.1, 0.95, 1]
         });
 
-    player.tracks.baseColor
-        .over(50, {
-            to: [0, 0, 0, 1],
-            time: 70050
-        })
-        .over(50, {
-            to: [0, 0, 0, 0.9],
-            time: 94000
-        });
-
-    player.tracks.flowColor
-        .over(94000-70050, {
-            to: [1, 1, 1, 0.1],
-            time: 94000,
-            ease: [0, 0, 1]
-        });
-
     player.tracks.fadeColor
         .over(50, {
             to: [1, 1, 1, 0],
-            call: [() => canvas.classList.add('light')],
+            call: [() => canvas.classList.add('light'), restart],
             time: 70050
         })
         .over(50, {
@@ -946,43 +927,40 @@ export default (canvas, settings, debug) => {
         })
         .smoothTo({
             to: {
-                colorMapAlpha: 0.4
+                colorMapAlpha: 0.3
             },
             time: 138000,
             ease: [0, 0.2, 1]
         });
 
-    /**
-     * @todo Animate the noise more at the peak of the cam capture, to show the
-     *       ripples rather than just a straight mirror
-     */
     player.tracks.tendrils2
-        .smoothOver(128000-124000, {
+        .smoothOver(129000-124000, {
             to: {
-                varyNoise: 0.1,
-                noiseScale: 15,
-                varyNoiseScale: -4,
+                varyNoise: 0.8,
+                noiseScale: -1.5,
+                varyNoiseScale: 20,
                 noiseSpeed: 0.0003,
                 varyNoiseSpeed: 0
             },
-            time: 128000,
-            ease: [0, 0.95, 1]
+            time: 129000,
+            ease: [0, 0, 1]
         })
         .smoothTo({
             to: {
-                noiseScale: 4,
-                varyNoiseScale: -3
+                noiseScale: 5,
+                varyNoiseScale: -4
             },
             time: 134000,
-            ease: [0, 0.95, 0.5, 1]
+            ease: [0, -0.1, 1.1, 1]
         })
         .smoothTo({
             to: {
+                varyNoise: 0.1,
                 noiseScale: 1.8,
                 varyNoiseScale: 2
             },
             time: 142000,
-            ease: [0, -0.01, 0.95, 1]
+            ease: [0, -0.05, 1.05, 1]
         });
 
     player.tracks.audio
@@ -996,11 +974,15 @@ export default (canvas, settings, debug) => {
         .over(50, {
             to: {
                 trackFlowAt: 0,
-                micFlowAt: 0,
+                trackFastAt: 0,
                 trackFormAt: 0,
-                micFormAt: 0,
                 trackSampleAt: 0,
+                trackSpawnAt: 0,
+                micFlowAt: 0,
+                micFastAt: 0,
+                micFormAt: 0,
                 micSampleAt: 0,
+                micSpawnAt: 0,
                 trackCamAt: audioDefaults.trackCamAt*1.2,
                 micCamAt: audioDefaults.micCamAt*1.2
             },
@@ -1008,17 +990,19 @@ export default (canvas, settings, debug) => {
         })
         .to({
             to: {
-                trackCamAt: audioDefaults.trackCamAt*0.5,
-                micCamAt: audioDefaults.micCamAt*0.5
+                trackCamAt: audioDefaults.trackCamAt*0.8,
+                micCamAt: audioDefaults.micCamAt*0.9
             },
-            time: 134000
+            time: 134000,
+            ease: [0, 0, 1]
         })
-        .to({
+        .flipTo({
             to: {
                 trackCamAt: audioDefaults.trackCamAt,
                 micCamAt: audioDefaults.micCamAt
             },
-            time: 137000
+            time: 137000,
+            ease: [0, 0.9, 1]
         })
         .over(50, {
             to: {
@@ -1026,6 +1010,8 @@ export default (canvas, settings, debug) => {
                 micCamAt: 0,
                 trackFlowAt: audioDefaults.trackFlowAt,
                 micFlowAt: audioDefaults.micFlowAt,
+                trackFastAt: audioDefaults.trackFastAt,
+                micFastAt: audioDefaults.micFastAt,
                 trackSampleAt: audioDefaults.trackSampleAt,
                 micSampleAt: audioDefaults.micSampleAt
             },
@@ -1036,7 +1022,7 @@ export default (canvas, settings, debug) => {
         .over(134000-129000, {
             to: [0, 1],
             time: 134000,
-            ease: [0, 0.2, 1]
+            ease: [0, 0.8, 1]
         })
         .smoothTo({
             to: [0.2, 0.8],
@@ -1044,7 +1030,7 @@ export default (canvas, settings, debug) => {
             ease: [0, 0.7, 1]
         })
         .smoothTo({
-            to: [0.6, 0.6],
+            to: [0.75, 0.5],
             time: 146000,
             ease: [0, 0, 1]
         });
@@ -1053,24 +1039,32 @@ export default (canvas, settings, debug) => {
     // 2:32-2:40-2:50 - quiet to vocal build
 
     player.tracks.tendrils
-        .smoothOver(174000-164000, {
+        .smoothTo({
             to: {
-                colorMapAlpha: 0.3
+                colorMapAlpha: 0.7
             },
             time: 174000,
-            ease: [0, 0.95, 1]
+            ease: [0, 0, 1]
         });
 
     player.tracks.blend
-        .over(174000-164000, {
+        .over(174000-160000, {
             to: [1, 0.3],
             time: 174000
         });
 
+    player.tracks.baseColor
+        .over(174000-168000, {
+            to: [1, 1, 1, 0.2],
+            time: 174000,
+            ease: [0, 0.1, 1]
+        });
+
     player.tracks.flowColor
-        .over(174000-164000, {
-            to: [1, 1, 1, 0.1],
-            time: 174000
+        .over(174000-160000, {
+            to: [1, 1, 1, 0.2],
+            time: 174000,
+            ease: [0, 0.7, 1]
         });
 
     player.tracks.audio
@@ -1079,7 +1073,7 @@ export default (canvas, settings, debug) => {
                 trackSampleAt: 0,
                 micSampleAt: 0
             },
-            time: 164000
+            time: 160000
         })
         .over(50, {
             to: {
@@ -1104,7 +1098,7 @@ export default (canvas, settings, debug) => {
         .smoothTo({
             to: {
                 flowWeight: 1,
-                colorMapAlpha: 0.2
+                colorMapAlpha: 0.3
             },
             time: 187400,
             ease: [0, 0.95, 1]
@@ -1205,32 +1199,29 @@ export default (canvas, settings, debug) => {
         });
 
     player.tracks.baseColor
-        .over(187000-178000, {
-            to: [0.55, 0.4, 0.05, 0.1],
-            time: 187000
+        .to({
+            to: [1, 0.8, 0, 0.6],
+            time: 187000,
+            ease: [0, 1, 1]
         })
         .to({
-            to: [0.3, 0.3, 0.3, 0.1],
+            to: [1, 1, 1, 0.4],
             time: 187400
         });
 
     player.tracks.flowColor
-        .over(186000-175000, {
-            to: [1, 1, 1, 0.3],
-            time: 186000
-        })
         .to({
             to: [1, 1, 1, 0.5],
-            time: 187300
+            time: 186000
         });
 
     player.tracks.fadeColor
-        .over(187000-174000, {
-            to: [0, 0, 0, 0.25],
+        .over(187000-173000, {
+            to: [0, 0, 0, 0.1],
             time: 187000
         })
         .to({
-            to: [0.12, 0.18, 0.24, 0.1],
+            to: [0.12, 0.18, 0.24, 0.05],
             time: 187400
         });
 
@@ -1238,14 +1229,26 @@ export default (canvas, settings, debug) => {
     // 3:20-3:42.5-4:15 - "reveal"-"before"-repeating
 
     player.tracks.tendrils
-        .smoothOver(255000-216000, {
+        .smoothTo({
             to: {
                 forceWeight: 0.014,
                 varyForce: 0.2,
-                flowWeight: 0.8
+                flowWeight: 0.8,
+                colorMapAlpha: 0.4
             },
             time: 255000,
             ease: [0, 0.1, 0.4, 1]
+        });
+
+    player.tracks.tendrils2
+        .smoothTo({
+            to: {
+                noiseScale: 0.4,
+                varyNoiseScale: 7,
+                noiseSpeed: 0.0005
+            },
+            time: 255000,
+            ease: [0, 0, 1]
         });
 
     player.tracks.audio
@@ -1274,7 +1277,7 @@ export default (canvas, settings, debug) => {
     // To artefact - bassy outro, artefact
 
     player.tracks.tendrils
-        .smoothOver(3000, {
+        .smoothTo({
             to: {
                 forceWeight: 0.014,
                 flowWeight: -0.2,
@@ -1283,6 +1286,13 @@ export default (canvas, settings, debug) => {
             },
             time: 256000,
             ease: [0, 0.95, 1]
+        })
+        .smoothTo({
+            to: {
+                colorMapAlpha: 0.3
+            },
+            time: 281000,
+            ease: [0, 0, 1]
         });
 
     player.tracks.tendrils2
@@ -1321,7 +1331,7 @@ export default (canvas, settings, debug) => {
                 micFastAt: audioDefaults.micFastAt,
                 micFormAt: 0,
                 micSampleAt: 0,
-                micCamAt: audioDefaults.micCamAt,
+                micCamAt: 0,
                 micSpawnAt: audioDefaults.micSpawnAt
             },
             time: 257500
@@ -1344,27 +1354,27 @@ export default (canvas, settings, debug) => {
 
     player.tracks.baseColor
         .over(1000, {
-            to: [0.55, 0.4, 0.05, 0],
+            to: [1, 0.9, 0.1, 0.7],
             time: 258000
         })
         .over(400, {
-            to: [0.5, 0.5, 0.5, 0.05],
+            to: [1, 1, 1, 0.8],
             time: 281000
         });
 
     player.tracks.flowColor
         .over(1500, {
-            to: [1, 0.9, 0.1, 0.2],
+            to: [1, 1, 0.4, 0.4],
             time: 258000
         })
         .over(200, {
-            to: [1, 1, 1, 0.4],
+            to: [1, 1, 1, 0.5],
             time: 281000
         });
 
     player.tracks.fadeColor
         .over(800, {
-            to: [1*0.12, 0.9*0.12, 0.1*0.12, 0.05],
+            to: [0.1, 0.1, 0.01, 0.05],
             time: 258000
         })
         .over(600, {
