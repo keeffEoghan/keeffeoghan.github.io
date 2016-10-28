@@ -289,6 +289,7 @@ export default (canvas, settings, debug) => {
     mat3.scale(camSpawner.spawnMatrix,
         mat3.identity(camSpawner.spawnMatrix), [-1, 1]);
 
+    // @todo Instead of `respawn`, have an abstract image of a face by default
     const spawnCam = () => {
         if(video) {
             camSpawner.shader = camShaders.direct;
@@ -1041,7 +1042,7 @@ export default (canvas, settings, debug) => {
     player.tracks.tendrils
         .smoothTo({
             to: {
-                colorMapAlpha: 0.7
+                colorMapAlpha: 0.8
             },
             time: 174000,
             ease: [0, 0, 1]
@@ -1055,7 +1056,7 @@ export default (canvas, settings, debug) => {
 
     player.tracks.baseColor
         .over(174000-168000, {
-            to: [1, 1, 1, 0.2],
+            to: [0, 0, 0, 0.1],
             time: 174000,
             ease: [0, 0.1, 1]
         });
@@ -1116,7 +1117,8 @@ export default (canvas, settings, debug) => {
         .smoothTo({
             to: {
                 noiseWeight: 0.008,
-                varyNoiseScale: 50,
+                noiseScale: 0.5,
+                varyNoiseScale: 120,
                 noiseSpeed: 0.0006
             },
             time: 180000,
@@ -1124,10 +1126,9 @@ export default (canvas, settings, debug) => {
         })
         .smoothTo({
             to: {
-                varyNoiseScale: 4,
-                noiseSpeed: 0
+                varyNoiseScale: 4
             },
-            time: 187400,
+            time: 187500,
             ease: [0, 0.8, 1]
         })
         .to({
@@ -1152,7 +1153,7 @@ export default (canvas, settings, debug) => {
                 trackFlowAt: audioDefaults.trackFlowAt,
                 trackFastAt: audioDefaults.trackFastAt
             },
-            time: 186500,
+            time: 187000,
             ease: [0, 0.9, 1]
         })
         .over(50, {
@@ -1160,6 +1161,7 @@ export default (canvas, settings, debug) => {
                 trackSpawnAt: audioDefaults.trackSpawnAt*0.2,
                 micSpawnAt: audioDefaults.micSpawnAt*0.2
             },
+            call: [respawn],
             time: 187200
         })
         .over(50, {
@@ -1167,7 +1169,7 @@ export default (canvas, settings, debug) => {
                 trackSpawnAt: 0,
                 micSpawnAt: 0
             },
-            time: 187600
+            time: 188000
         });
 
     player.tracks.spawn
@@ -1191,7 +1193,7 @@ export default (canvas, settings, debug) => {
         })
         .to({
             to: [1, 0],
-            time: 186000
+            time: 187000
         })
         .to({
             to: [1, 0.2],
@@ -1200,7 +1202,7 @@ export default (canvas, settings, debug) => {
 
     player.tracks.baseColor
         .to({
-            to: [1, 0.8, 0, 0.6],
+            to: [1, 0.9, 0.4, 0.6],
             time: 187000,
             ease: [0, 1, 1]
         })
@@ -1287,7 +1289,7 @@ export default (canvas, settings, debug) => {
             time: 256000,
             ease: [0, 0.95, 1]
         })
-        .smoothTo({
+        .smoothOver(800, {
             to: {
                 colorMapAlpha: 0.3
             },
@@ -1354,7 +1356,7 @@ export default (canvas, settings, debug) => {
 
     player.tracks.baseColor
         .over(1000, {
-            to: [1, 0.9, 0.1, 0.7],
+            to: [1, 0.9, 0.4, 0.5],
             time: 258000
         })
         .over(400, {
@@ -1364,7 +1366,7 @@ export default (canvas, settings, debug) => {
 
     player.tracks.flowColor
         .over(1500, {
-            to: [1, 1, 0.4, 0.4],
+            to: [1, 1, 0.6, 0.4],
             time: 258000
         })
         .over(200, {
@@ -1374,7 +1376,7 @@ export default (canvas, settings, debug) => {
 
     player.tracks.fadeColor
         .over(800, {
-            to: [0.1, 0.1, 0.01, 0.05],
+            to: [0.1, 0.09, 0.04, 0.2],
             time: 258000
         })
         .over(600, {
