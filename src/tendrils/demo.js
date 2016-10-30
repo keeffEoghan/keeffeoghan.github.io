@@ -579,7 +579,7 @@ export default (canvas, settings, debug) => {
         },
         baseColor: [1, 1, 1, 0.9],
         flowColor: [1, 1, 1, 0.1],
-        fadeColor: [0, 0, 0, 0.05],
+        fadeColor: [0, 0, 0, 0.1],
         spawn: {
             radius: 0.9,
             speed: 0.05
@@ -828,7 +828,7 @@ export default (canvas, settings, debug) => {
 
         player.tracks.fadeColor
             .over(500, {
-                to: [1, 1, 1, 0.05],
+                to: [1, 1, 1, 0.1],
                 time: 25000
             });
 
@@ -936,7 +936,7 @@ export default (canvas, settings, debug) => {
 
         player.tracks.flowColor
             .over(94000-70000, {
-                to: [1, 1, 1, 0.15],
+                to: [1, 1, 1, 0.05],
                 ease: [0, 0, 1],
                 time: 94000
             });
@@ -1258,23 +1258,26 @@ export default (canvas, settings, debug) => {
                 to: {
                     noiseWeight: 0.008,
                     noiseScale: 0.5,
-                    varyNoiseScale: 120,
+                    varyNoiseScale: 80,
                     noiseSpeed: 0.0006
                 },
-                time: 180000,
+                time: 183000,
                 ease: [0, 0.1, 1.1, 1]
             })
             .smoothTo({
                 to: {
-                    varyNoiseScale: 4
+                    noiseScale: 1.5,
+                    varyNoiseScale: 200
                 },
-                time: 187500,
-                ease: [0, 0.8, 1]
+                time: 187000,
+                ease: [0, 1, 1]
             })
             .to({
                 to: {
                     noiseWeight: 0.004,
-                    noiseSpeed: 0.0001
+                    noiseSpeed: 0.0001,
+                    noiseScale: 0.5,
+                    varyNoiseScale: 4
                 },
                 time: 187500
             });
@@ -1363,7 +1366,7 @@ export default (canvas, settings, debug) => {
                 time: 187000
             })
             .to({
-                to: [0.12, 0.18, 0.24, 0.05],
+                to: [0.12, 0.18, 0.24, 0.1],
                 time: 187400
             });
 
@@ -1426,7 +1429,7 @@ export default (canvas, settings, debug) => {
                     speedAlpha: 0.002,
                     colorMapAlpha: 0.85
                 },
-                time: 256000,
+                time: 258000,
                 ease: [0, 1, 1]
             })
             .smoothOver(300, {
@@ -1446,7 +1449,7 @@ export default (canvas, settings, debug) => {
                     noiseSpeed: 0.0001,
                     varyNoiseSpeed: 0.01
                 },
-                time: 255000,
+                time: 258000,
                 ease: [0, 0.1, 0.95, 1]
             })
             .smoothTo({
@@ -1456,7 +1459,7 @@ export default (canvas, settings, debug) => {
                     noiseSpeed: 0.0001,
                     varyNoiseSpeed: 0
                 },
-                time: 261000,
+                time: 262000,
                 ease: [0, -0.2, 1.2, 1]
             });
 
@@ -1514,7 +1517,6 @@ export default (canvas, settings, debug) => {
 
         player.tracks.baseColor
             .over(1000, {
-                // to: [1, 0.9, 0.4, 0.5],
                 to: [1, 0.8, 0.2, 0.7],
                 time: 259000
             })
@@ -1526,7 +1528,6 @@ export default (canvas, settings, debug) => {
 
         player.tracks.flowColor
             .over(1000, {
-                // to: [1, 0.9, 0.4, 0.1],
                 to: [1, 0.8, 0.2, 0.2],
                 time: 259000
             })
@@ -1538,8 +1539,7 @@ export default (canvas, settings, debug) => {
 
         player.tracks.fadeColor
             .over(2000, {
-                // to: [0.2, 0.18, 0.06, 0.2],
-                to: [0.06, 0.04, 0.02, 0.1],
+                to: [0.12, 0.08, 0.04, 0.1],
                 time: 259000,
                 ease: [0, 0, 1]
             })
