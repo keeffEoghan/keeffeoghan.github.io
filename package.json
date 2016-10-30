@@ -39,6 +39,7 @@
     "gl-texture2d": "^2.0.10",
     "gl-texture2d-display": "^1.0.0",
     "glsl-fxaa": "^3.0.0",
+    "glsl-hash-blur": "^1.0.3",
     "glsl-luma": "^1.0.1",
     "glsl-map": "^1.0.1",
     "glsl-noise": "0.0.0",
