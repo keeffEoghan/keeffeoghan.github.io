@@ -1017,7 +1017,7 @@ export default (canvas, settings, debug) => {
             })
             .over(134000-124000, {
                 to: {
-                    colorMapAlpha: 0.8
+                    colorMapAlpha: 0.9
                 },
                 time: 134000,
                 ease: [0, 0, 1]
@@ -1122,17 +1122,27 @@ export default (canvas, settings, debug) => {
             .over(134000-129000, {
                 to: [0, 1],
                 time: 134000,
-                ease: [0, 0.8, 1]
+                ease: [0, 0.9, 1]
             })
             .smoothTo({
-                to: [0.2, 0.8],
+                to: [0.2, 0.9],
                 time: 142000,
-                ease: [0, 0.7, 1]
+                ease: [0, 0, 1]
             })
             .smoothTo({
                 to: [0.75, 0.5],
                 time: 146000,
                 ease: [0, 0, 1]
+            });
+
+        player.tracks.flowColor
+            .over(134000-129000, {
+                to: [0, 0, 0, 0],
+                time: 134000
+            })
+            .over(146000-142000, {
+                to: [1, 1, 1, 0.05],
+                time: 146000
             });
 
 
@@ -1302,17 +1312,17 @@ export default (canvas, settings, debug) => {
         player.tracks.baseColor
             .to({
                 to: [1, 0.9, 0.4, 0.7],
-                time: 187000,
+                time: 182000,
                 ease: [0, 1, 1]
             })
-            .to({
+            .over(200, {
                 to: [1, 1, 1, 0.4],
                 time: 187400
             });
 
         player.tracks.flowColor
             .to({
-                to: [1, 1, 1, 0.25],
+                to: [1, 0.9, 0.4, 0.25],
                 time: 186000
             });
 
@@ -1383,12 +1393,12 @@ export default (canvas, settings, debug) => {
                     forceWeight: 0.014,
                     flowWeight: -0.2,
                     speedAlpha: 0.002,
-                    colorMapAlpha: 1
+                    colorMapAlpha: 0.85
                 },
                 time: 256000,
-                ease: [0, 0.95, 1]
+                ease: [0, 1, 1]
             })
-            .smoothOver(800, {
+            .smoothOver(300, {
                 to: {
                     colorMapAlpha: 0.3
                 },
@@ -1412,30 +1422,48 @@ export default (canvas, settings, debug) => {
                 to: {
                     noiseScale: 1.8,
                     varyNoiseScale: 3,
-                    noiseSpeed: 0.00005,
+                    noiseSpeed: 0.0001,
                     varyNoiseSpeed: 0
                 },
-                time: 265000,
+                time: 261000,
                 ease: [0, -0.2, 1.2, 1]
             });
 
         player.tracks.audio
             .over(50, {
                 to: {
-                    trackFlowAt: audioDefaults.trackFlowAt,
+                    trackFlowAt: 0,
                     trackFastAt: audioDefaults.trackFastAt,
                     trackFormAt: 0,
                     trackSampleAt: 0,
                     trackCamAt: 0,
                     trackSpawnAt: 0,
-                    micFlowAt: audioDefaults.micFlowAt,
+                    micFlowAt: 0,
                     micFastAt: audioDefaults.micFastAt,
                     micFormAt: 0,
                     micSampleAt: 0,
                     micCamAt: 0,
+                    micSpawnAt: 0
+                },
+                time: 258000
+            })
+            .to({
+                to: {
+                    trackFastAt: audioDefaults.trackFastAt*4,
+                    micFastAt: audioDefaults.micFastAt*4
+                },
+                time: 264000
+            })
+            .over(50, {
+                to: {
+                    trackFastAt: 0,
+                    micFlowAt: audioDefaults.micFlowAt,
+                    micFastAt: audioDefaults.micFastAt,
+                    micFormAt: audioDefaults.micFormAt,
+                    micSampleAt: audioDefaults.micSampleAt,
                     micSpawnAt: audioDefaults.micSpawnAt
                 },
-                time: 257500
+                time: 283000
             });
 
         player.tracks.spawn
@@ -1450,26 +1478,28 @@ export default (canvas, settings, debug) => {
         player.tracks.blend
             .over(1000, {
                 to: [1, 0.05],
-                time: 258000
+                time: 259000
             });
 
         player.tracks.baseColor
             .over(1000, {
-                to: [1, 0.9, 0.3, 0.3],
-                time: 258000
+                // to: [1, 0.9, 0.4, 0.5],
+                to: [1, 0.8, 0.2, 0.7],
+                time: 259000
             })
-            .to({
+            .over(300, {
                 to: [1, 1, 1, 0.75],
                 time: 281000,
                 ease: [0, 0, 1]
             });
 
         player.tracks.flowColor
-            .over(1500, {
-                to: [1, 0.9, 0.3, 0.4],
-                time: 258000
+            .over(1000, {
+                // to: [1, 0.9, 0.4, 0.1],
+                to: [1, 0.8, 0.2, 0.2],
+                time: 259000
             })
-            .to({
+            .over(300, {
                 to: [1, 1, 1, 0.6],
                 time: 281000,
                 ease: [0, 0, 1]
@@ -1477,11 +1507,12 @@ export default (canvas, settings, debug) => {
 
         player.tracks.fadeColor
             .over(2000, {
-                to: [0.2, 0.18, 0.06, 0.2],
-                time: 258000,
+                // to: [0.2, 0.18, 0.06, 0.2],
+                to: [0.06, 0.04, 0.02, 0.1],
+                time: 259000,
                 ease: [0, 0, 1]
             })
-            .to({
+            .over(300, {
                 to: [0, 0, 0, 0.15],
                 time: 281000,
                 ease: [0, 1, 1]
