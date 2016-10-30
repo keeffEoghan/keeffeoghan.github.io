@@ -1425,11 +1425,11 @@ export default (canvas, settings, debug) => {
             .smoothTo({
                 to: {
                     forceWeight: 0.014,
-                    flowWeight: -0.2,
+                    flowWeight: -0.1,
                     speedAlpha: 0.002,
                     colorMapAlpha: 0.85
                 },
-                time: 258000,
+                time: 257600,
                 ease: [0, 1, 1]
             })
             .smoothOver(300, {
@@ -1449,8 +1449,8 @@ export default (canvas, settings, debug) => {
                     noiseSpeed: 0.0001,
                     varyNoiseSpeed: 0.01
                 },
-                time: 258000,
-                ease: [0, 0.1, 0.95, 1]
+                time: 257600,
+                ease: [0, 0, 0, 1]
             })
             .smoothTo({
                 to: {
@@ -1479,7 +1479,7 @@ export default (canvas, settings, debug) => {
                     micCamAt: 0,
                     micSpawnAt: 0
                 },
-                time: 258000
+                time: 257600
             })
             .to({
                 to: {
@@ -1506,7 +1506,7 @@ export default (canvas, settings, debug) => {
                     radius: 0.6,
                     speed: 0.01
                 },
-                time: 258000
+                time: 257600
             });
 
         player.tracks.blend
