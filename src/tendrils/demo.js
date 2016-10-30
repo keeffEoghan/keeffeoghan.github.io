@@ -40,7 +40,10 @@ import FlowLines from './flow-line/multi';
 
 import Player from './animate';
 
+import Screen from './screen';
 import Blend from './screen/blend';
+import screenVert from './screen/index.vert';
+import blurFrag from './screen/blur.frag';
 
 import { curry } from '../fp/partial';
 import reduce from '../fp/reduce';
@@ -79,7 +82,10 @@ export default (canvas, settings, debug) => {
 
     // Tendrils init
 
-    const tendrils = new Tendrils(gl, { timer: timer.tendrils });
+    const tendrils = new Tendrils(gl, {
+            timer: timer.tendrils,
+            numBuffers: 1
+        });
 
     const resetSpawner = spawnReset(gl);
 
@@ -384,10 +390,7 @@ export default (canvas, settings, debug) => {
     const audioFirer = (threshold, key, test) => (trigger) => {
             const t = threshold();
 
-            if(!t) {
-                return false;
-            }
-            else{
+            if(t) {
                 const cached = audioCache.get(key);
 
                 if(cached){
@@ -400,6 +403,9 @@ export default (canvas, settings, debug) => {
 
                     return value;
                 }
+            }
+            else {
+                return t;
             }
         };
 
@@ -428,9 +434,9 @@ export default (canvas, settings, debug) => {
         [
             spawnSampleCam,
             audioFirer(() => audioState.track*audioState.trackSampleAt,
-                'meanWeight(track, 2, 0.3)',
+                'meanWeight(track, 2, 0.25)',
                 // Low end - acceleration
-                (trigger, t) => meanWeight(trigger.dataOrder(2), 0.3) > t)
+                (trigger, t) => meanWeight(trigger.dataOrder(2), 0.25) > t)
         ],
         [
             spawnCam,
@@ -487,9 +493,9 @@ export default (canvas, settings, debug) => {
         [
             restart,
             audioFirer(() => audioState.mic*audioState.micSpawnAt,
-                'meanWeight(mic, 2, 0.25)',
+                'meanWeight(mic, 2, 0.3)',
                 // Low end - acceleration
-                (trigger, t) => meanWeight(trigger.dataOrder(2), 0.25) > t)
+                (trigger, t) => meanWeight(trigger.dataOrder(2), 0.3) > t)
         ]
     ];
 
@@ -620,6 +626,11 @@ export default (canvas, settings, debug) => {
     });
 
 
+    // Blur vignette
+    const screen = new Screen(gl);
+    const blurShader = shader(gl, screenVert, blurFrag);
+
+
     // The main loop
     function render() {
         const dt = timer.tendrils.tick().dt;
@@ -640,7 +651,25 @@ export default (canvas, settings, debug) => {
         blend.draw(tendrils.colorMap);
 
         // The main event
-        tendrils.draw();
+        tendrils.step().draw();
+
+        if(tendrils.buffers.length) {
+            // Blur to the screen
+
+            gl.bindFramebuffer(gl.FRAMEBUFFER, null);
+            tendrils.drawFade();
+            blurShader.bind();
+
+            Object.assign(blurShader.uniforms, {
+                    view: tendrils.buffers[0].color[0].bind(0),
+                    resolution: tendrils.viewRes,
+                    time: tendrils.timer.time
+                });
+
+            screen.render();
+
+            tendrils.stepBuffers();
+        }
 
 
         // Draw inputs to flow
@@ -670,6 +699,8 @@ export default (canvas, settings, debug) => {
     function resize() {
         canvas.width = self.innerWidth;
         canvas.height = self.innerHeight;
+
+        tendrils.resize();
     }
 
     // Go
