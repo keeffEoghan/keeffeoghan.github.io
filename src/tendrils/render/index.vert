@@ -41,13 +41,10 @@ const vec4 maxColor = vec4(1.0);
 const vec4 minAlign = vec4(-1.0);
 const vec4 maxAlign = vec4(1.0);
 
+// @todo Turn some of these `const`s into `uniform`s
 const vec2 center = vec2(0.0);
-
-const vec2 falloffRange = vec2(0.1, 1.0);
-const vec4 falloff = vec4(falloffRange.x,
-    falloffRange.y, falloffRange.y,
-    falloffRange.y);
-// const vec3 falloff = vec3(falloffRange.x, falloffRange.y, falloffRange.y);
+const vec2 fadeRange = vec2(0.2, 1.0);
+const vec3 falloff = vec3(fadeRange.x, fadeRange.y, fadeRange.y);
 
 
 #pragma glslify: map = require(glsl-map)
@@ -94,7 +91,7 @@ void main() {
             clamp(preAlpha(flowAlignedColor), minColor, maxColor);
 
         color.a *= speedRate*clamp(vignette(pos, center, 1.0, falloff),
-                        falloffRange.x, falloffRange.y);
+                        fadeRange.x, fadeRange.y);
 
 
         // Position

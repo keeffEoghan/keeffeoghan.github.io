@@ -65,7 +65,7 @@ export const defaults = () => ({
     logicShader: null,
     renderShader: [renderVert, renderFrag],
     flowShader: [flowVert, flowFrag],
-    fadeShader: [screenVert, screenFrag],
+    fillShader: [screenVert, screenFrag],
     copyShader: [screenVert, copyFrag],
     colorMap: null
 });
@@ -113,9 +113,9 @@ export class Tendrils {
                 shader(this.gl, ...params.copyShader)
             :   params.copyShader);
 
-        this.fadeShader = ((Array.isArray(params.fadeShader))?
-                shader(this.gl, ...params.fadeShader)
-            :   params.fadeShader);
+        this.fillShader = ((Array.isArray(params.fillShader))?
+                shader(this.gl, ...params.fillShader)
+            :   params.fillShader);
 
 
         this.uniforms = {
@@ -137,7 +137,6 @@ export class Tendrils {
     }
 
     setup(...rest) {
-        this.setupBuffers();
         this.setupParticles(...rest);
         this.reset();
 
@@ -234,16 +233,7 @@ export class Tendrils {
         return this;
     }
 
-    /**
-     * @todo Find a way to use free texture bind units without having to
-     *       manually remember them
-     */
-    draw() {
-        this.resize();
-
-
-        // Physics
-
+    step() {
         if(!this.timer.paused) {
             this.particles.logic = this.logicShader;
 
@@ -264,6 +254,16 @@ export class Tendrils {
             this.gl.enable(this.gl.BLEND);
             this.gl.blendFunc(this.gl.SRC_ALPHA, this.gl.ONE_MINUS_SRC_ALPHA);
         }
+
+        return this;
+    }
+
+    /**
+     * @todo Find a way to use free texture bind units without having to
+     *       manually remember them
+     */
+    draw(fade = true) {
+        this.viewport();
 
 
         // Flow FBO and view renders
@@ -301,60 +301,76 @@ export class Tendrils {
 
         // Render to the view.
 
-        // Overlay fade.
-        if(this.state.fadeColor[3] > 0) {
-            this.fadeShader.bind();
-            this.fadeShader.uniforms.color = this.state.fadeColor;
-            this.gl.bindFramebuffer(this.gl.FRAMEBUFFER, null);
-            this.screen.render();
-        }
-
-        // Set up the particles for rendering
-        this.particles.render = this.renderShader;
-        this.gl.lineWidth(Math.max(0, this.state.lineWidth));
-
         if(this.buffers.length === 0) {
             // Render the particles directly to the screen
-
             this.gl.bindFramebuffer(this.gl.FRAMEBUFFER, null);
-
-            if(this.state.autoClearView) {
-                this.gl.clear(this.gl.COLOR_BUFFER_BIT);
-            }
-
-            this.particles.draw(this.uniforms.render, this.gl.LINES);
         }
         else {
-            // Multi-buffer fade etc passes
-
+            // Multi-buffer passes
             this.buffers[0].bind();
+        }
+
+        if(this.state.autoClearView) {
             this.gl.clear(this.gl.COLOR_BUFFER_BIT);
+        }
 
-            // Copy the last buffer into the current buffer
+        if(fade) {
+            this.drawFade();
+        }
 
+        // Draw the particles
+        this.particles.render = this.renderShader;
+        this.gl.lineWidth(Math.max(0, this.state.lineWidth));
+        this.particles.draw(this.uniforms.render, this.gl.LINES);
+
+        return this;
+    }
+
+    drawFade() {
+        if(this.state.fadeColor[3] > 0) {
+            this.drawFill(this.state.fadeColor);
+        }
+
+        return this;
+    }
+
+    drawFill(color = this.state.fadeColor) {
+        this.fillShader.bind();
+        this.fillShader.uniforms.color = color;
+        this.screen.render();
+
+        return this;
+    }
+
+    // Draw a buffer's contents to the screen
+    drawBuffer(index) {
+        this.gl.bindFramebuffer(this.gl.FRAMEBUFFER, null);
+
+        if(this.state.autoClearView) {
+            this.gl.clear(this.gl.COLOR_BUFFER_BIT);
+        }
+
+        return this.copyBuffer(index).stepBuffers();
+    }
+
+    // Copy a buffer's contents into the current render target
+    copyBuffer(index = 0) {
+        if(index < this.buffers.length) {
             this.copyShader.bind();
 
             Object.assign(this.copyShader.uniforms, {
-                    view: this.buffers[1].color[0].bind(1),
+                    view: this.buffers[index].color[0].bind(0),
                     viewRes: this.viewRes
                 });
 
             this.screen.render();
+        }
 
+        return this;
+    }
 
-            // Render the particles into the current buffer
-            this.particles.draw(this.uniforms.render, this.gl.LINES);
-
-
-            // Copy the current buffer to the screen
-
-            this.gl.bindFramebuffer(this.gl.FRAMEBUFFER, null);
-            this.gl.clear(this.gl.COLOR_BUFFER_BIT);
-            this.copyShader.bind();
-            this.copyShader.uniforms.view = this.buffers[0].color[0].bind(2);
-            this.screen.render();
-
-            // Step buffers
+    stepBuffers() {
+        if(this.buffers.length > 1) {
             step(this.buffers);
         }
 
@@ -375,6 +391,10 @@ export class Tendrils {
         // this.flow.shape = this.pow2Res;
         this.flow.shape = this.viewRes;
 
+        return this;
+    }
+
+    viewport() {
         /**
          * @todo Why do these 2 lines seem to be equivalent? Something to do
          *       with how `gl-big-triangle` scales its geometry over the screen?
@@ -397,7 +417,6 @@ export class Tendrils {
 
     // Respawn on the GPU using a given shader
     spawnShader(shader, update) {
-        this.resize();
         this.timer.tick();
 
         this.particles.logic = shader;

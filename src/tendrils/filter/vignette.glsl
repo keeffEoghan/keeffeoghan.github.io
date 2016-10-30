@@ -2,7 +2,7 @@
 
 
 float amount(vec2 point, vec2 mid, float limit) {
-    return limit-length(point-mid);
+    return min(1.0-(length(point-mid)/limit), 1.0);
 }
 
 
