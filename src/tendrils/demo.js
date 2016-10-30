@@ -936,7 +936,7 @@ export default (canvas, settings, debug) => {
 
         player.tracks.flowColor
             .over(94000-70000, {
-                to: [1, 1, 1, 0.15],
+                to: [1, 1, 1, 0.05],
                 ease: [0, 0, 1],
                 time: 94000
             });
