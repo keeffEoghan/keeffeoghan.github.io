@@ -1,3 +1,5 @@
+/* global Map */
+
 import 'pepjs';
 import glContext from 'gl-context';
 import vkey from 'vkey';
@@ -371,99 +373,123 @@ export default (canvas, settings, debug) => {
 
     // Audio `react` and `test` function pairs - for `AudioTrigger.fire`
     /**
-     * @todo URGENT: cache these results, rather than generating them multiple
-     *       times a frame! Just check against a WeakMap (key: array), and wrap
-     *       the result logic of the tests below in a function handling the
-     *       checks.
+     * @todo Move this cache stuff to `analyse` or a dedicated module, to handle
+     *       more subtle cases (like one analysis of data being used by others)?
+     *       Might need a cache per analysis function (WeakMap keyed on the
+     *       array of data), or explicit string keys.
      */
+
+    const audioCache = new Map();
+
+    const audioFirer = (threshold, key, test) => (trigger) => {
+            const t = threshold();
+
+            if(!t) {
+                return false;
+            }
+            else{
+                const cached = audioCache.get(key);
+
+                if(cached){
+                    return cached;
+                }
+                else {
+                    const value = test(trigger, t);
+
+                    audioCache.set(key, value);
+
+                    return value;
+                }
+            }
+        };
 
     const trackFires = [
         [
             spawnFlow,
-            (trigger) => ((audioState.trackFlowAt) &&
+            audioFirer(() => audioState.track*audioState.trackFlowAt,
+                'meanWeight(track, 1, 0.25)',
                 // Low end - velocity
-                meanWeight(trigger.dataOrder(1), 0.25) >
-                    audioState.track*audioState.trackFlowAt)
+                (trigger, t) => meanWeight(trigger.dataOrder(1), 0.25) > t)
         ],
         [
             spawnFastest,
-            (trigger) => ((audioState.trackFastAt) &&
+            audioFirer(() => audioState.track*audioState.trackFastAt,
+                'meanWeight(track, 2, 0.8)',
                 // High end - acceleration
-                meanWeight(trigger.dataOrder(2), 0.8) >
-                    audioState.track*audioState.trackFastAt)
+                (trigger, t) => meanWeight(trigger.dataOrder(2), 0.8) > t)
         ],
         [
             spawnForm,
-            (trigger) => ((audioState.trackFormAt) &&
+            audioFirer(() => audioState.track*audioState.trackFormAt,
+                'abs(peak(track, 3))',
                 // Sudden click/hit - force/attack
-                Math.abs(peak(trigger.dataOrder(-1))) >
-                    audioState.track*audioState.trackFormAt)
+                (trigger, t) => Math.abs(peak(trigger.dataOrder(3))) > t)
         ],
         [
             spawnSampleCam,
-            (trigger) => ((audioState.trackSampleAt) &&
+            audioFirer(() => audioState.track*audioState.trackSampleAt,
+                'meanWeight(track, 2, 0.3)',
                 // Low end - acceleration
-                meanWeight(trigger.dataOrder(2), 0.3) >
-                    audioState.track*audioState.trackSampleAt)
+                (trigger, t) => meanWeight(trigger.dataOrder(2), 0.3) > t)
         ],
         [
             spawnCam,
-            (trigger) => ((audioState.trackCamAt) &&
+            audioFirer(() => audioState.track*audioState.trackCamAt,
+                'meanWeight(track, 3, 0.5)',
                 // Mid - force/attack
-                meanWeight(trigger.dataOrder(-1), 0.5) >
-                    audioState.track*audioState.trackCamAt)
+                (trigger, t) => meanWeight(trigger.dataOrder(3), 0.5) > t)
         ],
         [
             restart,
-            (trigger) => ((audioState.trackSpawnAt) &&
+            audioFirer(() => audioState.track*audioState.trackSpawnAt,
+                'meanWeight(track, 3, 0.25)',
                 // Low end - acceleration
-                meanWeight(trigger.dataOrder(2), 0.25) >
-                    audioState.track*audioState.trackSpawnAt)
+                (trigger, t) => meanWeight(trigger.dataOrder(2), 0.25) > t)
         ]
     ];
 
     const micFires = [
         [
             spawnFlow,
-            (trigger) => ((audioState.micFlowAt) &&
+            audioFirer(() => audioState.mic*audioState.micFlowAt,
+                'meanWeight(mic, 1, 0.3)',
                 // Low end - velocity
-                meanWeight(trigger.dataOrder(1), 0.3) >
-                    audioState.mic*audioState.micFlowAt)
+                (trigger, t) => meanWeight(trigger.dataOrder(1), 0.3) > t)
         ],
         [
             spawnFastest,
-            (trigger) => ((audioState.micFastAt) &&
+            audioFirer(() => audioState.mic*audioState.micFastAt,
+                'meanWeight(mic, 1, 0.7)',
                 // High end - velocity
-                meanWeight(trigger.dataOrder(1), 0.7) >
-                    audioState.mic*audioState.micFastAt)
+                (trigger, t) => meanWeight(trigger.dataOrder(1), 0.7) > t)
         ],
         [
             spawnForm,
-            (trigger) => ((audioState.micFormAt) &&
+            audioFirer(() => audioState.mic*audioState.micFormAt,
+                'abs(peak(mic, 2))',
                 // Sudden click/hit - acceleration
-                Math.abs(peak(trigger.dataOrder(-1))) >
-                    audioState.mic*audioState.micFormAt)
+                (trigger, t) => Math.abs(peak(trigger.dataOrder(2))) > t)
         ],
         [
             spawnSampleCam,
-            (trigger) => ((audioState.micSampleAt) &&
+            audioFirer(() => audioState.mic*audioState.micSampleAt,
+                'meanWeight(mic, 1, 0.4)',
                 // Mid - velocity
-                meanWeight(trigger.dataOrder(1), 0.4) >
-                    audioState.mic*audioState.micSampleAt)
+                (trigger, t) => meanWeight(trigger.dataOrder(1), 0.4) > t)
         ],
         [
             spawnCam,
-            (trigger) => ((audioState.micCamAt) &&
+            audioFirer(() => audioState.mic*audioState.micCamAt,
+                'meanWeight(mic, 2, 0.6)',
                 // Mid - acceleration
-                meanWeight(trigger.dataOrder(-1), 0.6) >
-                    audioState.mic*audioState.micCamAt)
+                (trigger, t) => meanWeight(trigger.dataOrder(2), 0.6) > t)
         ],
         [
             restart,
-            (trigger) => ((audioState.micSpawnAt) &&
+            audioFirer(() => audioState.mic*audioState.micSpawnAt,
+                'meanWeight(mic, 2, 0.25)',
                 // Low end - acceleration
-                meanWeight(trigger.dataOrder(-1), 0.25) >
-                    audioState.mic*audioState.micSpawnAt)
+                (trigger, t) => meanWeight(trigger.dataOrder(2), 0.25) > t)
         ]
     ];
 
@@ -486,6 +512,8 @@ export default (canvas, settings, debug) => {
             soundOutput = micFires.some(micResponder ||
                 (micResponder = audioResponder(micTrigger)));
         }
+
+        audioCache.clear();
 
         return soundOutput;
     };
@@ -521,12 +549,12 @@ export default (canvas, settings, debug) => {
             speedLimit: 0.01,
 
             forceWeight: 0.015,
-            varyForce: -0.1,
+            varyForce: -0.15,
 
             flowWeight: 1,
             varyFlow: 0.25,
 
-            flowDecay: 0.002,
+            flowDecay: 0.0025,
             flowWidth: 5,
 
             lineWidth: 1,
