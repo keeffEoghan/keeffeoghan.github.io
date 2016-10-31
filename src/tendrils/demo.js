@@ -294,17 +294,20 @@ export default (canvas, settings, debug) => {
     let video = null;
     let mediaStream = null;
 
+
     const videoFrame = new Image();
     
-    videoFrame.src = '/build/images/max.jpg';
+    videoFrame.src = '/build/images/max-kath.jpg';
 
-    camSpawner.buffer.shape =
-        tendrils.colorMap.shape =
-            [videoFrame.width, videoFrame.height];
+    videoFrame.addEventListener('load', () => {
+            if(!video) {
+                camSpawner.buffer.shape =
+                    tendrils.colorMap.shape =
+                        [videoFrame.width, videoFrame.height];
+            }
+        });
 
-    // document.body.appendChild(videoFrame);
 
-    // @todo Instead of `respawn`, have an abstract image of a face by default
     const spawnCam = () => {
         camSpawner.shader = camShaders.direct;
         camSpawner.speed = 0.3;
@@ -329,7 +332,6 @@ export default (canvas, settings, debug) => {
                 throw e;
             }
             else {
-                return;
                 mediaStream = stream;
 
                 const v = Object.assign(document.createElement('video'), {
