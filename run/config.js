@@ -62,6 +62,7 @@ module.exports = {
         assets: {
             sourcePaths: [
                 './fonts/**/!(dir.txt)',
+                './images/**/!(dir.txt)',
                 './videos/**/!(dir.txt)',
                 './audio/**/!(dir.txt)'
             ]
