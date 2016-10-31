@@ -284,9 +284,6 @@ export default (canvas, settings, debug) => {
 
     // Cam and mic
 
-    let video = null;
-    let mediaStream = null;
-
     const camShaders = {
         direct: shader(gl, spawnPixels.defaults().shader[0], pixelsFrag),
         sample: shader(gl, spawnPixels.defaults().shader[0], bestSampleFrag)
@@ -294,32 +291,32 @@ export default (canvas, settings, debug) => {
 
     const camSpawner = new spawnPixels.PixelSpawner(gl, { shader: null });
 
-    mat3.scale(camSpawner.spawnMatrix,
-        mat3.identity(camSpawner.spawnMatrix), [-1, 1]);
+    let video = null;
+    let mediaStream = null;
+
+    const videoFrame = new Image();
+    
+    videoFrame.src = '/build/images/max.jpg';
+
+    camSpawner.buffer.shape =
+        tendrils.colorMap.shape =
+            [videoFrame.width, videoFrame.height];
+
+    // document.body.appendChild(videoFrame);
 
     // @todo Instead of `respawn`, have an abstract image of a face by default
     const spawnCam = () => {
-        if(video) {
-            camSpawner.shader = camShaders.direct;
-            camSpawner.speed = 0.3;
-            camSpawner.setPixels(video);
-            camSpawner.spawn(tendrils);
-        }
-        else {
-            respawn();
-        }
+        camSpawner.shader = camShaders.direct;
+        camSpawner.speed = 0.3;
+        camSpawner.setPixels(video || videoFrame);
+        camSpawner.spawn(tendrils);
     };
 
     const spawnSampleCam = () => {
-        if(video) {
-            camSpawner.shader = camShaders.sample;
-            camSpawner.speed = 1;
-            camSpawner.setPixels(video);
-            camSpawner.spawn(tendrils);
-        }
-        else {
-            spawnForm();
-        }
+        camSpawner.shader = camShaders.sample;
+        camSpawner.speed = 1;
+        camSpawner.setPixels(video || videoFrame);
+        camSpawner.spawn(tendrils);
     };
 
 
@@ -332,24 +329,30 @@ export default (canvas, settings, debug) => {
                 throw e;
             }
             else {
+                return;
                 mediaStream = stream;
 
-                video = Object.assign(document.createElement('video'), {
+                const v = Object.assign(document.createElement('video'), {
                         src: self.URL.createObjectURL(stream),
                         controls: true,
                         muted: true,
                         className: 'cam-stream'
                     });
 
-                video.addEventListener('canplay', () => {
+                v.addEventListener('canplay', () => {
+                    video = v;
+
                     camSpawner.buffer.shape =
                         tendrils.colorMap.shape =
                             [video.videoWidth, video.videoHeight];
 
+                    mat3.scale(camSpawner.spawnMatrix,
+                        mat3.identity(camSpawner.spawnMatrix), [-1, 1]);
+
                     camSpawner.setPixels(video);
                 });
 
-                video.play();
+                v.play();
                 // canvas.parentElement.appendChild(video);
 
 
@@ -1267,7 +1270,7 @@ export default (canvas, settings, debug) => {
             .smoothTo({
                 to: {
                     noiseScale: 1.5,
-                    varyNoiseScale: 200
+                    varyNoiseScale: 100
                 },
                 time: 187000,
                 ease: [0, 1, 1]
