@@ -1395,7 +1395,7 @@ export default (canvas, settings, debug) => {
                 to: {
                     noiseScale: 0.4,
                     varyNoiseScale: 12,
-                    noiseSpeed: 0.0003
+                    noiseSpeed: 0.0001
                 },
                 time: 254000,
                 ease: [0, 0, 1]
@@ -1451,7 +1451,7 @@ export default (canvas, settings, debug) => {
                     noiseWeight: 0.003,
                     noiseScale: 1.2,
                     varyNoiseScale: -4,
-                    noiseSpeed: 0.0001,
+                    noiseSpeed: 0.0003,
                     varyNoiseSpeed: 0.01
                 },
                 time: 257600,
