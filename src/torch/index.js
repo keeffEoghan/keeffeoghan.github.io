@@ -13,8 +13,9 @@ import Screen from '../tendrils/screen';
 
 import screenVert from '../tendrils/screen/index.vert';
 // import screenFrag from '../tendrils/screen/index.frag';
+// import copyFrag from '../tendrils/screen/copy.frag';
 import formFrag from './form.frag';
-import copyFrag from '../tendrils/screen/copy.frag';
+import drawFrag from './draw.frag';
 
 import AudioTrigger from '../tendrils/audio/';
 import AudioTexture from '../tendrils/audio/data-texture';
@@ -41,8 +42,9 @@ export default (canvas, settings, debug) => {
     const screen = new Screen(gl);
 
     // const screenShader = shader(gl, screenVert, screenFrag);
+    // const copyShader = shader(gl, screenVert, copyFrag);
     const formShader = shader(gl, screenVert, formFrag);
-    const copyShader = shader(gl, screenVert, copyFrag);
+    const drawShader = shader(gl, screenVert, drawFrag);
 
 
     // Track
@@ -116,11 +118,10 @@ export default (canvas, settings, debug) => {
         // Screen pass - draw the light and form
 
         gl.bindFramebuffer(gl.FRAMEBUFFER, null);
-        copyShader.bind();
+        drawShader.bind();
 
-        Object.assign(copyShader.uniforms, uniforms, {
-                view: buffers[0].color[0].bind(0),
-                viewRes: viewRes
+        Object.assign(drawShader.uniforms, uniforms, {
+                form: buffers[0].color[0].bind(0)
             });
 
         screen.render();
