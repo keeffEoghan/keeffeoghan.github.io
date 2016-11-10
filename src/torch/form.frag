@@ -9,7 +9,11 @@ uniform sampler2D previous;
 uniform vec2 viewSize;
 uniform vec2 viewRes;
 
+#pragma glslify: noise = require(glsl-noise/simplex/3d)
+
 void main() {
-    gl_FragColor = mod(texture2D(previous, gl_FragCoord.xy/viewRes)+
-            vec4(-0.05, 0.01, 0.3, 0.01), vec4(0.4, 1.0, 0.9, 1.0));
+    vec2 uv = gl_FragCoord.xy/viewRes*viewSize;
+
+    gl_FragColor = texture2D(previous, uv)+
+        vec4(vec3(noise(vec3(uv*10000.0, time*0.0001))), 0.01)*dt;
 }
