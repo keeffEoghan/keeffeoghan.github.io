@@ -8,9 +8,16 @@ import dat from 'dat-gui';
 
 import Timer from '../tendrils/timer';
 
+import Screen from '../tendrils/screen';
+
+import screenVert from '../tendrils/screen/index.vert';
+import screenFrag from '../tendrils/screen/index.frag';
+import copyFrag from '../tendrils/screen/copy.frag';
+
 import { coverAspect } from '../tendrils/utils/aspect';
 
 import each from '../fp/each';
+import { step } from '../utils';
 
 export default (canvas, settings, debug) => {
     const gl = glContext(canvas, { preserveDrawingBuffer: true }, render);
@@ -20,11 +27,59 @@ export default (canvas, settings, debug) => {
     const viewRes = [0, 0];
     const viewSize = [0, 0];
 
-    const buffers = [FBO(this.gl, [1, 1])];
+    const buffers = [FBO(gl, [1, 1]), FBO(gl, [1, 1])];
+
+    const uniforms = {};
+
+    const screen = new Screen(gl);
+
+    const screenShader = shader(gl, screenVert, screenFrag);
+    const copyShader = shader(gl, screenVert, copyFrag);
 
     // The main loop
     function render() {
+        gl.viewport(0, 0, viewRes[0], viewRes[1]);
+
         const dt = timer.tick().dt;
+
+        // Common
+        
+        Object.assign(uniforms, {
+                start: timer.since,
+                time: timer.time,
+                dt: timer.dt,
+                previous: buffers[1].color[0].bind(0),
+                viewSize,
+                viewRes,
+                color: [1, 1, 0, 1]
+            });
+
+
+        // Buffer pass - develop the form
+
+        buffers[0].bind();
+        screenShader.bind();
+
+        Object.assign(screenShader.uniforms, uniforms);
+        
+        screen.render();
+
+
+        // Screen pass - draw the light and form
+
+        gl.bindFramebuffer(gl.FRAMEBUFFER, null);
+        copyShader.bind();
+
+        Object.assign(copyShader.uniforms, uniforms, {
+                view: buffers[0].color[0].bind(0),
+                viewRes: viewRes
+            });
+
+        screen.render();
+
+
+        // Step frame
+        step(buffers);
     }
 
     function resize() {
