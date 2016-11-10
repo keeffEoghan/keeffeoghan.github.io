@@ -26,6 +26,5 @@ void main() {
     vec4 last = texture2D(previous, uv);
     vec4 sound = texture2D(audio, vec2(angle, 0.5));
 
-    gl_FragColor = vec4(sound.r*audioScale, (last.r*0.5)+(last.g*0.01), 0.1,
-        length(pos)-0.3);
+    gl_FragColor = vec4(sound.r*audioScale, last.r*0.5, last.g*0.01, 1.0);
 }
