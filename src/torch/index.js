@@ -11,7 +11,8 @@ import Timer from '../tendrils/timer';
 import Screen from '../tendrils/screen';
 
 import screenVert from '../tendrils/screen/index.vert';
-import screenFrag from '../tendrils/screen/index.frag';
+// import screenFrag from '../tendrils/screen/index.frag';
+import formFrag from './form.frag';
 import copyFrag from '../tendrils/screen/copy.frag';
 
 import { coverAspect } from '../tendrils/utils/aspect';
@@ -33,7 +34,8 @@ export default (canvas, settings, debug) => {
 
     const screen = new Screen(gl);
 
-    const screenShader = shader(gl, screenVert, screenFrag);
+    // const screenShader = shader(gl, screenVert, screenFrag);
+    const formShader = shader(gl, screenVert, formFrag);
     const copyShader = shader(gl, screenVert, copyFrag);
 
     // The main loop
@@ -50,17 +52,16 @@ export default (canvas, settings, debug) => {
                 dt: timer.dt,
                 previous: buffers[1].color[0].bind(0),
                 viewSize,
-                viewRes,
-                color: [1, 1, 0, 1]
+                viewRes
             });
 
 
         // Buffer pass - develop the form
 
         buffers[0].bind();
-        screenShader.bind();
+        formShader.bind();
 
-        Object.assign(screenShader.uniforms, uniforms);
+        Object.assign(formShader.uniforms, uniforms);
         
         screen.render();
 
