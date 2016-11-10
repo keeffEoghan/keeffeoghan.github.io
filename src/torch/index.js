@@ -19,7 +19,7 @@ import copyFrag from '../tendrils/screen/copy.frag';
 import AudioTrigger from '../tendrils/audio/';
 import AudioTexture from '../tendrils/audio/data-texture';
 
-import { coverAspect } from '../tendrils/utils/aspect';
+import { containAspect } from '../tendrils/utils/aspect';
 
 import each from '../fp/each';
 import { step } from '../utils';
@@ -50,6 +50,7 @@ export default (canvas, settings, debug) => {
     const audioMode = (queries.audioMode || 'waveform');
     const audioOrders = (parseInt(queries.audioOrders, 10) || 0);
     const audioScale = (parseFloat(queries.audioScale, 10) || 1);
+    const harmonies = (parseFloat(queries.harmonies, 10) || 1);
 
     const audio = Object.assign(new Audio(), {
             crossOrigin: 'anonymous',
@@ -97,7 +98,8 @@ export default (canvas, settings, debug) => {
                 viewRes,
                 previous: buffers[1].color[0].bind(0),
                 audio: audioTexture.texture.bind(1),
-                audioScale
+                audioScale,
+                harmonies
             });
 
 
@@ -135,8 +137,7 @@ export default (canvas, settings, debug) => {
         viewRes[0] = gl.drawingBufferWidth;
         viewRes[1] = gl.drawingBufferHeight;
 
-        // NDC dimensions in the range [-1, 1] -> [-(max radius), (max radius)]
-        coverAspect(viewSize, viewRes);
+        containAspect(viewSize, viewRes);
 
         each((buffer) => buffer.shape = viewRes, buffers);
     }
