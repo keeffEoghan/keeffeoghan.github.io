@@ -53,6 +53,8 @@ export default (canvas, settings, debug) => {
     const audioOrders = (parseInt(queries.audioOrders, 10) || 0);
     const audioScale = (parseFloat(queries.audioScale, 10) || 1);
     const harmonies = (parseFloat(queries.harmonies, 10) || 1);
+    const falloff = (parseFloat(queries.falloff, 10) || 100);
+    const growth = (parseFloat(queries.growth, 10) || 0.0001);
 
     const audio = Object.assign(new Audio(), {
             crossOrigin: 'anonymous',
@@ -98,10 +100,12 @@ export default (canvas, settings, debug) => {
                 dt: timer.dt,
                 viewSize,
                 viewRes,
-                previous: buffers[1].color[0].bind(0),
+                past: buffers[1].color[0].bind(0),
                 audio: audioTexture.texture.bind(1),
                 audioScale,
-                harmonies
+                harmonies,
+                falloff,
+                growth
             });
 
 
