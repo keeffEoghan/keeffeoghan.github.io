@@ -1,10 +1,11 @@
 import glContext from 'gl-context';
 import FBO from 'gl-fbo';
+import analyser from 'web-audio-analyser';
 import throttle from 'lodash/throttle';
 import mapRange from 'range-fit';
 import vec2 from 'gl-matrix/src/gl-matrix/vec2';
 import shader from 'gl-shader';
-import dat from 'dat-gui';
+import querystring from 'querystring';
 
 import Timer from '../tendrils/timer';
 
@@ -15,12 +16,17 @@ import screenVert from '../tendrils/screen/index.vert';
 import formFrag from './form.frag';
 import copyFrag from '../tendrils/screen/copy.frag';
 
+import AudioTrigger from '../tendrils/audio/';
+import AudioTexture from '../tendrils/audio/data-texture';
+
 import { coverAspect } from '../tendrils/utils/aspect';
 
 import each from '../fp/each';
 import { step } from '../utils';
 
 export default (canvas, settings, debug) => {
+    const queries = querystring.parse(location.search.slice(1));
+
     const gl = glContext(canvas, { preserveDrawingBuffer: true }, render);
 
     const timer = new Timer(0);
@@ -38,21 +44,60 @@ export default (canvas, settings, debug) => {
     const formShader = shader(gl, screenVert, formFrag);
     const copyShader = shader(gl, screenVert, copyFrag);
 
+
+    // Track
+
+    const audioMode = (queries.audioMode || 'waveform');
+    const audioOrders = (parseInt(queries.audioOrders, 10) || 0);
+    const audioScale = (parseFloat(queries.audioScale, 10) || 1);
+
+    const audio = Object.assign(new Audio(), {
+            crossOrigin: 'anonymous',
+            controls: true,
+            autoplay: true,
+            muted: 'muted' in queries,
+            className: 'track',
+            src: decodeURIComponent(queries.track || '%2Faudio.gitignored%2FTORCH%20SONGS%20(PRIVATE%20%26%20CONFIDENTIAL)%2FTorch%20Songs_Blaenavon_Elliott%20Smith_Everything%20Reminds%20Me%20Of%20Her.mp3')
+        });
+
+    canvas.parentElement.appendChild(audio);
+    
+    const audioAnalyser = analyser(audio);
+
+    audioAnalyser.analyser.fftSize = 2**10;
+
+    const audioTrigger = new AudioTrigger(audioAnalyser, audioOrders);
+
+    const audioTexture = new AudioTexture(gl, audioTrigger.dataOrder(-1));
+    // const audioTexture = new AudioTexture(gl,
+    //         audioAnalyser.analyser.frequencyBinCount);
+
+
     // The main loop
     function render() {
-        gl.viewport(0, 0, viewRes[0], viewRes[1]);
-
         const dt = timer.tick().dt;
 
-        // Common
+
+        // Sample audio
+
+        audioTrigger.sample(dt, audioMode);
+        // audioTexture[audioMode](audioTrigger.dataOrder(-1));
+        audioTexture.apply();
+
+
+        // Render - common
+
+        gl.viewport(0, 0, viewRes[0], viewRes[1]);
         
         Object.assign(uniforms, {
                 start: timer.since,
                 time: timer.time,
                 dt: timer.dt,
-                previous: buffers[1].color[0].bind(0),
                 viewSize,
-                viewRes
+                viewRes,
+                previous: buffers[1].color[0].bind(0),
+                audio: audioTexture.texture.bind(1),
+                audioScale
             });
 
 

@@ -649,7 +649,7 @@ export default (canvas, settings, debug) => {
          * @todo Spectogram with frequencies on x-axis, waveform on y; or
          *       something better than this 1D list.
          */
-        audioTexture.frequency(trackTrigger.dataOrder(0)).apply();
+        audioTexture.frequencies(trackTrigger.dataOrder(0)).apply();
 
         // Blend the color maps into tendrils one
         // @todo Only do this if necessary (skip if none or only one has alpha)
