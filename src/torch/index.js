@@ -65,7 +65,7 @@ export default (canvas, settings, debug) => {
     
     const audioAnalyser = analyser(audio);
 
-    audioAnalyser.analyser.fftSize = 2**10;
+    audioAnalyser.analyser.fftSize = 2**11;
 
     const audioTrigger = new AudioTrigger(audioAnalyser, audioOrders);
 
