@@ -18,4 +18,5 @@ void main() {
     vec4 geom = texture2D(form, uv);
 
     gl_FragColor = vec4(geom.rgb, geom.a*length(pos)-0.3);
+    // gl_FragColor = geom;
 }
