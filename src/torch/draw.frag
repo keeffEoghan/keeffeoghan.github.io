@@ -15,7 +15,7 @@ void main() {
     vec2 uv = gl_FragCoord.xy/viewRes;
     vec2 pos = uvToPos(uv)/viewSize;
 
-    vec4 imprint = texture2D(form, uv);
+    vec4 geom = texture2D(form, uv);
 
-    gl_FragColor = vec4(imprint.rgb, imprint.a*length(pos)-0.5);
+    gl_FragColor = vec4(geom.rgb, geom.a*length(pos)-0.3);
 }

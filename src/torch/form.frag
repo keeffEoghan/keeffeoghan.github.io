@@ -24,7 +24,7 @@ void main() {
     float angle = mod(posToAngle(pos)/harmonies, 1.0);
 
     vec4 last = texture2D(previous, uv);
-    vec4 sound = texture2D(audio, vec2(angle, 0.5));
+    vec4 sound = texture2D(audio, vec2(angle, 0.0));
 
     gl_FragColor = vec4(sound.r*audioScale, last.r*0.5, last.g*0.01, 1.0);
 }
