@@ -66,6 +66,7 @@ export default (canvas, settings, debug) => {
     const audioOrders = ((queries.audioOrders)? parseInt(queries.audioOrders, 10) : 2);
     const harmonies = ((queries.harmonies)? parseFloat(queries.harmonies, 10) : 1);
     const falloff = ((queries.falloff)? parseFloat(queries.falloff, 10) : 0.0001);
+    const attenuate = ((queries.attenuate)? parseFloat(queries.attenuate, 10) : 0.1);
     const silent = ((queries.silent)? parseFloat(queries.silent, 10) : 0);
     const grow = ((queries.grow)? parseFloat(queries.grow, 10) : 0.0006);
     const spin = ((queries.spin)? parseFloat(queries.spin, 10) : 0);
@@ -74,12 +75,15 @@ export default (canvas, settings, debug) => {
     const jitter = ((queries.jitter)? parseFloat(queries.jitter, 10) : 0.0008);
     const nowAlpha = ((queries.nowAlpha)? parseFloat(queries.nowAlpha, 10) : 1);
     const pastAlpha = ((queries.pastAlpha)? parseFloat(queries.pastAlpha, 10) : 0.96);
+    const formAlpha = ((queries.formAlpha)? parseFloat(queries.formAlpha, 10) : 0.85);
+    const ringAlpha = ((queries.ringAlpha)? parseFloat(queries.ringAlpha, 10) : 1);
 
     console.log('track='+track);
     console.log('audioMode='+audioMode);
     console.log('audioOrders='+audioOrders);
     console.log('harmonies='+harmonies);
     console.log('falloff='+falloff);
+    console.log('attenuate='+attenuate);
     console.log('silent='+silent);
     console.log('grow='+grow);
     console.log('spin='+spin);
@@ -88,6 +92,8 @@ export default (canvas, settings, debug) => {
     console.log('jitter='+jitter);
     console.log('nowAlpha='+nowAlpha);
     console.log('pastAlpha='+pastAlpha);
+    console.log('formAlpha='+formAlpha);
+    console.log('ringAlpha='+ringAlpha);
 
 
     // Track
@@ -140,6 +146,7 @@ export default (canvas, settings, debug) => {
                 audio: audioTexture.texture.bind(1),
                 harmonies,
                 falloff,
+                attenuate,
                 silent,
                 grow,
                 spin,
@@ -147,7 +154,9 @@ export default (canvas, settings, debug) => {
                 thick,
                 jitter,
                 nowAlpha,
-                pastAlpha
+                pastAlpha,
+                formAlpha,
+                ringAlpha
             });
 
 
