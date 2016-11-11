@@ -34,8 +34,6 @@ vec3 sampler(vec2 uv) {
 
 #pragma glslify: uvToPos = require(../tendrils/map/uv-to-pos)
 #pragma glslify: bezier = require(../tendrils/utils/bezier)
-#pragma glslify: preAlpha = require(../tendrils/utils/pre-alpha)
-#pragma glslify: length2 = require(../tendrils/utils/length-2)
 
 #pragma glslify: posToAngle = require(./pos-to-angle)
 #pragma glslify: sampleSound = require(./sample-sound)
@@ -52,24 +50,23 @@ void main() {
     float angle = mod(posToAngle(pos)+(spin*time), 1.0)/harmonies;
 
 
-    // The ring
+    // The light ring
     float sdf = clamp(abs(dist-radius)-thick, 0.0, 1.0);
 
     // Light attenuation
     // @see Attenuation: http://gamedev.stackexchange.com/questions/56897/glsl-light-attenuation-color-and-intensity-formula
-    // float attenuate = 1.0/(1.0+(0.1*sdf)+(0.01*sdf*sdf));
-    // float attenuate = pow(clamp(1.0-(sdf/radius), 0.0, 1.0), 2.0);
-    // float attenuate = pow(clamp(1.0-sdf, 0.0, 1.0), 2.0);
-    float attenuate = 1.0/sdf/sdf;
-    // float attenuate = 1.0/sdf;
+    // float fade = 1.0/(1.0+(0.1*sdf)+(0.01*sdf*sdf));
+    // float fade = pow(clamp(1.0-(sdf/radius), 0.0, 1.0), 2.0);
+    // float fade = pow(clamp(1.0-sdf, 0.0, 1.0), 2.0);
+    float fade = 1.0/sdf/sdf;
+    // float fade = 1.0/sdf;
 
 
     // Sound
-    float sound = attenuate*falloff*
-            max(abs(sampleSound(audio, angle).x), silent);
+    float sound = fade*max(abs(sampleSound(audio, angle).x), silent);
 
 
-    // Sample and warp the past state
+    // Sample and grow the past state
     
     vec2 off = mid-uv;
     float growRate = clamp(bezier(curve, dist/growLimit), 0.0, 1.0);
@@ -82,8 +79,8 @@ void main() {
 
     // Accumulate color
 
-    // vec4 color = vec4(sound*nowAlpha)+(old*pastAlpha);
-    vec4 color = vec4(clamp(sound*nowAlpha, 0.0, 1.0))+
+    // vec4 color = vec4(sound*falloff*nowAlpha)+(old*pastAlpha);
+    vec4 color = vec4(clamp(sound*falloff*nowAlpha, 0.0, 1.0))+
             clamp(old*pastAlpha, 0.0, 1.0);
 
     gl_FragColor = color;
