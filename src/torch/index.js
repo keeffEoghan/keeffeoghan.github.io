@@ -61,27 +61,29 @@ export default (canvas, settings, debug) => {
         tracks[Math.floor(Math.random()*tracks.length)]);
 
     const audioMode = (queries.audioMode || 'waveform');
-    const audioOrders = (parseInt(queries.audioOrders, 10) || 2);
-    const harmonies = (parseFloat(queries.harmonies, 10) || 1);
-    const falloff = (parseFloat(queries.falloff, 10) || 0.005);
-    const growth = (parseFloat(queries.growth, 10) || 0.0001);
-    const radius = (parseFloat(queries.radius, 10) || 0.4);
-    const thick = (parseFloat(queries.thick, 10) || 0.01);
-    const jitter = (parseFloat(queries.jitter, 10) || 0.0008);
-    const nowWeight = (parseFloat(queries.nowWeight, 10) || 1);
-    const pastWeight = (parseFloat(queries.pastWeight, 10) || 1);
+    const audioOrders = ((queries.audioOrders)? parseInt(queries.audioOrders, 10) : 2);
+    const harmonies = ((queries.harmonies)? parseFloat(queries.harmonies, 10) : 1);
+    const falloff = ((queries.falloff)? parseFloat(queries.falloff, 10) : 0.002);
+    const grow = ((queries.grow)? parseFloat(queries.grow, 10) : 0.0006);
+    const spin = ((queries.spin)? parseFloat(queries.spin, 10) : 0.0006);
+    const radius = ((queries.radius)? parseFloat(queries.radius, 10) : 0.4);
+    const thick = ((queries.thick)? parseFloat(queries.thick, 10) : 0.01);
+    const jitter = ((queries.jitter)? parseFloat(queries.jitter, 10) : 0.0004);
+    const nowAlpha = ((queries.nowAlpha)? parseFloat(queries.nowAlpha, 10) : 1);
+    const pastAlpha = ((queries.pastAlpha)? parseFloat(queries.pastAlpha, 10) : 0.96);
 
-    console.log('track', track);
-    console.log('audioMode', audioMode);
-    console.log('audioOrders', audioOrders);
-    console.log('harmonies', harmonies);
-    console.log('falloff', falloff);
-    console.log('growth', growth);
-    console.log('radius', radius);
-    console.log('thick', thick);
-    console.log('jitter', jitter);
-    console.log('nowWeight', nowWeight);
-    console.log('pastWeight', pastWeight);
+    console.log('track='+track);
+    console.log('audioMode='+audioMode);
+    console.log('audioOrders='+audioOrders);
+    console.log('harmonies='+harmonies);
+    console.log('falloff='+falloff);
+    console.log('grow='+grow);
+    console.log('spin='+spin);
+    console.log('radius='+radius);
+    console.log('thick='+thick);
+    console.log('jitter='+jitter);
+    console.log('nowAlpha='+nowAlpha);
+    console.log('pastAlpha='+pastAlpha);
 
 
     // Track
@@ -134,12 +136,13 @@ export default (canvas, settings, debug) => {
                 audio: audioTexture.texture.bind(1),
                 harmonies,
                 falloff,
-                growth,
+                grow,
+                spin,
                 radius,
                 thick,
                 jitter,
-                nowWeight,
-                pastWeight
+                nowAlpha,
+                pastAlpha
             });
 
 

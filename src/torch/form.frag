@@ -12,15 +12,16 @@ uniform sampler2D audio;
 
 uniform float harmonies;
 uniform float falloff;
-uniform float growth;
+uniform float grow;
+uniform float spin;
 
 uniform float radius;
 uniform float thick;
 
 uniform float jitter;
 
-uniform float nowWeight;
-uniform float pastWeight;
+uniform float nowAlpha;
+uniform float pastAlpha;
 
 vec3 sampler(vec2 uv) {
     return texture2D(past, uv).rgb;
@@ -40,13 +41,14 @@ vec3 sampler(vec2 uv) {
 
 const vec2 mid = vec2(0.5);
 const vec4 curve = vec4(0.0, 0.0, 0.4, 1.0);
+const float growLimit = 1.3;
 
 void main() {
     vec2 uv = gl_FragCoord.xy/viewRes;
     vec2 pos = uvToPos(uv)/viewSize;
 
     float dist = length(pos);
-    float angle = posToAngle(pos)/harmonies;
+    float angle = mod(posToAngle(pos)+(spin*time), 1.0)/harmonies;
 
 
     // The ring
@@ -57,27 +59,30 @@ void main() {
     // float attenuate = 1.0/(1.0+(0.1*sdf)+(0.01*sdf*sdf));
     // float attenuate = pow(clamp(1.0-(sdf/radius), 0.0, 1.0), 2.0);
     // float attenuate = pow(clamp(1.0-sdf, 0.0, 1.0), 2.0);
-    float attenuate = 1.0/sdf;
+    float attenuate = 1.0/sdf/sdf;
 
 
-    // Sound
+    // Sound and light
     float sound = sampleSound(audio, angle).x*attenuate*falloff;
 
 
     // Sample and warp the past state
     
     vec2 off = mid-uv;
-    float growRate = clamp(1.0-bezier(curve, dist), 0.0, 1.0);
-    vec2 pastUV = uv+(off*growth*dt*growRate);
+    float growRate = clamp(bezier(curve, dist/growLimit), 0.0, 1.0);
+    vec2 pastUV = uv+(off*grow*dt*(1.0-growRate));
 
     vec4 old = texture2D(past, pastUV);
 
-    old.rgb = blur(pastUV, jitter*dist, viewRes.x/viewRes.y, mod(time, 20.0));
+    old.rgb = blur(pastUV, jitter*growRate, viewRes.x/viewRes.y, mod(time, 20.0));
 
 
     // Accumulate color
 
-    vec4 color = vec4(sound*nowWeight)+(old*pastWeight);
+    // vec4 color = vec4(sound*nowAlpha)+(old*pastAlpha);
+    vec4 color = vec4(clamp(sound*nowAlpha, 0.0, 1.0))+
+            clamp(old*pastAlpha, 0.0, 1.0);
 
     gl_FragColor = color;
+    // gl_FragColor = clamp(color, vec4(0.0), vec4(1.0));
 }
