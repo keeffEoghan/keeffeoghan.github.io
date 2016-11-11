@@ -25,13 +25,16 @@ void main() {
     vec4 geom = texture2D(form, uv);
 
     // float sdf = circleSDF(pos, radius-thick)-circleSDF(pos, radius+thick);
-    float sdf = smoothstep(radius-thick, radius, dist)-
-            smoothstep(radius, radius+thick, dist);
+    // float sdf = smoothstep(radius-thick, radius, dist)-
+    //         smoothstep(radius, radius+thick, dist);
+
+    float sdf = 1.0-clamp(abs(dist-radius)-thick, 0.0, 1.0);
 
     vec4 ring = vec4(vec3(sdf), 1.0);
 
     vec4 color = preAlpha(ring)+preAlpha(geom);
 
+    // gl_FragColor = ring;
     // gl_FragColor = color;
     gl_FragColor = geom;
 }

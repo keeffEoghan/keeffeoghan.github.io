@@ -38,7 +38,7 @@ export default (canvas, settings, debug) => {
 
     const gl = glContext(canvas, { preserveDrawingBuffer: true }, render);
 
-    const timer = new Timer(0);
+    const timer = new Timer();
 
     const viewRes = [0, 0];
     const viewSize = [0, 0];
@@ -63,10 +63,10 @@ export default (canvas, settings, debug) => {
     const audioMode = (queries.audioMode || 'waveform');
     const audioOrders = ((queries.audioOrders)? parseInt(queries.audioOrders, 10) : 2);
     const harmonies = ((queries.harmonies)? parseFloat(queries.harmonies, 10) : 1);
-    const falloff = ((queries.falloff)? parseFloat(queries.falloff, 10) : 0.002);
+    const falloff = ((queries.falloff)? parseFloat(queries.falloff, 10) : 0.0001);
     const silent = ((queries.silent)? parseFloat(queries.silent, 10) : 0);
     const grow = ((queries.grow)? parseFloat(queries.grow, 10) : 0.0006);
-    const spin = ((queries.spin)? parseFloat(queries.spin, 10) : 0.0006);
+    const spin = ((queries.spin)? parseFloat(queries.spin, 10) : 0);
     const radius = ((queries.radius)? parseFloat(queries.radius, 10) : 0.4);
     const thick = ((queries.thick)? parseFloat(queries.thick, 10) : 0.01);
     const jitter = ((queries.jitter)? parseFloat(queries.jitter, 10) : 0.0004);

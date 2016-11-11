@@ -61,10 +61,12 @@ void main() {
     // float attenuate = pow(clamp(1.0-(sdf/radius), 0.0, 1.0), 2.0);
     // float attenuate = pow(clamp(1.0-sdf, 0.0, 1.0), 2.0);
     float attenuate = 1.0/sdf/sdf;
+    // float attenuate = 1.0/sdf;
 
 
     // Sound
-    float sound = max(abs(sampleSound(audio, angle).x), silent);
+    float sound = attenuate*falloff*
+            max(abs(sampleSound(audio, angle).x), silent);
 
 
     // Sample and warp the past state
@@ -80,8 +82,8 @@ void main() {
 
     // Accumulate color
 
-    // vec4 color = vec4(sound*attenuate*falloff*nowAlpha)+(old*pastAlpha);
-    vec4 color = vec4(clamp(sound*nowAlpha*attenuate*falloff, 0.0, 1.0))+
+    // vec4 color = vec4(sound*nowAlpha)+(old*pastAlpha);
+    vec4 color = vec4(clamp(sound*nowAlpha, 0.0, 1.0))+
             clamp(old*pastAlpha, 0.0, 1.0);
 
     gl_FragColor = color;
