@@ -38,7 +38,9 @@ export default (canvas, settings, debug) => {
 
     const gl = glContext(canvas, { preserveDrawingBuffer: true }, render);
 
-    const timer = new Timer();
+    const timer = Object(new Timer(), {
+            step: 1000/60
+        });
 
     const viewRes = [0, 0];
     const viewSize = [0, 0];
@@ -69,7 +71,7 @@ export default (canvas, settings, debug) => {
     const spin = ((queries.spin)? parseFloat(queries.spin, 10) : 0);
     const radius = ((queries.radius)? parseFloat(queries.radius, 10) : 0.4);
     const thick = ((queries.thick)? parseFloat(queries.thick, 10) : 0.01);
-    const jitter = ((queries.jitter)? parseFloat(queries.jitter, 10) : 0.0004);
+    const jitter = ((queries.jitter)? parseFloat(queries.jitter, 10) : 0.0008);
     const nowAlpha = ((queries.nowAlpha)? parseFloat(queries.nowAlpha, 10) : 1);
     const pastAlpha = ((queries.pastAlpha)? parseFloat(queries.pastAlpha, 10) : 0.96);
 
