@@ -64,6 +64,7 @@ export default (canvas, settings, debug) => {
     const audioOrders = ((queries.audioOrders)? parseInt(queries.audioOrders, 10) : 2);
     const harmonies = ((queries.harmonies)? parseFloat(queries.harmonies, 10) : 1);
     const falloff = ((queries.falloff)? parseFloat(queries.falloff, 10) : 0.002);
+    const silent = ((queries.silent)? parseFloat(queries.silent, 10) : 0);
     const grow = ((queries.grow)? parseFloat(queries.grow, 10) : 0.0006);
     const spin = ((queries.spin)? parseFloat(queries.spin, 10) : 0.0006);
     const radius = ((queries.radius)? parseFloat(queries.radius, 10) : 0.4);
@@ -77,6 +78,7 @@ export default (canvas, settings, debug) => {
     console.log('audioOrders='+audioOrders);
     console.log('harmonies='+harmonies);
     console.log('falloff='+falloff);
+    console.log('silent='+silent);
     console.log('grow='+grow);
     console.log('spin='+spin);
     console.log('radius='+radius);
@@ -136,6 +138,7 @@ export default (canvas, settings, debug) => {
                 audio: audioTexture.texture.bind(1),
                 harmonies,
                 falloff,
+                silent,
                 grow,
                 spin,
                 radius,

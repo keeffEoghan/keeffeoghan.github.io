@@ -12,6 +12,7 @@ uniform sampler2D audio;
 
 uniform float harmonies;
 uniform float falloff;
+uniform float silent;
 uniform float grow;
 uniform float spin;
 
@@ -62,8 +63,8 @@ void main() {
     float attenuate = 1.0/sdf/sdf;
 
 
-    // Sound and light
-    float sound = sampleSound(audio, angle).x*attenuate*falloff;
+    // Sound
+    float sound = max(abs(sampleSound(audio, angle).x), silent);
 
 
     // Sample and warp the past state
@@ -79,8 +80,8 @@ void main() {
 
     // Accumulate color
 
-    // vec4 color = vec4(sound*nowAlpha)+(old*pastAlpha);
-    vec4 color = vec4(clamp(sound*nowAlpha, 0.0, 1.0))+
+    // vec4 color = vec4(sound*attenuate*falloff*nowAlpha)+(old*pastAlpha);
+    vec4 color = vec4(clamp(sound*nowAlpha*attenuate*falloff, 0.0, 1.0))+
             clamp(old*pastAlpha, 0.0, 1.0);
 
     gl_FragColor = color;
