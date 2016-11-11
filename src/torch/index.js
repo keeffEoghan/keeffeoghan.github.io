@@ -25,6 +25,14 @@ import { containAspect } from '../tendrils/utils/aspect';
 import each from '../fp/each';
 import { step } from '../utils';
 
+const tracks = [
+    '%2Faudio.gitignored%2FTORCH%20SONGS%20(PRIVATE%20%26%20CONFIDENTIAL)%2FTorch%20Songs_Blaenavon_Elliott%20Smith_Everything%20Reminds%20Me%20Of%20Her.mp3',
+    // '%2Faudio.gitignored%2FTORCH%20SONGS%20(PRIVATE%20%26%20CONFIDENTIAL)%2FTorch%20Songs_Frank%20Turner_The%20Mountain%20Goats_This%20Year.aif',
+    '%2Faudio.gitignored%2FTORCH%20SONGS%20(PRIVATE%20%26%20CONFIDENTIAL)%2FTorch%20Songs_Retro%20Kid_Smokey%20Robinson_Tracks%20Of%20My%20Tears.mp3',
+    '%2Faudio.gitignored%2FTORCH%20SONGS%20(PRIVATE%20%26%20CONFIDENTIAL)%2FTorch%20Songs_Satellites_Talk%20Talk_Life\'s%20What%20You%20Make%20It.mp3',
+    '%2Faudio.gitignored%2FTORCH%20SONGS%20(PRIVATE%20%26%20CONFIDENTIAL)%2FTorch%20Songs_Years%20%26%20Years_Joni%20Mitchell_Both%20Sides%20Now.wav'
+];
+
 export default (canvas, settings, debug) => {
     const queries = querystring.parse(location.search.slice(1));
 
@@ -47,14 +55,36 @@ export default (canvas, settings, debug) => {
     const drawShader = shader(gl, screenVert, drawFrag);
 
 
-    // Track
+    // Parameters
+
+    const track = (queries.track ||
+        tracks[Math.floor(Math.random()*tracks.length)]);
 
     const audioMode = (queries.audioMode || 'waveform');
-    const audioOrders = (parseInt(queries.audioOrders, 10) || 0);
-    const audioScale = (parseFloat(queries.audioScale, 10) || 1);
+    const audioOrders = (parseInt(queries.audioOrders, 10) || 2);
     const harmonies = (parseFloat(queries.harmonies, 10) || 1);
-    const falloff = (parseFloat(queries.falloff, 10) || 100);
+    const falloff = (parseFloat(queries.falloff, 10) || 0.005);
     const growth = (parseFloat(queries.growth, 10) || 0.0001);
+    const radius = (parseFloat(queries.radius, 10) || 0.4);
+    const thick = (parseFloat(queries.thick, 10) || 0.01);
+    const jitter = (parseFloat(queries.jitter, 10) || 0.0008);
+    const nowWeight = (parseFloat(queries.nowWeight, 10) || 1);
+    const pastWeight = (parseFloat(queries.pastWeight, 10) || 1);
+
+    console.log('track', track);
+    console.log('audioMode', audioMode);
+    console.log('audioOrders', audioOrders);
+    console.log('harmonies', harmonies);
+    console.log('falloff', falloff);
+    console.log('growth', growth);
+    console.log('radius', radius);
+    console.log('thick', thick);
+    console.log('jitter', jitter);
+    console.log('nowWeight', nowWeight);
+    console.log('pastWeight', pastWeight);
+
+
+    // Track
 
     const audio = Object.assign(new Audio(), {
             crossOrigin: 'anonymous',
@@ -62,7 +92,7 @@ export default (canvas, settings, debug) => {
             autoplay: true,
             muted: 'muted' in queries,
             className: 'track',
-            src: decodeURIComponent(queries.track || '%2Faudio.gitignored%2FTORCH%20SONGS%20(PRIVATE%20%26%20CONFIDENTIAL)%2FTorch%20Songs_Blaenavon_Elliott%20Smith_Everything%20Reminds%20Me%20Of%20Her.mp3')
+            src: decodeURIComponent(track)
         });
 
     canvas.parentElement.appendChild(audio);
@@ -102,10 +132,14 @@ export default (canvas, settings, debug) => {
                 viewRes,
                 past: buffers[1].color[0].bind(0),
                 audio: audioTexture.texture.bind(1),
-                audioScale,
                 harmonies,
                 falloff,
-                growth
+                growth,
+                radius,
+                thick,
+                jitter,
+                nowWeight,
+                pastWeight
             });
 
 
