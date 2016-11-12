@@ -39,7 +39,7 @@ vec3 sampler(vec2 uv) {
 #pragma glslify: sampleSound = require(./sample-sound)
 
 const vec2 mid = vec2(0.5);
-const vec4 curve = vec4(0.0, 0.0, 0.4, 1.0);
+const vec4 curve = vec4(0.0, 0.0, 1.0, 1.0);
 const float growLimit = 1.3;
 
 void main() {
@@ -47,7 +47,7 @@ void main() {
     vec2 pos = uvToPos(uv)/viewSize;
 
     float dist = length(pos);
-    float angle = mod(posToAngle(pos)+(spin*time), 1.0)/harmonies;
+    float angle = abs(mod(posToAngle(pos)+(spin*time), 1.0)/harmonies);
 
 
     // The light ring
