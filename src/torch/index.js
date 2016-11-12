@@ -62,7 +62,7 @@ export default (canvas, settings, debug) => {
     const track = (queries.track ||
         tracks[Math.floor(Math.random()*tracks.length)]);
 
-    const audioMode = (queries.audioMode || 'waveform');
+    const audioMode = (queries.audioMode || 'frequencies');
     const audioOrders = ((queries.audioOrders)? parseInt(queries.audioOrders, 10) : 2);
     const harmonies = ((queries.harmonies)? parseFloat(queries.harmonies, 10) : 1);
     const falloff = ((queries.falloff)? parseFloat(queries.falloff, 10) : 0.0001);
@@ -74,7 +74,7 @@ export default (canvas, settings, debug) => {
     const thick = ((queries.thick)? parseFloat(queries.thick, 10) : 0.007);
     const jitter = ((queries.jitter)? parseFloat(queries.jitter, 10) : 0.0008);
     const nowAlpha = ((queries.nowAlpha)? parseFloat(queries.nowAlpha, 10) : 1);
-    const pastAlpha = ((queries.pastAlpha)? parseFloat(queries.pastAlpha, 10) : 0.97);
+    const pastAlpha = ((queries.pastAlpha)? parseFloat(queries.pastAlpha, 10) : 0.98);
     const formAlpha = ((queries.formAlpha)? parseFloat(queries.formAlpha, 10) : 1);
     const ringAlpha = ((queries.ringAlpha)? parseFloat(queries.ringAlpha, 10) : 0.001);
 

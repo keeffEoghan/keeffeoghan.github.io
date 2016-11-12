@@ -38,7 +38,7 @@ void main() {
     vec2 pos = uvToPos(uv)/viewSize;
 
     float dist = length(pos);
-    float angle = mod(posToAngle(pos)+(spin*time), 1.0)/harmonies;
+    float angle = abs(mod(posToAngle(pos)+(spin*time), 1.0)/harmonies);
 
 
     // The light ring (again)
@@ -62,14 +62,13 @@ void main() {
 
     // Accumulate color
 
-    // vec4 light = vec4(hsv2rgb(vec3(angle, 0.8, 0.7)), sound);
     vec4 ring = vec4(sound);
     vec4 ambient = vec4(hsv2rgb(vec3(angle, 0.8, 0.7)), 1.0);
     vec4 geom = texture2D(form, uv);
 
+    // vec4 color = ring*ringAlpha;
+    // vec4 color = geom*formAlpha*ambient;
     vec4 color = (ring*ringAlpha)+(geom*formAlpha*ambient);
-    // vec4 color = (light*ringAlpha)+(geom*formAlpha*light);
-    // vec4 color = geom*light;
 
     gl_FragColor = color;
 }
