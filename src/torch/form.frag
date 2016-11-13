@@ -1,36 +1,13 @@
 precision highp float;
 
-uniform float start;
-uniform float time;
-uniform float dt;
-
-uniform vec2 viewSize;
-uniform vec2 viewRes;
-
-uniform sampler2D past;
-uniform sampler2D audio;
-
-uniform float harmonies;
-uniform float falloff;
-uniform float silent;
-uniform float grow;
-uniform float spin;
-
-uniform float radius;
-uniform float thick;
-
-uniform float jitter;
-
-uniform float nowAlpha;
-uniform float pastAlpha;
+#pragma glslify: import(./head)
 
 vec3 sampler(vec2 uv) {
     return texture2D(past, uv).rgb;
 }
 
 #pragma glslify: blur = require(glsl-hash-blur, sample = sampler, iterations = 3)
-
-#pragma glslify: map = require(glsl-map)
+#pragma glslify: noise = require(glsl-noise/simplex/3d)
 
 #pragma glslify: uvToPos = require(../tendrils/map/uv-to-pos)
 #pragma glslify: bezier = require(../tendrils/utils/bezier)
@@ -57,7 +34,7 @@ void main() {
         mod(time, 20.0));
 
 
-    // Accumulate color
+    // Accumulate colors
 
     // vec4 color = vec4(sound*falloff*nowAlpha)+(old*pastAlpha);
     vec4 color = vec4(clamp(sound*falloff*nowAlpha, 0.0, 1.0))+
