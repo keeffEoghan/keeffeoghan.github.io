@@ -52,35 +52,39 @@ export default (canvas, settings, debug) => {
 
 
     // Parameters...
-        const track = (decodeURIComponent(queries.track || '') ||
+        self.track = (decodeURIComponent(queries.track || '') ||
                 prompt('Enter a track URL:'));
 
-        const audioMode = (queries.audioMode || 'frequencies');
-        const audioOrders = ((queries.audioOrders)? parseInt(queries.audioOrders, 10) : 2);
-        const harmonies = ((queries.harmonies)? parseFloat(queries.harmonies, 10) : 1);
-        const falloff = ((queries.falloff)? parseFloat(queries.falloff, 10) : 0.00001);
-        const attenuate = ((queries.attenuate)? parseFloat(queries.attenuate, 10) : 0.02);
-        const silent = ((queries.silent)? parseFloat(queries.silent, 10) : 0);
-        const soundSmooth = ((queries.soundSmooth)? parseFloat(queries.soundSmooth, 10) : 0.3);
-        const soundWarp = ((queries.soundWarp)? parseFloat(queries.soundWarp, 10) : 0.007);
-        const noiseWarp = ((queries.noiseWarp)? parseFloat(queries.noiseWarp, 10) : 0.1);
-        const noiseSpeed = ((queries.noiseSpeed)? parseFloat(queries.noiseSpeed, 10) : 0.001);
-        const noiseScale = ((queries.noiseScale)? parseFloat(queries.noiseScale, 10) : 0.3);
-        const meanFulcrum = ((queries.meanFulcrum)? parseFloat(queries.meanFulcrum, 10) : 0.4);
-        const grow = ((queries.grow)? parseFloat(queries.grow, 10) : 0.0005);
-        const growLimit = ((queries.growLimit)? parseFloat(queries.growLimit, 10) : 1.6);
-        const spin = ((queries.spin)? parseFloat(queries.spin, 10) : 0);
-        const radius = ((queries.radius)? parseFloat(queries.radius, 10) : 0.3);
-        const thick = ((queries.thick)? parseFloat(queries.thick, 10) : 0.005);
-        const otherScale = ((queries.otherScale)? parseFloat(queries.otherScale, 10) : 0.002);
-        const otherEdge = ((queries.otherEdge)? parseFloat(queries.otherEdge, 10) : 4);
-        const jitter = ((queries.jitter)? parseFloat(queries.jitter, 10) : 0.0008);
-        const nowAlpha = ((queries.nowAlpha)? parseFloat(queries.nowAlpha, 10) : 1);
-        const pastAlpha = ((queries.pastAlpha)? parseFloat(queries.pastAlpha, 10) : 0.99);
-        const formAlpha = ((queries.formAlpha)? parseFloat(queries.formAlpha, 10) : 0.7);
-        const ringAlpha = ((queries.ringAlpha)? parseFloat(queries.ringAlpha, 10) : 0.001);
-        const bokehRadius = ((queries.bokehRadius)? parseFloat(queries.bokehRadius, 10) : 4);
-        const bokehAmount = ((queries.bokehAmount)? parseFloat(queries.bokehAmount, 10) : 60);
+        self.audioMode = (queries.audioMode || 'frequencies');
+        self.audioOrders = ((queries.audioOrders)? parseInt(queries.audioOrders, 10) : 2);
+        self.harmonies = ((queries.harmonies)? parseFloat(queries.harmonies, 10) : 1);
+        self.falloff = ((queries.falloff)? parseFloat(queries.falloff, 10) : 0.00001);
+        self.attenuate = ((queries.attenuate)? parseFloat(queries.attenuate, 10) : 0.02);
+        self.silent = ((queries.silent)? parseFloat(queries.silent, 10) : 0);
+        self.soundSmooth = ((queries.soundSmooth)? parseFloat(queries.soundSmooth, 10) : 0.3);
+        self.soundWarp = ((queries.soundWarp)? parseFloat(queries.soundWarp, 10) : 0.007);
+        self.noiseWarp = ((queries.noiseWarp)? parseFloat(queries.noiseWarp, 10) : 0.1);
+        self.noiseSpeed = ((queries.noiseSpeed)? parseFloat(queries.noiseSpeed, 10) : 0.001);
+        self.noiseScale = ((queries.noiseScale)? parseFloat(queries.noiseScale, 10) : 0.3);
+        self.meanFulcrum = ((queries.meanFulcrum)? parseFloat(queries.meanFulcrum, 10) : 0.4);
+        self.grow = ((queries.grow)? parseFloat(queries.grow, 10) : 0.0005);
+        self.growLimit = ((queries.growLimit)? parseFloat(queries.growLimit, 10) : 1.6);
+        self.spin = ((queries.spin)? parseFloat(queries.spin, 10) : 0.0001);
+        self.radius = ((queries.radius)? parseFloat(queries.radius, 10) : 0.3);
+        self.thick = ((queries.thick)? parseFloat(queries.thick, 10) : 0.005);
+        self.otherScale = ((queries.otherScale)? parseFloat(queries.otherScale, 10) : 0.002);
+        self.otherEdge = ((queries.otherEdge)? parseFloat(queries.otherEdge, 10) : 4);
+        self.jitter = ((queries.jitter)? parseFloat(queries.jitter, 10) : 0.002);
+        self.nowAlpha = ((queries.nowAlpha)? parseFloat(queries.nowAlpha, 10) : 1);
+        self.pastAlpha = ((queries.pastAlpha)? parseFloat(queries.pastAlpha, 10) : 0.99);
+        self.formAlpha = ((queries.formAlpha)? parseFloat(queries.formAlpha, 10) : 1);
+        self.ringAlpha = ((queries.ringAlpha)? parseFloat(queries.ringAlpha, 10) : 0.001);
+        self.bokehRadius = ((queries.bokehRadius)? parseFloat(queries.bokehRadius, 10) : 8);
+        self.bokehAmount = ((queries.bokehAmount)? parseFloat(queries.bokehAmount, 10) : 60);
+
+        self.ambient = ((queries.ambient)?
+                queries.ambient.split(',').map((v) => parseFloat(v, 10))
+            :   [1, 1, 1, 1]);
 
 
         console.log('track='+track);
@@ -110,6 +114,7 @@ export default (canvas, settings, debug) => {
         console.log('ringAlpha='+ringAlpha);
         console.log('bokehRadius='+bokehRadius);
         console.log('bokehAmount='+bokehAmount);
+        console.log('ambient='+ambient);
 
 
     // Track
@@ -191,7 +196,8 @@ export default (canvas, settings, debug) => {
                 nowAlpha,
                 pastAlpha,
                 formAlpha,
-                ringAlpha
+                ringAlpha,
+                ambient
             });
 
 
