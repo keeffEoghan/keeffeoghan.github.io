@@ -61,7 +61,8 @@ export default (canvas, settings, debug) => {
         const falloff = ((queries.falloff)? parseFloat(queries.falloff, 10) : 0.0001);
         const attenuate = ((queries.attenuate)? parseFloat(queries.attenuate, 10) : 0.1);
         const silent = ((queries.silent)? parseFloat(queries.silent, 10) : 0);
-        const soundWarp = ((queries.soundWarp)? parseFloat(queries.soundWarp, 10) : 0.02);
+        const soundSmooth = ((queries.soundSmooth)? parseFloat(queries.soundSmooth, 10) : 0.3);
+        const soundWarp = ((queries.soundWarp)? parseFloat(queries.soundWarp, 10) : 0.005);
         const meanFulcrum = ((queries.meanFulcrum)? parseFloat(queries.meanFulcrum, 10) : 0.3);
         const grow = ((queries.grow)? parseFloat(queries.grow, 10) : 0.0005);
         const spin = ((queries.spin)? parseFloat(queries.spin, 10) : 0);
@@ -83,6 +84,7 @@ export default (canvas, settings, debug) => {
         console.log('falloff='+falloff);
         console.log('attenuate='+attenuate);
         console.log('silent='+silent);
+        console.log('soundSmooth='+soundSmooth);
         console.log('soundWarp='+soundWarp);
         console.log('meanFulcrum='+meanFulcrum);
         console.log('grow='+grow);
@@ -117,6 +119,7 @@ export default (canvas, settings, debug) => {
     const audioAnalyser = analyser(audio);
 
     audioAnalyser.analyser.fftSize = 2**11;
+    uniforms.frequencies = audioAnalyser.analyser.frequencyBinCount;
 
     const audioTrigger = new AudioTrigger(audioAnalyser, audioOrders);
 
@@ -155,6 +158,7 @@ export default (canvas, settings, debug) => {
                 falloff,
                 attenuate,
                 silent,
+                soundSmooth,
                 soundWarp,
                 grow,
                 spin,
