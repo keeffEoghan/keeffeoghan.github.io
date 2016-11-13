@@ -33,23 +33,19 @@ node_modules/.bin: package.json
 	npm install;
 	touch $@;
 
-# Convenience: merge whatever's on `develop` branch into `gh-pages` and push it.
+# Convenience: merge into `gh-pages` and push it.
 # Before doing this, make sure you've got a clean `git` stage, and you're not
 # running any build tasks...
 # This is still an interactive command - it still requires user input.
-gh-pages:
+deploy:
+	$(eval BRANCH = $(shell git rev-parse --abbrev-ref HEAD))
+	@echo "Switching to 'gh-pages' from '$(BRANCH)'"
 	git checkout gh-pages
-	git fetch origin develop
-	git merge FETCH_HEAD
+	git merge $(BRANCH)
 	make dist
 	git add -f build
 	git commit
 	git push
-
-deploy:
-	$(eval BRANCH = $(shell git rev-parse --abbrev-ref HEAD))
-	@echo "Switching to 'gh-pages' from '$(BRANCH)'"
-	-make gh-pages
 	@echo "Switching to '$(BRANCH)' from 'gh-pages'"
 	git checkout $(BRANCH)
 
