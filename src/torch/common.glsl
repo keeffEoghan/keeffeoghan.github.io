@@ -17,8 +17,12 @@ float amp = max(abs(soundKernel/(1.0+(2.0*soundSmooth))), silent);
 
 
 // The light ring
-// float sdf = clamp(abs(dist-radius-thick), 0.0, 1.0);
-float sdf = clamp(abs(dist-(radius+(soundWarp*mean*amp)))-thick, 0.0, 1.0);
+
+float warp = (mean*amp*soundWarp)+
+    (noise(vec3(pos, time*noiseSpeed))*noiseWarp*mean);
+
+// float sdf = clamp(abs(dist-radius-thick), 0.0, 1.0)
+float sdf = clamp(abs(dist-radius-warp)-thick, 0.0, 1.0);
 
 // Light attenuation
 // @see Attenuation: http://gamedev.stackexchange.com/questions/56897/glsl-light-attenuation-color-and-intensity-formula

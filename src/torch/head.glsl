@@ -9,6 +9,7 @@ uniform sampler2D past;
 uniform sampler2D audio;
 
 uniform float peak;
+uniform float peakPos;
 uniform float mean;
 
 uniform float frequencies;
@@ -16,6 +17,9 @@ uniform float harmonies;
 uniform float silent;
 uniform float soundSmooth;
 uniform float soundWarp;
+
+uniform float noiseWarp;
+uniform float noiseSpeed;
 
 uniform float falloff;
 uniform float attenuate;

@@ -4,6 +4,8 @@ precision highp float;
 
 uniform sampler2D form;
 
+#pragma glslify: noise = require(glsl-noise/simplex/3d)
+
 #pragma glslify: hsv2rgb = require(../../libs/glsl-hsv/hsv-rgb)
 
 #pragma glslify: uvToPos = require(../tendrils/map/uv-to-pos)

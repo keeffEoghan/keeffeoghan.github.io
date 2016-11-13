@@ -19,7 +19,7 @@ import bokehFrag from '../tendrils/screen/bokeh.frag';
 
 import AudioTrigger from '../tendrils/audio/';
 import AudioTexture from '../tendrils/audio/data-texture';
-import { peak, meanWeight } from '../tendrils/analyse';
+import { peakPos, meanWeight } from '../tendrils/analyse';
 
 import { containAspect } from '../tendrils/utils/aspect';
 
@@ -63,15 +63,17 @@ export default (canvas, settings, debug) => {
         const silent = ((queries.silent)? parseFloat(queries.silent, 10) : 0);
         const soundSmooth = ((queries.soundSmooth)? parseFloat(queries.soundSmooth, 10) : 0.3);
         const soundWarp = ((queries.soundWarp)? parseFloat(queries.soundWarp, 10) : 0.005);
-        const meanFulcrum = ((queries.meanFulcrum)? parseFloat(queries.meanFulcrum, 10) : 0.3);
+        const noiseWarp = ((queries.noiseWarp)? parseFloat(queries.noiseWarp, 10) : 0.0025);
+        const noiseSpeed = ((queries.noiseSpeed)? parseFloat(queries.noiseSpeed, 10) : 0.001);
+        const meanFulcrum = ((queries.meanFulcrum)? parseFloat(queries.meanFulcrum, 10) : 0.4);
         const grow = ((queries.grow)? parseFloat(queries.grow, 10) : 0.0005);
         const spin = ((queries.spin)? parseFloat(queries.spin, 10) : 0);
-        const radius = ((queries.radius)? parseFloat(queries.radius, 10) : 0.4);
+        const radius = ((queries.radius)? parseFloat(queries.radius, 10) : 0.3);
         const thick = ((queries.thick)? parseFloat(queries.thick, 10) : 0);
         const jitter = ((queries.jitter)? parseFloat(queries.jitter, 10) : 0.0008);
         const nowAlpha = ((queries.nowAlpha)? parseFloat(queries.nowAlpha, 10) : 1);
         const pastAlpha = ((queries.pastAlpha)? parseFloat(queries.pastAlpha, 10) : 0.99);
-        const formAlpha = ((queries.formAlpha)? parseFloat(queries.formAlpha, 10) : 0.6);
+        const formAlpha = ((queries.formAlpha)? parseFloat(queries.formAlpha, 10) : 0.7);
         const ringAlpha = ((queries.ringAlpha)? parseFloat(queries.ringAlpha, 10) : 0.001);
         const bokehRadius = ((queries.bokehRadius)? parseFloat(queries.bokehRadius, 10) : 1.6);
         const bokehAmount = ((queries.bokehAmount)? parseFloat(queries.bokehAmount, 10) : 60);
@@ -86,6 +88,8 @@ export default (canvas, settings, debug) => {
         console.log('silent='+silent);
         console.log('soundSmooth='+soundSmooth);
         console.log('soundWarp='+soundWarp);
+        console.log('noiseWarp='+noiseWarp);
+        console.log('noiseSpeed='+noiseSpeed);
         console.log('meanFulcrum='+meanFulcrum);
         console.log('grow='+grow);
         console.log('spin='+spin);
@@ -139,11 +143,13 @@ export default (canvas, settings, debug) => {
         // audioTexture[audioMode](audioTrigger.dataOrder(-1));
         audioTexture.apply();
 
+        let audioPeak = peakPos(audioTexture.array.data);
+
 
         // Render - common
 
         gl.viewport(0, 0, viewRes[0], viewRes[1]);
-        
+
         Object.assign(uniforms, {
                 start: timer.since,
                 time: timer.time,
@@ -152,7 +158,8 @@ export default (canvas, settings, debug) => {
                 viewRes,
                 past: buffers[1].color[0].bind(0),
                 audio: audioTexture.texture.bind(1),
-                peak: peak(audioTexture.array.data),
+                peak: audioPeak.peak,
+                peakPos: audioPeak.pos,
                 mean: meanWeight(audioTexture.array.data, meanFulcrum),
                 harmonies,
                 falloff,
@@ -160,6 +167,8 @@ export default (canvas, settings, debug) => {
                 silent,
                 soundSmooth,
                 soundWarp,
+                noiseWarp,
+                noiseSpeed,
                 grow,
                 spin,
                 radius,
