@@ -13,9 +13,9 @@ import Screen from '../tendrils/screen';
 
 import screenVert from '../tendrils/screen/index.vert';
 // import screenFrag from '../tendrils/screen/index.frag';
-// import copyFrag from '../tendrils/screen/copy.frag';
 import formFrag from './form.frag';
 import drawFrag from './draw.frag';
+import bokehFrag from '../tendrils/screen/bokeh.frag';
 
 import AudioTrigger from '../tendrils/audio/';
 import AudioTexture from '../tendrils/audio/data-texture';
@@ -46,54 +46,59 @@ export default (canvas, settings, debug) => {
     const viewSize = [0, 0];
 
     const buffers = [FBO(gl, [1, 1]), FBO(gl, [1, 1])];
+    const post = FBO(gl, [1, 1]);
 
     const uniforms = {};
 
     const screen = new Screen(gl);
 
     // const screenShader = shader(gl, screenVert, screenFrag);
-    // const copyShader = shader(gl, screenVert, copyFrag);
     const formShader = shader(gl, screenVert, formFrag);
     const drawShader = shader(gl, screenVert, drawFrag);
+    const bokehShader = shader(gl, screenVert, bokehFrag);
 
 
-    // Parameters
+    // Parameters...
+        const track = (queries.track ||
+            tracks[Math.floor(Math.random()*tracks.length)]);
 
-    const track = (queries.track ||
-        tracks[Math.floor(Math.random()*tracks.length)]);
+        const audioMode = (queries.audioMode || 'frequencies');
+        const audioOrders = ((queries.audioOrders)? parseInt(queries.audioOrders, 10) : 2);
+        const harmonies = ((queries.harmonies)? parseFloat(queries.harmonies, 10) : 1);
+        const falloff = ((queries.falloff)? parseFloat(queries.falloff, 10) : 0.0001);
+        const attenuate = ((queries.attenuate)? parseFloat(queries.attenuate, 10) : 0.1);
+        const silent = ((queries.silent)? parseFloat(queries.silent, 10) : 0);
+        const grow = ((queries.grow)? parseFloat(queries.grow, 10) : 0.0005);
+        const spin = ((queries.spin)? parseFloat(queries.spin, 10) : 0);
+        const radius = ((queries.radius)? parseFloat(queries.radius, 10) : 0.4);
+        const thick = ((queries.thick)? parseFloat(queries.thick, 10) : 0);
+        const jitter = ((queries.jitter)? parseFloat(queries.jitter, 10) : 0.0008);
+        const nowAlpha = ((queries.nowAlpha)? parseFloat(queries.nowAlpha, 10) : 1);
+        const pastAlpha = ((queries.pastAlpha)? parseFloat(queries.pastAlpha, 10) : 0.99);
+        const formAlpha = ((queries.formAlpha)? parseFloat(queries.formAlpha, 10) : 1);
+        const ringAlpha = ((queries.ringAlpha)? parseFloat(queries.ringAlpha, 10) : 0.001);
+        const bokehRadius = ((queries.bokehRadius)? parseFloat(queries.bokehRadius, 10) : 0.8);
+        const bokehAmount = ((queries.bokehAmount)? parseFloat(queries.bokehAmount, 10) : 60);
 
-    const audioMode = (queries.audioMode || 'frequencies');
-    const audioOrders = ((queries.audioOrders)? parseInt(queries.audioOrders, 10) : 2);
-    const harmonies = ((queries.harmonies)? parseFloat(queries.harmonies, 10) : 1);
-    const falloff = ((queries.falloff)? parseFloat(queries.falloff, 10) : 0.0001);
-    const attenuate = ((queries.attenuate)? parseFloat(queries.attenuate, 10) : 0.1);
-    const silent = ((queries.silent)? parseFloat(queries.silent, 10) : 0);
-    const grow = ((queries.grow)? parseFloat(queries.grow, 10) : 0.0005);
-    const spin = ((queries.spin)? parseFloat(queries.spin, 10) : 0.00005);
-    const radius = ((queries.radius)? parseFloat(queries.radius, 10) : 0.4);
-    const thick = ((queries.thick)? parseFloat(queries.thick, 10) : 0.007);
-    const jitter = ((queries.jitter)? parseFloat(queries.jitter, 10) : 0.0008);
-    const nowAlpha = ((queries.nowAlpha)? parseFloat(queries.nowAlpha, 10) : 1);
-    const pastAlpha = ((queries.pastAlpha)? parseFloat(queries.pastAlpha, 10) : 0.98);
-    const formAlpha = ((queries.formAlpha)? parseFloat(queries.formAlpha, 10) : 1);
-    const ringAlpha = ((queries.ringAlpha)? parseFloat(queries.ringAlpha, 10) : 0.001);
 
-    console.log('track='+track);
-    console.log('audioMode='+audioMode);
-    console.log('audioOrders='+audioOrders);
-    console.log('harmonies='+harmonies);
-    console.log('falloff='+falloff);
-    console.log('attenuate='+attenuate);
-    console.log('silent='+silent);
-    console.log('grow='+grow);
-    console.log('spin='+spin);
-    console.log('radius='+radius);
-    console.log('thick='+thick);
-    console.log('jitter='+jitter);
-    console.log('nowAlpha='+nowAlpha);
-    console.log('pastAlpha='+pastAlpha);
-    console.log('formAlpha='+formAlpha);
-    console.log('ringAlpha='+ringAlpha);
+        console.log('track='+track);
+        console.log('audioMode='+audioMode);
+        console.log('audioOrders='+audioOrders);
+        console.log('harmonies='+harmonies);
+        console.log('falloff='+falloff);
+        console.log('attenuate='+attenuate);
+        console.log('silent='+silent);
+        console.log('grow='+grow);
+        console.log('spin='+spin);
+        console.log('radius='+radius);
+        console.log('thick='+thick);
+        console.log('jitter='+jitter);
+        console.log('nowAlpha='+nowAlpha);
+        console.log('pastAlpha='+pastAlpha);
+        console.log('formAlpha='+formAlpha);
+        console.log('ringAlpha='+ringAlpha);
+        console.log('bokehRadius='+bokehRadius);
+        console.log('bokehAmount='+bokehAmount);
 
 
     // Track
@@ -172,11 +177,28 @@ export default (canvas, settings, debug) => {
 
         // Screen pass - draw the light and form
 
-        gl.bindFramebuffer(gl.FRAMEBUFFER, null);
+        post.bind();
+        // gl.bindFramebuffer(gl.FRAMEBUFFER, null);
         drawShader.bind();
 
         Object.assign(drawShader.uniforms, uniforms, {
                 form: buffers[0].color[0].bind(0)
+            });
+
+        screen.render();
+
+
+        // Post pass
+
+        gl.bindFramebuffer(gl.FRAMEBUFFER, null);
+        bokehShader.bind();
+
+        Object.assign(bokehShader.uniforms, uniforms, {
+                view: post.color[0].bind(0),
+                resolution: viewRes,
+                time: timer.time,
+                radius: bokehRadius,
+                amount: bokehAmount
             });
 
         screen.render();
@@ -196,6 +218,7 @@ export default (canvas, settings, debug) => {
         containAspect(viewSize, viewRes);
 
         each((buffer) => buffer.shape = viewRes, buffers);
+        post.shape = viewRes;
     }
 
 
