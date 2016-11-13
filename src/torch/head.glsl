@@ -11,15 +11,17 @@ uniform sampler2D audio;
 uniform float peak;
 uniform float mean;
 
+uniform float frequencies;
 uniform float harmonies;
 uniform float silent;
+uniform float soundSmooth;
+uniform float soundWarp;
 
 uniform float falloff;
 uniform float attenuate;
 
 uniform float grow;
 uniform float spin;
-uniform float soundWarp;
 
 uniform float radius;
 uniform float thick;

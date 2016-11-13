@@ -34,8 +34,6 @@ void main() {
     old.rgb = blur(pastUV, jitter*growRate, viewRes.x/viewRes.y,
         mod(time, 20.0));
 
-    // old.rgb *= old.rgb*1.1;
-
 
     // Accumulate color
 

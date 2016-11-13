@@ -7,11 +7,18 @@ vec2 pos = uvToPos(uv)/viewSize;
 float dist = length(pos);
 float angle = abs(mod(posToAngle(pos)+(spin*time), 1.0)/harmonies);
 
-float amp = max(abs(sampleSound(audio, angle).x), silent);
+float frequencyOffset = 1.0/frequencies;
+
+float soundKernel = sampleSound(audio, angle).x+
+    (sampleSound(audio, angle-frequencyOffset).x*soundSmooth)+
+    (sampleSound(audio, angle+frequencyOffset).x*soundSmooth);
+
+float amp = max(abs(soundKernel/(1.0+(2.0*soundSmooth))), silent);
 
 
 // The light ring
-float sdf = clamp(abs(dist-(radius+(soundWarp*mean*amp))-thick), 0.0, 1.0);
+// float sdf = clamp(abs(dist-radius-thick), 0.0, 1.0);
+float sdf = clamp(abs(dist-(radius+(soundWarp*mean*amp)))-thick, 0.0, 1.0);
 
 // Light attenuation
 // @see Attenuation: http://gamedev.stackexchange.com/questions/56897/glsl-light-attenuation-color-and-intensity-formula
