@@ -649,7 +649,7 @@ export default (canvas, settings, debug) => {
          * @todo Spectogram with frequencies on x-axis, waveform on y; or
          *       something better than this 1D list.
          */
-        audioTexture.frequency(trackTrigger.dataOrder(0)).apply();
+        audioTexture.frequencies(trackTrigger.dataOrder(0)).apply();
 
         // Blend the color maps into tendrils one
         // @todo Only do this if necessary (skip if none or only one has alpha)
@@ -662,7 +662,8 @@ export default (canvas, settings, debug) => {
             // Blur to the screen
 
             gl.bindFramebuffer(gl.FRAMEBUFFER, null);
-            tendrils.drawFade();
+            gl.clear(gl.COLOR_BUFFER_BIT);
+
             blurShader.bind();
 
             Object.assign(blurShader.uniforms, {
@@ -1395,7 +1396,7 @@ export default (canvas, settings, debug) => {
                 to: {
                     noiseScale: 0.4,
                     varyNoiseScale: 12,
-                    noiseSpeed: 0.0003
+                    noiseSpeed: 0.0001
                 },
                 time: 254000,
                 ease: [0, 0, 1]
@@ -1451,7 +1452,7 @@ export default (canvas, settings, debug) => {
                     noiseWeight: 0.003,
                     noiseScale: 1.2,
                     varyNoiseScale: -4,
-                    noiseSpeed: 0.0001,
+                    noiseSpeed: 0.0003,
                     varyNoiseSpeed: 0.01
                 },
                 time: 257600,

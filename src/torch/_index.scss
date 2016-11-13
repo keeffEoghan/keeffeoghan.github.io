@@ -1,0 +1,14 @@
+canvas {
+    display: block;
+    position: fixed;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    right: 0;
+    background: #000;
+    transition: background-color 200ms ease-in-out;
+
+    &.light {
+        background: #fff;
+    }
+}
