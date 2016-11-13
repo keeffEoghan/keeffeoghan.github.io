@@ -19,6 +19,7 @@ import bokehFrag from '../tendrils/screen/bokeh.frag';
 
 import AudioTrigger from '../tendrils/audio/';
 import AudioTexture from '../tendrils/audio/data-texture';
+import { peak, meanWeight } from '../tendrils/analyse';
 
 import { containAspect } from '../tendrils/utils/aspect';
 
@@ -60,6 +61,8 @@ export default (canvas, settings, debug) => {
         const falloff = ((queries.falloff)? parseFloat(queries.falloff, 10) : 0.0001);
         const attenuate = ((queries.attenuate)? parseFloat(queries.attenuate, 10) : 0.1);
         const silent = ((queries.silent)? parseFloat(queries.silent, 10) : 0);
+        const soundWarp = ((queries.soundWarp)? parseFloat(queries.soundWarp, 10) : 0.02);
+        const meanFulcrum = ((queries.meanFulcrum)? parseFloat(queries.meanFulcrum, 10) : 0.3);
         const grow = ((queries.grow)? parseFloat(queries.grow, 10) : 0.0005);
         const spin = ((queries.spin)? parseFloat(queries.spin, 10) : 0);
         const radius = ((queries.radius)? parseFloat(queries.radius, 10) : 0.4);
@@ -67,9 +70,9 @@ export default (canvas, settings, debug) => {
         const jitter = ((queries.jitter)? parseFloat(queries.jitter, 10) : 0.0008);
         const nowAlpha = ((queries.nowAlpha)? parseFloat(queries.nowAlpha, 10) : 1);
         const pastAlpha = ((queries.pastAlpha)? parseFloat(queries.pastAlpha, 10) : 0.99);
-        const formAlpha = ((queries.formAlpha)? parseFloat(queries.formAlpha, 10) : 1);
+        const formAlpha = ((queries.formAlpha)? parseFloat(queries.formAlpha, 10) : 0.6);
         const ringAlpha = ((queries.ringAlpha)? parseFloat(queries.ringAlpha, 10) : 0.001);
-        const bokehRadius = ((queries.bokehRadius)? parseFloat(queries.bokehRadius, 10) : 0.8);
+        const bokehRadius = ((queries.bokehRadius)? parseFloat(queries.bokehRadius, 10) : 1.6);
         const bokehAmount = ((queries.bokehAmount)? parseFloat(queries.bokehAmount, 10) : 60);
 
 
@@ -80,6 +83,8 @@ export default (canvas, settings, debug) => {
         console.log('falloff='+falloff);
         console.log('attenuate='+attenuate);
         console.log('silent='+silent);
+        console.log('soundWarp='+soundWarp);
+        console.log('meanFulcrum='+meanFulcrum);
         console.log('grow='+grow);
         console.log('spin='+spin);
         console.log('radius='+radius);
@@ -144,15 +149,20 @@ export default (canvas, settings, debug) => {
                 viewRes,
                 past: buffers[1].color[0].bind(0),
                 audio: audioTexture.texture.bind(1),
+                peak: peak(audioTexture.array.data),
+                mean: meanWeight(audioTexture.array.data, meanFulcrum),
                 harmonies,
                 falloff,
                 attenuate,
                 silent,
+                soundWarp,
                 grow,
                 spin,
                 radius,
                 thick,
                 jitter,
+                bokehRadius,
+                bokehAmount,
                 nowAlpha,
                 pastAlpha,
                 formAlpha,

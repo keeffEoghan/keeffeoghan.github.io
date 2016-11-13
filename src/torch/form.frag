@@ -1,28 +1,6 @@
 precision highp float;
 
-uniform float start;
-uniform float time;
-uniform float dt;
-
-uniform vec2 viewSize;
-uniform vec2 viewRes;
-
-uniform sampler2D past;
-uniform sampler2D audio;
-
-uniform float harmonies;
-uniform float falloff;
-uniform float silent;
-uniform float grow;
-uniform float spin;
-
-uniform float radius;
-uniform float thick;
-
-uniform float jitter;
-
-uniform float nowAlpha;
-uniform float pastAlpha;
+#pragma glslify: import(./head)
 
 vec3 sampler(vec2 uv) {
     return texture2D(past, uv).rgb;
@@ -55,6 +33,8 @@ void main() {
 
     old.rgb = blur(pastUV, jitter*growRate, viewRes.x/viewRes.y,
         mod(time, 20.0));
+
+    // old.rgb *= old.rgb*1.1;
 
 
     // Accumulate color
