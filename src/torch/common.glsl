@@ -19,7 +19,7 @@ float amp = max(abs(soundKernel/(1.0+(2.0*soundSmooth))), silent);
 // The light ring
 
 float warp = (mean*amp*soundWarp)+
-    (noise(vec3(pos, time*noiseSpeed))*noiseWarp*mean);
+    (noise(vec3(pos*(1.0+noiseScale*peak), time*noiseSpeed))*noiseWarp*mean);
 
 // float sdf = clamp(abs(dist-radius-thick), 0.0, 1.0)
 float sdf = clamp(abs(dist-radius-warp)-thick, 0.0, 1.0);
@@ -35,3 +35,7 @@ float fade = 1.0/sdf/sdf;
 
 // Sound
 float sound = fade*amp;
+
+
+// Elements
+

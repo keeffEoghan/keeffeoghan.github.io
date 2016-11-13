@@ -20,6 +20,7 @@ uniform float soundWarp;
 
 uniform float noiseWarp;
 uniform float noiseSpeed;
+uniform float noiseScale;
 
 uniform float falloff;
 uniform float attenuate;
