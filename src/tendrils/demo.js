@@ -662,7 +662,7 @@ export default (canvas, settings, debug) => {
             // Blur to the screen
 
             gl.bindFramebuffer(gl.FRAMEBUFFER, null);
-            gl.clear(gl.COLOR_BUFFER_BIT);
+            tendrils.drawFade();
 
             blurShader.bind();
 
