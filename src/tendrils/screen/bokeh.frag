@@ -9,7 +9,11 @@ uniform sampler2D view;
 uniform vec2 resolution;
 uniform float time;
 
-#pragma glslify: bokeh = require(../../../libs/bokeh, iterations = 20)
+vec3 sampler(vec2 uv) {
+    return texture2D(view, uv).rgb;
+}
+
+#pragma glslify: bokeh = require(../../../libs/bokeh, iterations = 20, sample = sampler)
 #pragma glslify: vignette = require(../filter/vignette)
 
 const vec4 falloff = vec4(0.0, 1.0, 1.0, 1.0);
@@ -24,6 +28,6 @@ void main() {
     vec2 texel = 1.0/resolution;
     float power = 1.0-vignette(uv, mid, limit, falloff);
 
-    gl_FragColor = vec4(bokeh(view, texel, uv, radius*power, amount*power),
+    gl_FragColor = vec4(bokeh(texel, uv, radius*power, amount*power),
             texture2D(view, uv).a);
 }
