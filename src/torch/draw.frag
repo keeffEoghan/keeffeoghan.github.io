@@ -22,7 +22,7 @@ void main() {
     vec4 ring = vec4(sound*attenuate);
 
     // vec4 ambient = vec4(hsv2rgb(vec3(angle, 0.8, 0.7)), 1.0);
-    vec4 ambient = vec4(1.0);
+    vec4 ambient = vec4(0.5, 0.8, 1.0, 1.0);
     // vec4 diffuse = vec4(1.0);
     vec4 geom = texture2D(form, uv);
 
