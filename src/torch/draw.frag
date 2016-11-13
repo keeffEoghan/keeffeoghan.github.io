@@ -21,18 +21,12 @@ void main() {
 
     vec4 ring = vec4(sound*attenuate);
 
-    // vec4 ambient = vec4(hsv2rgb(vec3(angle, 0.8, 0.7)), 1.0);
-    vec4 ambient = vec4(0.5, 0.8, 1.0, 1.0);
-    // vec4 diffuse = vec4(1.0);
     vec4 geom = texture2D(form, uv);
 
     // vec4 color = ring*ringAlpha;
     // vec4 color = geom*formAlpha*ambient;
 
-    vec4 color = (ring*ringAlpha)+
-        // (((geom*ambient)+(geom*diffuse*attenuate/dist))*formAlpha);
-        // (geom*formAlpha*diffuse*attenuate/dist);
-        (geom*formAlpha*ambient);
+    vec4 color = (ring*ringAlpha)+(geom*formAlpha*ambient);
 
     gl_FragColor = color;
 }

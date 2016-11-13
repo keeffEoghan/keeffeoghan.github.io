@@ -43,3 +43,5 @@ uniform float nowAlpha;
 uniform float pastAlpha;
 uniform float formAlpha;
 uniform float ringAlpha;
+
+uniform vec4 ambient;
