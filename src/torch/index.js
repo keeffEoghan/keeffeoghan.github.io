@@ -25,14 +25,6 @@ import { containAspect } from '../tendrils/utils/aspect';
 import each from '../fp/each';
 import { step } from '../utils';
 
-const tracks = [
-    '%2Faudio.gitignored%2FTORCH%20SONGS%20(PRIVATE%20%26%20CONFIDENTIAL)%2FTorch%20Songs_Blaenavon_Elliott%20Smith_Everything%20Reminds%20Me%20Of%20Her.mp3',
-    // '%2Faudio.gitignored%2FTORCH%20SONGS%20(PRIVATE%20%26%20CONFIDENTIAL)%2FTorch%20Songs_Frank%20Turner_The%20Mountain%20Goats_This%20Year.aif',
-    '%2Faudio.gitignored%2FTORCH%20SONGS%20(PRIVATE%20%26%20CONFIDENTIAL)%2FTorch%20Songs_Retro%20Kid_Smokey%20Robinson_Tracks%20Of%20My%20Tears.mp3',
-    '%2Faudio.gitignored%2FTORCH%20SONGS%20(PRIVATE%20%26%20CONFIDENTIAL)%2FTorch%20Songs_Satellites_Talk%20Talk_Life\'s%20What%20You%20Make%20It.mp3',
-    '%2Faudio.gitignored%2FTORCH%20SONGS%20(PRIVATE%20%26%20CONFIDENTIAL)%2FTorch%20Songs_Years%20%26%20Years_Joni%20Mitchell_Both%20Sides%20Now.wav'
-];
-
 export default (canvas, settings, debug) => {
     const queries = querystring.parse(location.search.slice(1));
 
@@ -59,8 +51,8 @@ export default (canvas, settings, debug) => {
 
 
     // Parameters...
-        const track = (queries.track ||
-            tracks[Math.floor(Math.random()*tracks.length)]);
+        const track = (decodeURIComponent(queries.track || '') ||
+                prompt('Enter a track URL:'));
 
         const audioMode = (queries.audioMode || 'frequencies');
         const audioOrders = ((queries.audioOrders)? parseInt(queries.audioOrders, 10) : 2);
@@ -109,7 +101,10 @@ export default (canvas, settings, debug) => {
             autoplay: true,
             muted: 'muted' in queries,
             className: 'track',
-            src: decodeURIComponent(track)
+            src: ((track.match(/^(https)?(:\/\/)?(www\.)?dropbox\.com\/s\//gi))?
+                    track.replace(/^((https)?(:\/\/)?(www\.)?)dropbox\.com\/s\/(.*)\?dl=(0)$/gi,
+                        'https://dl.dropboxusercontent.com/s/$5?dl=1&raw=1')
+                :   track)
         });
 
     canvas.parentElement.appendChild(audio);
