@@ -16,8 +16,7 @@ vec3 sampler(vec2 uv) {
 #pragma glslify: sampleSound = require(./sample-sound)
 
 const vec2 mid = vec2(0.5);
-const vec4 curve = vec4(0.0, 0.0, 1.0, 1.0);
-const float growLimit = 1.3;
+const vec3 curve = vec3(0.0, 1.0, 1.0);
 
 void main() {
     #pragma glslify: import(./common)

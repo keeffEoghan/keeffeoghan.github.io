@@ -25,11 +25,15 @@ uniform float noiseScale;
 uniform float falloff;
 uniform float attenuate;
 
+uniform float growLimit;
 uniform float grow;
 uniform float spin;
 
 uniform float radius;
 uniform float thick;
+
+uniform float otherScale;
+uniform float otherEdge;
 
 uniform float jitter;
 uniform float bokehRadius;
