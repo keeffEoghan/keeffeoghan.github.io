@@ -43,7 +43,7 @@ const vec4 curve = vec4(0.0, 0.0, 1.0, 1.0);
 const float growLimit = 1.3;
 
 void main() {
-#pragma glslify: import(./common)
+    #pragma glslify: import(./common)
 
     // Sample and grow the past state
     
@@ -53,7 +53,8 @@ void main() {
 
     vec4 old = texture2D(past, pastUV);
 
-    old.rgb = blur(pastUV, jitter*growRate, viewRes.x/viewRes.y, mod(time, 20.0));
+    old.rgb = blur(pastUV, jitter*growRate, viewRes.x/viewRes.y,
+        mod(time, 20.0));
 
 
     // Accumulate color

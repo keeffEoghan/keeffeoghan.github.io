@@ -1,6 +1,7 @@
 #pragma glslify: bezier = require(../utils/bezier)
 
 
+// @todo Remove the `1.0-` here?
 float amount(vec2 point, vec2 mid, float limit) {
     return min(1.0-(length(point-mid)/limit), 1.0);
 }
