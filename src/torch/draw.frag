@@ -1,27 +1,10 @@
-// @todo Remove duplication
-
 precision highp float;
 
-uniform float start;
-uniform float time;
-uniform float dt;
+#pragma glslify: import(./head)
 
-uniform vec2 viewSize;
-uniform vec2 viewRes;
-
-uniform sampler2D audio;
 uniform sampler2D form;
 
-uniform float harmonies;
-uniform float attenuate;
-uniform float silent;
-uniform float spin;
-
-uniform float radius;
-uniform float thick;
-
-uniform float formAlpha;
-uniform float ringAlpha;
+#pragma glslify: noise = require(glsl-noise/simplex/3d)
 
 #pragma glslify: hsv2rgb = require(../../libs/glsl-hsv/hsv-rgb)
 
