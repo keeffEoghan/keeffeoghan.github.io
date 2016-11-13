@@ -65,6 +65,7 @@ export default (canvas, settings, debug) => {
         const soundWarp = ((queries.soundWarp)? parseFloat(queries.soundWarp, 10) : 0.005);
         const noiseWarp = ((queries.noiseWarp)? parseFloat(queries.noiseWarp, 10) : 0.0025);
         const noiseSpeed = ((queries.noiseSpeed)? parseFloat(queries.noiseSpeed, 10) : 0.001);
+        const noiseScale = ((queries.noiseScale)? parseFloat(queries.noiseScale, 10) : 5);
         const meanFulcrum = ((queries.meanFulcrum)? parseFloat(queries.meanFulcrum, 10) : 0.4);
         const grow = ((queries.grow)? parseFloat(queries.grow, 10) : 0.0005);
         const spin = ((queries.spin)? parseFloat(queries.spin, 10) : 0);
@@ -90,6 +91,7 @@ export default (canvas, settings, debug) => {
         console.log('soundWarp='+soundWarp);
         console.log('noiseWarp='+noiseWarp);
         console.log('noiseSpeed='+noiseSpeed);
+        console.log('noiseScale='+noiseScale);
         console.log('meanFulcrum='+meanFulcrum);
         console.log('grow='+grow);
         console.log('spin='+spin);
@@ -169,6 +171,7 @@ export default (canvas, settings, debug) => {
                 soundWarp,
                 noiseWarp,
                 noiseSpeed,
+                noiseScale,
                 grow,
                 spin,
                 radius,
