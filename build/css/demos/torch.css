@@ -28,4 +28,6 @@ canvas { display: block; position: fixed; top: 0; left: 0; bottom: 0; right: 0; 
 
 canvas.light { background: #fff; }
 
+.show-params { position: absolute; z-index: 10; top: 1em; right: 1em; }
+
 /*# sourceMappingURL=torch.css.map */
