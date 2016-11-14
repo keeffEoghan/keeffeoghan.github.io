@@ -24,6 +24,8 @@ import { peakPos, meanWeight } from '../tendrils/analyse';
 import { containAspect } from '../tendrils/utils/aspect';
 
 import each from '../fp/each';
+import map from '../fp/map';
+import reduce from '../fp/reduce';
 import { step } from '../utils';
 
 export default (canvas, settings, debug) => {
@@ -52,64 +54,72 @@ export default (canvas, settings, debug) => {
 
 
     // Parameters...
-        const track = (decodeURIComponent(queries.track || '') ||
-                prompt('Enter a track URL:'));
 
-        const audioMode = (queries.audioMode || 'frequencies');
-        const audioOrders = ((queries.audioOrders)? parseInt(queries.audioOrders, 10) : 2);
-        const harmonies = ((queries.harmonies)? parseFloat(queries.harmonies, 10) : 1);
-        const falloff = ((queries.falloff)? parseFloat(queries.falloff, 10) : 0.00001);
-        const attenuate = ((queries.attenuate)? parseFloat(queries.attenuate, 10) : 0.02);
-        const silent = ((queries.silent)? parseFloat(queries.silent, 10) : 0);
-        const soundSmooth = ((queries.soundSmooth)? parseFloat(queries.soundSmooth, 10) : 0.3);
-        const soundWarp = ((queries.soundWarp)? parseFloat(queries.soundWarp, 10) : 0.007);
-        const noiseWarp = ((queries.noiseWarp)? parseFloat(queries.noiseWarp, 10) : 0.1);
-        const noiseSpeed = ((queries.noiseSpeed)? parseFloat(queries.noiseSpeed, 10) : 0.001);
-        const noiseScale = ((queries.noiseScale)? parseFloat(queries.noiseScale, 10) : 0.3);
-        const meanFulcrum = ((queries.meanFulcrum)? parseFloat(queries.meanFulcrum, 10) : 0.4);
-        const grow = ((queries.grow)? parseFloat(queries.grow, 10) : 0.0005);
-        const growLimit = ((queries.growLimit)? parseFloat(queries.growLimit, 10) : 1.6);
-        const spin = ((queries.spin)? parseFloat(queries.spin, 10) : 0);
-        const radius = ((queries.radius)? parseFloat(queries.radius, 10) : 0.3);
-        const thick = ((queries.thick)? parseFloat(queries.thick, 10) : 0.005);
-        const otherScale = ((queries.otherScale)? parseFloat(queries.otherScale, 10) : 0.002);
-        const otherEdge = ((queries.otherEdge)? parseFloat(queries.otherEdge, 10) : 4);
-        const jitter = ((queries.jitter)? parseFloat(queries.jitter, 10) : 0.0008);
-        const nowAlpha = ((queries.nowAlpha)? parseFloat(queries.nowAlpha, 10) : 1);
-        const pastAlpha = ((queries.pastAlpha)? parseFloat(queries.pastAlpha, 10) : 0.99);
-        const formAlpha = ((queries.formAlpha)? parseFloat(queries.formAlpha, 10) : 0.7);
-        const ringAlpha = ((queries.ringAlpha)? parseFloat(queries.ringAlpha, 10) : 0.001);
-        const bokehRadius = ((queries.bokehRadius)? parseFloat(queries.bokehRadius, 10) : 4);
-        const bokehAmount = ((queries.bokehAmount)? parseFloat(queries.bokehAmount, 10) : 60);
+    const params = {
+        track: (decodeURIComponent(queries.track || '') ||
+                prompt('Enter a track URL:')),
+
+        audioMode: (queries.audioMode || 'frequencies'),
+        audioOrders: ((queries.audioOrders)? parseInt(queries.audioOrders, 10) : 2),
+        harmonies: ((queries.harmonies)? parseFloat(queries.harmonies, 10) : 1),
+        falloff: ((queries.falloff)? parseFloat(queries.falloff, 10) : 0.00001),
+        attenuate: ((queries.attenuate)? parseFloat(queries.attenuate, 10) : 0.02),
+        silent: ((queries.silent)? parseFloat(queries.silent, 10) : 0),
+        soundSmooth: ((queries.soundSmooth)? parseFloat(queries.soundSmooth, 10) : 0.3),
+        soundWarp: ((queries.soundWarp)? parseFloat(queries.soundWarp, 10) : 0.007),
+        noiseWarp: ((queries.noiseWarp)? parseFloat(queries.noiseWarp, 10) : 0.1),
+        noiseSpeed: ((queries.noiseSpeed)? parseFloat(queries.noiseSpeed, 10) : 0.001),
+        noiseScale: ((queries.noiseScale)? parseFloat(queries.noiseScale, 10) : 0.3),
+        meanFulcrum: ((queries.meanFulcrum)? parseFloat(queries.meanFulcrum, 10) : 0.4),
+        grow: ((queries.grow)? parseFloat(queries.grow, 10) : 0.0005),
+        growLimit: ((queries.growLimit)? parseFloat(queries.growLimit, 10) : 1.6),
+        spin: ((queries.spin)? parseFloat(queries.spin, 10) : 0.0001),
+        radius: ((queries.radius)? parseFloat(queries.radius, 10) : 0.3),
+        thick: ((queries.thick)? parseFloat(queries.thick, 10) : 0.005),
+        otherRadius: ((queries.otherRadius)? parseFloat(queries.otherRadius, 10) : 0.2),
+        otherThick: ((queries.otherThick)? parseFloat(queries.otherThick, 10) : 0.0025),
+        otherEdge: ((queries.otherEdge)? parseFloat(queries.otherEdge, 10) : 4),
+        jitter: ((queries.jitter)? parseFloat(queries.jitter, 10) : 0.002),
+        nowAlpha: ((queries.nowAlpha)? parseFloat(queries.nowAlpha, 10) : 1),
+        pastAlpha: ((queries.pastAlpha)? parseFloat(queries.pastAlpha, 10) : 0.99),
+        formAlpha: ((queries.formAlpha)? parseFloat(queries.formAlpha, 10) : 1),
+        ringAlpha: ((queries.ringAlpha)? parseFloat(queries.ringAlpha, 10) : 0.001),
+        bokehRadius: ((queries.bokehRadius)? parseFloat(queries.bokehRadius, 10) : 8),
+        bokehAmount: ((queries.bokehAmount)? parseFloat(queries.bokehAmount, 10) : 60),
+
+        ambient: ((queries.ambient)?
+                queries.ambient.split(',').map((v) =>
+                    parseFloat(v.replace(/[\[\]]/gi, ''), 10))
+            :   [1, 1, 1, 1])
+    };
+
+    Object.assign(self, params);
+
+    self.applyParams = () => map((param, name) => self[name], params, params);
+
+    const paramQuery = () =>
+        reduce((out, param, name) => {
+                out.push(name+'='+param);
+
+                return out;
+            },
+            params, []);
+
+    const showState = () => prompt('The URL to this state:',
+            location.href.replace(location.search, '')+'?'+
+                paramQuery().join('&'));
+
+    console.log(paramQuery().join('\n'));
 
 
-        console.log('track='+track);
-        console.log('audioMode='+audioMode);
-        console.log('audioOrders='+audioOrders);
-        console.log('harmonies='+harmonies);
-        console.log('falloff='+falloff);
-        console.log('attenuate='+attenuate);
-        console.log('silent='+silent);
-        console.log('soundSmooth='+soundSmooth);
-        console.log('soundWarp='+soundWarp);
-        console.log('noiseWarp='+noiseWarp);
-        console.log('noiseSpeed='+noiseSpeed);
-        console.log('noiseScale='+noiseScale);
-        console.log('meanFulcrum='+meanFulcrum);
-        console.log('grow='+grow);
-        console.log('growLimit='+growLimit);
-        console.log('spin='+spin);
-        console.log('radius='+radius);
-        console.log('thick='+thick);
-        console.log('otherScale='+otherScale);
-        console.log('otherEdge='+otherEdge);
-        console.log('jitter='+jitter);
-        console.log('nowAlpha='+nowAlpha);
-        console.log('pastAlpha='+pastAlpha);
-        console.log('formAlpha='+formAlpha);
-        console.log('ringAlpha='+ringAlpha);
-        console.log('bokehRadius='+bokehRadius);
-        console.log('bokehAmount='+bokehAmount);
+    const showStateButton = Object.assign(document.createElement('button'), {
+            className: 'show-params',
+            innerText: 'show state'
+        });
+
+    showStateButton.addEventListener('click', showState);
+
+    canvas.parentElement.appendChild(showStateButton);
 
 
     // Track
@@ -183,7 +193,8 @@ export default (canvas, settings, debug) => {
                 spin,
                 radius,
                 thick,
-                otherScale,
+                otherRadius,
+                otherThick,
                 otherEdge,
                 jitter,
                 bokehRadius,
@@ -191,7 +202,8 @@ export default (canvas, settings, debug) => {
                 nowAlpha,
                 pastAlpha,
                 formAlpha,
-                ringAlpha
+                ringAlpha,
+                ambient
             });
 
 

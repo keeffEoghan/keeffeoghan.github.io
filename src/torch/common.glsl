@@ -28,14 +28,14 @@ float sdf = clamp(abs(dist-radius-warp)-thick, 0.0, 1.0)/amp;
 
 // Elements
 
-vec2 otherPos = vec2(noise(vec3(peakPos, time*noiseSpeed, mean)),
-        noise(vec3(peakPos, time*noiseSpeed+0.2345678, mean*noiseScale)));
+vec2 otherPos = vec2(noise(vec3(peakPos, peak+(time*noiseSpeed), mean)),
+        noise(vec3(peakPos+0.972, peak+(time*noiseSpeed)+0.234, mean+0.3785)));
 
-float otherRad = radius*length(otherPos)*peakPos*otherScale;
+float otherRad = otherRadius*length(otherPos)*peakPos;
 
 sdf = min(sdf,
-    clamp(abs(length(pos-otherPos)-otherRad-(thick*peak))/step(otherEdge, peak),
-        0.0, 1.0));
+    clamp(abs(length(pos-otherPos)-otherRad)-abs(otherThick*mean), 0.0, 1.0)/
+        step(otherEdge, peak));
 
 
 // Light attenuation
