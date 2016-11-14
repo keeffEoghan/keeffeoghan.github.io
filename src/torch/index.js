@@ -24,6 +24,7 @@ import { peakPos, meanWeight } from '../tendrils/analyse';
 import { containAspect } from '../tendrils/utils/aspect';
 
 import each from '../fp/each';
+import map from '../fp/map';
 import reduce from '../fp/reduce';
 import { step } from '../utils';
 
@@ -77,7 +78,6 @@ export default (canvas, settings, debug) => {
         thick: ((queries.thick)? parseFloat(queries.thick, 10) : 0.005),
         otherRadius: ((queries.otherRadius)? parseFloat(queries.otherRadius, 10) : 0.2),
         otherThick: ((queries.otherThick)? parseFloat(queries.otherThick, 10) : 0.0025),
-        otherScale: ((queries.otherScale)? parseFloat(queries.otherScale, 10) : 0.002),
         otherEdge: ((queries.otherEdge)? parseFloat(queries.otherEdge, 10) : 4),
         jitter: ((queries.jitter)? parseFloat(queries.jitter, 10) : 0.002),
         nowAlpha: ((queries.nowAlpha)? parseFloat(queries.nowAlpha, 10) : 1),
@@ -88,11 +88,14 @@ export default (canvas, settings, debug) => {
         bokehAmount: ((queries.bokehAmount)? parseFloat(queries.bokehAmount, 10) : 60),
 
         ambient: ((queries.ambient)?
-                queries.ambient.split(',').map((v) => parseFloat(v, 10))
+                queries.ambient.split(',').map((v) =>
+                    parseFloat(v.replace(/[\[\]]/gi, ''), 10))
             :   [1, 1, 1, 1])
     };
 
     Object.assign(self, params);
+
+    self.applyParams = () => map((param, name) => self[name], params, params);
 
     const paramQuery = () =>
         reduce((out, param, name) => {
@@ -192,7 +195,6 @@ export default (canvas, settings, debug) => {
                 thick,
                 otherRadius,
                 otherThick,
-                otherScale,
                 otherEdge,
                 jitter,
                 bokehRadius,

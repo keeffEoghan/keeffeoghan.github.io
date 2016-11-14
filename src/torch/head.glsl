@@ -34,7 +34,6 @@ uniform float thick;
 
 uniform float otherRadius;
 uniform float otherThick;
-uniform float otherScale;
 uniform float otherEdge;
 
 uniform float jitter;
