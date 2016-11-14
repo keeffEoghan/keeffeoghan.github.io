@@ -32,7 +32,8 @@ uniform float spin;
 uniform float radius;
 uniform float thick;
 
-uniform float otherScale;
+uniform float otherRadius;
+uniform float otherThick;
 uniform float otherEdge;
 
 uniform float jitter;
@@ -43,3 +44,5 @@ uniform float nowAlpha;
 uniform float pastAlpha;
 uniform float formAlpha;
 uniform float ringAlpha;
+
+uniform vec4 ambient;
