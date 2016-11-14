@@ -32,6 +32,8 @@ uniform float spin;
 uniform float radius;
 uniform float thick;
 
+uniform float otherRadius;
+uniform float otherThick;
 uniform float otherScale;
 uniform float otherEdge;
 
