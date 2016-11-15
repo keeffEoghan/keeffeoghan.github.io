@@ -41,9 +41,12 @@ export default (canvas, settings, debug) => {
     const viewSize = [0, 0];
 
     const buffers = [FBO(gl, [1, 1]), FBO(gl, [1, 1])];
-    const post = FBO(gl, [1, 1]);
 
-    const uniforms = {};
+    const uniforms = {
+        head: {},
+        form: {},
+        draw: {}
+    };
 
     const screen = new Screen(gl);
 
@@ -77,7 +80,7 @@ export default (canvas, settings, debug) => {
         radius: ((queries.radius)? parseFloat(queries.radius, 10) : 0.3),
         thick: ((queries.thick)? parseFloat(queries.thick, 10) : 0.005),
         otherRadius: ((queries.otherRadius)? parseFloat(queries.otherRadius, 10) : 0.2),
-        otherThick: ((queries.otherThick)? parseFloat(queries.otherThick, 10) : 0.0025),
+        otherThick: ((queries.otherThick)? parseFloat(queries.otherThick, 10) : 0.03),
         otherEdge: ((queries.otherEdge)? parseFloat(queries.otherEdge, 10) : 4),
         jitter: ((queries.jitter)? parseFloat(queries.jitter, 10) : 0.002),
         nowAlpha: ((queries.nowAlpha)? parseFloat(queries.nowAlpha, 10) : 1),
@@ -164,47 +167,16 @@ export default (canvas, settings, debug) => {
         let audioPeak = peakPos(audioTexture.array.data);
 
 
-        // Render - common
+        // Render
 
         gl.viewport(0, 0, viewRes[0], viewRes[1]);
 
-        Object.assign(uniforms, {
-                start: timer.since,
-                time: timer.time,
-                dt: timer.dt,
-                viewSize,
-                viewRes,
-                past: buffers[1].color[0].bind(0),
-                audio: audioTexture.texture.bind(1),
-                peak: audioPeak.peak,
-                peakPos: audioPeak.pos,
-                mean: meanWeight(audioTexture.array.data, meanFulcrum),
-                harmonies,
-                falloff,
-                attenuate,
-                silent,
-                soundSmooth,
-                soundWarp,
-                noiseWarp,
-                noiseSpeed,
-                noiseScale,
-                grow,
-                growLimit,
-                spin,
-                radius,
-                thick,
-                otherRadius,
-                otherThick,
-                otherEdge,
-                jitter,
-                bokehRadius,
-                bokehAmount,
-                nowAlpha,
-                pastAlpha,
-                formAlpha,
-                ringAlpha,
-                ambient
-            });
+        const head = {
+            time: timer.time,
+            dt: timer.dt,
+            viewSize,
+            viewRes
+        };
 
 
         // Buffer pass - develop the form
@@ -212,19 +184,52 @@ export default (canvas, settings, debug) => {
         buffers[0].bind();
         formShader.bind();
 
-        Object.assign(formShader.uniforms, uniforms);
+        Object.assign(formShader.uniforms, head, {
+                past: buffers[1].color[0].bind(0),
+                // @todo Bring audio stuff here as well?
+                falloff,
+                grow,
+                growLimit,
+                // @todo Spin form too?
+                // spinPast,
+                jitter,
+                pastAlpha
+            });
         
         screen.render();
 
 
         // Screen pass - draw the light and form
 
-        post.bind();
+        buffers[1].bind();
         // gl.bindFramebuffer(gl.FRAMEBUFFER, null);
         drawShader.bind();
 
-        Object.assign(drawShader.uniforms, uniforms, {
-                form: buffers[0].color[0].bind(0)
+        Object.assign(drawShader.uniforms, head, {
+                form: buffers[0].color[0].bind(0),
+                audio: audioTexture.texture.bind(1),
+                peak: audioPeak.peak,
+                peakPos: audioPeak.pos,
+                mean: meanWeight(audioTexture.array.data, meanFulcrum),
+                harmonies,
+                attenuate,
+                silent,
+                soundSmooth,
+                soundWarp,
+                noiseWarp,
+                noiseSpeed,
+                noiseScale,
+                spin,
+                radius,
+                thick,
+                otherRadius,
+                otherThick,
+                otherEdge,
+                bokehRadius,
+                bokehAmount,
+                formAlpha,
+                ringAlpha,
+                ambient
             });
 
         screen.render();
@@ -235,8 +240,8 @@ export default (canvas, settings, debug) => {
         gl.bindFramebuffer(gl.FRAMEBUFFER, null);
         bokehShader.bind();
 
-        Object.assign(bokehShader.uniforms, uniforms, {
-                view: post.color[0].bind(0),
+        Object.assign(bokehShader.uniforms, {
+                view: buffers[1].color[0].bind(0),
                 resolution: viewRes,
                 time: timer.time,
                 radius: bokehRadius,
@@ -244,10 +249,6 @@ export default (canvas, settings, debug) => {
             });
 
         screen.render();
-
-
-        // Step frame
-        step(buffers);
     }
 
     function resize() {
@@ -260,7 +261,6 @@ export default (canvas, settings, debug) => {
         containAspect(viewSize, viewRes);
 
         each((buffer) => buffer.shape = viewRes, buffers);
-        post.shape = viewRes;
     }
 
 
