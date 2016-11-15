@@ -1,48 +1,18 @@
-uniform float start;
 uniform float time;
+// @todo Use dt against audio rates?
 uniform float dt;
-
 uniform vec2 viewSize;
 uniform vec2 viewRes;
 
-uniform sampler2D past;
-uniform sampler2D audio;
+/**
+ * @todo Some bug with `glslify-import` & sons breaks `node_modules` aliased
+ *       `require`s in `import`ed files, so we need to do it the looooooong way.
+ * @todo Noise in form as well?
+ */
+// #pragma glslify: noise = require(glsl-noise/simplex/3d)
+// #pragma glslify: noise = require(../../node_modules/glsl-noise/simplex/3d)
 
-uniform float peak;
-uniform float peakPos;
-uniform float mean;
+#pragma glslify: uvToPos = require(../tendrils/map/uv-to-pos)
 
-uniform float frequencies;
-uniform float harmonies;
-uniform float silent;
-uniform float soundSmooth;
-uniform float soundWarp;
-
-uniform float noiseWarp;
-uniform float noiseSpeed;
-uniform float noiseScale;
-
-uniform float falloff;
-uniform float attenuate;
-
-uniform float growLimit;
-uniform float grow;
-uniform float spin;
-
-uniform float radius;
-uniform float thick;
-
-uniform float otherRadius;
-uniform float otherThick;
-uniform float otherEdge;
-
-uniform float jitter;
-uniform float bokehRadius;
-uniform float bokehAmount;
-
-uniform float nowAlpha;
-uniform float pastAlpha;
-uniform float formAlpha;
-uniform float ringAlpha;
-
-uniform vec4 ambient;
+// @todo Spin in form as well?
+// #pragma glslify: posToAngle = require(./pos-to-angle)
