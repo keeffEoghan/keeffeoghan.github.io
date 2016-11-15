@@ -43,7 +43,11 @@ export default (canvas, settings, debug) => {
     const buffers = [FBO(gl, [1, 1]), FBO(gl, [1, 1])];
     const post = FBO(gl, [1, 1]);
 
-    const uniforms = {};
+    const uniforms = {
+        head: {},
+        form: {},
+        draw: {}
+    };
 
     const screen = new Screen(gl);
 
@@ -164,47 +168,16 @@ export default (canvas, settings, debug) => {
         let audioPeak = peakPos(audioTexture.array.data);
 
 
-        // Render - common
+        // Render
 
         gl.viewport(0, 0, viewRes[0], viewRes[1]);
 
-        Object.assign(uniforms, {
-                start: timer.since,
-                time: timer.time,
-                dt: timer.dt,
-                viewSize,
-                viewRes,
-                past: post.color[0].bind(0),
-                audio: audioTexture.texture.bind(1),
-                peak: audioPeak.peak,
-                peakPos: audioPeak.pos,
-                mean: meanWeight(audioTexture.array.data, meanFulcrum),
-                harmonies,
-                falloff,
-                attenuate,
-                silent,
-                soundSmooth,
-                soundWarp,
-                noiseWarp,
-                noiseSpeed,
-                noiseScale,
-                grow,
-                growLimit,
-                spin,
-                radius,
-                thick,
-                otherRadius,
-                otherThick,
-                otherEdge,
-                jitter,
-                bokehRadius,
-                bokehAmount,
-                nowAlpha,
-                pastAlpha,
-                formAlpha,
-                ringAlpha,
-                ambient
-            });
+        const head = {
+            time: timer.time,
+            dt: timer.dt,
+            viewSize,
+            viewRes
+        };
 
 
         // Buffer pass - develop the form
@@ -212,7 +185,17 @@ export default (canvas, settings, debug) => {
         buffers[0].bind();
         formShader.bind();
 
-        Object.assign(formShader.uniforms, uniforms);
+        Object.assign(formShader.uniforms, head, {
+                past: post.color[0].bind(0),
+                // @todo Bring audio stuff here as well?
+                falloff,
+                grow,
+                growLimit,
+                // @todo Spin form too?
+                // spinPast,
+                jitter,
+                pastAlpha
+            });
         
         screen.render();
 
@@ -223,8 +206,31 @@ export default (canvas, settings, debug) => {
         // gl.bindFramebuffer(gl.FRAMEBUFFER, null);
         drawShader.bind();
 
-        Object.assign(drawShader.uniforms, uniforms, {
-                form: buffers[0].color[0].bind(0)
+        Object.assign(drawShader.uniforms, head, {
+                form: buffers[0].color[0].bind(0),
+                audio: audioTexture.texture.bind(1),
+                peak: audioPeak.peak,
+                peakPos: audioPeak.pos,
+                mean: meanWeight(audioTexture.array.data, meanFulcrum),
+                harmonies,
+                attenuate,
+                silent,
+                soundSmooth,
+                soundWarp,
+                noiseWarp,
+                noiseSpeed,
+                noiseScale,
+                spin,
+                radius,
+                thick,
+                otherRadius,
+                otherThick,
+                otherEdge,
+                bokehRadius,
+                bokehAmount,
+                formAlpha,
+                ringAlpha,
+                ambient
             });
 
         screen.render();
@@ -235,7 +241,7 @@ export default (canvas, settings, debug) => {
         gl.bindFramebuffer(gl.FRAMEBUFFER, null);
         bokehShader.bind();
 
-        Object.assign(bokehShader.uniforms, uniforms, {
+        Object.assign(bokehShader.uniforms, {
                 view: post.color[0].bind(0),
                 resolution: viewRes,
                 time: timer.time,

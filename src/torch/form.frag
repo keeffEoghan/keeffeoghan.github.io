@@ -2,14 +2,28 @@ precision highp float;
 
 #pragma glslify: import(./head)
 
+uniform sampler2D past;
+
+uniform float growLimit;
+uniform float grow;
+
+// @todo Is there a use for `falloff` in this new setup?
+uniform float falloff;
+// @todo Spin this as well?
+uniform float spinPast;
+
+uniform float jitter;
+
+uniform float pastAlpha;
+
 vec3 sampler(vec2 uv) {
     return texture2D(past, uv).rgb;
 }
 
+// @todo Noise in form as well?
 #pragma glslify: blur = require(glsl-hash-blur, sample = sampler, iterations = 3)
 
 #pragma glslify: bezier = require(../tendrils/utils/bezier)
-
 
 const vec2 mid = vec2(0.5);
 const vec3 curve = vec3(0.0, 1.0, 1.0);
@@ -34,9 +48,7 @@ void main() {
 
     // Accumulate colors
 
-    // vec4 color = vec4(sound*falloff*nowAlpha)+(old*pastAlpha);
     vec4 color = vec4(clamp(old*pastAlpha, 0.0, 1.0));
 
     gl_FragColor = color;
-    // gl_FragColor = clamp(color, vec4(0.0), vec4(1.0));
 }
