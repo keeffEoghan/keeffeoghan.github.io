@@ -7,13 +7,9 @@ vec3 sampler(vec2 uv) {
 }
 
 #pragma glslify: blur = require(glsl-hash-blur, sample = sampler, iterations = 3)
-#pragma glslify: noise = require(glsl-noise/simplex/3d)
 
-#pragma glslify: uvToPos = require(../tendrils/map/uv-to-pos)
 #pragma glslify: bezier = require(../tendrils/utils/bezier)
 
-#pragma glslify: posToAngle = require(./pos-to-angle)
-#pragma glslify: sampleSound = require(./sample-sound)
 
 const vec2 mid = vec2(0.5);
 const vec3 curve = vec3(0.0, 1.0, 1.0);
