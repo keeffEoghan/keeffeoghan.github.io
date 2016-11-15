@@ -41,7 +41,6 @@ export default (canvas, settings, debug) => {
     const viewSize = [0, 0];
 
     const buffers = [FBO(gl, [1, 1]), FBO(gl, [1, 1])];
-    const post = FBO(gl, [1, 1]);
 
     const uniforms = {
         head: {},
@@ -186,7 +185,7 @@ export default (canvas, settings, debug) => {
         formShader.bind();
 
         Object.assign(formShader.uniforms, head, {
-                past: post.color[0].bind(0),
+                past: buffers[1].color[0].bind(0),
                 // @todo Bring audio stuff here as well?
                 falloff,
                 grow,
@@ -202,7 +201,7 @@ export default (canvas, settings, debug) => {
 
         // Screen pass - draw the light and form
 
-        post.bind();
+        buffers[1].bind();
         // gl.bindFramebuffer(gl.FRAMEBUFFER, null);
         drawShader.bind();
 
@@ -242,7 +241,7 @@ export default (canvas, settings, debug) => {
         bokehShader.bind();
 
         Object.assign(bokehShader.uniforms, {
-                view: post.color[0].bind(0),
+                view: buffers[1].color[0].bind(0),
                 resolution: viewRes,
                 time: timer.time,
                 radius: bokehRadius,
@@ -250,10 +249,6 @@ export default (canvas, settings, debug) => {
             });
 
         screen.render();
-
-
-        // Step frame
-        step(buffers);
     }
 
     function resize() {
@@ -266,7 +261,6 @@ export default (canvas, settings, debug) => {
         containAspect(viewSize, viewRes);
 
         each((buffer) => buffer.shape = viewRes, buffers);
-        post.shape = viewRes;
     }
 
 
