@@ -2,8 +2,6 @@ import glContext from 'gl-context';
 import FBO from 'gl-fbo';
 import analyser from 'web-audio-analyser';
 import throttle from 'lodash/throttle';
-import mapRange from 'range-fit';
-import vec2 from 'gl-matrix/src/gl-matrix/vec2';
 import shader from 'gl-shader';
 import querystring from 'querystring';
 
@@ -28,7 +26,7 @@ import map from '../fp/map';
 import reduce from '../fp/reduce';
 import { step } from '../utils';
 
-export default (canvas, settings, debug) => {
+export default (canvas) => {
     const queries = querystring.parse(location.search.slice(1));
 
     const gl = glContext(canvas, { preserveDrawingBuffer: true }, render);
@@ -79,6 +77,7 @@ export default (canvas, settings, debug) => {
         otherRadius: ((queries.otherRadius)? parseFloat(queries.otherRadius, 10) : 0.2),
         otherThick: ((queries.otherThick)? parseFloat(queries.otherThick, 10) : 0.0025),
         otherEdge: ((queries.otherEdge)? parseFloat(queries.otherEdge, 10) : 4),
+        triangleRadius: ((queries.triangleRadius)? parseFloat(queries.triangleRadius, 10) : 0.2),
         jitter: ((queries.jitter)? parseFloat(queries.jitter, 10) : 0.002),
         nowAlpha: ((queries.nowAlpha)? parseFloat(queries.nowAlpha, 10) : 1),
         pastAlpha: ((queries.pastAlpha)? parseFloat(queries.pastAlpha, 10) : 0.99),
@@ -130,20 +129,20 @@ export default (canvas, settings, debug) => {
             autoplay: true,
             muted: 'muted' in queries,
             className: 'track',
-            src: ((track.match(/^(https)?(:\/\/)?(www\.)?dropbox\.com\/s\//gi))?
-                    track.replace(/^((https)?(:\/\/)?(www\.)?)dropbox\.com\/s\/(.*)\?dl=(0)$/gi,
+            src: ((self.track.match(/^(https)?(:\/\/)?(www\.)?dropbox\.com\/s\//gi))?
+                    self.track.replace(/^((https)?(:\/\/)?(www\.)?)dropbox\.com\/s\/(.*)\?dl=(0)$/gi,
                         'https://dl.dropboxusercontent.com/s/$5?dl=1&raw=1')
-                :   track)
+                :   self.track)
         });
 
     canvas.parentElement.appendChild(audio);
-    
+
     const audioAnalyser = analyser(audio);
 
     audioAnalyser.analyser.fftSize = 2**11;
     uniforms.frequencies = audioAnalyser.analyser.frequencyBinCount;
 
-    const audioTrigger = new AudioTrigger(audioAnalyser, audioOrders);
+    const audioTrigger = new AudioTrigger(audioAnalyser, self.audioOrders);
 
     const audioTexture = new AudioTexture(gl, audioTrigger.dataOrder(-1));
     // const audioTexture = new AudioTexture(gl,
@@ -157,8 +156,8 @@ export default (canvas, settings, debug) => {
 
         // Sample audio
 
-        audioTrigger.sample(dt, audioMode);
-        // audioTexture[audioMode](audioTrigger.dataOrder(-1));
+        audioTrigger.sample(dt, self.audioMode);
+        // audioTexture[self.audioMode](audioTrigger.dataOrder(-1));
         audioTexture.apply();
 
         let audioPeak = peakPos(audioTexture.array.data);
@@ -178,32 +177,33 @@ export default (canvas, settings, debug) => {
                 audio: audioTexture.texture.bind(1),
                 peak: audioPeak.peak,
                 peakPos: audioPeak.pos,
-                mean: meanWeight(audioTexture.array.data, meanFulcrum),
-                harmonies,
-                falloff,
-                attenuate,
-                silent,
-                soundSmooth,
-                soundWarp,
-                noiseWarp,
-                noiseSpeed,
-                noiseScale,
-                grow,
-                growLimit,
-                spin,
-                radius,
-                thick,
-                otherRadius,
-                otherThick,
-                otherEdge,
-                jitter,
-                bokehRadius,
-                bokehAmount,
-                nowAlpha,
-                pastAlpha,
-                formAlpha,
-                ringAlpha,
-                ambient
+                mean: meanWeight(audioTexture.array.data, self.meanFulcrum),
+                harmonies: self.harmonies,
+                falloff: self.falloff,
+                attenuate: self.attenuate,
+                silent: self.silent,
+                soundSmooth: self.soundSmooth,
+                soundWarp: self.soundWarp,
+                noiseWarp: self.noiseWarp,
+                noiseSpeed: self.noiseSpeed,
+                noiseScale: self.noiseScale,
+                grow: self.grow,
+                growLimit: self.growLimit,
+                spin: self.spin,
+                radius: self.radius,
+                thick: self.thick,
+                otherRadius: self.otherRadius,
+                otherThick: self.otherThick,
+                otherEdge: self.otherEdge,
+                triangleRadius: self.triangleRadius,
+                jitter: self.jitter,
+                bokehRadius: self.bokehRadius,
+                bokehAmount: self.bokehAmount,
+                nowAlpha: self.nowAlpha,
+                pastAlpha: self.pastAlpha,
+                formAlpha: self.formAlpha,
+                ringAlpha: self.ringAlpha,
+                ambient: self.ambient
             });
 
 
@@ -213,7 +213,7 @@ export default (canvas, settings, debug) => {
         formShader.bind();
 
         Object.assign(formShader.uniforms, uniforms);
-        
+
         screen.render();
 
 
@@ -239,8 +239,8 @@ export default (canvas, settings, debug) => {
                 view: post.color[0].bind(0),
                 resolution: viewRes,
                 time: timer.time,
-                radius: bokehRadius,
-                amount: bokehAmount
+                radius: self.bokehRadius,
+                amount: self.bokehAmount
             });
 
         screen.render();

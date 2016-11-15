@@ -36,6 +36,8 @@ uniform float otherRadius;
 uniform float otherThick;
 uniform float otherEdge;
 
+uniform float triangleRadius;
+
 uniform float jitter;
 uniform float bokehRadius;
 uniform float bokehAmount;

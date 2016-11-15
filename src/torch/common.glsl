@@ -38,7 +38,7 @@ float otherSDF = clamp(abs(sdfCircle(pos, otherPos, otherRad))-
     step(otherEdge, abs(peak));
 
 
-// Other triangle
+// Triangle
 
 vec3 triA = vec3(noise(vec3(peak, peakPos-(time*noiseSpeed), mean+0.54543)),
         noise(vec3(peak+0.882, peakPos+(time*noiseSpeed)+0.834, mean+0.4585)),
@@ -52,7 +52,10 @@ vec3 triC = vec3(noise(vec3(amp, peak+(time*noiseSpeed), mean)),
         noise(vec3(amp+0.2284, peak+(time*noiseSpeed)+0.2054, mean+0.3785)),
         0.0);
 
-float triSDF = sdfTriangle(vec3(pos, 0.0), triA, triB, triC);
+float triRad = mean*soundWarp*triangleRadius;
+
+float triSDF = sdfTriangle(vec3(pos, 0.0),
+        triA*triRad, triB*triRad, triC*triRad);
 
 
 // Closest
