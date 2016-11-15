@@ -37,6 +37,8 @@ uniform float otherThick;
 uniform float otherEdge;
 
 uniform float triangleRadius;
+uniform float triangleFat;
+uniform float triangleEdge;
 
 uniform float jitter;
 uniform float bokehRadius;
@@ -47,7 +49,6 @@ uniform float pastAlpha;
 uniform float formAlpha;
 uniform float ringAlpha;
 
-uniform vec4 ambient;
 
 /**
  * @todo Some bug with `glslify-import` & sons breaks `node_modules` aliased
@@ -62,3 +63,5 @@ uniform vec4 ambient;
 #pragma glslify: sampleSound = require(./sample-sound)
 #pragma glslify: sdfCircle = require(./sdf/circle)
 #pragma glslify: sdfTriangle = require(./sdf/triangle)
+
+const vec3 tri0 = vec3(0.0);
