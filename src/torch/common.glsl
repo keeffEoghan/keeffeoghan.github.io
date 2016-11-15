@@ -22,21 +22,26 @@ float warp = (mean*amp*soundWarp)+
     (noise(vec3(pos*(1.0+noiseScale*(0.3+peak)), time*noiseSpeed))
         *noiseWarp*(0.3+mean));
 
-// float sdf = clamp(abs(dist-radius-thick), 0.0, 1.0)/amp
-float sdf = clamp(abs(dist-radius-warp)-thick, 0.0, 1.0)/amp;
+float ringSDF = clamp(abs(dist-radius-warp)-thick, 0.0, 1.0)/amp;
 
 
-// Elements
+// Other circle
 
 vec2 otherPos = vec2(noise(vec3(peakPos, peak+(time*noiseSpeed), mean)),
         noise(vec3(peakPos+0.972, peak+(time*noiseSpeed)+0.234, mean+0.3785)));
 
 float otherRad = otherRadius*length(otherPos)*peakPos;
 
-sdf = min(sdf,
-    clamp(abs(length(pos-otherPos)-otherRad)-abs(otherThick*mean), 0.0, 1.0)/
-        step(otherEdge, peak));
+float otherSDF = clamp(abs(sdfCircle(pos, otherPos, otherRad))-
+            abs(otherThick*mean),
+        0.0, 1.0)/
+    step(otherEdge, abs(peak));
 
+
+// Other triangle
+
+
+float sdf = min(ringSDF, otherSDF);
 
 // Light attenuation
 // @see Attenuation: http://gamedev.stackexchange.com/questions/56897/glsl-light-attenuation-color-and-intensity-formula

@@ -46,3 +46,17 @@ uniform float formAlpha;
 uniform float ringAlpha;
 
 uniform vec4 ambient;
+
+/**
+ * @todo Some bug with `glslify-import` & sons breaks `node_modules` aliased
+ *       `require`s in `import`ed files, so we need to do it the looooooong way.
+ */
+// #pragma glslify: noise = require(glsl-noise/simplex/3d)
+#pragma glslify: noise = require(../../node_modules/glsl-noise/simplex/3d)
+
+#pragma glslify: uvToPos = require(../tendrils/map/uv-to-pos)
+
+#pragma glslify: posToAngle = require(./pos-to-angle)
+#pragma glslify: sampleSound = require(./sample-sound)
+#pragma glslify: sdfCircle = require(./sdf/circle)
+#pragma glslify: sdfTriangle = require(./sdf/triangle)
