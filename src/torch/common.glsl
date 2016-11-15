@@ -15,11 +15,13 @@ float soundKernel = sampleSound(audio, angle).x+
 
 float amp = max(abs(soundKernel/(1.0+(2.0*soundSmooth))), silent);
 
+float noiseTime = time*noiseSpeed;
+
 
 // The light ring
 
 float warp = (mean*amp*soundWarp)+
-    (noise(vec3(pos*(1.0+noiseScale*(0.3+peak)), time*noiseSpeed))
+    (noise(vec3(pos*(1.0+noiseScale*(0.3+peak)), noiseTime))
         *noiseWarp*(0.3+mean));
 
 float ringSDF = clamp(abs(dist-radius-warp)-thick, 0.0, 1.0)/amp;
@@ -27,8 +29,8 @@ float ringSDF = clamp(abs(dist-radius-warp)-thick, 0.0, 1.0)/amp;
 
 // Other circle
 
-vec2 otherPos = vec2(noise(vec3(peakPos, peak+(time*noiseSpeed), mean)),
-        noise(vec3(peakPos+0.972, peak+(time*noiseSpeed)+0.234, mean+0.3785)));
+vec2 otherPos = vec2(noise(vec3(peakPos, peak+noiseTime, mean)),
+        noise(vec3(peakPos+0.972, peak+noiseTime+0.234, mean+0.379)));
 
 float otherRad = otherRadius*length(otherPos)*peakPos;
 
@@ -40,27 +42,28 @@ float otherSDF = clamp(abs(sdfCircle(pos, otherPos, otherRad))-
 
 // Triangle
 
-vec3 triA = vec3(noise(vec3(peak, peakPos-(time*noiseSpeed), mean+0.54543)),
-        noise(vec3(peak+0.882, peakPos+(time*noiseSpeed)+0.834, mean+0.4585)),
+vec3 tri1 = vec3(noise(vec3(peak+dt+0.879, peakPos-noiseTime+0.822,
+            peak-peakPos+0.545)),
+        noise(vec3(peak+0.882, peakPos+noiseTime+0.354,
+            peak+peakPos+0.455)),
         0.0);
 
-vec3 triB = vec3(noise(vec3(dt, mean+(time*noiseSpeed), mean)),
-        noise(vec3(dt+0.1902, mean+(time*noiseSpeed)+0.277, mean-0.37004)),
+vec3 tri2 = vec3(noise(vec3(peak+dt+0.227, peakPos+noiseTime+0.822,
+            peak+peakPos+0.092)),
+        noise(vec3(peak-dt+0.192, peakPos-noiseTime+0.277,
+            peak-peakPos+0.304)),
         0.0);
 
-vec3 triC = vec3(noise(vec3(amp, peak+(time*noiseSpeed), mean)),
-        noise(vec3(amp+0.2284, peak+(time*noiseSpeed)+0.2054, mean+0.3785)),
-        0.0);
+float triRad = mean*triangleRadius;
 
-float triRad = mean*soundWarp*triangleRadius;
-
-float triSDF = sdfTriangle(vec3(pos, 0.0),
-        triA*triRad, triB*triRad, triC*triRad);
+float triSDF = sdfTriangle(vec3(pos, 0.0), tri0, tri1*triRad,
+        mix(tri1, tri2*triRad, triangleFat*(1.0-peakPos)))/
+    step(triangleEdge, abs(peak));
 
 
 // Closest
 
-float sdf = min(ringSDF, min(otherSDF, triSDF));
+float sdf = min(min(ringSDF, otherSDF), triSDF);
 
 // Light attenuation
 // @see Attenuation: http://gamedev.stackexchange.com/questions/56897/glsl-light-attenuation-color-and-intensity-formula

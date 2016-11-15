@@ -53,6 +53,9 @@ export default (canvas) => {
 
     // Parameters...
 
+    const queryColor = (query) => query.split(',').map((v) =>
+                    parseFloat(v.replace(/[\[\]]/gi, ''), 10));
+
     const params = {
         track: (decodeURIComponent(queries.track || '') ||
                 prompt('Enter a track URL:')),
@@ -77,7 +80,9 @@ export default (canvas) => {
         otherRadius: ((queries.otherRadius)? parseFloat(queries.otherRadius, 10) : 0.2),
         otherThick: ((queries.otherThick)? parseFloat(queries.otherThick, 10) : 0.0025),
         otherEdge: ((queries.otherEdge)? parseFloat(queries.otherEdge, 10) : 4),
-        triangleRadius: ((queries.triangleRadius)? parseFloat(queries.triangleRadius, 10) : 0.2),
+        triangleRadius: ((queries.triangleRadius)? parseFloat(queries.triangleRadius, 10) : 1),
+        triangleFat: ((queries.triangleFat)? parseFloat(queries.triangleFat, 10) : 0),
+        triangleEdge: ((queries.triangleEdge)? parseFloat(queries.triangleEdge, 10) : 3),
         jitter: ((queries.jitter)? parseFloat(queries.jitter, 10) : 0.002),
         nowAlpha: ((queries.nowAlpha)? parseFloat(queries.nowAlpha, 10) : 1),
         pastAlpha: ((queries.pastAlpha)? parseFloat(queries.pastAlpha, 10) : 0.99),
@@ -85,11 +90,8 @@ export default (canvas) => {
         ringAlpha: ((queries.ringAlpha)? parseFloat(queries.ringAlpha, 10) : 0.001),
         bokehRadius: ((queries.bokehRadius)? parseFloat(queries.bokehRadius, 10) : 8),
         bokehAmount: ((queries.bokehAmount)? parseFloat(queries.bokehAmount, 10) : 60),
-
-        ambient: ((queries.ambient)?
-                queries.ambient.split(',').map((v) =>
-                    parseFloat(v.replace(/[\[\]]/gi, ''), 10))
-            :   [1, 1, 1, 1])
+        ambient: ((queries.ambient)? queryColor(queries.ambient) : [1, 1, 1, 1]),
+        emit: ((queries.emit)? queryColor(queries.emit) : [1, 1, 1, 1])
     };
 
     Object.assign(self, params);
@@ -176,7 +178,7 @@ export default (canvas) => {
                 past: buffers[1].color[0].bind(0),
                 audio: audioTexture.texture.bind(1),
                 peak: audioPeak.peak,
-                peakPos: audioPeak.pos,
+                peakPos: audioPeak.pos/audioTexture.array.data.length,
                 mean: meanWeight(audioTexture.array.data, self.meanFulcrum),
                 harmonies: self.harmonies,
                 falloff: self.falloff,
@@ -196,6 +198,8 @@ export default (canvas) => {
                 otherThick: self.otherThick,
                 otherEdge: self.otherEdge,
                 triangleRadius: self.triangleRadius,
+                triangleFat: self.triangleFat,
+                triangleEdge: self.triangleEdge,
                 jitter: self.jitter,
                 bokehRadius: self.bokehRadius,
                 bokehAmount: self.bokehAmount,
@@ -203,7 +207,8 @@ export default (canvas) => {
                 pastAlpha: self.pastAlpha,
                 formAlpha: self.formAlpha,
                 ringAlpha: self.ringAlpha,
-                ambient: self.ambient
+                ambient: self.ambient,
+                emit: self.emit
             });
 
 
