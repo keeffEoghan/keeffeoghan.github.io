@@ -15,7 +15,10 @@ const vec2 mid = vec2(0.5);
 const vec3 curve = vec3(0.0, 1.0, 1.0);
 
 void main() {
-    #pragma glslify: import(./common)
+    vec2 uv = gl_FragCoord.xy/viewRes;
+    vec2 pos = uvToPos(uv)/viewSize;
+
+    float dist = length(pos);
 
     // Sample and grow the past state
     
@@ -32,8 +35,7 @@ void main() {
     // Accumulate colors
 
     // vec4 color = vec4(sound*falloff*nowAlpha)+(old*pastAlpha);
-    vec4 color = vec4(clamp(sound*falloff*nowAlpha, 0.0, 1.0))+
-            clamp(old*pastAlpha, 0.0, 1.0);
+    vec4 color = vec4(clamp(old*pastAlpha, 0.0, 1.0));
 
     gl_FragColor = color;
     // gl_FragColor = clamp(color, vec4(0.0), vec4(1.0));
