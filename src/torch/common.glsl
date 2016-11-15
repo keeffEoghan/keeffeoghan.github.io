@@ -40,8 +40,24 @@ float otherSDF = clamp(abs(sdfCircle(pos, otherPos, otherRad))-
 
 // Other triangle
 
+vec3 triA = vec3(noise(vec3(peak, peakPos-(time*noiseSpeed), mean+0.54543)),
+        noise(vec3(peak+0.882, peakPos+(time*noiseSpeed)+0.834, mean+0.4585)),
+        0.0);
 
-float sdf = min(ringSDF, otherSDF);
+vec3 triB = vec3(noise(vec3(dt, mean+(time*noiseSpeed), mean)),
+        noise(vec3(dt+0.1902, mean+(time*noiseSpeed)+0.277, mean-0.37004)),
+        0.0);
+
+vec3 triC = vec3(noise(vec3(amp, peak+(time*noiseSpeed), mean)),
+        noise(vec3(amp+0.2284, peak+(time*noiseSpeed)+0.2054, mean+0.3785)),
+        0.0);
+
+float triSDF = sdfTriangle(vec3(pos, 0.0), triA, triB, triC);
+
+
+// Closest
+
+float sdf = min(ringSDF, min(otherSDF, triSDF));
 
 // Light attenuation
 // @see Attenuation: http://gamedev.stackexchange.com/questions/56897/glsl-light-attenuation-color-and-intensity-formula
