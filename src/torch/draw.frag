@@ -4,6 +4,10 @@ precision highp float;
 
 uniform sampler2D form;
 
+uniform float staticScale;
+uniform float staticSpeed;
+uniform float staticAlpha;
+
 uniform vec4 ambient;
 uniform vec4 emit;
 
@@ -20,10 +24,15 @@ void main() {
 
     vec4 geom = texture2D(form, uv);
 
+    vec4 background = vec4(noise(vec3(uv*noiseScale*staticScale,
+            mean*noiseTime*dt*staticSpeed)));
+
     // vec4 color = ring*emit*ringAlpha;
     // vec4 color = geom*ambient*formAlpha;
 
-    vec4 color = (ring*emit*ringAlpha)+(geom*ambient*formAlpha);
+    vec4 color = (ring*emit*ringAlpha)+
+            (geom*ambient*formAlpha)+
+            (background*staticAlpha);
 
     gl_FragColor = color;
 }
