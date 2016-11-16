@@ -2,8 +2,6 @@ import glContext from 'gl-context';
 import FBO from 'gl-fbo';
 import analyser from 'web-audio-analyser';
 import throttle from 'lodash/throttle';
-import mapRange from 'range-fit';
-import vec2 from 'gl-matrix/src/gl-matrix/vec2';
 import shader from 'gl-shader';
 import querystring from 'querystring';
 
@@ -28,7 +26,7 @@ import map from '../fp/map';
 import reduce from '../fp/reduce';
 import { step } from '../utils';
 
-export default (canvas, settings, debug) => {
+export default (canvas) => {
     const queries = querystring.parse(location.search.slice(1));
 
     const gl = glContext(canvas, { preserveDrawingBuffer: true }, render);
@@ -58,6 +56,9 @@ export default (canvas, settings, debug) => {
 
     // Parameters...
 
+    const queryColor = (query) => query.split(',').map((v) =>
+                    parseFloat(v.replace(/[\[\]]/gi, ''), 10));
+
     const params = {
         track: (decodeURIComponent(queries.track || '') ||
                 prompt('Enter a track URL:')),
@@ -82,6 +83,12 @@ export default (canvas, settings, debug) => {
         otherRadius: ((queries.otherRadius)? parseFloat(queries.otherRadius, 10) : 0.2),
         otherThick: ((queries.otherThick)? parseFloat(queries.otherThick, 10) : 0.03),
         otherEdge: ((queries.otherEdge)? parseFloat(queries.otherEdge, 10) : 4),
+        triangleRadius: ((queries.triangleRadius)? parseFloat(queries.triangleRadius, 10) : 1),
+        triangleFat: ((queries.triangleFat)? parseFloat(queries.triangleFat, 10) : 0),
+        triangleEdge: ((queries.triangleEdge)? parseFloat(queries.triangleEdge, 10) : 3),
+        staticScale: ((queries.staticScale)? parseFloat(queries.staticScale, 10) : 100),
+        staticSpeed: ((queries.staticSpeed)? parseFloat(queries.staticSpeed, 10) : 0.001),
+        staticAlpha: ((queries.staticAlpha)? parseFloat(queries.staticAlpha, 10) : 0.02),
         jitter: ((queries.jitter)? parseFloat(queries.jitter, 10) : 0.002),
         nowAlpha: ((queries.nowAlpha)? parseFloat(queries.nowAlpha, 10) : 1),
         pastAlpha: ((queries.pastAlpha)? parseFloat(queries.pastAlpha, 10) : 0.99),
@@ -89,11 +96,8 @@ export default (canvas, settings, debug) => {
         ringAlpha: ((queries.ringAlpha)? parseFloat(queries.ringAlpha, 10) : 0.001),
         bokehRadius: ((queries.bokehRadius)? parseFloat(queries.bokehRadius, 10) : 8),
         bokehAmount: ((queries.bokehAmount)? parseFloat(queries.bokehAmount, 10) : 60),
-
-        ambient: ((queries.ambient)?
-                queries.ambient.split(',').map((v) =>
-                    parseFloat(v.replace(/[\[\]]/gi, ''), 10))
-            :   [1, 1, 1, 1])
+        ambient: ((queries.ambient)? queryColor(queries.ambient) : [1, 1, 1, 1]),
+        emit: ((queries.emit)? queryColor(queries.emit) : [1, 1, 1, 1])
     };
 
     Object.assign(self, params);
@@ -133,20 +137,20 @@ export default (canvas, settings, debug) => {
             autoplay: true,
             muted: 'muted' in queries,
             className: 'track',
-            src: ((track.match(/^(https)?(:\/\/)?(www\.)?dropbox\.com\/s\//gi))?
-                    track.replace(/^((https)?(:\/\/)?(www\.)?)dropbox\.com\/s\/(.*)\?dl=(0)$/gi,
+            src: ((self.track.match(/^(https)?(:\/\/)?(www\.)?dropbox\.com\/s\//gi))?
+                    self.track.replace(/^((https)?(:\/\/)?(www\.)?)dropbox\.com\/s\/(.*)\?dl=(0)$/gi,
                         'https://dl.dropboxusercontent.com/s/$5?dl=1&raw=1')
-                :   track)
+                :   self.track)
         });
 
     canvas.parentElement.appendChild(audio);
-    
+
     const audioAnalyser = analyser(audio);
 
     audioAnalyser.analyser.fftSize = 2**11;
     uniforms.frequencies = audioAnalyser.analyser.frequencyBinCount;
 
-    const audioTrigger = new AudioTrigger(audioAnalyser, audioOrders);
+    const audioTrigger = new AudioTrigger(audioAnalyser, self.audioOrders);
 
     const audioTexture = new AudioTexture(gl, audioTrigger.dataOrder(-1));
     // const audioTexture = new AudioTexture(gl,
@@ -160,8 +164,8 @@ export default (canvas, settings, debug) => {
 
         // Sample audio
 
-        audioTrigger.sample(dt, audioMode);
-        // audioTexture[audioMode](audioTrigger.dataOrder(-1));
+        audioTrigger.sample(dt, self.audioMode);
+        // audioTexture[self.audioMode](audioTrigger.dataOrder(-1));
         audioTexture.apply();
 
         let audioPeak = peakPos(audioTexture.array.data);
@@ -187,19 +191,25 @@ export default (canvas, settings, debug) => {
         Object.assign(formShader.uniforms, head, {
                 past: buffers[1].color[0].bind(0),
                 // @todo Bring audio stuff here as well?
-                falloff,
-                grow,
-                growLimit,
+
+                falloff: self.falloff,
+                grow: self.grow,
+                growLimit: self.growLimit,
                 // @todo Spin form too?
-                // spinPast,
-                jitter,
-                pastAlpha
+                // spinPast: self.spinPast,
+                jitter: self.jitter,
+                pastAlpha: self.pastAlpha
             });
-        
+
         screen.render();
 
 
         // Screen pass - draw the light and form
+        /**
+         * @todo May need to do this twice, each having their own alpha inputs:
+         *           - For the current light, which gets after-imaged
+         *           - For a separate flash layer, which doesn't
+         */
 
         buffers[1].bind();
         // gl.bindFramebuffer(gl.FRAMEBUFFER, null);
@@ -208,28 +218,44 @@ export default (canvas, settings, debug) => {
         Object.assign(drawShader.uniforms, head, {
                 form: buffers[0].color[0].bind(0),
                 audio: audioTexture.texture.bind(1),
+
                 peak: audioPeak.peak,
-                peakPos: audioPeak.pos,
-                mean: meanWeight(audioTexture.array.data, meanFulcrum),
-                harmonies,
-                attenuate,
-                silent,
-                soundSmooth,
-                soundWarp,
-                noiseWarp,
-                noiseSpeed,
-                noiseScale,
-                spin,
-                radius,
-                thick,
-                otherRadius,
-                otherThick,
-                otherEdge,
-                bokehRadius,
-                bokehAmount,
-                formAlpha,
-                ringAlpha,
-                ambient
+                peakPos: audioPeak.pos/audioTexture.array.data.length,
+                mean: meanWeight(audioTexture.array.data, self.meanFulcrum),
+
+                harmonies: self.harmonies,
+                silent: self.silent,
+                soundSmooth: self.soundSmooth,
+                soundWarp: self.soundWarp,
+
+                noiseWarp: self.noiseWarp,
+                noiseSpeed: self.noiseSpeed,
+                noiseScale: self.noiseScale,
+
+                spin: self.spin,
+
+                radius: self.radius,
+                thick: self.thick,
+
+                otherRadius: self.otherRadius,
+                otherThick: self.otherThick,
+                otherEdge: self.otherEdge,
+
+                triangleRadius: self.triangleRadius,
+                triangleFat: self.triangleFat,
+                triangleEdge: self.triangleEdge,
+
+                staticScale: self.staticScale,
+                staticSpeed: self.staticSpeed,
+                staticAlpha: self.staticAlpha,
+
+                formAlpha: self.formAlpha,
+                ringAlpha: self.ringAlpha,
+
+                attenuate: self.attenuate,
+
+                ambient: self.ambient,
+                emit: self.emit
             });
 
         screen.render();
@@ -244,8 +270,8 @@ export default (canvas, settings, debug) => {
                 view: buffers[1].color[0].bind(0),
                 resolution: viewRes,
                 time: timer.time,
-                radius: bokehRadius,
-                amount: bokehAmount
+                radius: self.bokehRadius,
+                amount: self.bokehAmount
             });
 
         screen.render();
