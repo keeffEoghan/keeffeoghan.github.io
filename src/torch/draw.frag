@@ -30,13 +30,25 @@ uniform float otherRadius;
 uniform float otherThick;
 uniform float otherEdge;
 
+uniform float triangleRadius;
+uniform float triangleFat;
+uniform float triangleEdge;
+
 uniform float formAlpha;
 uniform float ringAlpha;
 
+uniform float staticScale;
+uniform float staticSpeed;
+uniform float staticAlpha;
+
 uniform vec4 ambient;
+uniform vec4 emit;
+
+const vec3 mid = vec3(0.0);
 
 // @todo Noise in form as well?
 #pragma glslify: noise = require(glsl-noise/simplex/3d)
+
 #pragma glslify: hsv2rgb = require(../../libs/glsl-hsv/hsv-rgb)
 
 #pragma glslify: posToAngle = require(./pos-to-angle)
@@ -60,11 +72,13 @@ void main() {
 
     float amp = max(abs(soundKernel/(1.0+(2.0*soundSmooth))), silent);
 
+    float noiseTime = time*noiseSpeed;
+
 
     // The light ring
 
     float warp = (mean*amp*soundWarp)+
-        (noise(vec3(pos*(1.0+noiseScale*(0.3+peak)), time*noiseSpeed))
+        (noise(vec3(pos*(1.0+noiseScale*(0.3+peak)), noiseTime))
             *noiseWarp*(0.3+mean));
 
     float ringSDF = clamp(abs(dist-radius-warp)-thick, 0.0, 1.0)/amp;
@@ -72,8 +86,8 @@ void main() {
 
     // Other circle
 
-    vec2 otherPos = vec2(noise(vec3(peakPos, peak+(time*noiseSpeed), mean)),
-            noise(vec3(peakPos+0.972, peak+(time*noiseSpeed)+0.234, mean+0.3785)));
+    vec2 otherPos = vec2(noise(vec3(peakPos, peak+noiseTime, mean)),
+            noise(vec3(peakPos+0.972, peak+noiseTime+0.234, mean+0.3785)));
 
     float otherRad = otherRadius*length(otherPos)*peakPos;
 
@@ -83,10 +97,30 @@ void main() {
         step(otherEdge, abs(peak));
 
 
-    // Other triangle
+    // Triangle
+
+    vec3 tri1 = vec3(noise(vec3(peak+dt+0.879, peakPos-noiseTime+0.822,
+                peak-peakPos+0.545)),
+            noise(vec3(peak+0.882, peakPos+noiseTime+0.354,
+                peak+peakPos+0.455)),
+            0.0);
+
+    vec3 tri2 = vec3(noise(vec3(peak+dt+0.227, peakPos+noiseTime+0.822,
+                peak+peakPos+0.092)),
+            noise(vec3(peak-dt+0.192, peakPos-noiseTime+0.277,
+                peak-peakPos+0.304)),
+            0.0);
+
+    float triRad = mean*triangleRadius;
+
+    float triSDF = sdfTriangle(vec3(pos, 0.0), mid, tri1*triRad,
+            mix(tri1, tri2*triRad, triangleFat*(1.0-peakPos)))/
+        step(triangleEdge, abs(peak));
 
 
-    float sdf = min(ringSDF, otherSDF);
+    // Closest
+
+    float sdf = min(min(ringSDF, otherSDF), triSDF);
 
     // Light attenuation
     // @see Attenuation: http://gamedev.stackexchange.com/questions/56897/glsl-light-attenuation-color-and-intensity-formula
@@ -107,10 +141,15 @@ void main() {
 
     vec4 geom = texture2D(form, uv);
 
-    // vec4 color = ring*ringAlpha;
-    // vec4 color = geom*formAlpha*ambient;
+    vec4 background = vec4(noise(vec3(uv*noiseScale*staticScale,
+            mean*noiseTime*dt*staticSpeed)));
 
-    vec4 color = (ring*ringAlpha)+(geom*formAlpha*ambient);
+    // vec4 color = ring*emit*ringAlpha;
+    // vec4 color = geom*ambient*formAlpha;
+
+    vec4 color = (ring*emit*ringAlpha)+
+            (geom*ambient*formAlpha)+
+            (background*staticAlpha);
 
     gl_FragColor = color;
 }
