@@ -13,6 +13,18 @@ canvas {
     }
 }
 
+.track {
+    position: absolute;
+    top: 0;
+    left: 0;
+    opacity: 0;
+    transition: opacity 300ms ease-in-out;
+
+    &:hover {
+        opacity: 1;
+    }
+}
+
 .progress-total {
     position: absolute;
     bottom: 0;
