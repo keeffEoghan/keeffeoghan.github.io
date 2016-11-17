@@ -69,7 +69,6 @@ export default (canvas) => {
         meanFulcrum: ((queries.meanFulcrum)? parseFloat(queries.meanFulcrum, 10) : 0.4),
 
         harmonies: ((queries.harmonies)? parseFloat(queries.harmonies, 10) : 1),
-        falloff: ((queries.falloff)? parseFloat(queries.falloff, 10) : 0.00001),
 
         silent: ((queries.silent)? parseFloat(queries.silent, 10) : 0),
 
