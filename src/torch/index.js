@@ -66,19 +66,17 @@ export default (canvas) => {
     const queryColor = (query) => query.split(',').map((v) =>
                     parseFloat(v.replace(/[\[\]]/gi, ''), 10));
 
+    const track = (decodeURIComponent(queries.track || '') ||
+        prompt('Enter a track URL:'));
+
+    const audioOrders = ((queries.audioOrders)? parseInt(queries.audioOrders, 10) : 2);
+
+    const showAudio = ((queries.showAudio === 'true') || false);
+
     const state = self.state = {
-        // These 2 are required
-
-        animation: (queries.animation ||
-            prompt('Enter an animation name:',
-                Object.keys(animations).join(' / '))),
-
-        track: (decodeURIComponent(queries.track || '') ||
-            prompt('Enter a track URL:')),
-
+        animation: queries.animation,
 
         audioMode: (queries.audioMode || 'frequencies'),
-        audioOrders: ((queries.audioOrders)? parseInt(queries.audioOrders, 10) : 2),
 
         meanFulcrum: ((queries.meanFulcrum)? parseFloat(queries.meanFulcrum, 10) : 0.4),
 
@@ -95,7 +93,7 @@ export default (canvas) => {
 
         spin: ((queries.spin)? parseFloat(queries.spin, 10) : 0.0001),
 
-        ringRadius: ((queries.ringRadius)? parseFloat(queries.ringRadius, 10) : 0.3),
+        ringRadius: ((queries.ringRadius)? parseFloat(queries.ringRadius, 10) : 0.4),
         ringThick: ((queries.ringThick)? parseFloat(queries.ringThick, 10) : 0.005),
         ringAlpha: ((queries.ringAlpha)? parseFloat(queries.ringAlpha, 10) : 0.0005),
 
@@ -128,30 +126,6 @@ export default (canvas) => {
         bokehAmount: ((queries.bokehAmount)? parseFloat(queries.bokehAmount, 10) : 60)
     };
 
-    const paramQuery = () =>
-        reduce((out, param, name) => {
-                out.push(name+'='+param);
-
-                return out;
-            },
-            state, []);
-
-    const showState = () => prompt('The URL to this state:',
-            location.href.replace(location.search, '')+'?'+
-                paramQuery().join('&'));
-
-    console.log(paramQuery().join('\n'));
-
-
-    const showStateButton = Object.assign(document.createElement('button'), {
-            className: 'show-params',
-            innerText: 'show state'
-        });
-
-    showStateButton.addEventListener('click', showState);
-
-    canvas.parentElement.appendChild(showStateButton);
-
 
     // Track
 
@@ -161,19 +135,26 @@ export default (canvas) => {
             autoplay: true,
             muted: 'muted' in queries,
             className: 'track',
-            src: ((state.track.match(/^(https)?(:\/\/)?(www\.)?dropbox\.com\/s\//gi))?
-                    state.track.replace(/^((https)?(:\/\/)?(www\.)?)dropbox\.com\/s\/(.*)\?dl=(0)$/gi,
+            src: ((track.match(/^(https)?(:\/\/)?(www\.)?dropbox\.com\/s\//gi))?
+                    track.replace(/^((https)?(:\/\/)?(www\.)?)dropbox\.com\/s\/(.*)\?dl=(0)$/gi,
                         'https://dl.dropboxusercontent.com/s/$5?dl=1&raw=1')
-                :   state.track)
+                :   track)
         });
 
-    canvas.parentElement.appendChild(audio);
+    if(showAudio) {
+        canvas.parentElement.appendChild(audio);
+    }
+
+    const progress = document.getElementsByClassName('progress')[0];
+
+
+    // Audio analysis
 
     const audioAnalyser = analyser(audio);
 
     audioAnalyser.analyser.fftSize = 2**11;
 
-    const audioTrigger = new AudioTrigger(audioAnalyser, state.audioOrders);
+    const audioTrigger = new AudioTrigger(audioAnalyser, audioOrders);
 
     const audioTexture = new AudioTexture(gl, audioTrigger.dataOrder(-1));
     // const audioTexture = new AudioTexture(gl,
@@ -201,7 +182,9 @@ export default (canvas) => {
     });
 
     // Hand over the rest to the param-defined animation
-    animations[state.animation](player);
+    if(state.animation) {
+        animations[state.animation](player);
+    }
 
 
     // The main loop
@@ -211,12 +194,13 @@ export default (canvas) => {
 
         // Animate
 
-        if(audio && audio.currentTime >= 0 && !audio.paused) {
+        if(audio.currentTime >= 0 && !audio.paused && state.animation) {
             timers.player.tick(audio.currentTime*1000);
             player.play(timers.player.time);
-
-            console.log(state.ringRadius, timers.player.time);
         }
+
+        // For guaging time accurately by looking at the video recording
+        progress.style.width = (audio.currentTime/audio.duration*100)+'%';
 
 
         // Sample audio
