@@ -135,5 +135,4 @@ void main() {
             (attenuate(otherSDF)*otherAlpha)+
             (attenuate(triangleSDF)*triangleAlpha)+
             (background*staticAlpha));
-    // gl_FragColor = vec4(step(0.01, ringRadius-dist));
 }
