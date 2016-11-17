@@ -27,10 +27,10 @@ const float limit = 0.6;
 
 void main() {
     vec2 uv = gl_FragCoord.xy/viewRes;
-    // vec2 texel = 1.0/viewRes;
-    // float power = 1.0-vignette(uv, mid, limit, falloff);
+    vec2 texel = 1.0/viewRes;
+    float power = 1.0-vignette(uv, mid, limit, falloff);
 
-    // gl_FragColor = vec4(bokeh(texel, uv, bokehRadius*power, bokehAmount*power),
-    //         color(uv).a);
-    gl_FragColor = color(uv);
+    gl_FragColor = vec4(bokeh(texel, uv, bokehRadius*power, bokehAmount*power),
+            color(uv).a);
+    // gl_FragColor = color(uv);
 }
