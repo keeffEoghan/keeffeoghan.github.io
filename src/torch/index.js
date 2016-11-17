@@ -2,8 +2,6 @@ import glContext from 'gl-context';
 import FBO from 'gl-fbo';
 import analyser from 'web-audio-analyser';
 import throttle from 'lodash/throttle';
-import mapRange from 'range-fit';
-import vec2 from 'gl-matrix/src/gl-matrix/vec2';
 import shader from 'gl-shader';
 import querystring from 'querystring';
 
@@ -12,117 +10,232 @@ import Timer from '../tendrils/timer';
 import Screen from '../tendrils/screen';
 
 import screenVert from '../tendrils/screen/index.vert';
-// import screenFrag from '../tendrils/screen/index.frag';
-import formFrag from './form.frag';
+
+import lightFrag from './light.frag';
+import fadeFrag from './fade.frag';
 import drawFrag from './draw.frag';
-import bokehFrag from '../tendrils/screen/bokeh.frag';
 
 import AudioTrigger from '../tendrils/audio/';
 import AudioTexture from '../tendrils/audio/data-texture';
 import { peakPos, meanWeight } from '../tendrils/analyse';
 
+import Player from '../tendrils/animate';
+
 import { containAspect } from '../tendrils/utils/aspect';
 
-import each from '../fp/each';
 import map from '../fp/map';
 import reduce from '../fp/reduce';
+
 import { step } from '../utils';
 
-export default (canvas, settings, debug) => {
+import * as colors from './colors';
+import animations from './animations';
+
+
+export default (canvas) => {
     const queries = querystring.parse(location.search.slice(1));
 
     const gl = glContext(canvas, { preserveDrawingBuffer: true }, render);
 
-    const timer = Object(new Timer(), {
-            step: 1000/60
-        });
+    const timers = {
+        main: Object(new Timer(), { step: 1000/60 }),
+        player: new Timer(0)
+    };
 
     const viewRes = [0, 0];
     const viewSize = [0, 0];
 
-    const buffers = [FBO(gl, [1, 1]), FBO(gl, [1, 1])];
+    const buffers = {
+        light: FBO(gl, [1, 1]),
+        // @todo
+        // flash: FBO(gl, [1, 1]),
+        fade: [FBO(gl, [1, 1]), FBO(gl, [1, 1])]
+    };
 
-    const uniforms = {
-        head: {},
-        form: {},
-        draw: {}
+    const shaders = {
+        light: shader(gl, screenVert, lightFrag),
+        fade: shader(gl, screenVert, fadeFrag),
+        draw: shader(gl, screenVert, drawFrag)
     };
 
     const screen = new Screen(gl);
 
-    // const screenShader = shader(gl, screenVert, screenFrag);
-    const formShader = shader(gl, screenVert, formFrag);
-    const drawShader = shader(gl, screenVert, drawFrag);
-    const bokehShader = shader(gl, screenVert, bokehFrag);
-
 
     // Parameters...
 
-    const params = {
-        track: (decodeURIComponent(queries.track || '') ||
-                prompt('Enter a track URL:')),
+    const queryColor = (query) => query.split(',').map((v) =>
+                    parseFloat(v.replace(/[\[\]]/gi, ''), 10));
 
+    const track = (decodeURIComponent(queries.track || '') ||
+        prompt('Enter a track URL:'));
+
+    const audioOrders = ((queries.audioOrders)?
+            parseInt(queries.audioOrders, 10) : 3);
+
+    const showAudio = ((queries.showAudio === 'true') || false);
+
+    const state = self.state = {
+        animation: queries.animation,
+
+        /**
+         * @note `waveform` seems to make everything about an order of magnitude
+         *       more sensitive than `frequencies`.
+         */
         audioMode: (queries.audioMode || 'frequencies'),
-        audioOrders: ((queries.audioOrders)? parseInt(queries.audioOrders, 10) : 2),
-        harmonies: ((queries.harmonies)? parseFloat(queries.harmonies, 10) : 1),
-        falloff: ((queries.falloff)? parseFloat(queries.falloff, 10) : 0.00001),
-        attenuate: ((queries.attenuate)? parseFloat(queries.attenuate, 10) : 0.02),
-        silent: ((queries.silent)? parseFloat(queries.silent, 10) : 0),
-        soundSmooth: ((queries.soundSmooth)? parseFloat(queries.soundSmooth, 10) : 0.3),
-        soundWarp: ((queries.soundWarp)? parseFloat(queries.soundWarp, 10) : 0.007),
-        noiseWarp: ((queries.noiseWarp)? parseFloat(queries.noiseWarp, 10) : 0.1),
-        noiseSpeed: ((queries.noiseSpeed)? parseFloat(queries.noiseSpeed, 10) : 0.001),
-        noiseScale: ((queries.noiseScale)? parseFloat(queries.noiseScale, 10) : 0.3),
-        meanFulcrum: ((queries.meanFulcrum)? parseFloat(queries.meanFulcrum, 10) : 0.4),
-        grow: ((queries.grow)? parseFloat(queries.grow, 10) : 0.0005),
-        growLimit: ((queries.growLimit)? parseFloat(queries.growLimit, 10) : 1.6),
-        spin: ((queries.spin)? parseFloat(queries.spin, 10) : 0.0001),
-        radius: ((queries.radius)? parseFloat(queries.radius, 10) : 0.3),
-        thick: ((queries.thick)? parseFloat(queries.thick, 10) : 0.005),
-        otherRadius: ((queries.otherRadius)? parseFloat(queries.otherRadius, 10) : 0.2),
-        otherThick: ((queries.otherThick)? parseFloat(queries.otherThick, 10) : 0.03),
-        otherEdge: ((queries.otherEdge)? parseFloat(queries.otherEdge, 10) : 4),
-        jitter: ((queries.jitter)? parseFloat(queries.jitter, 10) : 0.002),
-        nowAlpha: ((queries.nowAlpha)? parseFloat(queries.nowAlpha, 10) : 1),
-        pastAlpha: ((queries.pastAlpha)? parseFloat(queries.pastAlpha, 10) : 0.99),
-        formAlpha: ((queries.formAlpha)? parseFloat(queries.formAlpha, 10) : 1),
-        ringAlpha: ((queries.ringAlpha)? parseFloat(queries.ringAlpha, 10) : 0.001),
-        bokehRadius: ((queries.bokehRadius)? parseFloat(queries.bokehRadius, 10) : 8),
-        bokehAmount: ((queries.bokehAmount)? parseFloat(queries.bokehAmount, 10) : 60),
 
-        ambient: ((queries.ambient)?
-                queries.ambient.split(',').map((v) =>
-                    parseFloat(v.replace(/[\[\]]/gi, ''), 10))
-            :   [1, 1, 1, 1])
+        /**
+         * @note Each higher order seems to make everything aboutan order of
+         *       magnitude more sensitive.
+         */
+        audioOrder: ((queries.audioOrder)?
+                parseInt(queries.audioOrder, 10)
+            :   1),
+
+        // audioScale: 1, // audioOrder = 0
+        audioScale: 0.008, // audioOrder = 1
+
+        meanFulcrum: ((queries.meanFulcrum)?
+                parseFloat(queries.meanFulcrum, 10)
+            :   0.4),
+
+
+        harmonies: ((queries.harmonies)?
+                parseFloat(queries.harmonies, 10)
+            :   1),
+
+
+        silent: ((queries.silent)?
+                parseFloat(queries.silent, 10)
+            :   0.000001),
+
+
+        soundSmooth: ((queries.soundSmooth)?
+                parseFloat(queries.soundSmooth, 10)
+            :   0.3),
+
+        soundWarp: ((queries.soundWarp)?
+                parseFloat(queries.soundWarp, 10)
+            :   0.006),
+
+
+        noiseWarp: ((queries.noiseWarp)?
+                parseFloat(queries.noiseWarp, 10)
+            // :   0.04),
+            :   0),
+
+        noiseSpeed: ((queries.noiseSpeed)?
+                parseFloat(queries.noiseSpeed, 10)
+            :   0.0005),
+
+        noiseScale: ((queries.noiseScale)?
+                parseFloat(queries.noiseScale, 10)
+            :   0.05),
+
+
+        spin: ((queries.spin)?
+                parseFloat(queries.spin, 10)
+            :   0.0001),
+
+
+        ringRadius: ((queries.ringRadius)?
+                parseFloat(queries.ringRadius, 10)
+            :   0.4),
+
+        ringThick: ((queries.ringThick)?
+                parseFloat(queries.ringThick, 10)
+            :   0.01),
+
+        ringAlpha: ((queries.ringAlpha)?
+                parseFloat(queries.ringAlpha, 10)
+            :   10),
+
+
+        otherRadius: ((queries.otherRadius)?
+                parseFloat(queries.otherRadius, 10)
+            :   100),
+
+        otherThick: ((queries.otherThick)?
+                parseFloat(queries.otherThick, 10)
+            :   0.000001),
+
+        otherEdge: ((queries.otherEdge)?
+                parseFloat(queries.otherEdge, 10)
+            :   250),
+
+        otherAlpha: ((queries.otherAlpha)?
+                parseFloat(queries.otherAlpha, 10)
+            :   0.0001),
+
+
+        triangleRadius: ((queries.triangleRadius)?
+                parseFloat(queries.triangleRadius, 10)
+            :   0.1),
+
+        triangleFat: ((queries.triangleFat)?
+                parseFloat(queries.triangleFat, 10)
+            :   0.2),
+
+        triangleEdge: ((queries.triangleEdge)?
+                parseFloat(queries.triangleEdge, 10)
+            :   255),
+
+        triangleAlpha: ((queries.triangleAlpha)?
+                parseFloat(queries.triangleAlpha, 10)
+            :   0.000001),
+
+
+        staticScale: ((queries.staticScale)?
+                parseFloat(queries.staticScale, 10)
+            :   150),
+
+        staticSpeed: ((queries.staticSpeed)?
+                parseFloat(queries.staticSpeed, 10)
+            :   1),
+
+        staticShift: ((queries.staticShift)?
+                parseFloat(queries.staticShift, 10)
+            :   0.3),
+
+        staticAlpha: ((queries.staticAlpha)?
+                parseFloat(queries.staticAlpha, 10)
+            :   0.03),
+
+
+        grow: ((queries.grow)?
+                parseFloat(queries.grow, 10)
+            :   0.0005),
+
+        growLimit: ((queries.growLimit)?
+                parseFloat(queries.growLimit, 10)
+            :   1.6),
+
+
+        jitter: ((queries.jitter)?
+                parseFloat(queries.jitter, 10)
+            :   0.002),
+
+
+        fadeAlpha: ((queries.fadeAlpha)?
+                parseFloat(queries.fadeAlpha, 10)
+            // :   0.99),
+            :   0),
+
+
+        lightColor: ((queries.lightColor)?
+                queryColor(queries.lightColor)
+            :   colors.white),
+        fadeColor: ((queries.fadeColor)?
+                queryColor(queries.fadeColor)
+            :   colors.lightBlueB),
+
+        bokehRadius: ((queries.bokehRadius)?
+                parseFloat(queries.bokehRadius, 10)
+            :   8),
+
+        bokehAmount: ((queries.bokehAmount)?
+                parseFloat(queries.bokehAmount, 10)
+            :   60)
     };
-
-    Object.assign(self, params);
-
-    self.applyParams = () => map((param, name) => self[name], params, params);
-
-    const paramQuery = () =>
-        reduce((out, param, name) => {
-                out.push(name+'='+param);
-
-                return out;
-            },
-            params, []);
-
-    const showState = () => prompt('The URL to this state:',
-            location.href.replace(location.search, '')+'?'+
-                paramQuery().join('&'));
-
-    console.log(paramQuery().join('\n'));
-
-
-    const showStateButton = Object.assign(document.createElement('button'), {
-            className: 'show-params',
-            innerText: 'show state'
-        });
-
-    showStateButton.addEventListener('click', showState);
-
-    canvas.parentElement.appendChild(showStateButton);
 
 
     // Track
@@ -139,29 +252,91 @@ export default (canvas, settings, debug) => {
                 :   track)
         });
 
-    canvas.parentElement.appendChild(audio);
-    
+    if(showAudio) {
+        canvas.parentElement.appendChild(audio);
+    }
+
+    const progress = document.getElementsByClassName('progress')[0];
+
+
+    // Audio analysis
+
     const audioAnalyser = analyser(audio);
 
     audioAnalyser.analyser.fftSize = 2**11;
-    uniforms.frequencies = audioAnalyser.analyser.frequencyBinCount;
 
     const audioTrigger = new AudioTrigger(audioAnalyser, audioOrders);
 
-    const audioTexture = new AudioTexture(gl, audioTrigger.dataOrder(-1));
-    // const audioTexture = new AudioTexture(gl,
-    //         audioAnalyser.analyser.frequencyBinCount);
+    const audioTexture = new AudioTexture(gl,
+            audioTrigger.dataOrder(state.audioOrder));
+
+
+    // Animation setup
+
+    const tracks = {
+        main: state,
+        lightColor: state.lightColor,
+        fadeColor: state.fadeColor
+    };
+
+    const tracksStart = {
+        main: { ...state },
+        lightColor: state.lightColor.slice(0),
+        fadeColor: state.fadeColor.slice(0)
+    };
+
+    const player = new Player(map(() => [], tracks, {}), tracks);
+
+    // Set up the start/reset frame
+    player.apply((track, key) => {
+        const start = tracksStart[key];
+
+        track.to({
+            to: start,
+            time: 200
+        });
+
+        return { apply: start };
+    });
+
+    // Hand over the rest to the param-defined animation
+    if(state.animation) {
+        animations[state.animation](player);
+    }
+
+
+    const scrub = () => {
+        if(audio.currentTime >= 0 && !audio.paused && state.animation) {
+            player.playFrom(audio.currentTime*1000, 0);
+        }
+    };
+
+
+    audio.addEventListener('seeked', scrub);
+    audio.addEventListener('play', scrub);
 
 
     // The main loop
     function render() {
-        const dt = timer.tick().dt;
+        const dt = timers.main.tick().dt;
+
+
+        // Animate
+
+        if(audio.currentTime >= 0 && !audio.paused && state.animation) {
+            timers.player.tick(audio.currentTime*1000);
+            player.play(timers.player.time);
+        }
+
+        // For guaging time accurately by looking at the video recording
+        progress.style.width = (audio.currentTime/audio.duration*100)+'%';
 
 
         // Sample audio
 
-        audioTrigger.sample(dt, audioMode);
-        // audioTexture[audioMode](audioTrigger.dataOrder(-1));
+        audioTrigger.sample(dt, state.audioMode);
+        // @todo Hack, remove
+        audioTexture.array.data = audioTrigger.dataOrder(state.audioOrder);
         audioTexture.apply();
 
         let audioPeak = peakPos(audioTexture.array.data);
@@ -170,85 +345,125 @@ export default (canvas, settings, debug) => {
         // Render
 
         gl.viewport(0, 0, viewRes[0], viewRes[1]);
-
-        const head = {
-            time: timer.time,
-            dt: timer.dt,
-            viewSize,
-            viewRes
-        };
+        screen.bind();
 
 
-        // Buffer pass - develop the form
+        // Light pass
+        /**
+         * @todo May need to do this twice, each having their own alpha inputs:
+         *           - For the current light, which gets after-imaged
+         *           - For a separate flash layer, which doesn't
+         */
 
-        buffers[0].bind();
-        formShader.bind();
+        buffers.light.bind();
+        shaders.light.bind();
 
-        Object.assign(formShader.uniforms, head, {
-                past: buffers[1].color[0].bind(0),
-                // @todo Bring audio stuff here as well?
-                falloff,
-                grow,
-                growLimit,
-                // @todo Spin form too?
-                // spinPast,
-                jitter,
-                pastAlpha
-            });
-        
-        screen.render();
+        Object.assign(shaders.light.uniforms, {
+                time: timers.main.time,
+                dt: timers.main.dt,
 
+                viewSize,
+                viewRes,
 
-        // Screen pass - draw the light and form
+                audio: audioTexture.texture.bind(0),
+                audioScale: state.audioScale,
 
-        buffers[1].bind();
-        // gl.bindFramebuffer(gl.FRAMEBUFFER, null);
-        drawShader.bind();
-
-        Object.assign(drawShader.uniforms, head, {
-                form: buffers[0].color[0].bind(0),
-                audio: audioTexture.texture.bind(1),
                 peak: audioPeak.peak,
-                peakPos: audioPeak.pos,
-                mean: meanWeight(audioTexture.array.data, meanFulcrum),
-                harmonies,
-                attenuate,
-                silent,
-                soundSmooth,
-                soundWarp,
-                noiseWarp,
-                noiseSpeed,
-                noiseScale,
-                spin,
-                radius,
-                thick,
-                otherRadius,
-                otherThick,
-                otherEdge,
-                bokehRadius,
-                bokehAmount,
-                formAlpha,
-                ringAlpha,
-                ambient
+                peakPos: audioPeak.pos/audioTexture.array.data.length,
+                mean: meanWeight(audioTexture.array.data, state.meanFulcrum),
+
+                frequencies: audioAnalyser.analyser.frequencyBinCount,
+                harmonies: state.harmonies,
+                silent: state.silent,
+                soundSmooth: state.soundSmooth,
+                soundWarp: state.soundWarp,
+
+                noiseWarp: state.noiseWarp,
+                noiseSpeed: state.noiseSpeed,
+                noiseScale: state.noiseScale,
+
+                spin: state.spin,
+
+                ringRadius: state.ringRadius,
+                ringThick: state.ringThick,
+                ringAlpha: state.ringAlpha,
+
+                otherRadius: state.otherRadius,
+                otherThick: state.otherThick,
+                otherEdge: state.otherEdge,
+                otherAlpha: state.otherAlpha,
+
+                triangleRadius: state.triangleRadius,
+                triangleFat: state.triangleFat,
+                triangleEdge: state.triangleEdge,
+                triangleAlpha: state.triangleAlpha,
+
+                staticScale: state.staticScale,
+                staticSpeed: state.staticSpeed,
+                staticShift: state.staticShift,
+                staticAlpha: state.staticAlpha
             });
 
-        screen.render();
+        screen.draw();
 
 
-        // Post pass
+        // Fade pass
+
+        buffers.fade[0].bind();
+        // gl.bindFramebuffer(gl.FRAMEBUFFER, null);
+        shaders.fade.bind();
+
+        Object.assign(shaders.fade.uniforms, {
+                time: timers.main.time,
+                dt: timers.main.dt,
+
+                viewSize,
+                viewRes,
+
+                next: buffers.light.color[0].bind(0),
+                past: buffers.fade[1].color[0].bind(1),
+                // @todo Bring audio stuff here as well?
+
+                grow: state.grow,
+                growLimit: state.growLimit,
+
+                // @todo Spin this too?
+                // spinPast: state.spinPast,
+
+                jitter: state.jitter,
+
+                fadeAlpha: state.fadeAlpha
+            });
+
+        screen.draw();
+
+
+        // Draw pass
 
         gl.bindFramebuffer(gl.FRAMEBUFFER, null);
-        bokehShader.bind();
+        shaders.draw.bind();
 
-        Object.assign(bokehShader.uniforms, {
-                view: buffers[1].color[0].bind(0),
-                resolution: viewRes,
-                time: timer.time,
-                radius: bokehRadius,
-                amount: bokehAmount
+        Object.assign(shaders.draw.uniforms, {
+                viewRes,
+
+                light: buffers.light.color[0].bind(0),
+                fade: buffers.fade[0].color[0].bind(1),
+
+                lightColor: state.lightColor,
+                fadeColor: state.fadeColor,
+
+                bokehRadius: state.bokehRadius,
+                bokehAmount: state.bokehAmount
             });
 
-        screen.render();
+        screen.draw();
+
+
+        // Step the fade
+        step(buffers.fade);
+
+        // Finish up
+        screen.bind();
     }
 
     function resize() {
@@ -260,7 +475,8 @@ export default (canvas, settings, debug) => {
 
         containAspect(viewSize, viewRes);
 
-        each((buffer) => buffer.shape = viewRes, buffers);
+        buffers.light.shape = viewRes;
+        buffers.fade[0].shape = buffers.fade[1].shape = viewRes;
     }
 
 
