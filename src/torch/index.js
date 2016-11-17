@@ -221,10 +221,10 @@ export default (canvas) => {
 
         lightColor: ((queries.lightColor)?
                 queryColor(queries.lightColor)
-            :   colors.white),
+            :   [...colors.white]),
         fadeColor: ((queries.fadeColor)?
                 queryColor(queries.fadeColor)
-            :   colors.lightBlueB),
+            :   [...colors.lightBlueB]),
 
         bokehRadius: ((queries.bokehRadius)?
                 parseFloat(queries.bokehRadius, 10)
