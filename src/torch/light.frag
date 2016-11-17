@@ -9,6 +9,8 @@ uniform vec2 viewRes;
 
 uniform sampler2D audio;
 
+uniform float audioScale;
+
 uniform float peak;
 uniform float peakPos;
 uniform float mean;
@@ -61,7 +63,8 @@ const vec3 mid = vec3(0.0);
 
 float attenuate(float sdf) {
     // @see Attenuation: http://gamedev.stackexchange.com/questions/56897/glsl-light-attenuation-color-and-intensity-formula
-    return 1.0/sdf/sdf;
+    // return clamp(1.0/sdf/sdf, 0.0, 1.0);
+    return max(0.0, 1.0/sdf/sdf);
 }
 
 void main() {
@@ -77,15 +80,17 @@ void main() {
         (sampleSound(audio, angle-frequencyOffset).x*soundSmooth)+
         (sampleSound(audio, angle+frequencyOffset).x*soundSmooth);
 
-    float sound = abs(soundWarp*soundKernel/(1.0+(2.0*soundSmooth)))+silent;
+    float sound = max(abs(soundWarp*soundKernel/(1.0+(2.0*soundSmooth))), silent);
 
     float noiseTime = time*noiseSpeed;
 
 
     // The light ring
 
-    float warp = (mean*sound)+
-        (noise(vec3(pos*(1.0+noiseScale), noiseTime))*noiseWarp);
+    float warp = (mean*sound/audioScale)+
+        (noise(vec3(pos*(1.0+noiseScale*(1.0+(0.5*soundWarp*mean/audioScale))),
+                noiseTime))*
+            noiseWarp*(1.0+(0.5*soundWarp*peak/audioScale)));
 
     float ringSDF = clamp(abs(dist-ringRadius-warp)-ringThick, 0.0, 1.0)/sound;
 
@@ -98,9 +103,9 @@ void main() {
     float otherRad = otherRadius*length(otherPos)*peakPos;
 
     float otherSDF = clamp(abs(sdfCircle(pos, otherPos, otherRad))-
-                abs(otherThick*mean),
+                abs(otherThick*mean*audioScale),
             0.0, 1.0)/
-        step(otherEdge, abs(peak));
+        step(otherEdge, abs(peak/audioScale));
 
 
     // Triangle
@@ -111,10 +116,10 @@ void main() {
                 peak+peakPos+0.455)),
             0.0);
 
-    vec3 tri2 = vec3(noise(vec3(peak+dt+0.227, peakPos+noiseTime+0.822,
-                peak+peakPos+0.092)),
-            noise(vec3(peak-dt+0.192, peakPos-noiseTime+0.277,
-                peak-peakPos+0.304)),
+    vec3 tri2 = vec3(noise(vec3(peak+dt+10.227, peakPos+noiseTime+10.822,
+                peak+peakPos+10.092)),
+            noise(vec3(peak-dt+10.192, peakPos-noiseTime+10.277,
+                peak-peakPos+10.304)),
             0.0);
 
     float triRad = mean*triangleRadius;
@@ -126,12 +131,12 @@ void main() {
 
     // "TV static" background
     float background = noise(vec3(uv*staticScale,
-            (mean*staticShift)+(time*staticSpeed)));
+            (mean*staticShift/audioScale)+(time*staticSpeed)));
 
 
     // Accumulate
-    gl_FragColor = vec4(max(0.0, attenuate(ringSDF)*ringAlpha)+
+    gl_FragColor = vec4((attenuate(ringSDF)*ringAlpha)+
             (attenuate(otherSDF)*otherAlpha)+
             (attenuate(triangleSDF)*triangleAlpha)+
-            (background*staticAlpha));
+            max(0.0, background*staticAlpha));
 }
