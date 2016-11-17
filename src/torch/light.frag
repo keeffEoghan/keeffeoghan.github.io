@@ -77,16 +77,15 @@ void main() {
         (sampleSound(audio, angle-frequencyOffset).x*soundSmooth)+
         (sampleSound(audio, angle+frequencyOffset).x*soundSmooth);
 
-    float sound = max(abs(soundKernel/(1.0+(2.0*soundSmooth))), silent);
+    float sound = abs(soundWarp*soundKernel/(1.0+(2.0*soundSmooth)))+silent;
 
     float noiseTime = time*noiseSpeed;
 
 
     // The light ring
 
-    float warp = (mean*sound*soundWarp)+
-        (noise(vec3(pos*(1.0+noiseScale*(0.3+peak)), noiseTime))
-            *noiseWarp*(0.3+mean));
+    float warp = (mean*sound)+
+        (noise(vec3(pos*(1.0+noiseScale), noiseTime))*noiseWarp);
 
     float ringSDF = clamp(abs(dist-ringRadius-warp)-ringThick, 0.0, 1.0)/sound;
 
@@ -126,8 +125,8 @@ void main() {
 
 
     // "TV static" background
-    float background = noise(vec3(uv*noiseScale*staticScale,
-            (mean*staticShift)+(noiseTime*staticSpeed)));
+    float background = noise(vec3(uv*staticScale,
+            (mean*staticShift)+(time*staticSpeed)));
 
 
     // Accumulate

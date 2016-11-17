@@ -80,7 +80,8 @@ export default (canvas) => {
         audioMode: (queries.audioMode || 'frequencies'),
 
         audioOrder: ((queries.audioOrder)?
-            parseInt(queries.audioOrder, 10) : 2),
+                parseInt(queries.audioOrder, 10)
+            :   0),
 
         meanFulcrum: ((queries.meanFulcrum)?
                 parseFloat(queries.meanFulcrum, 10)
@@ -94,7 +95,7 @@ export default (canvas) => {
 
         silent: ((queries.silent)?
                 parseFloat(queries.silent, 10)
-            :   0),
+            :   0.001),
 
 
         soundSmooth: ((queries.soundSmooth)?
@@ -103,7 +104,7 @@ export default (canvas) => {
 
         soundWarp: ((queries.soundWarp)?
                 parseFloat(queries.soundWarp, 10)
-            :   0.007),
+            :   0.002),
 
 
         noiseWarp: ((queries.noiseWarp)?
@@ -112,11 +113,11 @@ export default (canvas) => {
 
         noiseSpeed: ((queries.noiseSpeed)?
                 parseFloat(queries.noiseSpeed, 10)
-            :   0.001),
+            :   0.0005),
 
         noiseScale: ((queries.noiseScale)?
                 parseFloat(queries.noiseScale, 10)
-            :   0.3),
+            :   0.05),
 
 
         spin: ((queries.spin)?
@@ -130,11 +131,11 @@ export default (canvas) => {
 
         ringThick: ((queries.ringThick)?
                 parseFloat(queries.ringThick, 10)
-            :   0.005),
+            :   0.01),
 
         ringAlpha: ((queries.ringAlpha)?
                 parseFloat(queries.ringAlpha, 10)
-            :   0.0005),
+            :   0.01),
 
 
         otherRadius: ((queries.otherRadius)?
@@ -151,7 +152,8 @@ export default (canvas) => {
 
         otherAlpha: ((queries.otherAlpha)?
                 parseFloat(queries.otherAlpha, 10)
-            :   0.001),
+            // :   0.001),
+            :   0),
 
 
         triangleRadius: ((queries.triangleRadius)?
@@ -168,7 +170,8 @@ export default (canvas) => {
 
         triangleAlpha: ((queries.triangleAlpha)?
                 parseFloat(queries.triangleAlpha, 10)
-            :   0.001),
+            // :   0.001),
+            :   0),
 
 
         staticScale: ((queries.staticScale)?
@@ -185,7 +188,8 @@ export default (canvas) => {
 
         staticAlpha: ((queries.staticAlpha)?
                 parseFloat(queries.staticAlpha, 10)
-            :   0.001),
+            // :   0.001),
+            :   0),
 
 
         grow: ((queries.grow)?
@@ -204,7 +208,8 @@ export default (canvas) => {
 
         fadeAlpha: ((queries.fadeAlpha)?
                 parseFloat(queries.fadeAlpha, 10)
-            :   0.99),
+            // :   0.99),
+            :   0),
 
 
         lightColor: ((queries.lightColor)?
@@ -326,7 +331,7 @@ export default (canvas) => {
         shaders.light.bind();
 
         Object.assign(shaders.light.uniforms, {
-                time: timers.time,
+                time: timers.main.time,
                 dt: timers.dt,
 
                 viewSize,
