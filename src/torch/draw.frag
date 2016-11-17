@@ -32,5 +32,4 @@ void main() {
 
     gl_FragColor = vec4(bokeh(texel, uv, bokehRadius*power, bokehAmount*power),
             color(uv).a);
-    // gl_FragColor = color(uv);
 }

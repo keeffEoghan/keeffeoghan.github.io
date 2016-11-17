@@ -19,6 +19,8 @@ import AudioTrigger from '../tendrils/audio/';
 import AudioTexture from '../tendrils/audio/data-texture';
 import { peakPos, meanWeight } from '../tendrils/analyse';
 
+import Player from '../tendrils/animate';
+
 import { containAspect } from '../tendrils/utils/aspect';
 
 import map from '../fp/map';
@@ -26,14 +28,19 @@ import reduce from '../fp/reduce';
 
 import { step } from '../utils';
 
+import * as colors from './colors';
+import animations from './animations';
+
+
 export default (canvas) => {
     const queries = querystring.parse(location.search.slice(1));
 
     const gl = glContext(canvas, { preserveDrawingBuffer: true }, render);
 
-    const timer = Object(new Timer(), {
-            step: 1000/60
-        });
+    const timers = {
+        main: Object(new Timer(), { step: 1000/60 }),
+        player: new Timer(0)
+    };
 
     const viewRes = [0, 0];
     const viewSize = [0, 0];
@@ -59,9 +66,16 @@ export default (canvas) => {
     const queryColor = (query) => query.split(',').map((v) =>
                     parseFloat(v.replace(/[\[\]]/gi, ''), 10));
 
-    const params = {
+    const state = self.state = {
+        // These 2 are required
+
+        animation: (queries.animation ||
+            prompt('Enter an animation name:',
+                Object.keys(animations).join(' / '))),
+
         track: (decodeURIComponent(queries.track || '') ||
-                prompt('Enter a track URL:')),
+            prompt('Enter a track URL:')),
+
 
         audioMode: (queries.audioMode || 'frequencies'),
         audioOrders: ((queries.audioOrders)? parseInt(queries.audioOrders, 10) : 2),
@@ -83,7 +97,7 @@ export default (canvas) => {
 
         ringRadius: ((queries.ringRadius)? parseFloat(queries.ringRadius, 10) : 0.3),
         ringThick: ((queries.ringThick)? parseFloat(queries.ringThick, 10) : 0.005),
-        ringAlpha: ((queries.ringAlpha)? parseFloat(queries.ringAlpha, 10) : 0.001),
+        ringAlpha: ((queries.ringAlpha)? parseFloat(queries.ringAlpha, 10) : 0.0005),
 
         otherRadius: ((queries.otherRadius)? parseFloat(queries.otherRadius, 10) : 0.2),
         otherThick: ((queries.otherThick)? parseFloat(queries.otherThick, 10) : 0.03),
@@ -107,16 +121,12 @@ export default (canvas) => {
 
         fadeAlpha: ((queries.fadeAlpha)? parseFloat(queries.fadeAlpha, 10) : 0.99),
 
-        lightColor: ((queries.lightColor)? queryColor(queries.lightColor) : [1, 1, 1, 1]),
-        fadeColor: ((queries.fadeColor)? queryColor(queries.fadeColor) : [0, 161/255, 210/255, 1]),
+        lightColor: ((queries.lightColor)? queryColor(queries.lightColor) : colors.white),
+        fadeColor: ((queries.fadeColor)? queryColor(queries.fadeColor) : colors.lightBlueB),
 
         bokehRadius: ((queries.bokehRadius)? parseFloat(queries.bokehRadius, 10) : 8),
         bokehAmount: ((queries.bokehAmount)? parseFloat(queries.bokehAmount, 10) : 60)
     };
-
-    Object.assign(self, params);
-
-    self.applyParams = () => map((param, name) => self[name], params, params);
 
     const paramQuery = () =>
         reduce((out, param, name) => {
@@ -124,7 +134,7 @@ export default (canvas) => {
 
                 return out;
             },
-            params, []);
+            state, []);
 
     const showState = () => prompt('The URL to this state:',
             location.href.replace(location.search, '')+'?'+
@@ -151,10 +161,10 @@ export default (canvas) => {
             autoplay: true,
             muted: 'muted' in queries,
             className: 'track',
-            src: ((self.track.match(/^(https)?(:\/\/)?(www\.)?dropbox\.com\/s\//gi))?
-                    self.track.replace(/^((https)?(:\/\/)?(www\.)?)dropbox\.com\/s\/(.*)\?dl=(0)$/gi,
+            src: ((state.track.match(/^(https)?(:\/\/)?(www\.)?dropbox\.com\/s\//gi))?
+                    state.track.replace(/^((https)?(:\/\/)?(www\.)?)dropbox\.com\/s\/(.*)\?dl=(0)$/gi,
                         'https://dl.dropboxusercontent.com/s/$5?dl=1&raw=1')
-                :   self.track)
+                :   state.track)
         });
 
     canvas.parentElement.appendChild(audio);
@@ -163,22 +173,56 @@ export default (canvas) => {
 
     audioAnalyser.analyser.fftSize = 2**11;
 
-    const audioTrigger = new AudioTrigger(audioAnalyser, self.audioOrders);
+    const audioTrigger = new AudioTrigger(audioAnalyser, state.audioOrders);
 
     const audioTexture = new AudioTexture(gl, audioTrigger.dataOrder(-1));
     // const audioTexture = new AudioTexture(gl,
     //         audioAnalyser.analyser.frequencyBinCount);
 
 
+    // Animation setup
+
+    const tracks = {
+        a: state
+    };
+
+    const player = new Player(map(() => [], tracks, {}), tracks);
+
+    const start = { ...state };
+
+    // Set up the start/reset frame
+    player.apply((track) => {
+        track.to({
+            to: start,
+            time: 200
+        });
+
+        return { apply: start };
+    });
+
+    // Hand over the rest to the param-defined animation
+    animations[state.animation](player);
+
+
     // The main loop
     function render() {
-        const dt = timer.tick().dt;
+        const dt = timers.main.tick().dt;
+
+
+        // Animate
+
+        if(audio && audio.currentTime >= 0 && !audio.paused) {
+            timers.player.tick(audio.currentTime*1000);
+            player.play(timers.player.time);
+
+            console.log(state.ringRadius, timers.player.time);
+        }
 
 
         // Sample audio
 
-        audioTrigger.sample(dt, self.audioMode);
-        // audioTexture[self.audioMode](audioTrigger.dataOrder(-1));
+        audioTrigger.sample(dt, state.audioMode);
+        // audioTexture[state.audioMode](audioTrigger.dataOrder(-1));
         audioTexture.apply();
 
         let audioPeak = peakPos(audioTexture.array.data);
@@ -201,8 +245,8 @@ export default (canvas) => {
         shaders.light.bind();
 
         Object.assign(shaders.light.uniforms, {
-                time: timer.time,
-                dt: timer.dt,
+                time: timers.time,
+                dt: timers.dt,
 
                 viewSize,
                 viewRes,
@@ -211,38 +255,38 @@ export default (canvas) => {
 
                 peak: audioPeak.peak,
                 peakPos: audioPeak.pos/audioTexture.array.data.length,
-                mean: meanWeight(audioTexture.array.data, self.meanFulcrum),
+                mean: meanWeight(audioTexture.array.data, state.meanFulcrum),
 
                 frequencies: audioAnalyser.analyser.frequencyBinCount,
-                harmonies: self.harmonies,
-                silent: self.silent,
-                soundSmooth: self.soundSmooth,
-                soundWarp: self.soundWarp,
+                harmonies: state.harmonies,
+                silent: state.silent,
+                soundSmooth: state.soundSmooth,
+                soundWarp: state.soundWarp,
 
-                noiseWarp: self.noiseWarp,
-                noiseSpeed: self.noiseSpeed,
-                noiseScale: self.noiseScale,
+                noiseWarp: state.noiseWarp,
+                noiseSpeed: state.noiseSpeed,
+                noiseScale: state.noiseScale,
 
-                spin: self.spin,
+                spin: state.spin,
 
-                ringRadius: self.ringRadius,
-                ringThick: self.ringThick,
-                ringAlpha: self.ringAlpha,
+                ringRadius: state.ringRadius,
+                ringThick: state.ringThick,
+                ringAlpha: state.ringAlpha,
 
-                otherRadius: self.otherRadius,
-                otherThick: self.otherThick,
-                otherEdge: self.otherEdge,
-                otherAlpha: self.otherAlpha,
+                otherRadius: state.otherRadius,
+                otherThick: state.otherThick,
+                otherEdge: state.otherEdge,
+                otherAlpha: state.otherAlpha,
 
-                triangleRadius: self.triangleRadius,
-                triangleFat: self.triangleFat,
-                triangleEdge: self.triangleEdge,
-                triangleAlpha: self.triangleAlpha,
+                triangleRadius: state.triangleRadius,
+                triangleFat: state.triangleFat,
+                triangleEdge: state.triangleEdge,
+                triangleAlpha: state.triangleAlpha,
 
-                staticScale: self.staticScale,
-                staticSpeed: self.staticSpeed,
-                staticShift: self.staticShift,
-                staticAlpha: self.staticAlpha
+                staticScale: state.staticScale,
+                staticSpeed: state.staticSpeed,
+                staticShift: state.staticShift,
+                staticAlpha: state.staticAlpha
             });
 
         screen.draw();
@@ -255,8 +299,8 @@ export default (canvas) => {
         shaders.fade.bind();
 
         Object.assign(shaders.fade.uniforms, {
-                time: timer.time,
-                dt: timer.dt,
+                time: timers.time,
+                dt: timers.dt,
 
                 viewSize,
                 viewRes,
@@ -265,15 +309,15 @@ export default (canvas) => {
                 past: buffers.fade[1].color[0].bind(1),
                 // @todo Bring audio stuff here as well?
 
-                grow: self.grow,
-                growLimit: self.growLimit,
+                grow: state.grow,
+                growLimit: state.growLimit,
 
                 // @todo Spin this too?
-                // spinPast: self.spinPast,
+                // spinPast: state.spinPast,
 
-                jitter: self.jitter,
+                jitter: state.jitter,
 
-                fadeAlpha: self.fadeAlpha
+                fadeAlpha: state.fadeAlpha
             });
 
         screen.draw();
@@ -290,11 +334,11 @@ export default (canvas) => {
                 light: buffers.light.color[0].bind(0),
                 fade: buffers.fade[0].color[0].bind(1),
 
-                lightColor: self.lightColor,
-                fadeColor: self.fadeColor,
+                lightColor: state.lightColor,
+                fadeColor: state.fadeColor,
 
-                bokehRadius: self.bokehRadius,
-                bokehAmount: self.bokehAmount
+                bokehRadius: state.bokehRadius,
+                bokehAmount: state.bokehAmount
             });
 
         screen.draw();
