@@ -60,9 +60,17 @@ export default (player) => {
         })
         .smoothOver(5000, {
             to: {
-                ringRadius: 0.95,
+                ringRadius: 0.95
             },
             time: 44000,
+            ease: [0, 0, 1]
+        })
+        .smoothOver(5000, {
+            to: {
+                noiseWarp: 0.55,
+                noiseScale: 0.1
+            },
+            time: 49000,
             ease: [0, 0, 1]
         })
         .smoothOver(5000, {
@@ -88,6 +96,20 @@ export default (player) => {
                 otherRadius: 0.8
             },
             time: 76000,
+            ease: [0, 0, 1]
+        })
+        .smoothOver(3000, {
+            to: {
+                noiseWarp: 0.2
+            },
+            time: 80000,
+            ease: [0, 0, 1]
+        })
+        .smoothTo({
+            to: {
+                noiseWarp: 0.1
+            },
+            time: 86000,
             ease: [0, 0, 1]
         })
         .smoothTo({
