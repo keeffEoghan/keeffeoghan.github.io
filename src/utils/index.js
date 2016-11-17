@@ -7,7 +7,7 @@ export function step(array) {
 }
 
 export const wrapIndex = (index, array) =>
-    array[(array.length+index)%array.length];
+    array[(array.length+Math.round(index))%array.length];
 
 
 const invLog2 = 1/Math.log(2);
