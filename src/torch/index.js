@@ -120,7 +120,8 @@ export default (canvas) => {
 
         noiseWarp: ((queries.noiseWarp)?
                 parseFloat(queries.noiseWarp, 10)
-            :   0.04),
+            // :   0.04),
+            :   0),
 
         noiseSpeed: ((queries.noiseSpeed)?
                 parseFloat(queries.noiseSpeed, 10)
@@ -216,7 +217,8 @@ export default (canvas) => {
 
         fadeAlpha: ((queries.fadeAlpha)?
                 parseFloat(queries.fadeAlpha, 10)
-            :   0.99),
+            // :   0.99),
+            :   0),
 
 
         lightColor: ((queries.lightColor)?
@@ -272,15 +274,23 @@ export default (canvas) => {
     // Animation setup
 
     const tracks = {
-        a: state
+        main: state,
+        lightColor: state.lightColor,
+        fadeColor: state.fadeColor
+    };
+
+    const tracksStart = {
+        main: { ...state },
+        lightColor: state.lightColor.slice(0),
+        fadeColor: state.fadeColor.slice(0)
     };
 
     const player = new Player(map(() => [], tracks, {}), tracks);
 
-    const start = { ...state };
-
     // Set up the start/reset frame
-    player.apply((track) => {
+    player.apply((track, key) => {
+        const start = tracksStart[key];
+
         track.to({
             to: start,
             time: 200
@@ -293,6 +303,17 @@ export default (canvas) => {
     if(state.animation) {
         animations[state.animation](player);
     }
+
+
+    const scrub = () => {
+        if(audio.currentTime >= 0 && !audio.paused && state.animation) {
+            player.playFrom(audio.currentTime*1000, 0);
+        }
+    };
+
+
+    audio.addEventListener('seeked', scrub);
+    audio.addEventListener('play', scrub);
 
 
     // The main loop
