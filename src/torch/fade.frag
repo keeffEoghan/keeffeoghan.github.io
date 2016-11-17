@@ -1,28 +1,36 @@
 precision highp float;
 
-#pragma glslify: import(./head)
+uniform float time;
+uniform float dt;
 
+uniform vec2 viewSize;
+uniform vec2 viewRes;
+
+uniform sampler2D next;
 uniform sampler2D past;
 
-uniform float growLimit;
 uniform float grow;
+uniform float growLimit;
 
-// @todo Is there a use for `falloff` in this new setup?
-uniform float falloff;
 // @todo Spin this as well?
-uniform float spinPast;
+// uniform float spinPast;
 
 uniform float jitter;
 
-uniform float pastAlpha;
+uniform float fadeAlpha;
+
+vec4 color(vec2 uv) {
+    return ((texture2D(past, uv)*fadeAlpha)+texture2D(next, uv));
+}
 
 vec3 sampler(vec2 uv) {
-    return texture2D(past, uv).rgb;
+    return color(uv).rgb;
 }
 
 // @todo Noise in form as well?
 #pragma glslify: blur = require(glsl-hash-blur, sample = sampler, iterations = 3)
 
+#pragma glslify: uvToPos = require(../tendrils/map/uv-to-pos)
 #pragma glslify: bezier = require(../tendrils/utils/bezier)
 
 const vec2 mid = vec2(0.5);
@@ -34,21 +42,15 @@ void main() {
 
     float dist = length(pos);
 
-    // Sample and grow the past state
+    // Sample and grow
     
-    vec2 off = mid-uv;
     float growRate = clamp(bezier(curve, dist/growLimit), 0.0, 1.0);
-    vec2 pastUV = uv+(off*grow*dt*(1.0-growRate));
+    vec2 st = uv+((mid-uv)*grow*dt*(1.0-growRate));
 
-    vec4 old = texture2D(past, pastUV);
+    vec4 fade = color(st);
 
-    old.rgb = blur(pastUV, jitter*growRate, viewRes.x/viewRes.y,
+    fade.rgb = blur(st, jitter*growRate, viewRes.x/viewRes.y,
         mod(time, 20.0));
 
-
-    // Accumulate colors
-
-    vec4 color = vec4(clamp(old*pastAlpha, 0.0, 1.0));
-
-    gl_FragColor = color;
+    gl_FragColor = vec4(clamp(fade, 0.0, 1.0));
 }

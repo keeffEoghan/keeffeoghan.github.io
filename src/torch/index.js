@@ -10,10 +10,10 @@ import Timer from '../tendrils/timer';
 import Screen from '../tendrils/screen';
 
 import screenVert from '../tendrils/screen/index.vert';
-// import screenFrag from '../tendrils/screen/index.frag';
-import formFrag from './form.frag';
+
+import lightFrag from './light.frag';
+import fadeFrag from './fade.frag';
 import drawFrag from './draw.frag';
-import bokehFrag from '../tendrils/screen/bokeh.frag';
 
 import AudioTrigger from '../tendrils/audio/';
 import AudioTexture from '../tendrils/audio/data-texture';
@@ -21,9 +21,9 @@ import { peakPos, meanWeight } from '../tendrils/analyse';
 
 import { containAspect } from '../tendrils/utils/aspect';
 
-import each from '../fp/each';
 import map from '../fp/map';
 import reduce from '../fp/reduce';
+
 import { step } from '../utils';
 
 export default (canvas) => {
@@ -38,20 +38,20 @@ export default (canvas) => {
     const viewRes = [0, 0];
     const viewSize = [0, 0];
 
-    const buffers = [FBO(gl, [1, 1]), FBO(gl, [1, 1])];
+    const buffers = {
+        light: FBO(gl, [1, 1]),
+        // @todo
+        // flash: FBO(gl, [1, 1]),
+        fade: [FBO(gl, [1, 1]), FBO(gl, [1, 1])]
+    };
 
-    const uniforms = {
-        head: {},
-        form: {},
-        draw: {}
+    const shaders = {
+        light: shader(gl, screenVert, lightFrag),
+        fade: shader(gl, screenVert, fadeFrag),
+        draw: shader(gl, screenVert, drawFrag)
     };
 
     const screen = new Screen(gl);
-
-    // const screenShader = shader(gl, screenVert, screenFrag);
-    const formShader = shader(gl, screenVert, formFrag);
-    const drawShader = shader(gl, screenVert, drawFrag);
-    const bokehShader = shader(gl, screenVert, bokehFrag);
 
 
     // Parameters...
@@ -65,39 +65,54 @@ export default (canvas) => {
 
         audioMode: (queries.audioMode || 'frequencies'),
         audioOrders: ((queries.audioOrders)? parseInt(queries.audioOrders, 10) : 2),
+
+        meanFulcrum: ((queries.meanFulcrum)? parseFloat(queries.meanFulcrum, 10) : 0.4),
+
         harmonies: ((queries.harmonies)? parseFloat(queries.harmonies, 10) : 1),
         falloff: ((queries.falloff)? parseFloat(queries.falloff, 10) : 0.00001),
-        attenuate: ((queries.attenuate)? parseFloat(queries.attenuate, 10) : 0.02),
+
         silent: ((queries.silent)? parseFloat(queries.silent, 10) : 0),
+
         soundSmooth: ((queries.soundSmooth)? parseFloat(queries.soundSmooth, 10) : 0.3),
         soundWarp: ((queries.soundWarp)? parseFloat(queries.soundWarp, 10) : 0.007),
+
         noiseWarp: ((queries.noiseWarp)? parseFloat(queries.noiseWarp, 10) : 0.1),
         noiseSpeed: ((queries.noiseSpeed)? parseFloat(queries.noiseSpeed, 10) : 0.001),
         noiseScale: ((queries.noiseScale)? parseFloat(queries.noiseScale, 10) : 0.3),
-        meanFulcrum: ((queries.meanFulcrum)? parseFloat(queries.meanFulcrum, 10) : 0.4),
-        grow: ((queries.grow)? parseFloat(queries.grow, 10) : 0.0005),
-        growLimit: ((queries.growLimit)? parseFloat(queries.growLimit, 10) : 1.6),
+
         spin: ((queries.spin)? parseFloat(queries.spin, 10) : 0.0001),
-        radius: ((queries.radius)? parseFloat(queries.radius, 10) : 0.3),
-        thick: ((queries.thick)? parseFloat(queries.thick, 10) : 0.005),
+
+        ringRadius: ((queries.ringRadius)? parseFloat(queries.ringRadius, 10) : 0.3),
+        ringThick: ((queries.ringThick)? parseFloat(queries.ringThick, 10) : 0.005),
+        ringAlpha: ((queries.ringAlpha)? parseFloat(queries.ringAlpha, 10) : 0.001),
+
         otherRadius: ((queries.otherRadius)? parseFloat(queries.otherRadius, 10) : 0.2),
         otherThick: ((queries.otherThick)? parseFloat(queries.otherThick, 10) : 0.03),
         otherEdge: ((queries.otherEdge)? parseFloat(queries.otherEdge, 10) : 4),
-        triangleRadius: ((queries.triangleRadius)? parseFloat(queries.triangleRadius, 10) : 1),
-        triangleFat: ((queries.triangleFat)? parseFloat(queries.triangleFat, 10) : 0),
-        triangleEdge: ((queries.triangleEdge)? parseFloat(queries.triangleEdge, 10) : 3),
-        staticScale: ((queries.staticScale)? parseFloat(queries.staticScale, 10) : 100),
-        staticSpeed: ((queries.staticSpeed)? parseFloat(queries.staticSpeed, 10) : 0.001),
-        staticAlpha: ((queries.staticAlpha)? parseFloat(queries.staticAlpha, 10) : 0.02),
+        otherAlpha: ((queries.otherAlpha)? parseFloat(queries.otherAlpha, 10) : 0.001),
+
+        triangleRadius: ((queries.triangleRadius)? parseFloat(queries.triangleRadius, 10) : 1.5),
+        triangleFat: ((queries.triangleFat)? parseFloat(queries.triangleFat, 10) : 0.2),
+        triangleEdge: ((queries.triangleEdge)? parseFloat(queries.triangleEdge, 10) : 2.5),
+        triangleAlpha: ((queries.triangleAlpha)? parseFloat(queries.triangleAlpha, 1) : 0.001),
+
+        staticScale: ((queries.staticScale)? parseFloat(queries.staticScale, 10) : 150),
+        staticSpeed: ((queries.staticSpeed)? parseFloat(queries.staticSpeed, 10) : 1),
+        staticShift: ((queries.staticShift)? parseFloat(queries.staticShift, 10) : 0.1),
+        staticAlpha: ((queries.staticAlpha)? parseFloat(queries.staticAlpha, 10) : 0.001),
+
+        grow: ((queries.grow)? parseFloat(queries.grow, 10) : 0.0005),
+        growLimit: ((queries.growLimit)? parseFloat(queries.growLimit, 10) : 1.6),
+
         jitter: ((queries.jitter)? parseFloat(queries.jitter, 10) : 0.002),
-        nowAlpha: ((queries.nowAlpha)? parseFloat(queries.nowAlpha, 10) : 1),
-        pastAlpha: ((queries.pastAlpha)? parseFloat(queries.pastAlpha, 10) : 0.99),
-        formAlpha: ((queries.formAlpha)? parseFloat(queries.formAlpha, 10) : 1),
-        ringAlpha: ((queries.ringAlpha)? parseFloat(queries.ringAlpha, 10) : 0.001),
+
+        fadeAlpha: ((queries.fadeAlpha)? parseFloat(queries.fadeAlpha, 10) : 0.99),
+
+        lightColor: ((queries.lightColor)? queryColor(queries.lightColor) : [1, 1, 1, 1]),
+        fadeColor: ((queries.fadeColor)? queryColor(queries.fadeColor) : [0, 161/255, 210/255, 1]),
+
         bokehRadius: ((queries.bokehRadius)? parseFloat(queries.bokehRadius, 10) : 8),
-        bokehAmount: ((queries.bokehAmount)? parseFloat(queries.bokehAmount, 10) : 60),
-        ambient: ((queries.ambient)? queryColor(queries.ambient) : [1, 1, 1, 1]),
-        emit: ((queries.emit)? queryColor(queries.emit) : [1, 1, 1, 1])
+        bokehAmount: ((queries.bokehAmount)? parseFloat(queries.bokehAmount, 10) : 60)
     };
 
     Object.assign(self, params);
@@ -148,7 +163,6 @@ export default (canvas) => {
     const audioAnalyser = analyser(audio);
 
     audioAnalyser.analyser.fftSize = 2**11;
-    uniforms.frequencies = audioAnalyser.analyser.frequencyBinCount;
 
     const audioTrigger = new AudioTrigger(audioAnalyser, self.audioOrders);
 
@@ -174,55 +188,33 @@ export default (canvas) => {
         // Render
 
         gl.viewport(0, 0, viewRes[0], viewRes[1]);
-
-        const head = {
-            time: timer.time,
-            dt: timer.dt,
-            viewSize,
-            viewRes
-        };
+        screen.bind();
 
 
-        // Buffer pass - develop the form
-
-        buffers[0].bind();
-        formShader.bind();
-
-        Object.assign(formShader.uniforms, head, {
-                past: buffers[1].color[0].bind(0),
-                // @todo Bring audio stuff here as well?
-
-                falloff: self.falloff,
-                grow: self.grow,
-                growLimit: self.growLimit,
-                // @todo Spin form too?
-                // spinPast: self.spinPast,
-                jitter: self.jitter,
-                pastAlpha: self.pastAlpha
-            });
-
-        screen.render();
-
-
-        // Screen pass - draw the light and form
+        // Light pass
         /**
          * @todo May need to do this twice, each having their own alpha inputs:
          *           - For the current light, which gets after-imaged
          *           - For a separate flash layer, which doesn't
          */
 
-        buffers[1].bind();
-        // gl.bindFramebuffer(gl.FRAMEBUFFER, null);
-        drawShader.bind();
+        buffers.light.bind();
+        shaders.light.bind();
 
-        Object.assign(drawShader.uniforms, head, {
-                form: buffers[0].color[0].bind(0),
-                audio: audioTexture.texture.bind(1),
+        Object.assign(shaders.light.uniforms, {
+                time: timer.time,
+                dt: timer.dt,
+
+                viewSize,
+                viewRes,
+
+                audio: audioTexture.texture.bind(0),
 
                 peak: audioPeak.peak,
                 peakPos: audioPeak.pos/audioTexture.array.data.length,
                 mean: meanWeight(audioTexture.array.data, self.meanFulcrum),
 
+                frequencies: audioAnalyser.analyser.frequencyBinCount,
                 harmonies: self.harmonies,
                 silent: self.silent,
                 soundSmooth: self.soundSmooth,
@@ -234,47 +226,86 @@ export default (canvas) => {
 
                 spin: self.spin,
 
-                radius: self.radius,
-                thick: self.thick,
+                ringRadius: self.ringRadius,
+                ringThick: self.ringThick,
+                ringAlpha: self.ringAlpha,
 
                 otherRadius: self.otherRadius,
                 otherThick: self.otherThick,
                 otherEdge: self.otherEdge,
+                otherAlpha: self.otherAlpha,
 
                 triangleRadius: self.triangleRadius,
                 triangleFat: self.triangleFat,
                 triangleEdge: self.triangleEdge,
+                triangleAlpha: self.triangleAlpha,
 
                 staticScale: self.staticScale,
                 staticSpeed: self.staticSpeed,
-                staticAlpha: self.staticAlpha,
-
-                formAlpha: self.formAlpha,
-                ringAlpha: self.ringAlpha,
-
-                attenuate: self.attenuate,
-
-                ambient: self.ambient,
-                emit: self.emit
+                staticShift: self.staticShift,
+                staticAlpha: self.staticAlpha
             });
 
-        screen.render();
+        screen.draw();
 
 
-        // Post pass
+        // Fade pass
+
+        buffers.fade[0].bind();
+        // gl.bindFramebuffer(gl.FRAMEBUFFER, null);
+        shaders.fade.bind();
+
+        Object.assign(shaders.fade.uniforms, {
+                time: timer.time,
+                dt: timer.dt,
+
+                viewSize,
+                viewRes,
+
+                next: buffers.light.color[0].bind(0),
+                past: buffers.fade[1].color[0].bind(1),
+                // @todo Bring audio stuff here as well?
+
+                grow: self.grow,
+                growLimit: self.growLimit,
+
+                // @todo Spin this too?
+                // spinPast: self.spinPast,
+
+                jitter: self.jitter,
+
+                fadeAlpha: self.fadeAlpha
+            });
+
+        screen.draw();
+
+
+        // Draw pass
 
         gl.bindFramebuffer(gl.FRAMEBUFFER, null);
-        bokehShader.bind();
+        shaders.draw.bind();
 
-        Object.assign(bokehShader.uniforms, {
-                view: buffers[1].color[0].bind(0),
-                resolution: viewRes,
-                time: timer.time,
-                radius: self.bokehRadius,
-                amount: self.bokehAmount
+        Object.assign(shaders.draw.uniforms, {
+                viewRes,
+
+                light: buffers.light.color[0].bind(0),
+                fade: buffers.fade[0].color[0].bind(1),
+
+                lightColor: self.lightColor,
+                fadeColor: self.fadeColor,
+
+                bokehRadius: self.bokehRadius,
+                bokehAmount: self.bokehAmount
             });
 
-        screen.render();
+        screen.draw();
+
+
+        // Step the fade
+        step(buffers.fade);
+
+        // Finish up
+        screen.bind();
     }
 
     function resize() {
@@ -286,7 +317,8 @@ export default (canvas) => {
 
         containAspect(viewSize, viewRes);
 
-        each((buffer) => buffer.shape = viewRes, buffers);
+        buffers.light.shape = viewRes;
+        buffers.fade[0].shape = buffers.fade[1].shape = viewRes;
     }
 
 
