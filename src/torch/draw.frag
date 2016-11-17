@@ -1,116 +1,35 @@
 precision highp float;
 
-#pragma glslify: import(./head)
+uniform vec2 viewRes;
 
-uniform sampler2D audio;
-uniform sampler2D form;
+uniform sampler2D light;
+uniform sampler2D fade;
 
-uniform float peak;
-uniform float peakPos;
-uniform float mean;
+uniform vec4 lightColor;
+uniform vec4 fadeColor;
 
-uniform float frequencies;
-uniform float harmonies;
-uniform float silent;
-uniform float soundSmooth;
-uniform float soundWarp;
+uniform float bokehRadius;
+uniform float bokehAmount;
 
-uniform float noiseWarp;
-uniform float noiseSpeed;
-uniform float noiseScale;
 
-uniform float attenuate;
+vec4 color(vec2 uv) {
+    return (texture2D(light, uv)*lightColor)+
+        (texture2D(fade, uv)*fadeColor);
+}
 
-uniform float spin;
+#pragma glslify: bokeh = require(../../libs/bokeh, iterations = 20, sample = color)
 
-uniform float radius;
-uniform float thick;
+#pragma glslify: vignette = require(../tendrils/filter/vignette)
 
-uniform float otherRadius;
-uniform float otherThick;
-uniform float otherEdge;
-
-uniform float formAlpha;
-uniform float ringAlpha;
-
-uniform vec4 ambient;
-
-// @todo Noise in form as well?
-#pragma glslify: noise = require(glsl-noise/simplex/3d)
-#pragma glslify: hsv2rgb = require(../../libs/glsl-hsv/hsv-rgb)
-
-#pragma glslify: posToAngle = require(./pos-to-angle)
-
-#pragma glslify: sampleSound = require(./sample-sound)
-#pragma glslify: sdfCircle = require(./sdf/circle)
-#pragma glslify: sdfTriangle = require(./sdf/triangle)
+const vec4 falloff = vec4(0.0, 1.0, 1.0, 1.0);
+const vec2 mid = vec2(0.5);
+const float limit = 0.6;
 
 void main() {
     vec2 uv = gl_FragCoord.xy/viewRes;
-    vec2 pos = uvToPos(uv)/viewSize;
+    vec2 texel = 1.0/viewRes;
+    float power = 1.0-vignette(uv, mid, limit, falloff);
 
-    float dist = length(pos);
-    float angle = abs(mod(posToAngle(pos)+(spin*time), 1.0)/harmonies);
-
-    float frequencyOffset = 1.0/frequencies;
-
-    float soundKernel = sampleSound(audio, angle).x+
-        (sampleSound(audio, angle-frequencyOffset).x*soundSmooth)+
-        (sampleSound(audio, angle+frequencyOffset).x*soundSmooth);
-
-    float amp = max(abs(soundKernel/(1.0+(2.0*soundSmooth))), silent);
-
-
-    // The light ring
-
-    float warp = (mean*amp*soundWarp)+
-        (noise(vec3(pos*(1.0+noiseScale*(0.3+peak)), time*noiseSpeed))
-            *noiseWarp*(0.3+mean));
-
-    float ringSDF = clamp(abs(dist-radius-warp)-thick, 0.0, 1.0)/amp;
-
-
-    // Other circle
-
-    vec2 otherPos = vec2(noise(vec3(peakPos, peak+(time*noiseSpeed), mean)),
-            noise(vec3(peakPos+0.972, peak+(time*noiseSpeed)+0.234, mean+0.3785)));
-
-    float otherRad = otherRadius*length(otherPos)*peakPos;
-
-    float otherSDF = clamp(abs(sdfCircle(pos, otherPos, otherRad))-
-                abs(otherThick*mean),
-            0.0, 1.0)/
-        step(otherEdge, abs(peak));
-
-
-    // Other triangle
-
-
-    float sdf = min(ringSDF, otherSDF);
-
-    // Light attenuation
-    // @see Attenuation: http://gamedev.stackexchange.com/questions/56897/glsl-light-attenuation-color-and-intensity-formula
-    // float fade = 1.0/(1.0+(0.1*sdf)+(0.01*sdf*sdf));
-    // float fade = pow(clamp(1.0-(sdf/radius), 0.0, 1.0), 2.0);
-    // float fade = pow(clamp(1.0-sdf, 0.0, 1.0), 2.0);
-    float fade = 1.0/sdf/sdf;
-    // float fade = 1.0/sdf;
-
-
-    // Sound
-    float sound = fade;
-
-
-    // Accumulate color
-
-    vec4 ring = vec4(sound*attenuate);
-
-    vec4 geom = texture2D(form, uv);
-
-    // vec4 color = ring*ringAlpha;
-    // vec4 color = geom*formAlpha*ambient;
-
-    vec4 color = (ring*ringAlpha)+(geom*formAlpha*ambient);
-
-    gl_FragColor = color;
+    gl_FragColor = vec4(bokeh(texel, uv, bokehRadius*power, bokehAmount*power),
+            color(uv).a);
 }
