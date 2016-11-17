@@ -9,10 +9,10 @@ export default (player) => {
                 audioOrder: 2,
                 silent: 0.001,
                 soundSmooth: 0.3,
-                soundWarp: 0.008,
+                soundWarp: 0.01,
                 meanFulcrum: 0.4,
                 ringAlpha: 0.1,
-                otherAlpha: 0,
+                otherAlpha: 0.000001,
                 triangleAlpha: 0,
                 bokehRadius: 8,
                 bokehAmount: 60
@@ -22,9 +22,9 @@ export default (player) => {
         })
         .smoothTo({
             to: {
-                otherRadius: 0.4,
+                otherRadius: 0.8,
                 otherThick: -0.01,
-                otherEdge: 7
+                otherEdge: 6
             },
             time: 5000,
             ease: [0, 0, 1]
@@ -53,8 +53,7 @@ export default (player) => {
         .smoothOver(4000, {
             to: {
                 soundWarp: 0.05,
-                noiseWarp: 0.2,
-                otherAlpha: 0.000001
+                noiseWarp: 0.2
             },
             time: 43000,
             ease: [0, 0, 1]
@@ -63,7 +62,7 @@ export default (player) => {
             to: {
                 noiseWarp: 0.04,
                 otherAlpha: 0.0001,
-                otherEdge: 5
+                otherEdge: 4
             },
             time: 94000,
             ease: [0, 0, 1]
@@ -117,11 +116,20 @@ export default (player) => {
                 noiseWarp: 0.8,
                 noiseScale: 3,
                 ringRadius: 1,
-                ringThick: 0.002,
-                ringAlpha: 0.00001
+                ringThick: 0.005,
+                ringAlpha: 0.01
             },
             time: 250000,
             ease: [0, 0, 1]
+        })
+        .smoothOver(284000-276500, {
+            to: {
+                noiseScale: 0.2,
+                ringThick: 1.5,
+                ringAlpha: 3
+            },
+            time: 284000,
+            ease: [0, 0, 0, 1]
         });
 
     player.tracks.lightColor
