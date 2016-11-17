@@ -77,11 +77,22 @@ export default (canvas) => {
     const state = self.state = {
         animation: queries.animation,
 
+        /**
+         * @note `waveform` seems to make everything about an order of magnitude
+         *       more sensitive than `frequencies`.
+         */
         audioMode: (queries.audioMode || 'frequencies'),
 
+        /**
+         * @note Each higher order seems to make everything aboutan order of
+         *       magnitude more sensitive.
+         */
         audioOrder: ((queries.audioOrder)?
                 parseInt(queries.audioOrder, 10)
-            :   0),
+            :   1),
+
+        // audioScale: 1, // audioOrder = 0
+        audioScale: 0.008, // audioOrder = 1
 
         meanFulcrum: ((queries.meanFulcrum)?
                 parseFloat(queries.meanFulcrum, 10)
@@ -95,7 +106,7 @@ export default (canvas) => {
 
         silent: ((queries.silent)?
                 parseFloat(queries.silent, 10)
-            :   0.001),
+            :   0.000001),
 
 
         soundSmooth: ((queries.soundSmooth)?
@@ -104,12 +115,12 @@ export default (canvas) => {
 
         soundWarp: ((queries.soundWarp)?
                 parseFloat(queries.soundWarp, 10)
-            :   0.002),
+            :   0.006),
 
 
         noiseWarp: ((queries.noiseWarp)?
                 parseFloat(queries.noiseWarp, 10)
-            :   0.1),
+            :   0.04),
 
         noiseSpeed: ((queries.noiseSpeed)?
                 parseFloat(queries.noiseSpeed, 10)
@@ -135,30 +146,29 @@ export default (canvas) => {
 
         ringAlpha: ((queries.ringAlpha)?
                 parseFloat(queries.ringAlpha, 10)
-            :   0.01),
+            :   10),
 
 
         otherRadius: ((queries.otherRadius)?
                 parseFloat(queries.otherRadius, 10)
-            :   0.2),
+            :   100),
 
         otherThick: ((queries.otherThick)?
                 parseFloat(queries.otherThick, 10)
-            :   0.03),
+            :   0.000001),
 
         otherEdge: ((queries.otherEdge)?
                 parseFloat(queries.otherEdge, 10)
-            :   4),
+            :   250),
 
         otherAlpha: ((queries.otherAlpha)?
                 parseFloat(queries.otherAlpha, 10)
-            // :   0.001),
-            :   0),
+            :   0.0001),
 
 
         triangleRadius: ((queries.triangleRadius)?
                 parseFloat(queries.triangleRadius, 10)
-            :   1.5),
+            :   0.1),
 
         triangleFat: ((queries.triangleFat)?
                 parseFloat(queries.triangleFat, 10)
@@ -166,12 +176,11 @@ export default (canvas) => {
 
         triangleEdge: ((queries.triangleEdge)?
                 parseFloat(queries.triangleEdge, 10)
-            :   2.5),
+            :   255),
 
         triangleAlpha: ((queries.triangleAlpha)?
                 parseFloat(queries.triangleAlpha, 10)
-            // :   0.001),
-            :   0),
+            :   0.000001),
 
 
         staticScale: ((queries.staticScale)?
@@ -184,12 +193,11 @@ export default (canvas) => {
 
         staticShift: ((queries.staticShift)?
                 parseFloat(queries.staticShift, 10)
-            :   0.1),
+            :   0.3),
 
         staticAlpha: ((queries.staticAlpha)?
                 parseFloat(queries.staticAlpha, 10)
-            // :   0.001),
-            :   0),
+            :   0.03),
 
 
         grow: ((queries.grow)?
@@ -208,8 +216,7 @@ export default (canvas) => {
 
         fadeAlpha: ((queries.fadeAlpha)?
                 parseFloat(queries.fadeAlpha, 10)
-            // :   0.99),
-            :   0),
+            :   0.99),
 
 
         lightColor: ((queries.lightColor)?
@@ -332,12 +339,13 @@ export default (canvas) => {
 
         Object.assign(shaders.light.uniforms, {
                 time: timers.main.time,
-                dt: timers.dt,
+                dt: timers.main.dt,
 
                 viewSize,
                 viewRes,
 
                 audio: audioTexture.texture.bind(0),
+                audioScale: state.audioScale,
 
                 peak: audioPeak.peak,
                 peakPos: audioPeak.pos/audioTexture.array.data.length,
@@ -385,8 +393,8 @@ export default (canvas) => {
         shaders.fade.bind();
 
         Object.assign(shaders.fade.uniforms, {
-                time: timers.time,
-                dt: timers.dt,
+                time: timers.main.time,
+                dt: timers.main.dt,
 
                 viewSize,
                 viewRes,
