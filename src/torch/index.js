@@ -72,8 +72,6 @@ export default (canvas) => {
     const audioOrders = ((queries.audioOrders)?
             parseInt(queries.audioOrders, 10) : 3);
 
-    const showAudio = ((queries.showAudio === 'true') || false);
-
     const state = self.state = {
         animation: queries.animation,
 
@@ -252,9 +250,7 @@ export default (canvas) => {
                 :   track)
         });
 
-    if(showAudio) {
-        canvas.parentElement.appendChild(audio);
-    }
+    canvas.parentElement.appendChild(audio);
 
     const progress = document.getElementsByClassName('progress')[0];
 
