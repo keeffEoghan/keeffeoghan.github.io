@@ -100,7 +100,7 @@ export default (player) => {
                 otherEdge: 2,
                 otherThick: 0.000001
             },
-            time: 75000,
+            time: 70000,
             ease: [0, 0, 1]
         })
         .over(500, {
@@ -172,12 +172,12 @@ export default (player) => {
         .smoothOver(10000, {
             to: {
                 ringRadius: 0.4,
-                ringAlpha: 0.0005,
+                ringAlpha: 0.005,
                 ringThick: 0.0000001,
                 noiseWarp: 0.05,
                 noiseSpeed: 0.0003
             },
-            time: 147000,
+            time: 148000,
             ease: [0, 0, 1]
         });
 
@@ -190,12 +190,12 @@ export default (player) => {
         .smoothOver(4000, {
             to: colors.lightBlueA,
             time: 17000,
-            ease: [0, 0.95, 1]
+            ease: [0, 0, 1]
         })
         .smoothOver(10000, {
-            to: colors.darkBlue,
-            time: 121000,
-            ease: [0, 0.95, 1]
+            to: colors.white,
+            time: 148000,
+            ease: [0, 0, 1]
         });
 
     player.tracks.fadeColor
@@ -207,11 +207,11 @@ export default (player) => {
         .smoothOver(4000, {
             to: colors.darkBlue,
             time: 17000,
-            ease: [0, 0.95, 1]
+            ease: [0, 0, 1]
         })
         .smoothOver(10000, {
-            to: colors.lightBlueA,
-            time: 121000,
-            ease: [0, 0.95, 1]
+            to: colors.white,
+            time: 148000,
+            ease: [0, 0, 1]
         });
 };
