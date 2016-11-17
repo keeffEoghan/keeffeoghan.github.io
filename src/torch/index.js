@@ -69,7 +69,8 @@ export default (canvas) => {
     const track = (decodeURIComponent(queries.track || '') ||
         prompt('Enter a track URL:'));
 
-    const audioOrders = ((queries.audioOrders)? parseInt(queries.audioOrders, 10) : 2);
+    const audioOrders = ((queries.audioOrders)?
+            parseInt(queries.audioOrders, 10) : 3);
 
     const showAudio = ((queries.showAudio === 'true') || false);
 
@@ -78,52 +79,148 @@ export default (canvas) => {
 
         audioMode: (queries.audioMode || 'frequencies'),
 
-        meanFulcrum: ((queries.meanFulcrum)? parseFloat(queries.meanFulcrum, 10) : 0.4),
+        audioOrder: ((queries.audioOrder)?
+            parseInt(queries.audioOrder, 10) : 2),
 
-        harmonies: ((queries.harmonies)? parseFloat(queries.harmonies, 10) : 1),
+        meanFulcrum: ((queries.meanFulcrum)?
+                parseFloat(queries.meanFulcrum, 10)
+            :   0.4),
 
-        silent: ((queries.silent)? parseFloat(queries.silent, 10) : 0),
 
-        soundSmooth: ((queries.soundSmooth)? parseFloat(queries.soundSmooth, 10) : 0.3),
-        soundWarp: ((queries.soundWarp)? parseFloat(queries.soundWarp, 10) : 0.007),
+        harmonies: ((queries.harmonies)?
+                parseFloat(queries.harmonies, 10)
+            :   1),
 
-        noiseWarp: ((queries.noiseWarp)? parseFloat(queries.noiseWarp, 10) : 0.1),
-        noiseSpeed: ((queries.noiseSpeed)? parseFloat(queries.noiseSpeed, 10) : 0.001),
-        noiseScale: ((queries.noiseScale)? parseFloat(queries.noiseScale, 10) : 0.3),
 
-        spin: ((queries.spin)? parseFloat(queries.spin, 10) : 0.0001),
+        silent: ((queries.silent)?
+                parseFloat(queries.silent, 10)
+            :   0),
 
-        ringRadius: ((queries.ringRadius)? parseFloat(queries.ringRadius, 10) : 0.4),
-        ringThick: ((queries.ringThick)? parseFloat(queries.ringThick, 10) : 0.005),
-        ringAlpha: ((queries.ringAlpha)? parseFloat(queries.ringAlpha, 10) : 0.0005),
 
-        otherRadius: ((queries.otherRadius)? parseFloat(queries.otherRadius, 10) : 0.2),
-        otherThick: ((queries.otherThick)? parseFloat(queries.otherThick, 10) : 0.03),
-        otherEdge: ((queries.otherEdge)? parseFloat(queries.otherEdge, 10) : 4),
-        otherAlpha: ((queries.otherAlpha)? parseFloat(queries.otherAlpha, 10) : 0.001),
+        soundSmooth: ((queries.soundSmooth)?
+                parseFloat(queries.soundSmooth, 10)
+            :   0.3),
 
-        triangleRadius: ((queries.triangleRadius)? parseFloat(queries.triangleRadius, 10) : 1.5),
-        triangleFat: ((queries.triangleFat)? parseFloat(queries.triangleFat, 10) : 0.2),
-        triangleEdge: ((queries.triangleEdge)? parseFloat(queries.triangleEdge, 10) : 2.5),
-        triangleAlpha: ((queries.triangleAlpha)? parseFloat(queries.triangleAlpha, 1) : 0.001),
+        soundWarp: ((queries.soundWarp)?
+                parseFloat(queries.soundWarp, 10)
+            :   0.007),
 
-        staticScale: ((queries.staticScale)? parseFloat(queries.staticScale, 10) : 150),
-        staticSpeed: ((queries.staticSpeed)? parseFloat(queries.staticSpeed, 10) : 1),
-        staticShift: ((queries.staticShift)? parseFloat(queries.staticShift, 10) : 0.1),
-        staticAlpha: ((queries.staticAlpha)? parseFloat(queries.staticAlpha, 10) : 0.001),
 
-        grow: ((queries.grow)? parseFloat(queries.grow, 10) : 0.0005),
-        growLimit: ((queries.growLimit)? parseFloat(queries.growLimit, 10) : 1.6),
+        noiseWarp: ((queries.noiseWarp)?
+                parseFloat(queries.noiseWarp, 10)
+            :   0.1),
 
-        jitter: ((queries.jitter)? parseFloat(queries.jitter, 10) : 0.002),
+        noiseSpeed: ((queries.noiseSpeed)?
+                parseFloat(queries.noiseSpeed, 10)
+            :   0.001),
 
-        fadeAlpha: ((queries.fadeAlpha)? parseFloat(queries.fadeAlpha, 10) : 0.99),
+        noiseScale: ((queries.noiseScale)?
+                parseFloat(queries.noiseScale, 10)
+            :   0.3),
 
-        lightColor: ((queries.lightColor)? queryColor(queries.lightColor) : colors.white),
-        fadeColor: ((queries.fadeColor)? queryColor(queries.fadeColor) : colors.lightBlueB),
 
-        bokehRadius: ((queries.bokehRadius)? parseFloat(queries.bokehRadius, 10) : 8),
-        bokehAmount: ((queries.bokehAmount)? parseFloat(queries.bokehAmount, 10) : 60)
+        spin: ((queries.spin)?
+                parseFloat(queries.spin, 10)
+            :   0.0001),
+
+
+        ringRadius: ((queries.ringRadius)?
+                parseFloat(queries.ringRadius, 10)
+            :   0.4),
+
+        ringThick: ((queries.ringThick)?
+                parseFloat(queries.ringThick, 10)
+            :   0.005),
+
+        ringAlpha: ((queries.ringAlpha)?
+                parseFloat(queries.ringAlpha, 10)
+            :   0.0005),
+
+
+        otherRadius: ((queries.otherRadius)?
+                parseFloat(queries.otherRadius, 10)
+            :   0.2),
+
+        otherThick: ((queries.otherThick)?
+                parseFloat(queries.otherThick, 10)
+            :   0.03),
+
+        otherEdge: ((queries.otherEdge)?
+                parseFloat(queries.otherEdge, 10)
+            :   4),
+
+        otherAlpha: ((queries.otherAlpha)?
+                parseFloat(queries.otherAlpha, 10)
+            :   0.001),
+
+
+        triangleRadius: ((queries.triangleRadius)?
+                parseFloat(queries.triangleRadius, 10)
+            :   1.5),
+
+        triangleFat: ((queries.triangleFat)?
+                parseFloat(queries.triangleFat, 10)
+            :   0.2),
+
+        triangleEdge: ((queries.triangleEdge)?
+                parseFloat(queries.triangleEdge, 10)
+            :   2.5),
+
+        triangleAlpha: ((queries.triangleAlpha)?
+                parseFloat(queries.triangleAlpha, 10)
+            :   0.001),
+
+
+        staticScale: ((queries.staticScale)?
+                parseFloat(queries.staticScale, 10)
+            :   150),
+
+        staticSpeed: ((queries.staticSpeed)?
+                parseFloat(queries.staticSpeed, 10)
+            :   1),
+
+        staticShift: ((queries.staticShift)?
+                parseFloat(queries.staticShift, 10)
+            :   0.1),
+
+        staticAlpha: ((queries.staticAlpha)?
+                parseFloat(queries.staticAlpha, 10)
+            :   0.001),
+
+
+        grow: ((queries.grow)?
+                parseFloat(queries.grow, 10)
+            :   0.0005),
+
+        growLimit: ((queries.growLimit)?
+                parseFloat(queries.growLimit, 10)
+            :   1.6),
+
+
+        jitter: ((queries.jitter)?
+                parseFloat(queries.jitter, 10)
+            :   0.002),
+
+
+        fadeAlpha: ((queries.fadeAlpha)?
+                parseFloat(queries.fadeAlpha, 10)
+            :   0.99),
+
+
+        lightColor: ((queries.lightColor)?
+                queryColor(queries.lightColor)
+            :   colors.white),
+        fadeColor: ((queries.fadeColor)?
+                queryColor(queries.fadeColor)
+            :   colors.lightBlueB),
+
+        bokehRadius: ((queries.bokehRadius)?
+                parseFloat(queries.bokehRadius, 10)
+            :   8),
+
+        bokehAmount: ((queries.bokehAmount)?
+                parseFloat(queries.bokehAmount, 10)
+            :   60)
     };
 
 
@@ -156,9 +253,8 @@ export default (canvas) => {
 
     const audioTrigger = new AudioTrigger(audioAnalyser, audioOrders);
 
-    const audioTexture = new AudioTexture(gl, audioTrigger.dataOrder(-1));
-    // const audioTexture = new AudioTexture(gl,
-    //         audioAnalyser.analyser.frequencyBinCount);
+    const audioTexture = new AudioTexture(gl,
+            audioTrigger.dataOrder(state.audioOrder));
 
 
     // Animation setup
@@ -206,7 +302,8 @@ export default (canvas) => {
         // Sample audio
 
         audioTrigger.sample(dt, state.audioMode);
-        // audioTexture[state.audioMode](audioTrigger.dataOrder(-1));
+        // @todo Hack, remove
+        audioTexture.array.data = audioTrigger.dataOrder(state.audioOrder);
         audioTexture.apply();
 
         let audioPeak = peakPos(audioTexture.array.data);
