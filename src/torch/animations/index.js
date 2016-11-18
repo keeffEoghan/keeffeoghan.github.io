@@ -4,6 +4,8 @@ import blaenavon from './blaenavon';
 import frankTurner from './frank-turner';
 import tomTheLion from './tom-the-lion';
 import tallChildren from './tall-children';
+import neilCowleyTrio from './neil-cowley-trio';
+import lewisFieldhouse from './lewis-fieldhouse';
 
 export default {
     vaccines,
@@ -11,5 +13,7 @@ export default {
     blaenavon,
     frankTurner,
     tomTheLion,
-    tallChildren
+    tallChildren,
+    neilCowleyTrio,
+    lewisFieldhouse
 };
