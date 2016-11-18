@@ -224,7 +224,7 @@ export default (canvas) => {
             :   [...colors.white]),
         fadeColor: ((queries.fadeColor)?
                 queryColor(queries.fadeColor)
-            :   [...colors.lightBlueB]),
+            :   [...colors.white]),
 
         bokehRadius: ((queries.bokehRadius)?
                 parseFloat(queries.bokehRadius, 10)
@@ -308,7 +308,7 @@ export default (canvas) => {
     };
 
 
-    audio.addEventListener('seeked', scrub);
+    // audio.addEventListener('seeked', scrub);
     audio.addEventListener('play', scrub);
 
 
