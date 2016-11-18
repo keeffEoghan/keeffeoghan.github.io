@@ -115,7 +115,7 @@ export default (player) => {
         .smoothTo({
             to: {
                 ringRadius: 0.25,
-                ringAlpha: 0.00001,
+                ringAlpha: 0.0005,
                 soundWarp: 0.1
             },
             time: 92000,
@@ -123,7 +123,7 @@ export default (player) => {
         })
         .smoothTo({
             to: {
-                ringThick: 0.000001,
+                ringThick: 0.005,
                 ringRadius: 0.33
             },
             time: 95000,
@@ -159,7 +159,7 @@ export default (player) => {
         })
         .smoothTo({
             to: {
-                ringAlpha: 0.0001,
+                ringAlpha: 0.001,
                 fadeAlpha: 0.99,
                 otherAlpha: -0.00001,
                 staticAlpha: 0.05,
@@ -173,9 +173,10 @@ export default (player) => {
             to: {
                 ringRadius: 0.4,
                 ringAlpha: 0.005,
-                ringThick: 0.0000001,
+                ringThick: 0.01,
                 noiseWarp: 0.05,
-                noiseSpeed: 0.0003
+                noiseSpeed: 0.0003,
+                staticAlpha: 0.5
             },
             time: 148000,
             ease: [0, 0, 1]
