@@ -15,7 +15,7 @@ export default (player) => {
                 ringRadius: 0.35,
                 ringAlpha: 0.5,
                 ringThick: 0.01,
-                noiseSpeed: 0.0001,
+                noiseSpeed: 0.001,
                 noiseWarp: 0.001,
                 otherRadius: 0,
                 otherThick: 0,
@@ -165,6 +165,66 @@ export default (player) => {
             },
             time: 210000,
             ease: [0, 0, 1]
+        })
+        .smoothOver(254000-230000, {
+            to: {
+                otherRadius: 1.4,
+                soundWarp: 0.0001
+            },
+            time: 254000,
+            ease: [0, -0.1, 1.3, 1]
+        })
+        .smoothTo({
+            to: {
+                ringRadius: 0.6,
+                ringThick: 0.05,
+                otherRadius: 0.01,
+                otherThick: 0.003
+            },
+            time: 258000,
+            ease: [0, 1, 0.3, 1]
+        })
+        .smoothTo({
+            to: {
+                ringRadius: 0.4,
+                otherThick: -0.0006
+            },
+            time: 275000,
+            ease: [0, 0, 1.6, 1]
+        })
+        .smoothOver(6000, {
+            to: {
+                ringRadius: 0.3,
+                noiseWarp: 0.08,
+                grow: 0.0008
+            },
+            time: 283000,
+            ease: [0, 0, 1]
+        })
+        .smoothTo({
+            to: {
+                ringRadius: 0.6,
+                soundWarp: 0.00006,
+                meanFulcrum: 0.1
+            },
+            time: 300000,
+            ease: [0, 0, 1]
+        })
+        .smoothOver(315300-304000, {
+            to: {
+                ringRadius: 0.3,
+                soundWarp: 0.00001
+            },
+            time: 315300,
+            ease: [0, 0.8, 0, 1]
+        })
+        .smoothTo({
+            to: {
+                ringRadius: 0,
+                ringThick: 2
+            },
+            time: 318000,
+            ease: [0, 0.8, 0, 1]
         });
 
     player.tracks.lightColor
@@ -176,6 +236,10 @@ export default (player) => {
         .over(3000, {
             to: colors.yellow,
             time: 210000
+        })
+        .over(8000, {
+            to: colors.white,
+            time: 261000
         });
 
     player.tracks.fadeColor
@@ -187,5 +251,9 @@ export default (player) => {
         .over(12000, {
             to: colors.orange,
             time: 165000
+        })
+        .over(12000, {
+            to: colors.yellow,
+            time: 261000
         });
 };
