@@ -9,8 +9,8 @@ export default (player) => {
                 audioOrder: 2,
                 silent: 0.001,
                 soundSmooth: 0.3,
-                soundWarp: 0.01,
-                meanFulcrum: 0.4,
+                soundWarp: 0.02,
+                meanFulcrum: 0.7,
                 ringAlpha: 0.1,
                 otherAlpha: 0.000001,
                 triangleAlpha: 0,
@@ -24,7 +24,7 @@ export default (player) => {
             to: {
                 otherRadius: 0.8,
                 otherThick: -0.01,
-                otherEdge: 6
+                otherEdge: 5
             },
             time: 5000,
             ease: [0, 0, 1]
@@ -52,7 +52,7 @@ export default (player) => {
         })
         .smoothOver(4000, {
             to: {
-                soundWarp: 0.05,
+                soundWarp: 0.07,
                 noiseWarp: 0.2
             },
             time: 43000,
@@ -62,7 +62,7 @@ export default (player) => {
             to: {
                 noiseWarp: 0.04,
                 otherAlpha: 0.0001,
-                otherEdge: 4
+                otherEdge: 3.5
             },
             time: 94000,
             ease: [0, 0, 1]
@@ -73,7 +73,7 @@ export default (player) => {
                 soundWarp: 0.025,
                 otherRadius: 0,
                 otherThick: 10,
-                otherEdge: 4
+                otherEdge: 3
             },
             time: 120000,
             ease: [0, 0, 1]
@@ -82,7 +82,7 @@ export default (player) => {
             to: {
                 otherRadius: 2,
                 otherThick: 0.00000001,
-                otherEdge: 7.5
+                otherEdge: 6
             },
             time: 180000,
             ease: [0, 0, 1]
@@ -102,7 +102,7 @@ export default (player) => {
                 ringRadius: 0.7,
                 ringThick: 0.15,
                 ringAlpha: 0.00001,
-                otherEdge: 6,
+                otherEdge: 4,
                 otherRadius: 0.8,
                 otherThick: 0.0000001,
                 otherAlpha: 0.000001
