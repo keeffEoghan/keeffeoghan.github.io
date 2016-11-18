@@ -91,7 +91,14 @@ export default (player) => {
             time: 80000,
             ease: [0, 0, 1]
         })
-        .smoothOver(4000, {
+        .smoothTo({
+            to: {
+                otherRadius: 1,
+            },
+            time: 85000,
+            ease: [0, 0, 1]
+        })
+        .smoothTo({
             to: {
                 otherRadius: 1,
                 soundWarp: -0.00008
