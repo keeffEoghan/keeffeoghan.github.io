@@ -80,7 +80,7 @@ void main() {
         (sampleSound(audio, angle-frequencyOffset).x*soundSmooth)+
         (sampleSound(audio, angle+frequencyOffset).x*soundSmooth);
 
-    float sound = max(abs(soundWarp*soundKernel/(1.0+(2.0*soundSmooth))), silent);
+    float sound = soundWarp*max(abs(soundKernel/(1.0+(2.0*soundSmooth))), silent);
 
     float noiseTime = time*noiseSpeed;
 
