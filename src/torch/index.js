@@ -67,6 +67,8 @@ export default (canvas) => {
     const queryColor = (query) => query.split(',').map((v) =>
                     parseFloat(v.replace(/[\[\]]/gi, ''), 10));
 
+    const debug = (queries.debug === 'true');
+
     const showTros = (queries.showTros === 'true');
 
     const intro = (decodeURIComponent(queries.intro || ''));
@@ -242,6 +244,11 @@ export default (canvas) => {
     };
 
 
+    if(debug) {
+        document.documentElement.className += ' debug';
+    }
+
+
     // Track
 
     const audio = Object.assign(new Audio(), {
@@ -262,6 +269,25 @@ export default (canvas) => {
 
 
     // Intro and outro
+
+    let videos;
+
+    function startSequence() {
+        if(videos) {
+            audio.play();
+            videos.intro.el.className += ' hide';
+            canvas.className = canvas.className.replace('hide', '');
+        }
+    }
+
+    function endSequence() {
+        if(videos) {
+            videos.outro.player.playVideo();
+            canvas.className += ' hide';
+            videos.outro.el.className = videos.outro.el.className
+                .replace('hide', '');
+        }
+    }
 
     if(showTros) {
         canvas.className += ' hide';
@@ -288,20 +314,6 @@ export default (canvas) => {
             src: reduce((out, v, k) =>
                 out+((out)? '&' : '?')+k+'='+v, playerVars, '')
         };
-
-        let videos;
-
-        function startSequence() {
-            videos.intro.el.className += ' hide';
-            canvas.className = canvas.className.replace('hide', '');
-            audio.play();
-        }
-
-        function endSequence() {
-            canvas.className += ' hide';
-            videos.outro.el.className = videos.outro.el.className
-                .replace('hide', '');
-        }
 
         videos = {
             intro: {
@@ -411,7 +423,7 @@ export default (canvas) => {
     // Hand over the rest to the param-defined animation
     if(state.animation) {
         // @todo Add an "end" callback here to show the outro
-        animations[state.animation](player);
+        animations[state.animation](player, endSequence);
     }
 
 

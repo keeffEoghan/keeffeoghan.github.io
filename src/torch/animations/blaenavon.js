@@ -1,6 +1,6 @@
 import * as colors from '../colors';
 
-export default (player) => {
+export default (player, end) => {
     player.tracks.main
         .smoothTo({
             to: {
@@ -179,7 +179,8 @@ export default (player) => {
                 staticAlpha: 0.5
             },
             time: 148000,
-            ease: [0, 0, 1]
+            ease: [0, 0, 1],
+            call: [end]
         });
 
     player.tracks.lightColor

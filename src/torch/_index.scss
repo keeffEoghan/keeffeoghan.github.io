@@ -27,6 +27,15 @@ canvas {
     opacity: 0;
 }
 
+.track,
+.progress-total {
+    display: none;
+
+    .debug & {
+        display: block;
+    }
+}
+
 .track {
     position: absolute;
     top: 0;
