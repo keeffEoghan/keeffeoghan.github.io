@@ -33,6 +33,13 @@ import * as colors from './colors';
 import animations from './animations';
 
 
+const deClass = (className, ...rest) =>
+    reduce((name, remove) => name.replace(remove, ''), rest, className)
+        .replace(/\s\s/gi, '');
+
+const queryColor = (query) => query.split(',').map((v) =>
+                parseFloat(v.replace(/[\[\]]/gi, ''), 10));
+
 export default (canvas) => {
     const queries = querystring.parse(location.search.slice(1));
 
@@ -64,15 +71,15 @@ export default (canvas) => {
 
     // Parameters...
 
-    const queryColor = (query) => query.split(',').map((v) =>
-                    parseFloat(v.replace(/[\[\]]/gi, ''), 10));
-
     const debug = (queries.debug === 'true');
 
     const showTros = (queries.showTros === 'true');
 
     const intro = (decodeURIComponent(queries.intro || ''));
     const outro = (decodeURIComponent(queries.outro || ''));
+
+    const fallback = (decodeURIComponent(queries.fallback || ''));
+    const name = (decodeURIComponent(queries.name || ''));
 
     const track = (decodeURIComponent(queries.track || '') ||
         prompt('Enter a track URL:'));
@@ -100,6 +107,7 @@ export default (canvas) => {
         // audioScale: 1, // audioOrder = 0
         audioScale: 0.008, // audioOrder = 1
 
+        // @todo Not actually meaningful for waveforms - check for this case
         meanFulcrum: ((queries.meanFulcrum)?
                 parseFloat(queries.meanFulcrum, 10)
             :   0.4),
@@ -249,6 +257,18 @@ export default (canvas) => {
     }
 
 
+    // Fallback
+
+    if(fallback) {
+        const fallbackInfo = document.querySelector('.fallback-info');
+
+        fallbackInfo.querySelector('.name').innerText = ((name)? ' '+name : '');
+        fallbackInfo.querySelector('.fallback').href = fallback;
+
+        fallbackInfo.className = deClass(fallbackInfo.className, 'hide');
+    }
+
+
     // Track
 
     const audio = Object.assign(new Audio(), {
@@ -263,7 +283,7 @@ export default (canvas) => {
                 :   track)
         });
 
-    canvas.parentElement.appendChild(audio);
+    document.body.appendChild(audio);
 
     const progress = document.getElementsByClassName('progress')[0];
 
@@ -272,36 +292,39 @@ export default (canvas) => {
 
     let videos;
 
+    const visuals = document.querySelector('.visuals');
+
     function startSequence() {
         if(videos) {
-            audio.play();
             videos.intro.el.className += ' hide';
-            canvas.className = canvas.className.replace('hide', '');
         }
+
+        audio.play();
+        visuals.className = deClass(visuals.className, 'hide');
     }
 
     function endSequence() {
         if(videos) {
             videos.outro.player.playVideo();
-            canvas.className += ' hide';
             videos.outro.el.className = videos.outro.el.className
                 .replace('hide', '');
         }
+
+        visuals.className += ' hide';
     }
 
     if(showTros) {
-        canvas.className += ' hide';
-
         const playerVars = {
-            width: 1280,
-            height: 720,
+            modestbranding: 1,
+            showinfo: 0,
+            controls: 0,
+            playsinline: 1,
             autoplay: 0,
             enablejsapi: 1,
             rel: 0,
-            showinfo: 0,
-            modestbranding: 1,
             disablekb: 1,
-            controls: 0,
+            width: 1280,
+            height: 720,
             origin: self.location.href.match(/.*?\/\/.*?(?=\/)/gi)[0]
         };
 
@@ -327,7 +350,7 @@ export default (canvas) => {
                     events: {
                         onReady(e) {
                             e.target.playVideo();
-                            setTimeout(startSequence, 14300);
+                            setTimeout(startSequence, 15000);
                         }
                         // onReady(e) {
                         //     e.target.playVideo();
@@ -356,7 +379,7 @@ export default (canvas) => {
                 config.el = Object.assign(document.createElement('iframe'),
                         config.iframeOptions);
 
-                canvas.parentElement.appendChild(config.el);
+                document.body.appendChild(config.el);
             },
             videos);
 
@@ -377,6 +400,9 @@ export default (canvas) => {
                         video.playerOptions),
                 videos);
         };
+    }
+    else {
+        startSequence();
     }
 
 
