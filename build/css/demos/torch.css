@@ -24,15 +24,23 @@ main { min-height: 100%; }
 
 body { margin: 0; }
 
-body { background: #000; }
+body { background: #000; color: #fff; text-align: center; }
 
-canvas, .video { display: block; position: fixed; top: 0; left: 0; bottom: 0; right: 0; width: 100%; height: 100%; }
+.visuals, canvas, .video { display: block; position: absolute; top: 0; left: 0; bottom: 0; right: 0; width: 100%; height: 100%; }
 
-canvas { z-index: 100; -webkit-transition: opacity 1000ms ease-in-out; transition: opacity 1000ms ease-in-out; }
+canvas, .video { pointer-events: none; }
+
+.visuals { z-index: 100; -webkit-transition: opacity 600ms cubic-bezier(0, 1.51, 0.98, -0.8); transition: opacity 600ms cubic-bezier(0, 1.51, 0.98, -0.8); }
 
 .video { z-index: 10; }
 
+canvas { z-index: 100; }
+
 .hide { opacity: 0; }
+
+.fallback-info { position: absolute; top: 50%; left: 50%; -webkit-transform: translate(-50%, -50%); transform: translate(-50%, -50%); /*font-family: 'Helvatica', 'Arial', sans-serif;*/ font-family: sans-serif; line-height: 2; width: 60%; max-width: 37em; }
+
+.name { text-transform: uppercase; }
 
 .track, .progress-total { display: none; }
 
@@ -45,5 +53,15 @@ canvas { z-index: 100; -webkit-transition: opacity 1000ms ease-in-out; transitio
 .progress-total { position: absolute; bottom: 0; left: 0; width: 100%; height: 1px; background-color: #002e62; overflow: hidden; z-index: 1000; }
 
 .progress { position: relative; width: 0; height: 100%; background-color: #e6007e; border-left: 1px solid black; border-right: 1px solid white; }
+
+a { text-decoration: none; color: #69c6dd; }
+
+a:link { color: #69c6dd; }
+
+a:visited { color: #00a1d2; }
+
+a:hover { color: #00649e; }
+
+a:active { color: #002e62; }
 
 /*# sourceMappingURL=torch.css.map */
