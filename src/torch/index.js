@@ -260,7 +260,7 @@ export default (canvas) => {
         modestbranding: 1,
         showinfo: 0,
         controls: 0,
-        autoplay: 0,
+        autoplay: 1,
         playsinline: 1,
         enablejsapi: 1,
         rel: 0,
@@ -278,10 +278,7 @@ export default (canvas) => {
 
     if(fallback) {
         const fallbackInfo = document.querySelector('.fallback-info');
-        const href = fallback+ytPlayerParams({
-                ...ytPlayerVars,
-                autoplay: 1
-            });
+        const href = fallback+ytPlayerParams(ytPlayerVars);
 
         fallbackInfo.querySelector('.name').innerText = ((name)? ' '+name : '');
         fallbackInfo.querySelector('.fallback').href = href;
@@ -357,7 +354,6 @@ export default (canvas) => {
                     ytPlayerVars,
                     events: {
                         onReady(e) {
-                            e.target.playVideo();
                             setTimeout(startSequence, 15000);
                         },
                         onStateChange(e) {
@@ -379,6 +375,11 @@ export default (canvas) => {
                     ytPlayerVars,
                     events: {
                         onStateChange(e) {
+                            if(!videos.outro.buffering &&
+                                    e.data === self.YT.PlayerState.PLAYING) {
+                                videos.outro.buffering = true;
+                                videos.outro.player.pauseVideo();
+                            }
                             if(e.data === self.YT.PlayerState.ENDED) {
                                 videos.outro.el.className += ' hide';
                             }
