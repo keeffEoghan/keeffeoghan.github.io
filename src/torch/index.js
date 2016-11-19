@@ -256,18 +256,39 @@ export default (canvas) => {
         document.documentElement.className += ' debug';
     }
 
+    const ytPlayerVars = {
+        modestbranding: 1,
+        showinfo: 0,
+        controls: 0,
+        autoplay: 0,
+        playsinline: 1,
+        enablejsapi: 1,
+        rel: 0,
+        disablekb: 1,
+        width: 1280,
+        height: 720,
+        origin: self.location.href.match(/.*?\/\/.*?(?=\/)/gi)[0]
+    };
+
+    const ytPlayerParams = (vars) => reduce((out, v, k) =>
+            out+((out)? '&' : '?')+k+'='+v, vars, '');
+
 
     // Fallback
 
     if(fallback) {
         const fallbackInfo = document.querySelector('.fallback-info');
+        const href = fallback+ytPlayerParams({
+                ...ytPlayerVars,
+                autoplay: 1
+            });
 
         fallbackInfo.querySelector('.name').innerText = ((name)? ' '+name : '');
-        fallbackInfo.querySelector('.fallback').href = fallback;
+        fallbackInfo.querySelector('.fallback').href = href;
 
         fallbackInfo.className = deClass(fallbackInfo.className, 'hide');
 
-        console.log('Fallback', fallback);
+        console.log('Fallback', href);
     }
 
 
@@ -316,39 +337,24 @@ export default (canvas) => {
     }
 
     if(showTros) {
-        const playerVars = {
-            modestbranding: 1,
-            showinfo: 0,
-            controls: 0,
-            playsinline: 1,
-            autoplay: 0,
-            enablejsapi: 1,
-            rel: 0,
-            disablekb: 1,
-            width: 1280,
-            height: 720,
-            origin: self.location.href.match(/.*?\/\/.*?(?=\/)/gi)[0]
-        };
-
-        const iframeVars = {
-            width: playerVars.width,
-            height: playerVars.height,
+        const ytIframeVars = {
+            width: ytPlayerVars.width,
+            height: ytPlayerVars.height,
             frameborder: 0,
             allowfullscreen: true,
             className: 'video',
-            src: reduce((out, v, k) =>
-                out+((out)? '&' : '?')+k+'='+v, playerVars, '')
+            src: ytPlayerParams(ytPlayerVars)
         };
 
         videos = {
             intro: {
                 iframeOptions: {
-                    ...iframeVars,
-                    src: intro+iframeVars.src,
-                    className: 'intro '+iframeVars.className
+                    ...ytIframeVars,
+                    src: intro+ytIframeVars.src,
+                    className: 'intro '+ytIframeVars.className
                 },
                 playerOptions: {
-                    playerVars,
+                    ytPlayerVars,
                     events: {
                         onReady(e) {
                             e.target.playVideo();
@@ -367,12 +373,12 @@ export default (canvas) => {
             },
             outro: {
                 iframeOptions: {
-                    ...iframeVars,
-                    src: outro+iframeVars.src,
-                    className: 'outro hide '+iframeVars.className
+                    ...ytIframeVars,
+                    src: outro+ytIframeVars.src,
+                    className: 'outro hide '+ytIframeVars.className
                 },
                 playerOptions: {
-                    playerVars
+                    ytPlayerVars
                 }
             }
         };
