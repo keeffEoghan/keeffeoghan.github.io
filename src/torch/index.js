@@ -266,6 +266,8 @@ export default (canvas) => {
         fallbackInfo.querySelector('.fallback').href = fallback;
 
         fallbackInfo.className = deClass(fallbackInfo.className, 'hide');
+
+        console.log('Fallback', fallback);
     }
 
 
