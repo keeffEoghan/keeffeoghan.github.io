@@ -25,6 +25,7 @@ import { containAspect } from '../tendrils/utils/aspect';
 
 import map from '../fp/map';
 import reduce from '../fp/reduce';
+import each from '../fp/each';
 
 import { step } from '../utils';
 
@@ -65,6 +66,11 @@ export default (canvas) => {
 
     const queryColor = (query) => query.split(',').map((v) =>
                     parseFloat(v.replace(/[\[\]]/gi, ''), 10));
+
+    const showTros = (queries.showTros === 'true');
+
+    const intro = (decodeURIComponent(queries.intro || ''));
+    const outro = (decodeURIComponent(queries.outro || ''));
 
     const track = (decodeURIComponent(queries.track || '') ||
         prompt('Enter a track URL:'));
@@ -241,7 +247,7 @@ export default (canvas) => {
     const audio = Object.assign(new Audio(), {
             crossOrigin: 'anonymous',
             controls: true,
-            autoplay: true,
+            autoplay: false,
             muted: 'muted' in queries,
             className: 'track',
             src: ((track.match(/^(https)?(:\/\/)?(www\.)?dropbox\.com\/s\//gi))?
@@ -253,6 +259,113 @@ export default (canvas) => {
     canvas.parentElement.appendChild(audio);
 
     const progress = document.getElementsByClassName('progress')[0];
+
+
+    // Intro and outro
+
+    if(showTros) {
+        canvas.className += ' hide';
+
+        const playerVars = {
+            width: 1280,
+            height: 720,
+            autoplay: 0,
+            enablejsapi: 1,
+            rel: 0,
+            showinfo: 0,
+            modestbranding: 1,
+            disablekb: 1,
+            controls: 0,
+            origin: self.location.href.match(/.*?\/\/.*?(?=\/)/gi)[0]
+        };
+
+        const iframeVars = {
+            width: playerVars.width,
+            height: playerVars.height,
+            frameborder: 0,
+            allowfullscreen: true,
+            className: 'video',
+            src: reduce((out, v, k) =>
+                out+((out)? '&' : '?')+k+'='+v, playerVars, '')
+        };
+
+        let videos;
+
+        function startSequence() {
+            videos.intro.el.className += ' hide';
+            canvas.className = canvas.className.replace('hide', '');
+            audio.play();
+        }
+
+        function endSequence() {
+            canvas.className += ' hide';
+            videos.outro.el.className = videos.outro.el.className
+                .replace('hide', '');
+        }
+
+        videos = {
+            intro: {
+                iframeOptions: {
+                    ...iframeVars,
+                    src: intro+iframeVars.src,
+                    className: 'intro '+iframeVars.className
+                },
+                playerOptions: {
+                    playerVars,
+                    events: {
+                        onReady(e) {
+                            e.target.playVideo();
+                            setTimeout(startSequence, 14300);
+                        }
+                        // onReady(e) {
+                        //     e.target.playVideo();
+                        // },
+                        // onStateChange(e) {
+                        //     if(e.data === self.YT.PlayerState.ENDED) {
+                        //         startSequence();
+                        //     }
+                        // }
+                    }
+                }
+            },
+            outro: {
+                iframeOptions: {
+                    ...iframeVars,
+                    src: outro+iframeVars.src,
+                    className: 'outro hide '+iframeVars.className
+                },
+                playerOptions: {
+                    playerVars
+                }
+            }
+        };
+
+        each((config) => {
+                config.el = Object.assign(document.createElement('iframe'),
+                        config.iframeOptions);
+
+                canvas.parentElement.appendChild(config.el);
+            },
+            videos);
+
+
+        // Load the IFrame Player API code asynchronously.
+
+        const youTubeAPITag = document.createElement('script');
+
+        youTubeAPITag.src = 'https://www.youtube.com/player_api';
+
+        const firstScriptTag = document.getElementsByTagName('script')[0];
+
+        firstScriptTag.parentNode.insertBefore(youTubeAPITag, firstScriptTag);
+
+        // self.onYouTubePlayerAPIReady = () => {
+        self.onYouTubeIframeAPIReady = () => {
+            each((video) => video.player = new self.YT.Player(video.el,
+                        video.playerOptions),
+                videos);
+        };
+    }
 
 
     // Audio analysis
@@ -297,6 +410,7 @@ export default (canvas) => {
 
     // Hand over the rest to the param-defined animation
     if(state.animation) {
+        // @todo Add an "end" callback here to show the outro
         animations[state.animation](player);
     }
 
