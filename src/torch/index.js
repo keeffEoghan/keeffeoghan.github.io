@@ -359,15 +359,13 @@ export default (canvas) => {
                         onReady(e) {
                             e.target.playVideo();
                             setTimeout(startSequence, 15000);
+                        },
+                        onStateChange(e) {
+                            if(e.data === self.YT.PlayerState.ENDED) {
+                                // startSequence();
+                                videos.intro.el.className += ' hide';
+                            }
                         }
-                        // onReady(e) {
-                        //     e.target.playVideo();
-                        // },
-                        // onStateChange(e) {
-                        //     if(e.data === self.YT.PlayerState.ENDED) {
-                        //         startSequence();
-                        //     }
-                        // }
                     }
                 }
             },
@@ -378,7 +376,14 @@ export default (canvas) => {
                     className: 'outro hide '+ytIframeVars.className
                 },
                 playerOptions: {
-                    ytPlayerVars
+                    ytPlayerVars,
+                    events: {
+                        onStateChange(e) {
+                            if(e.data === self.YT.PlayerState.ENDED) {
+                                videos.outro.el.className += ' hide';
+                            }
+                        }
+                    }
                 }
             }
         };
