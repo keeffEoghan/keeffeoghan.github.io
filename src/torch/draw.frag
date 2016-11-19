@@ -25,11 +25,13 @@ const vec4 falloff = vec4(0.0, 1.0, 1.0, 1.0);
 const vec2 mid = vec2(0.5);
 const float limit = 0.6;
 
+const vec4 black = vec4(vec3(0.0), 1.0);
+
 void main() {
     vec2 uv = gl_FragCoord.xy/viewRes;
     vec2 texel = 1.0/viewRes;
-    float power = 1.0-vignette(uv, mid, limit, falloff);
+    float edge = 1.0-vignette(uv, mid, limit, falloff);
 
-    gl_FragColor = vec4(bokeh(texel, uv, bokehRadius*power, bokehAmount*power),
-            color(uv).a);
+    gl_FragColor = black+
+        vec4(bokeh(texel, uv, bokehRadius*edge, bokehAmount*edge), color(uv).a);
 }
