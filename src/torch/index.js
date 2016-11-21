@@ -691,7 +691,7 @@ export default (canvas) => {
 
         if(interact) {
             const aspect = viewRes[0]/viewRes[1];
-            const fov = Math.PI/2;
+            const fov = Math.PI/2.5;
             const near = 0;
             const far = 1;
 

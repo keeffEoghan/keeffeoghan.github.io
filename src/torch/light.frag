@@ -73,8 +73,8 @@ float attenuate(float sdf) {
 void main() {
     vec2 uv = gl_FragCoord.xy/viewRes;
 
-    vec2 pos = (cameraProjection*cameraView*
-            vec4(uvToPos(uv)/viewSize, 1.0, 1.0)).xy;
+    vec4 projected = (cameraProjection*cameraView*vec4(uvToPos(uv), 0.5, 1.0));
+    vec2 pos = projected.xy/viewSize;
 
     float dist = length(pos);
     float angle = abs(mod(posToAngle(pos)+(spin*time), 1.0)/harmonies);
