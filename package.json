@@ -48,6 +48,7 @@
     "glslify-import": "^3.0.0",
     "lerp": "^1.0.3",
     "lodash": "^4.13.1",
+    "lookat-camera": "^1.0.0",
     "mouse-event-offset": "^3.0.2",
     "ndarray": "^1.0.18",
     "pepjs": "^0.4.1",
