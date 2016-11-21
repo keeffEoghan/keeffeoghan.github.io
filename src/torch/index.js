@@ -500,21 +500,6 @@ export default (canvas) => {
 
                     pointer[0] = mapRange(pointer[0], 0, viewRes[0], -l, l);
                     pointer[1] = mapRange(pointer[1], 0, viewRes[1], l, -l);
-
-                    camera.position[0] = pointer[0];
-                    camera.position[1] = pointer[1];
-
-                    camera.view(cameraView);
-                }
-            },
-            false);
-
-        document.body.addEventListener('pointerout', (e) => {
-                if(e.isPrimary) {
-                    camera.position[0] = camera.position[1] =
-                        pointer[0] = pointer[1] = 0;
-
-                    camera.view(cameraView);
                 }
             },
             false);
@@ -674,7 +659,15 @@ export default (canvas) => {
         step(buffers.fade);
 
         // Finish up
-        screen.bind();
+        screen.unbind();
+
+
+        const pointerDamp = 0.99;
+
+        camera.position[0] = pointer[0] *= pointerDamp;
+        camera.position[1] = pointer[1] *= pointerDamp;
+
+        camera.view(cameraView);
     }
 
     function resize() {
