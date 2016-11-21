@@ -29,6 +29,7 @@ const vec4 black = vec4(vec3(0.0), 1.0);
 
 void main() {
     vec2 uv = gl_FragCoord.xy/viewRes;
+
     vec2 texel = 1.0/viewRes;
     float edge = 1.0-vignette(uv, mid, limit, falloff);
 
