@@ -46,6 +46,9 @@ uniform float staticSpeed;
 uniform float staticShift;
 uniform float staticAlpha;
 
+uniform mat4 cameraView;
+uniform mat4 cameraProjection;
+
 // @todo Noise in form as well?
 #pragma glslify: noise = require(glsl-noise/simplex/3d)
 
@@ -69,7 +72,9 @@ float attenuate(float sdf) {
 
 void main() {
     vec2 uv = gl_FragCoord.xy/viewRes;
-    vec2 pos = uvToPos(uv)/viewSize;
+
+    vec2 pos = (cameraProjection*cameraView*
+            vec4(uvToPos(uv)/viewSize, 1.0, 1.0)).xy;
 
     float dist = length(pos);
     float angle = abs(mod(posToAngle(pos)+(spin*time), 1.0)/harmonies);
