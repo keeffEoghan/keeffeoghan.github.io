@@ -215,7 +215,12 @@ export default (canvas, settings, debug) => {
     const flowInputs = new FlowLines(gl);
 
     const pointerFlow = (e) => {
-        const pos = offset(e, canvas, vec2.create());
+        /**
+         * @todo Passing a `vec2` doesn't work - TypedArrays fail the test
+         *       `offset` uses.
+         */
+        // const pos = offset(e, canvas, vec2.create());
+        const pos = offset(e, canvas);
 
         pos[0] = mapRange(pos[0], 0, tendrils.viewRes[0], -1, 1);
         pos[1] = mapRange(pos[1], 0, tendrils.viewRes[1], 1, -1);

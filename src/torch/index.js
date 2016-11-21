@@ -1,9 +1,14 @@
+import 'pepjs';
 import glContext from 'gl-context';
 import FBO from 'gl-fbo';
 import analyser from 'web-audio-analyser';
 import throttle from 'lodash/throttle';
 import shader from 'gl-shader';
 import querystring from 'querystring';
+import offset from 'mouse-event-offset';
+import makeCamera from 'lookat-camera';
+import mapRange from 'range-fit';
+import mat4 from 'gl-matrix/src/gl-matrix/mat4';
 
 import Timer from '../tendrils/timer';
 
@@ -72,6 +77,8 @@ export default (canvas) => {
     // Parameters...
 
     const debug = (queries.debug === 'true');
+
+    const interact = (queries.interact === 'true');
 
     const showTros = (queries.showTros === 'true');
 
@@ -251,6 +258,11 @@ export default (canvas) => {
             :   60)
     };
 
+    const pointer = [0, 0];
+    const cameraView = mat4.create();
+    const cameraProjection = mat4.create();
+    const camera = makeCamera();
+
 
     if(debug) {
         document.documentElement.className += ' debug';
@@ -353,7 +365,7 @@ export default (canvas) => {
                 playerOptions: {
                     ytPlayerVars,
                     events: {
-                        onReady(e) {
+                        onReady() {
                             setTimeout(startSequence, 15000);
                         },
                         onStateChange(e) {
@@ -478,6 +490,37 @@ export default (canvas) => {
     audio.addEventListener('play', scrub);
 
 
+    // Interaction
+    if(interact) {
+        document.body.addEventListener('pointermove', (e) => {
+                if(e.isPrimary) {
+                    offset(e, document.body, pointer);
+
+                    const l = 3;
+
+                    pointer[0] = mapRange(pointer[0], 0, viewRes[0], -l, l);
+                    pointer[1] = mapRange(pointer[1], 0, viewRes[1], l, -l);
+
+                    camera.position[0] = pointer[0];
+                    camera.position[1] = pointer[1];
+
+                    camera.view(cameraView);
+                }
+            },
+            false);
+
+        document.body.addEventListener('pointerout', (e) => {
+                if(e.isPrimary) {
+                    camera.position[0] = camera.position[1] =
+                        pointer[0] = pointer[1] = 0;
+
+                    camera.view(cameraView);
+                }
+            },
+            false);
+    }
+
+
     // The main loop
     function render() {
         const dt = timers.main.tick().dt;
@@ -563,7 +606,10 @@ export default (canvas) => {
                 staticScale: state.staticScale,
                 staticSpeed: state.staticSpeed,
                 staticShift: state.staticShift,
-                staticAlpha: state.staticAlpha
+                staticAlpha: state.staticAlpha,
+
+                cameraView,
+                cameraProjection
             });
 
         screen.draw();
@@ -594,7 +640,10 @@ export default (canvas) => {
 
                 jitter: state.jitter,
 
-                fadeAlpha: state.fadeAlpha
+                fadeAlpha: state.fadeAlpha,
+
+                cameraView,
+                cameraProjection
             });
 
         screen.draw();
@@ -639,6 +688,15 @@ export default (canvas) => {
 
         buffers.light.shape = viewRes;
         buffers.fade[0].shape = buffers.fade[1].shape = viewRes;
+
+        if(interact) {
+            const aspect = viewRes[0]/viewRes[1];
+            const fov = Math.PI/2;
+            const near = 0;
+            const far = 1;
+
+            mat4.perspective(cameraProjection, fov, aspect, near, far);
+        }
     }
 
 
