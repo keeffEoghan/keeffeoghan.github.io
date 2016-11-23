@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="634px" height="243px" viewBox="0 0 634 243" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <!-- Generator: Sketch 41.1 (35376) - http://www.bohemiancoding.com/sketch -->
+    <title>Slice 1</title>
+    <desc>Created with Sketch.</desc>
+    <defs></defs>
+    <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="Build" transform="translate(1.000000, 1.000000)" stroke="#979797">
+            <circle id="Oval" cx="405" cy="120" r="60"></circle>
+            <circle id="Oval" cx="345" cy="120" r="120"></circle>
+            <path d="M0.483916012,180 L630,180" id="Line" stroke-linecap="square"></path>
+            <path d="M0.483916012,60 L630,60" id="Line" stroke-linecap="square"></path>
+            <path d="M629.69159,60.5 L422.5,180.033609" id="Line" stroke-linecap="square" transform="translate(526.095795, 120.266805) scale(-1, 1) translate(-526.095795, -120.266805) "></path>
+            <path d="M629.69159,60.5 L422.5,180.033609" id="Line" stroke-linecap="square" transform="translate(526.095795, 120.266805) scale(-1, -1) translate(-526.095795, -120.266805) "></path>
+            <path d="M526,180.5 L526,60" id="Line" stroke-linecap="square"></path>
+            <path d="M448.5,60.5 L136.499941,240.500034" id="Line" stroke-linecap="square"></path>
+            <circle id="Oval" cx="225" cy="120" r="60"></circle>
+            <path d="M165,223.5 L165,120" id="Line" stroke-linecap="square"></path>
+            <path d="M165.009178,120.316776 L61.5,180.033609" id="Line" stroke-linecap="square" transform="translate(113.254589, 150.175193) scale(-1, -1) translate(-113.254589, -150.175193) "></path>
+            <path d="M62.0091775,149.300678 L8.73876399,180.033609" id="Line" stroke-linecap="square" transform="translate(35.373971, 164.667144) scale(1, -1) translate(-35.373971, -164.667144) "></path>
+            <path d="M112.009178,89.3167762 L8.5,149.033609" id="Line" stroke-linecap="square" transform="translate(60.254589, 119.175193) scale(-1, -1) translate(-60.254589, -119.175193) "></path>
+            <circle id="Oval" cx="61" cy="120" r="60"></circle>
+        </g>
+        <g id="Draw" transform="translate(2.000000, 61.000000)" stroke-width="12" stroke="#000000">
+            <g id="O" transform="translate(344.000000, 0.000000)">
+                <circle id="Oval" cx="60" cy="60" r="60"></circle>
+            </g>
+            <g id="K" transform="translate(523.000000, 0.000000)" stroke-linecap="square">
+                <path d="M104.69159,0.5 L1.18241201,60.2168332 L105.386719,120.369141" id="Line"></path>
+                <path d="M6,119.5 L6,-4.26325641e-14" id="Line"></path>
+            </g>
+            <g id="P" transform="translate(164.000000, 0.000000)">
+                <path d="M0,120 C0,120 23.8105469,119.076172 60,120 C96.1894531,120.923828 120,86.2875118 120,60 C120,26.862915 93.137085,0 60,0 C26.862915,0 6.12010442e-13,26.862915 6.12010442e-13,60 C6.12010442e-13,71.8934844 0,165.128906 0,165.128906" id="Oval"></path>
+            </g>
+            <g id="E">
+                <path d="M27.0480052,12.2371511 L86.3851219,115.821443 C104.007854,105.369323 115.821443,86.153546 115.821443,64.1785573 C115.821443,31.0414723 88.9585277,4.17855731 55.8214427,4.17855731 C22.6843577,4.17855731 -4.17855731,31.0414723 -4.17855731,64.1785573" id="Oval" transform="translate(55.821443, 60.000000) rotate(-90.000000) translate(-55.821443, -60.000000) "></path>
+            </g>
+        </g>
+    </g>
+</svg>
