@@ -13,7 +13,15 @@
         <link rel="stylesheet" type="text/css" href="../../build/css/demos/torch.css">
     </head>
     <body>
-        <canvas touch-action="none"></canvas>
+        <div class="visuals hide">
+            <p class="fallback-info hide">
+                Computer says NO.<br>
+                View<span class="name"></span> video on <a href="" class="fallback">YouTube</a>
+            </p>
+            <canvas touch-action="none"></canvas>
+        </div>
+
+        <div class="progress-total"><div class="progress"></div></div>
 
         <script type="text/javascript" src="../../build/js/demos/torch.js"></script>
     </body>

@@ -30,8 +30,8 @@ export class AudioTexture {
             makeTexture(gl, this.array, { float: true }));
     }
 
-    apply() {
-        this.texture.setPixels(this.array);
+    apply(array = this.array) {
+        this.texture.setPixels(array);
 
         return this;
     }
