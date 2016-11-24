@@ -6,6 +6,11 @@ import tomTheLion from './tom-the-lion';
 import tallChildren from './tall-children';
 import neilCowleyTrio from './neil-cowley-trio';
 import lewisFieldhouse from './lewis-fieldhouse';
+import twinAtlantic from './twin-atlantic';
+import lowerThanAtlantis from './lower-than-atlantis';
+import francisLung from './francis-lung';
+import retroKid from './retro-kid';
+import sattelites from './sattelites';
 
 export default {
     vaccines,
@@ -15,5 +20,10 @@ export default {
     tomTheLion,
     tallChildren,
     neilCowleyTrio,
-    lewisFieldhouse
+    lewisFieldhouse,
+    twinAtlantic,
+    lowerThanAtlantis,
+    francisLung,
+    retroKid,
+    sattelites
 };

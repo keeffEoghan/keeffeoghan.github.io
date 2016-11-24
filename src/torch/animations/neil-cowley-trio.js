@@ -2,7 +2,7 @@ import * as colors from '../colors';
 
 export default (player, end) => {
     player.tracks.main
-        .smoothTo({
+        .to({
             to: {
                 audioMode: 'frequencies',
                 audioScale: 1,
@@ -33,7 +33,6 @@ export default (player, end) => {
                 bokehAmount: 40
             },
             time: 210,
-            ease: [0, 0, 1],
             call: [end]
         });
 
