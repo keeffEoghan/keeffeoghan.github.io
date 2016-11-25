@@ -78,7 +78,7 @@ export default (canvas) => {
 
     const debug = (queries.debug === 'true');
 
-    const interact = (queries.interact === 'true');
+    const interact = ((queries.interact)? parseFloat(queries.interact, 10) : 0);
 
     const showTros = (queries.showTros === 'true');
 
@@ -262,6 +262,8 @@ export default (canvas) => {
     const cameraView = mat4.create();
     const cameraProjection = mat4.create();
     const camera = makeCamera();
+
+    let bump = 0;
 
 
     if(debug) {
@@ -496,13 +498,16 @@ export default (canvas) => {
                 if(e.isPrimary) {
                     offset(e, document.body, pointer);
 
-                    const l = 3;
+                    const l = interact;
 
                     pointer[0] = mapRange(pointer[0], 0, viewRes[0], -l, l);
                     pointer[1] = mapRange(pointer[1], 0, viewRes[1], l, -l);
                 }
             },
             false);
+
+        document.body.addEventListener('pointerdown',
+            (e) => bump = interact*0.1, false);
     }
 
 
@@ -594,7 +599,9 @@ export default (canvas) => {
                 staticAlpha: state.staticAlpha,
 
                 cameraView,
-                cameraProjection
+                cameraProjection,
+
+                bump
             });
 
         screen.draw();
@@ -662,10 +669,12 @@ export default (canvas) => {
         screen.unbind();
 
 
-        const pointerDamp = 0.99;
+        const damping = 0.99;
 
-        camera.position[0] = pointer[0] *= pointerDamp;
-        camera.position[1] = pointer[1] *= pointerDamp;
+        camera.position[0] = pointer[0] *= damping;
+        camera.position[1] = pointer[1] *= damping;
+
+        bump *= damping;
 
         camera.view(cameraView);
     }
