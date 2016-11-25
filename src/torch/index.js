@@ -79,9 +79,7 @@ export default (canvas) => {
     const debug = (queries.debug === 'true');
 
     // Handle legacy stuff...
-    const interact = ((queries.interact === 'true')?
-            3
-        :   (parseFloat(queries.interact, 10) || 0));
+    const interact = (parseFloat(queries.interact, 10) || 1);
 
     const showTros = (queries.showTros === 'true');
 
@@ -496,22 +494,20 @@ export default (canvas) => {
 
 
     // Interaction
-    if(interact) {
-        document.body.addEventListener('pointermove', (e) => {
-                if(e.isPrimary) {
-                    offset(e, document.body, pointer);
+    document.body.addEventListener('pointermove', (e) => {
+            if(e.isPrimary) {
+                offset(e, document.body, pointer);
 
-                    const l = interact;
+                const l = interact-1;
 
-                    pointer[0] = mapRange(pointer[0], 0, viewRes[0], -l, l);
-                    pointer[1] = mapRange(pointer[1], 0, viewRes[1], l, -l);
-                }
-            },
-            false);
+                pointer[0] = mapRange(pointer[0], 0, viewRes[0], -l, l);
+                pointer[1] = mapRange(pointer[1], 0, viewRes[1], l, -l);
+            }
+        },
+        false);
 
-        document.body.addEventListener('pointerdown',
-            (e) => bump = interact*0.1, false);
-    }
+    document.body.addEventListener('pointerdown',
+        (e) => bump = interact*0.1, false);
 
 
     // The main loop
@@ -694,14 +690,12 @@ export default (canvas) => {
         buffers.light.shape = viewRes;
         buffers.fade[0].shape = buffers.fade[1].shape = viewRes;
 
-        if(interact) {
-            const aspect = viewRes[0]/viewRes[1];
-            const fov = Math.PI/2.5;
-            const near = 0;
-            const far = 1;
+        const aspect = viewRes[0]/viewRes[1];
+        const fov = Math.PI/2.5;
+        const near = 0;
+        const far = 1;
 
-            mat4.perspective(cameraProjection, fov, aspect, near, far);
-        }
+        mat4.perspective(cameraProjection, fov, aspect, near, far);
     }
 
 
