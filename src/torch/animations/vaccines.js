@@ -2,14 +2,13 @@ import * as colors from '../colors';
 
 export default (player, end) => {
     player.tracks.main
-        .smoothTo({
+        .to({
             to: {
                 staticAlpha: 0,
                 fadeAlpha: 0,
                 noiseSpeed: 0.002
             },
-            time: 1500,
-            ease: [0, 0, 1]
+            time: 1500
         })
         .smoothTo({
             to: {

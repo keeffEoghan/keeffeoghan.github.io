@@ -2,7 +2,7 @@ import * as colors from '../colors';
 
 export default (player, end) => {
     player.tracks.main
-        .smoothTo({
+        .to({
             to: {
                 audioMode: 'waveform',
                 audioScale: 1,
@@ -21,8 +21,7 @@ export default (player, end) => {
                 bokehRadius: 7,
                 bokehAmount: 40
             },
-            time: 500,
-            ease: [0, 0, 1]
+            time: 500
         })
         .smoothOver(1000, {
             to: {
