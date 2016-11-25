@@ -16,6 +16,7 @@ export default (player, end) => {
                 otherAlpha: 0,
                 otherEdge: 0.01,
                 triangleAlpha: 0,
+                triangleFat: 0.01,
                 triangleEdge: 0.01,
                 grow: -2,
                 jitter: 0,
@@ -52,11 +53,74 @@ export default (player, end) => {
         })
         .smoothTo({
             to: {
-                ringRadius: 0.1,
-                grow: 1
+                grow: 0.3
             },
             time: 70000,
             ease: [0, 0, 1]
+        })
+        .smoothOver(95000-78000, {
+            to: {
+                ringRadius: 0.4,
+                ringThick: 0.04,
+                soundWarp: 0.00004,
+                grow: 0.08,
+                triangleEdge: 230,
+                triangleAlpha: 0.0001
+            },
+            time: 95000,
+            ease: [0, 0, 1]
+        })
+        .smoothOver(3000, {
+            to: {
+                grow: 0.04,
+                growLimit: 1
+            },
+            time: 104000,
+            ease: [0, 0, 1]
+        })
+        .smoothOver(142000-116000, {
+            to: {
+                ringRadius: 0.6,
+                ringThick: 0.01,
+                soundWarp: 0.00001,
+                growLimit: 0.4
+            },
+            time: 142000,
+            ease: [0, 0, 1]
+        })
+        .smoothOver(159000-151000, {
+            to: {
+                ringThick: 0.05,
+                triangleFat: 1,
+                triangleEdge: 200,
+                grow: -0.003
+            },
+            time: 159000,
+            ease: [0, 1, 1]
+        })
+        .smoothOver(202000-196000, {
+            to: {
+                ringThick: 0.15,
+                growLimit: 2
+            },
+            time: 202000,
+            ease: [0, 1, 1]
+        })
+        .smoothOver(230000-210000, {
+            to: {
+                grow: 0.1,
+                triangleAlpha: 0
+            },
+            time: 230000,
+            ease: [0, 1, 1]
+        })
+        .smoothTo({
+            to: {
+                ringRadius: 0.1,
+                ringThick: 2
+            },
+            time: 233500,
+            ease: [0, 0.2, 1]
         });
 
     player.tracks.lightColor
@@ -73,6 +137,21 @@ export default (player, end) => {
         .smoothTo({
             to: colors.lightBlueC,
             time: 4000,
+            ease: [0, 0, 1]
+        })
+        .smoothOver(4000, {
+            to: colors.lightBlueB,
+            time: 80000,
+            ease: [0, 0, 1]
+        })
+        .smoothOver(10000, {
+            to: colors.lightBlueA,
+            time: 159000,
+            ease: [0, 0, 1]
+        })
+        .smoothOver(14000, {
+            to: colors.white,
+            time: 233500,
             ease: [0, 0, 1]
         });
 };
