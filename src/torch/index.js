@@ -78,7 +78,10 @@ export default (canvas) => {
 
     const debug = (queries.debug === 'true');
 
-    const interact = ((queries.interact)? parseFloat(queries.interact, 10) : 0);
+    // Handle legacy stuff...
+    const interact = ((queries.interact === 'true')?
+            3
+        :   (parseFloat(queries.interact, 10) || 0));
 
     const showTros = (queries.showTros === 'true');
 
