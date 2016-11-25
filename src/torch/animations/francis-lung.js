@@ -117,7 +117,7 @@ export default (player, end) => {
         .smoothTo({
             to: {
                 ringRadius: 0.1,
-                ringThick: 2
+                ringThick: 2.5
             },
             time: 233500,
             ease: [0, 0.2, 1]
