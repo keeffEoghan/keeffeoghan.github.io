@@ -46,6 +46,8 @@ uniform float staticSpeed;
 uniform float staticShift;
 uniform float staticAlpha;
 
+uniform float bump;
+
 uniform mat4 cameraView;
 uniform mat4 cameraProjection;
 
@@ -97,7 +99,7 @@ void main() {
                 noiseTime))*
             noiseWarp*(1.0+(0.5*soundWarp*peak/audioScale)));
 
-    float ringSDF = clamp(abs(dist-ringRadius-warp)-ringThick, 0.0, 1.0)/sound;
+    float ringSDF = clamp(abs(dist-ringRadius-warp+bump)-ringThick, 0.0, 1.0)/sound;
 
 
     // Other circle
@@ -108,7 +110,7 @@ void main() {
     float otherRad = otherRadius*length(otherPos)*peakPos;
 
     float otherSDF = clamp(abs(sdfCircle(pos, otherPos, otherRad))-
-                abs(otherThick*mean*audioScale),
+                abs((otherThick+bump)*mean*audioScale),
             0.0, 1.0)/
         step(otherEdge, abs(peak/audioScale));
 
@@ -130,13 +132,13 @@ void main() {
     float triRad = mean*triangleRadius;
 
     float triangleSDF = sdfTriangle(vec3(pos, 0.0), mid, tri1*triRad,
-            mix(tri1, tri2*triRad, triangleFat*(1.0-peakPos)))/
+            mix(tri1, tri2*triRad, (triangleFat+bump)*(1.0-peakPos)))/
         step(triangleEdge, abs(peak));
 
 
     // "TV static" background
     float background = noise(vec3(uv*staticScale,
-            (mean*staticShift/audioScale)+(time*staticSpeed)));
+            (mean*(staticShift+bump)/audioScale)+(time*staticSpeed)));
 
 
     // Accumulate
