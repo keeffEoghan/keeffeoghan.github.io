@@ -522,9 +522,12 @@ export default (canvas) => {
 
     // Hand over the rest to the param-defined animation
     if(state.animation) {
-        // @todo Add an "end" callback here to show the outro
-        animations[state.animation](player, endSequence);
+        audio.addEventListener('durationchange',
+            () => animations[state.animation](player, endSequence, audio),
+            false);
     }
+
+    self.t = (time = audio.currentTime) => time/audio.duration;
 
 
     const scrub = () => {
