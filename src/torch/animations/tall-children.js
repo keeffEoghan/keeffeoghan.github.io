@@ -12,7 +12,6 @@ export default (player, end) => {
                 soundSmooth: 0.3,
                 meanFulcrum: 0.35,
                 spin: -0.0001,
-                ringRadius: 0.5,
                 ringAlpha: 0.5,
                 ringThick: 0.01,
                 noiseSpeed: 0.0001,
@@ -31,6 +30,12 @@ export default (player, end) => {
                 fadeAlpha: 0.91,
                 bokehRadius: 6,
                 bokehAmount: 40
+            },
+            time: 210
+        })
+        .smoothTo(2500, {
+            to: {
+                ringRadius: 0.5,
             },
             time: 210
         })

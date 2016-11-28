@@ -11,7 +11,6 @@ export default (player, end) => {
                 soundWarp: 0.000003,
                 soundSmooth: 0.3,
                 meanFulcrum: 0.3,
-                ringRadius: 0.5,
                 ringAlpha: 0.5,
                 ringThick: 0.001,
                 noiseSpeed: 0.0001,
@@ -32,6 +31,13 @@ export default (player, end) => {
                 bokehAmount: 40
             },
             time: 210
+        })
+        .smoothTo({
+            to: {
+                ringRadius: 0.5
+            },
+            time: 2500,
+            ease: [0, 0, 1]
         })
         .smoothOver(9000, {
             to: {

@@ -8,7 +8,6 @@ body {
     text-align: center;
 }
 
-.visuals,
 canvas,
 .video {
     display: block;
@@ -23,12 +22,11 @@ canvas,
 
 canvas,
 .video {
-    /*pointer-events: none;*/
+    pointer-events: none;
 }
 
 .visuals {
-    z-index: 100;
-    font-size: 5vmin;
+    font-size: 4.5vmin;
 }
 
 .video {
@@ -37,11 +35,11 @@ canvas,
 
 canvas {
     z-index: 100;
-    transition: opacity 900ms cubic-bezier(0, 1.51, 0.98, -0.8);
+    transition: opacity 750ms cubic-bezier(0, 1.51, 0.98, -0.8);
 }
 
 .fade {
-    transition: opacity 900ms ease-out;
+    transition: opacity 750ms ease-out;
 }
 
 .hide {
@@ -55,6 +53,9 @@ canvas {
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
+}
+
+.intro-info {
     z-index: 1000;
 }
 
@@ -62,17 +63,19 @@ canvas {
     line-height: 2;
     width: 60%;
     max-width: 37em;
+    z-index: 1;
+    transition-delay: 750ms;
 }
 
 .name {
-    text-transform: uppercase;
     font-family: 'Mekar Script', serif;
-    font-size: 2em;
+    font-size: 1.9em;
+    word-spacing: -0.2em;
 }
 
 .intro-info .name {
     margin: 0.5em 0 0.2em;
-    transition: opacity 1900ms ease-out;
+    transition: opacity 1750ms ease-out;
 }
 
 .track,

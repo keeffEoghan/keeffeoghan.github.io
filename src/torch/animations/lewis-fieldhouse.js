@@ -12,7 +12,6 @@ export default (player, end) => {
                 soundSmooth: 0.3,
                 meanFulcrum: 0.7,
                 spin: -0.0001,
-                ringRadius: 0.35,
                 ringAlpha: 0.5,
                 ringThick: 0.01,
                 noiseSpeed: 0.001,
@@ -36,6 +35,7 @@ export default (player, end) => {
         })
         .smoothOver(5000, {
             to: {
+                ringRadius: 0.35,
                 ringThick: 0,
                 ringAlpha: 0.01,
                 grow: 0.003

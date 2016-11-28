@@ -169,7 +169,7 @@ export default (canvas) => {
 
         ringRadius: ((queries.ringRadius)?
                 parseFloat(queries.ringRadius, 10)
-            :   0.4),
+            :   0.95),
 
         ringThick: ((queries.ringThick)?
                 parseFloat(queries.ringThick, 10)
@@ -298,7 +298,7 @@ export default (canvas) => {
 
 
     // Info
-    
+
     if(showInfo) {
         const introInfo = document.querySelector('.intro-info');
 
@@ -318,8 +318,6 @@ export default (canvas) => {
 
         fallbackInfo.querySelector('.name').innerText = ((name)? ' '+name : '');
         fallbackInfo.querySelector('.fallback').href = href;
-
-        fallbackInfo.className = deClass(fallbackInfo.className, 'hide');
     }
 
 
@@ -373,6 +371,12 @@ export default (canvas) => {
             videos.intro.el.className += ' hide';
         }
 
+        if(fallback) {
+            const fallbackInfo = document.querySelector('.fallback-info');
+
+            fallbackInfo.className = deClass(fallbackInfo.className, 'hide');
+        }
+
         audio.play();
         canvas.className = deClass(canvas.className, 'hide');
     }
@@ -392,7 +396,7 @@ export default (canvas) => {
             height: ytPlayerVars.height,
             frameborder: 0,
             allowfullscreen: true,
-            className: 'video',
+            className: 'video fade',
             src: ytPlayerParams(ytPlayerVars)
         };
 
