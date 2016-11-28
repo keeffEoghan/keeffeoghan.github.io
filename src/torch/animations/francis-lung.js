@@ -120,7 +120,8 @@ export default (player, end) => {
                 ringThick: 2.5
             },
             time: 233500,
-            ease: [0, 0.2, 1]
+            ease: [0, 0.2, 1],
+            call: [end]
         });
 
     player.tracks.lightColor

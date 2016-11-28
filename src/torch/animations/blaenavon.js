@@ -80,7 +80,7 @@ export default (player, end) => {
                 triangleFat: 0.1,
                 fadeAlpha: 0.92
             },
-            time: 30000,
+            time: 32000,
             ease: [0, 0, 1]
         })
         .smoothOver(10000, {
