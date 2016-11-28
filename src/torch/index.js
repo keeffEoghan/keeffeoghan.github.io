@@ -40,7 +40,7 @@ import animations from './animations';
 
 const deClass = (className, ...rest) =>
     reduce((name, remove) => name.replace(remove, ''), rest, className)
-        .replace(/\s\s/gi, '');
+        .replace(/\s\s/gi, ' ');
 
 const queryColor = (query) => query.split(',').map((v) =>
                 parseFloat(v.replace(/[\[\]]/gi, ''), 10));
@@ -380,8 +380,7 @@ export default (canvas) => {
     function endSequence() {
         if(videos) {
             videos.outro.player.playVideo();
-            videos.outro.el.className = videos.outro.el.className
-                .replace('hide', '');
+            videos.outro.el.className = deClass(videos.outro.el.className, 'hide');
         }
 
         canvas.className += ' hide';

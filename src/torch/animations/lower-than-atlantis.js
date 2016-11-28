@@ -21,7 +21,8 @@ export default (player, end) => {
                 bokehRadius: 7,
                 bokehAmount: 40
             },
-            time: 500
+            time: 500,
+            call: [end]
         });
 
     player.tracks.lightColor
