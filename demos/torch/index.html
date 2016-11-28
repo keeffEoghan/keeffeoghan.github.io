@@ -13,12 +13,18 @@
         <link rel="stylesheet" type="text/css" href="../../build/css/demos/torch.css">
     </head>
     <body>
-        <div class="visuals hide">
-            <p class="fallback-info hide">
-                Computer says NO.<br>
-                View<span class="name"></span> video on <a href="" class="fallback">YouTube</a>
-            </p>
-            <canvas touch-action="none"></canvas>
+        <div class="visuals">
+            <div class="fallback-info fade hide">
+                <p>Computer says NO.</p>
+                <p>View<span class="name"></span> video on <a href="" class="fallback">YouTube</a></p>
+            </div>
+            <div class="intro-info fade hide">
+                <p class="torch-song fade hide">a <strong>TORCH SONG</strong> by</p>
+                <p class="name fade hide"></p>
+                <p class="song-name fade hide"></p>
+                <p class="by-name fade hide"></p>
+            </div>
+            <canvas class="hide" touch-action="none"></canvas>
         </div>
 
         <div class="progress-total"><div class="progress"></div></div>
