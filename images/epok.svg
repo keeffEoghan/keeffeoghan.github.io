@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<svg width="634px" height="243px" viewBox="0 0 634 243" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<svg width="652px" height="250px" viewBox="0 0 652 250" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
     <!-- Generator: Sketch 41.1 (35376) - http://www.bohemiancoding.com/sketch -->
     <title>Slice 1</title>
     <desc>Created with Sketch.</desc>
     <defs></defs>
     <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
-        <g id="Build" transform="translate(1.000000, 1.000000)" stroke="#979797">
+        <g id="Build" transform="translate(10.000000, 4.000000)" stroke="#979797">
             <circle id="Oval" cx="405" cy="120" r="60"></circle>
             <circle id="Oval" cx="345" cy="120" r="120"></circle>
             <path d="M0.483916012,180 L630,180" id="Line" stroke-linecap="square"></path>
@@ -21,7 +21,7 @@
             <path d="M112.009178,89.3167762 L8.5,149.033609" id="Line" stroke-linecap="square" transform="translate(60.254589, 119.175193) scale(-1, -1) translate(-60.254589, -119.175193) "></path>
             <circle id="Oval" cx="61" cy="120" r="60"></circle>
         </g>
-        <g id="Draw" transform="translate(2.000000, 61.000000)" stroke-width="12" stroke="#000000">
+        <g id="Draw" transform="translate(11.000000, 64.000000)" stroke-width="12" stroke="#000000">
             <g id="O" transform="translate(344.000000, 0.000000)">
                 <circle id="Oval" cx="60" cy="60" r="60"></circle>
             </g>
