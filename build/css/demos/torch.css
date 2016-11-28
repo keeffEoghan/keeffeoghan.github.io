@@ -24,13 +24,13 @@ main { min-height: 100%; }
 
 body { margin: 0; }
 
-@font-face { font-family: 'Mekar Script'; src: url("/fonts/Mekar Script/mekar_script-webfont.woff2") format("woff2"), url("/fonts/Mekar Script/mekar_script-webfont.woff") format("woff"), url("/fonts/Mekar Script/mekar_script-webfont.ttf") format("truetype"); font-weight: normal; font-style: normal; }
+@font-face { font-family: 'Mekar Script'; src: url("../../fonts/Mekar Script/mekar_script-webfont.woff2") format("woff2"), url("../../fonts/Mekar Script/mekar_script-webfont.woff") format("woff"), url("../../fonts/Mekar Script/mekar_script-webfont.ttf") format("truetype"); font-weight: normal; font-style: normal; }
 
-@font-face { font-family: 'Futura Bold'; src: url("/fonts/Futura/futura-bold-webfont.woff2") format("woff2"), url("/fonts/Futura/futura-bold-webfont.woff") format("woff"), url("/fonts/Futura/futura-bold-webfont.ttf") format("truetype"); font-weight: normal; font-style: normal; }
+@font-face { font-family: 'Futura Bold'; src: url("../../fonts/Futura/futura-bold-webfont.woff2") format("woff2"), url("../../fonts/Futura/futura-bold-webfont.woff") format("woff"), url("../../fonts/Futura/futura-bold-webfont.ttf") format("truetype"); font-weight: normal; font-style: normal; }
 
-@font-face { font-family: 'Futura Book'; src: url("/fonts/Futura/futura-book-webfont.woff2") format("woff2"), url("/fonts/Futura/futura-book-webfont.woff") format("woff"), url("/fonts/Futura/futura-book-webfont.ttf") format("truetype"); font-weight: normal; font-style: normal; }
+@font-face { font-family: 'Futura Book'; src: url("../../fonts/Futura/futura-book-webfont.woff2") format("woff2"), url("../../fonts/Futura/futura-book-webfont.woff") format("woff"), url("../../fonts/Futura/futura-book-webfont.ttf") format("truetype"); font-weight: normal; font-style: normal; }
 
-@font-face { font-family: 'Futura Light'; src: url("/fonts/Futura/futurabt-light-webfont.woff2") format("woff2"), url("/fonts/Futura/futurabt-light-webfont.woff") format("woff"), url("/fonts/Futura/futurabt-light-webfont.ttf") format("truetype"); font-weight: normal; font-style: normal; }
+@font-face { font-family: 'Futura Light'; src: url("../../fonts/Futura/futurabt-light-webfont.woff2") format("woff2"), url("../../fonts/Futura/futurabt-light-webfont.woff") format("woff"), url("../../fonts/Futura/futurabt-light-webfont.ttf") format("truetype"); font-weight: normal; font-style: normal; }
 
 body { background: #000; color: #fff; font-family: 'Futura Book', 'Helvetica', 'Arial', sans-serif; text-align: center; }
 
