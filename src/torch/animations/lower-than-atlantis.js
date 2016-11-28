@@ -8,7 +8,7 @@ export default (player, end) => {
                 audioScale: 1,
                 audioOrder: 1,
                 silent: 0.00001,
-                soundWarp: 0.1,
+                soundWarp: 0.01,
                 soundSmooth: 0.3,
                 meanFulcrum: 0.3,
                 ringAlpha: 0.005,
@@ -21,7 +21,12 @@ export default (player, end) => {
                 bokehRadius: 7,
                 bokehAmount: 40
             },
-            time: 500,
+            time: 500
+        })
+        .to({
+            to: {
+            },
+            time: 261000,
             call: [end]
         });
 
