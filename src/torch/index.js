@@ -83,11 +83,19 @@ export default (canvas) => {
 
     const showTros = (queries.showTros === 'true');
 
-    const intro = (decodeURIComponent(queries.intro || ''));
-    const outro = (decodeURIComponent(queries.outro || ''));
+    const intro = (decodeURIComponent(queries.intro ||
+            'https://www.youtube.com/embed/7mT4vCdZY9w'));
+
+    const outro = (decodeURIComponent(queries.outro ||
+            'https://www.youtube.com/embed/Xr1vohT1yG4'));
+
+    const showInfo = (queries.showInfo === 'true');
+
+    const name = (decodeURIComponent(queries.name || ''));
+    const songName = (decodeURIComponent(queries.songName || ''));
+    const byName = (decodeURIComponent(queries.byName || ''));
 
     const fallback = (decodeURIComponent(queries.fallback || ''));
-    const name = (decodeURIComponent(queries.name || ''));
 
     const track = (decodeURIComponent(queries.track || '') ||
         prompt('Enter a track URL:'));
@@ -289,6 +297,19 @@ export default (canvas) => {
             out+((out)? '&' : '?')+k+'='+v, vars, '');
 
 
+    // Info
+    
+    if(showInfo) {
+        const introInfo = document.querySelector('.intro-info');
+
+        introInfo.querySelector('.name').innerText = (name || '');
+        introInfo.querySelector('.song-name').innerText = (songName || '');
+        introInfo.querySelector('.by-name').innerText = (byName || '');
+
+        introInfo.className = deClass(introInfo.className, 'hide');
+    }
+
+
     // Fallback
 
     if(fallback) {
@@ -299,8 +320,6 @@ export default (canvas) => {
         fallbackInfo.querySelector('.fallback').href = href;
 
         fallbackInfo.className = deClass(fallbackInfo.className, 'hide');
-
-        console.log('Fallback', href);
     }
 
 
@@ -329,13 +348,33 @@ export default (canvas) => {
 
     const visuals = document.querySelector('.visuals');
 
+    function startInfo() {
+        if(showInfo) {
+            visuals.className = deClass(visuals.className, 'hide');
+
+            const introInfo = document.querySelector('.intro-info');
+
+            each(([el, t]) => setTimeout(() =>
+                    el.className = deClass(el.className, 'hide'),
+                t),
+                [
+                    [introInfo.querySelector('.torch-song'), 0],
+                    [introInfo.querySelector('.name'), 1000],
+                    [introInfo.querySelector('.song-name'), 3000],
+                    [introInfo.querySelector('.by-name'), 4000]
+                ]);
+
+            setTimeout(() => introInfo.className += ' hide', 15000);
+        }
+    }
+
     function startSequence() {
         if(videos) {
             videos.intro.el.className += ' hide';
         }
 
         audio.play();
-        visuals.className = deClass(visuals.className, 'hide');
+        canvas.className = deClass(canvas.className, 'hide');
     }
 
     function endSequence() {
@@ -345,7 +384,7 @@ export default (canvas) => {
                 .replace('hide', '');
         }
 
-        visuals.className += ' hide';
+        canvas.className += ' hide';
     }
 
     if(showTros) {
@@ -372,7 +411,10 @@ export default (canvas) => {
                             setTimeout(startSequence, 15000);
                         },
                         onStateChange(e) {
-                            if(e.data === self.YT.PlayerState.ENDED) {
+                            if(e.data === self.YT.PlayerState.PLAYING) {
+                                startInfo();
+                            }
+                            else if(e.data === self.YT.PlayerState.ENDED) {
                                 // startSequence();
                                 videos.intro.el.className += ' hide';
                             }
