@@ -60,7 +60,7 @@ canvas { z-index: 100; -webkit-transition: opacity 750ms cubic-bezier(0, 1.51, 0
 
 .track, .progress-total { display: none; }
 
-.debug .track, .debug .progress-total { display: block; }
+.show-track .track, .show-track .progress-total { display: block; }
 
 .track { position: absolute; top: 0; left: 0; opacity: 0; -webkit-transition: opacity 300ms ease-in-out; transition: opacity 300ms ease-in-out; z-index: 1000; }
 
@@ -83,5 +83,7 @@ a:active { color: #002e62; }
 strong { font-family: 'Futura Bold', 'Helvetica', 'Arial', sans-serif; }
 
 p { margin: 0.2em; }
+
+.dg.main { display: none; }
 
 /*# sourceMappingURL=torch.css.map */
