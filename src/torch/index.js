@@ -296,7 +296,9 @@ export default (canvas) => {
 
     const configGUI = gui.addFolder('Config: main settings');
 
-    // This is an exception...
+
+    // This is an exception... need a multi-select
+
     const animation = config.animation;
 
     delete config.animation;
@@ -309,8 +311,9 @@ export default (canvas) => {
 
     config.animation = animation;
 
-    configGUI.add(config, 'animation', Object.keys(animations))
+    configGUI.add(config, 'animation', ['', ...Object.keys(animations)])
         .onFinishChange(updateURL);
+
 
     configGUI.open();
 
