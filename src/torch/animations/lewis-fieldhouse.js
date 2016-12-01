@@ -33,14 +33,14 @@ export default (player, end) => {
             },
             time: 210
         })
-        .smoothOver(5000, {
+        .smoothOver(0.01567398119122257*t, {
             to: {
                 ringRadius: 0.35,
                 ringThick: 0,
                 ringAlpha: 0.01,
                 grow: 0.003
             },
-            time: 8500,
+            time: 0.02664576802507837*t,
             ease: [0, 0, 1]
         })
         .smoothTo({
@@ -48,7 +48,7 @@ export default (player, end) => {
                 soundWarp: 0.00004,
                 ringRadius: 0.1
             },
-            time: 30000,
+            time: 0.09404388714733543*t,
             ease: [0, 0, 1]
         })
         .smoothTo({
@@ -56,7 +56,7 @@ export default (player, end) => {
                 soundWarp: 0.000055,
                 fadeAlpha: 0.93
             },
-            time: 40000,
+            time: 0.12539184952978055*t,
             ease: [0, 0, 1]
         })
         .smoothTo({
@@ -66,35 +66,35 @@ export default (player, end) => {
                 ringThick: 0.001,
                 fadeAlpha: 0.94
             },
-            time: 55000,
+            time: 0.1724137931034483*t,
             ease: [0, 0, 1]
         })
         .smoothTo({
             to: {
                 ringAlpha: 0.1
             },
-            time: 63000,
+            time: 0.1974921630094044*t,
             ease: [0, 0, 1]
         })
-        .smoothOver(10000, {
+        .smoothOver(0.03134796238244514*t, {
             to: {
                 grow: 0.01
             },
-            time: 90000,
+            time: 0.28213166144200624*t,
             ease: [0, 0, 1]
         })
-        .smoothOver(5000, {
+        .smoothOver(0.01567398119122257*t, {
             to: {
                 otherEdge: 0.01
             },
-            time: 114000,
+            time: 0.3573667711598746*t,
             ease: [0, 0, 1]
         })
         .smoothTo({
             to: {
                 otherRadius: 0.3
             },
-            time: 125000,
+            time: 0.39184952978056425*t,
             ease: [0, 0, 1]
         })
         .smoothTo({
@@ -103,22 +103,22 @@ export default (player, end) => {
                 otherThick: 0.0001,
                 otherEdge: 200
             },
-            time: 130000,
+            time: 0.40752351097178685*t,
             ease: [0, 0, 1]
         })
-        .smoothOver(6000, {
+        .smoothOver(0.018808777429467086*t, {
             to: {
                 grow: 0.005,
                 growLimit: 1.4
             },
-            time: 144000,
+            time: 0.45141065830721006*t,
             ease: [0, 0, 1]
         })
-        .smoothOver(6000, {
+        .smoothOver(0.018808777429467086*t, {
             to: {
                 otherThick: 0.0001,
             },
-            time: 165000,
+            time: 0.5172413793103449*t,
             ease: [0, 0, 1]
         })
         .smoothTo({
@@ -128,7 +128,7 @@ export default (player, end) => {
                 growLimit: -0.3,
                 ringRadius: 0.6
             },
-            time: 171000,
+            time: 0.5360501567398119*t,
             ease: [0, 0, 1]
         })
         .smoothTo({
@@ -136,7 +136,7 @@ export default (player, end) => {
                 otherThick: -0.01,
                 otherRadius: 0.1
             },
-            time: 181000,
+            time: 0.567398119122257*t,
             ease: [0, 0, 1]
         })
         .smoothTo({
@@ -145,32 +145,32 @@ export default (player, end) => {
                 otherThick: 0.0001,
                 otherRadius: 0.7
             },
-            time: 183000,
+            time: 0.5736677115987461*t,
             ease: [0, 0, 1]
         })
-        .smoothOver(203000-197000, {
+        .smoothOver(0.018808777429467086*t, {
             to: {
                 otherAlpha: 0.0005
             },
-            time: 203000,
+            time: 0.6363636363636364*t,
             ease: [0, 0, 1]
         })
-        .smoothOver(3000, {
+        .smoothOver(0.009404388714733543*t, {
             to: {
                 otherAlpha: 0.00001,
                 grow: 0.002,
                 growLimit: 0,
                 ringRadius: 0.3
             },
-            time: 210000,
+            time: 0.658307210031348*t,
             ease: [0, 0, 1]
         })
-        .smoothOver(254000-230000, {
+        .smoothOver(0.07523510971786834*t, {
             to: {
                 otherRadius: 1.4,
                 soundWarp: 0.0001
             },
-            time: 254000,
+            time: 0.7962382445141066*t,
             ease: [0, -0.1, 1.3, 1]
         })
         .smoothTo({
@@ -180,7 +180,7 @@ export default (player, end) => {
                 otherRadius: 0.01,
                 otherThick: 0.003
             },
-            time: 258000,
+            time: 0.8087774294670846*t,
             ease: [0, 1, 0.3, 1]
         })
         .smoothTo({
@@ -188,16 +188,16 @@ export default (player, end) => {
                 ringRadius: 0.4,
                 otherThick: -0.0006
             },
-            time: 275000,
+            time: 0.8620689655172413*t,
             ease: [0, 0, 1.6, 1]
         })
-        .smoothOver(6000, {
+        .smoothOver(0.018808777429467086*t, {
             to: {
                 ringRadius: 0.3,
                 noiseWarp: 0.08,
                 grow: 0.0008
             },
-            time: 283000,
+            time: 0.8871473354231975*t,
             ease: [0, 0, 1]
         })
         .smoothTo({
@@ -206,15 +206,15 @@ export default (player, end) => {
                 soundWarp: 0.00006,
                 meanFulcrum: 0.1
             },
-            time: 300000,
+            time: 0.9404388714733543*t,
             ease: [0, 0, 1]
         })
-        .smoothOver(315300-304000, {
+        .smoothOver(0.03542319749216301*t, {
             to: {
                 ringRadius: 0.3,
                 soundWarp: 0.00001
             },
-            time: 315300,
+            time: 0.9884012539184953*t,
             ease: [0, 0.8, 0, 1]
         })
         .smoothTo({
@@ -222,7 +222,7 @@ export default (player, end) => {
                 ringRadius: 0,
                 ringThick: 2
             },
-            time: 318000,
+            time: 0.9968652037617555*t,
             ease: [0, 0.8, 0, 1],
             call: [end]
         });
@@ -230,30 +230,30 @@ export default (player, end) => {
     player.tracks.lightColor
         .smoothTo({
             to: colors.lightBlueC,
-            time: 29000,
+            time: 0.09090909090909091*t,
             ease: [0, 0.95, 1]
         })
-        .over(3000, {
+        .over(0.009404388714733543*t, {
             to: colors.yellow,
-            time: 210000
+            time: 0.658307210031348*t
         })
-        .over(8000, {
+        .over(0.025078369905956112*t, {
             to: colors.white,
-            time: 261000
+            time: 0.8181818181818182*t
         });
 
     player.tracks.fadeColor
         .smoothTo({
             to: colors.yellow,
-            time: 29000,
+            time: 0.09090909090909091*t,
             ease: [0, 0.95, 1]
         })
-        .over(12000, {
+        .over(0.03761755485893417*t, {
             to: colors.orange,
-            time: 165000
+            time: 0.5172413793103449*t
         })
-        .over(12000, {
+        .over(0.03761755485893417*t, {
             to: colors.yellow,
-            time: 261000
+            time: 0.8181818181818182*t
         });
 };
