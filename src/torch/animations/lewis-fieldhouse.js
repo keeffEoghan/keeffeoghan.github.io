@@ -1,6 +1,8 @@
 import * as colors from '../colors';
 
-export default (player, end) => {
+export default (player, end, audio) => {
+    const t = audio.duration*1000;
+
     player.tracks.main
         .to({
             to: {
