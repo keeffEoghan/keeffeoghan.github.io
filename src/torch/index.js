@@ -78,6 +78,8 @@ export default (canvas) => {
     const config = self.config = {
         edit: (queries.edit === 'true'),
 
+        showTrack: (queries.showTrack === 'true'),
+
         interact: (parseFloat(queries.interact, 10) || 1),
 
         showEndVideos: (queries.showEndVideos === 'true' ||
@@ -267,65 +269,67 @@ export default (canvas) => {
     };
 
 
-    // Edit
-
-    if(config.edit) {
-        document.documentElement.className += ' edit';
+    // Editor
 
 
-        const gui = new dat.GUI();
+    const gui = new dat.GUI();
 
-        gui.domElement.parentNode.style.zIndex = 10000;
+    gui.domElement.parentNode.style.zIndex = 10000;
 
-        const proxyURL = {
-            URL: location.href,
-            'GO!': () => location.href = proxyURL.URL
-        };
+    const proxyURL = {
+        URL: location.href,
+        'GO!': () => location.href = proxyURL.URL
+    };
 
-        gui.add(proxyURL, 'GO!');
-        gui.add(proxyURL, 'URL');
+    gui.add(proxyURL, 'GO!');
+    gui.add(proxyURL, 'URL');
 
-        const urlCtrl = gui.__controllers[gui.__controllers.length-1];
+    const urlCtrl = gui.__controllers[gui.__controllers.length-1];
 
-        function updateURL() {
-            proxyURL.URL = location.href.replace(location.search, '?')+
-                querystring.stringify({ ...config, ...state });
+    function updateURL() {
+        proxyURL.URL = location.href.replace(location.search, '?')+
+            querystring.stringify({ ...config, ...state });
 
-            urlCtrl.updateDisplay();
-        }
-
-
-        const configGUI = gui.addFolder('Config: main settings');
-
-        // This is an exception...
-        const animation = config.animation;
-
-        delete config.animation;
-
-        each((value, name) =>
-                configGUI[(typeof value === 'object')?
-                        'addColor' : 'add'](config, name)
-                    .onFinishChange(updateURL),
-            config);
-
-        config.animation = animation;
-
-        configGUI.add(config, 'animation', Object.keys(animations))
-            .onFinishChange(updateURL);
-
-        configGUI.open();
-
-
-        const stateGUI = gui.addFolder('State: animated settings');
-
-        each((value, name) =>
-                stateGUI[(typeof value === 'object')?
-                        'addColor' : 'add'](state, name)
-                    .onFinishChange(updateURL),
-            state);
-
-        stateGUI.close();
+        urlCtrl.updateDisplay();
     }
+
+
+    const configGUI = gui.addFolder('Config: main settings');
+
+    // This is an exception...
+    const animation = config.animation;
+
+    delete config.animation;
+
+    each((value, name) =>
+            configGUI[(typeof value === 'object')?
+                    'addColor' : 'add'](config, name)
+                .onFinishChange(updateURL),
+        config);
+
+    config.animation = animation;
+
+    configGUI.add(config, 'animation', Object.keys(animations))
+        .onFinishChange(updateURL);
+
+    configGUI.open();
+
+
+    const stateGUI = gui.addFolder('State: animated settings');
+
+    each((value, name) =>
+            stateGUI[(typeof value === 'object')?
+                    'addColor' : 'add'](state, name)
+                .onFinishChange(updateURL),
+        state);
+
+    stateGUI.close();
+
+    if(!config.edit) {
+        dat.GUI.toggleHide();
+    }
+
+    setTimeout(() => gui.domElement.style.display = 'block', 0);
 
 
     const pointer = [0, 0];
@@ -333,7 +337,9 @@ export default (canvas) => {
     const cameraProjection = mat4.create();
     const camera = makeCamera();
 
+
     let bump = 0;
+
 
     const ytPlayerVars = {
         modestbranding: 1,
@@ -394,6 +400,13 @@ export default (canvas) => {
         });
 
     document.body.appendChild(audio);
+
+
+    // Progress
+
+    if(config.showTrack) {
+        document.documentElement.className += ' show-track';
+    }
 
     const progress = document.getElementsByClassName('progress')[0];
 
