@@ -105,7 +105,7 @@ export default (canvas) => {
         audioOrders: ((queries.audioOrders)?
             parseInt(queries.audioOrders, 10) : 3),
 
-        animation: queries.animation
+        animation: (queries.animation || '')
     };
 
     // Animation, running
