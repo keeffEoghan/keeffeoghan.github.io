@@ -82,7 +82,7 @@ canvas {
 .progress-total {
     display: none;
 
-    .debug & {
+    .show-track & {
         display: block;
     }
 }
@@ -147,4 +147,8 @@ strong {
 
 p {
     margin: 0.2em;
+}
+
+.dg.main {
+    display: none;
 }

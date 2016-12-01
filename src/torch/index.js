@@ -9,6 +9,7 @@ import offset from 'mouse-event-offset';
 import makeCamera from 'lookat-camera';
 import mapRange from 'range-fit';
 import mat4 from 'gl-matrix/src/gl-matrix/mat4';
+import dat from 'dat-gui';
 
 import Timer from '../tendrils/timer';
 
@@ -42,9 +43,6 @@ const deClass = (className, ...rest) =>
     reduce((name, remove) => name.replace(remove, ''), rest, className)
         .replace(/\s\s/gi, ' ');
 
-const queryColor = (query) => query.split(',').map((v) =>
-                parseFloat(v.replace(/[\[\]]/gi, ''), 10));
-
 export default (canvas) => {
     const queries = querystring.parse(location.search.slice(1));
 
@@ -76,36 +74,42 @@ export default (canvas) => {
 
     // Parameters...
 
-    const debug = (queries.debug === 'true');
+    // Configuration, setup
+    const config = self.config = {
+        edit: (queries.edit === 'true'),
 
-    // Handle legacy stuff...
-    const interact = (parseFloat(queries.interact, 10) || 1);
+        showTrack: (queries.showTrack === 'true'),
 
-    const showTros = (queries.showTros === 'true');
+        interact: (parseFloat(queries.interact, 10) || 1),
 
-    const intro = (decodeURIComponent(queries.intro ||
-            'https://www.youtube.com/embed/7mT4vCdZY9w'));
+        showEndVideos: (queries.showEndVideos === 'true' ||
+            queries.showTros === 'true'), // Legacy
 
-    const outro = (decodeURIComponent(queries.outro ||
-            'https://www.youtube.com/embed/Xr1vohT1yG4'));
+        intro: (decodeURIComponent(queries.intro ||
+            'https://www.youtube.com/embed/7mT4vCdZY9w')),
 
-    const showInfo = (queries.showInfo === 'true');
+        outro: (decodeURIComponent(queries.outro ||
+            'https://www.youtube.com/embed/Xr1vohT1yG4')),
 
-    const name = (decodeURIComponent(queries.name || ''));
-    const songName = (decodeURIComponent(queries.songName || ''));
-    const byName = (decodeURIComponent(queries.byName || ''));
+        showInfo: (queries.showInfo === 'true'),
 
-    const fallback = (decodeURIComponent(queries.fallback || ''));
+        name: (decodeURIComponent(queries.name || '')),
+        songName: (decodeURIComponent(queries.songName || '')),
+        byName: (decodeURIComponent(queries.byName || '')),
 
-    const track = (decodeURIComponent(queries.track || '') ||
-        prompt('Enter a track URL:'));
+        fallback: (decodeURIComponent(queries.fallback || '')),
 
-    const audioOrders = ((queries.audioOrders)?
-            parseInt(queries.audioOrders, 10) : 3);
+        track: (decodeURIComponent(queries.track || '') ||
+            prompt('Enter a track URL:')),
 
+        audioOrders: ((queries.audioOrders)?
+            parseInt(queries.audioOrders, 10) : 3),
+
+        animation: queries.animation
+    };
+
+    // Animation, running
     const state = self.state = {
-        animation: queries.animation,
-
         /**
          * @note `waveform` seems to make everything about an order of magnitude
          *       more sensitive than `frequencies`.
@@ -251,12 +255,9 @@ export default (canvas) => {
             :   0),
 
 
-        lightColor: ((queries.lightColor)?
-                queryColor(queries.lightColor)
-            :   [...colors.white]),
-        fadeColor: ((queries.fadeColor)?
-                queryColor(queries.fadeColor)
-            :   [...colors.white]),
+        lightColor: (queries.lightColor || [...colors.white]),
+
+        fadeColor: (queries.fadeColor || [...colors.white]),
 
         bokehRadius: ((queries.bokehRadius)?
                 parseFloat(queries.bokehRadius, 10)
@@ -267,17 +268,81 @@ export default (canvas) => {
             :   60)
     };
 
+
+    // Editor
+
+
+    const gui = new dat.GUI();
+
+    gui.domElement.parentNode.style.zIndex = 10000;
+
+    const proxyURL = {
+        URL: location.href,
+        'GO!': () => location.href = proxyURL.URL
+    };
+
+    gui.add(proxyURL, 'GO!');
+    gui.add(proxyURL, 'URL');
+
+    const urlCtrl = gui.__controllers[gui.__controllers.length-1];
+
+    function updateURL() {
+        proxyURL.URL = location.href.replace(location.search, '?')+
+            querystring.stringify({ ...config, ...state });
+
+        urlCtrl.updateDisplay();
+    }
+
+
+    const configGUI = gui.addFolder('Config: main settings');
+
+
+    // This is an exception... need a multi-select
+
+    const animation = config.animation;
+
+    delete config.animation;
+
+    each((value, name) =>
+            configGUI[(typeof value === 'object')?
+                    'addColor' : 'add'](config, name)
+                .onFinishChange(updateURL),
+        config);
+
+    config.animation = animation;
+
+    configGUI.add(config, 'animation', ['', ...Object.keys(animations)])
+        .onFinishChange(updateURL);
+
+
+    configGUI.open();
+
+
+    const stateGUI = gui.addFolder('State: animated settings');
+
+    each((value, name) =>
+            stateGUI[(typeof value === 'object')?
+                    'addColor' : 'add'](state, name)
+                .onFinishChange(updateURL),
+        state);
+
+    stateGUI.close();
+
+    if(!config.edit) {
+        dat.GUI.toggleHide();
+    }
+
+    setTimeout(() => gui.domElement.style.display = 'block', 0);
+
+
     const pointer = [0, 0];
     const cameraView = mat4.create();
     const cameraProjection = mat4.create();
     const camera = makeCamera();
 
+
     let bump = 0;
 
-
-    if(debug) {
-        document.documentElement.className += ' debug';
-    }
 
     const ytPlayerVars = {
         modestbranding: 1,
@@ -299,12 +364,12 @@ export default (canvas) => {
 
     // Info
 
-    if(showInfo) {
+    if(config.showInfo) {
         const introInfo = document.querySelector('.intro-info');
 
-        introInfo.querySelector('.name').innerText = (name || '');
-        introInfo.querySelector('.song-name').innerText = (songName || '');
-        introInfo.querySelector('.by-name').innerText = (byName || '');
+        introInfo.querySelector('.name').innerText = (config.name || '');
+        introInfo.querySelector('.song-name').innerText = (config.songName || '');
+        introInfo.querySelector('.by-name').innerText = (config.byName || '');
 
         introInfo.className = deClass(introInfo.className, 'hide');
     }
@@ -312,11 +377,13 @@ export default (canvas) => {
 
     // Fallback
 
-    if(fallback) {
+    if(config.fallback) {
         const fallbackInfo = document.querySelector('.fallback-info');
-        const href = fallback+ytPlayerParams(ytPlayerVars);
+        const href = config.fallback+ytPlayerParams(ytPlayerVars);
 
-        fallbackInfo.querySelector('.name').innerText = ((name)? ' '+name : '');
+        fallbackInfo.querySelector('.name').innerText = ((config.name)?
+            ' '+config.name : '');
+
         fallbackInfo.querySelector('.fallback').href = href;
     }
 
@@ -329,13 +396,20 @@ export default (canvas) => {
             autoplay: false,
             muted: 'muted' in queries,
             className: 'track',
-            src: ((track.match(/^(https)?(:\/\/)?(www\.)?dropbox\.com\/s\//gi))?
-                    track.replace(/^((https)?(:\/\/)?(www\.)?)dropbox\.com\/s\/(.*)\?dl=(0)$/gi,
+            src: ((config.track.match(/^(https)?(:\/\/)?(www\.)?dropbox\.com\/s\//gi))?
+                    config.track.replace(/^((https)?(:\/\/)?(www\.)?)dropbox\.com\/s\/(.*)\?dl=(0)$/gi,
                         'https://dl.dropboxusercontent.com/s/$5?dl=1&raw=1')
-                :   track)
+                :   config.track)
         });
 
     document.body.appendChild(audio);
+
+
+    // Progress
+
+    if(config.showTrack) {
+        document.documentElement.className += ' show-track';
+    }
 
     const progress = document.getElementsByClassName('progress')[0];
 
@@ -347,7 +421,7 @@ export default (canvas) => {
     const visuals = document.querySelector('.visuals');
 
     function startInfo() {
-        if(showInfo) {
+        if(config.showInfo) {
             visuals.className = deClass(visuals.className, 'hide');
 
             const introInfo = document.querySelector('.intro-info');
@@ -371,7 +445,7 @@ export default (canvas) => {
             videos.intro.el.className += ' hide';
         }
 
-        if(fallback) {
+        if(config.fallback) {
             const fallbackInfo = document.querySelector('.fallback-info');
 
             fallbackInfo.className = deClass(fallbackInfo.className, 'hide');
@@ -390,7 +464,7 @@ export default (canvas) => {
         canvas.className += ' hide';
     }
 
-    if(showTros) {
+    if(config.showEndVideos) {
         const ytIframeVars = {
             width: ytPlayerVars.width,
             height: ytPlayerVars.height,
@@ -404,7 +478,7 @@ export default (canvas) => {
             intro: {
                 iframeOptions: {
                     ...ytIframeVars,
-                    src: intro+ytIframeVars.src,
+                    src: config.intro+ytIframeVars.src,
                     className: 'intro '+ytIframeVars.className
                 },
                 playerOptions: {
@@ -428,7 +502,7 @@ export default (canvas) => {
             outro: {
                 iframeOptions: {
                     ...ytIframeVars,
-                    src: outro+ytIframeVars.src,
+                    src: config.outro+ytIframeVars.src,
                     className: 'outro hide '+ytIframeVars.className
                 },
                 playerOptions: {
@@ -486,7 +560,7 @@ export default (canvas) => {
 
     audioAnalyser.analyser.fftSize = 2**11;
 
-    const audioTrigger = new AudioTrigger(audioAnalyser, audioOrders);
+    const audioTrigger = new AudioTrigger(audioAnalyser, config.audioOrders);
 
     const audioTexture = new AudioTexture(gl,
             audioTrigger.dataOrder(state.audioOrder));
@@ -521,9 +595,9 @@ export default (canvas) => {
     });
 
     // Hand over the rest to the param-defined animation
-    if(state.animation) {
+    if(config.animation) {
         audio.addEventListener('durationchange',
-            () => animations[state.animation](player, endSequence, audio),
+            () => animations[config.animation](player, endSequence, audio),
             false);
     }
 
@@ -531,7 +605,7 @@ export default (canvas) => {
 
 
     const scrub = () => {
-        if(audio.currentTime >= 0 && !audio.paused && state.animation) {
+        if(audio.currentTime >= 0 && !audio.paused && config.animation) {
             player.playFrom(audio.currentTime*1000, 0);
         }
     };
@@ -546,7 +620,7 @@ export default (canvas) => {
             if(e.isPrimary) {
                 offset(e, document.body, pointer);
 
-                const l = interact-1;
+                const l = config.interact-1;
 
                 pointer[0] = mapRange(pointer[0], 0, viewRes[0], -l, l);
                 pointer[1] = mapRange(pointer[1], 0, viewRes[1], l, -l);
@@ -555,7 +629,7 @@ export default (canvas) => {
         false);
 
     document.body.addEventListener('pointerdown',
-        (e) => bump = interact*0.1, false);
+        (e) => bump = config.interact*0.1, false);
 
 
     // The main loop
@@ -565,7 +639,7 @@ export default (canvas) => {
 
         // Animate
 
-        if(audio.currentTime >= 0 && !audio.paused && state.animation) {
+        if(audio.currentTime >= 0 && !audio.paused && config.animation) {
             timers.player.tick(audio.currentTime*1000);
             player.play(timers.player.time);
         }

@@ -1,6 +1,8 @@
 import * as colors from '../colors';
 
-export default (player, end) => {
+export default (player, end, audio) => {
+    const t = audio.duration*1000;
+
     player.tracks.main
         .smoothTo({
             to: {
@@ -34,44 +36,44 @@ export default (player, end) => {
             time: 1800,
             ease: [0, 0, 1]
         })
-        .smoothOver(1000, {
+        .smoothOver(0.004901960784313725*t, {
             to: {
                 noiseWarp: 0.06,
                 grow: 1
             },
-            time: 16000,
+            time: 0.0784313725490196*t,
             ease: [0, 0, 1]
         })
-        .smoothOver(1000, {
+        .smoothOver(0.004901960784313725*t, {
             to: {
                 ringAlpha: 0.02,
                 noiseWarp: 0.1,
                 ringRadius: -0.2
             },
-            time: 32000,
+            time: 0.1568627450980392*t,
             ease: [0, -0.3, 1.3, 1]
         })
-        .smoothOver(1000, {
+        .smoothOver(0.004901960784313725*t, {
             to: {
                 ringAlpha: 0.25,
             },
-            time: 46000,
+            time: 0.22549019607843138*t,
             ease: [0, 0, 1]
         })
-        .smoothOver(1000, {
+        .smoothOver(0.004901960784313725*t, {
             to: {
                 ringAlpha: 0.1,
                 soundWarp: 0.012
             },
-            time: 61000,
+            time: 0.29901960784313725*t,
             ease: [0, 0, 1]
         })
-        .smoothOver(2000, {
+        .smoothOver(0.00980392156862745*t, {
             to: {
                 ringAlpha: 0.01,
                 soundWarp: 0.01
             },
-            time: 77000,
+            time: 0.37745098039215685*t,
             ease: [0, 0, 1]
         })
         .smoothTo({
@@ -81,7 +83,7 @@ export default (player, end) => {
                 triangleRadius: -1,
                 fadeAlpha: 0.93
             },
-            time: 97000,
+            time: 0.47549019607843135*t,
             ease: [0, 0, 1]
         })
         .smoothTo({
@@ -89,7 +91,7 @@ export default (player, end) => {
                 ringRadius: -0.1,
                 fadeAlpha: 0.99
             },
-            time: 103000,
+            time: 0.5049019607843137*t,
             ease: [0, 0, 1]
         })
         .smoothTo({
@@ -97,7 +99,7 @@ export default (player, end) => {
                 ringRadius: -0.1,
                 fadeAlpha: 0.99
             },
-            time: 105000,
+            time: 0.5147058823529411*t,
             ease: [0, 0, 1]
         })
         .smoothTo({
@@ -108,7 +110,7 @@ export default (player, end) => {
                 otherEdge: 0.22,
                 staticScale: 40
             },
-            time: 109000,
+            time: 0.5343137254901961*t,
             ease: [0, 0, 1]
         })
         .smoothTo({
@@ -116,7 +118,7 @@ export default (player, end) => {
                 ringRadius: 0.5,
                 ringThick: 0.03
             },
-            time: 118000,
+            time: 0.5784313725490197*t,
             ease: [0, 0, 1]
         })
         .smoothTo({
@@ -126,19 +128,19 @@ export default (player, end) => {
                 noiseSpeed: 0.001,
                 fadeAlpha: 0.9
             },
-            time: 120000,
+            time: 0.5882352941176471*t,
             ease: [0, 1, 1]
         })
-        .smoothOver(4000, {
+        .smoothOver(0.0196078431372549*t, {
             to: {
                 ringRadius: 0,
                 ringThick: 0.7,
                 staticAlpha: 0.3
             },
-            time: 137000,
+            time: 0.6715686274509803*t,
             ease: [0, 1, 1]
         })
-        .smoothOver(4000, {
+        .smoothOver(0.0196078431372549*t, {
             to: {
                 ringThick: 0.95,
                 triangleEdge: 210,
@@ -146,29 +148,29 @@ export default (player, end) => {
                 triangleRadius: -5,
                 otherThick: -0.000001
             },
-            time: 151000,
+            time: 0.7401960784313726*t,
             ease: [0, 1, 1]
         })
         .smoothTo({
             to: {
                 ringThick: 1.8
             },
-            time: 180000,
+            time: 0.8823529411764706*t,
             ease: [0, 1, 1]
         })
-        .smoothOver(13000, {
+        .smoothOver(0.06372549019607843*t, {
             to: {
                 triangleRadius: -10,
                 otherEdge: 0
             },
-            time: 201000,
+            time: 0.9852941176470589*t,
             ease: [0, 0, 1]
         })
         .smoothTo({
             to: {
                 otherEdge: 1
             },
-            time: 203000,
+            time: 0.9950980392156863*t,
             ease: [0, 0, 1],
             call: [end]
         });
@@ -186,14 +188,14 @@ export default (player, end) => {
             time: 1000,
             ease: [0, 0.95, 1]
         })
-        .smoothOver(10000, {
+        .smoothOver(0.049019607843137254*t, {
             to: colors.lightBlueA,
-            time: 109000,
+            time: 0.5343137254901961*t,
             ease: [0, 0.95, 1]
         })
-        .smoothOver(1000, {
+        .smoothOver(0.004901960784313725*t, {
             to: colors.darkBlue,
-            time: 118000,
+            time: 0.5784313725490197*t,
             ease: [0, 0.95, 1]
         });
 };
