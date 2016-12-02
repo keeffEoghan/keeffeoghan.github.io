@@ -4,7 +4,6 @@ import blaenavon from './blaenavon';
 import frankTurner from './frank-turner';
 import tomTheLion from './tom-the-lion';
 import tallChildren from './tall-children';
-import neilCowleyTrio from './neil-cowley-trio';
 import lewisFieldhouse from './lewis-fieldhouse';
 import twinAtlantic from './twin-atlantic';
 import lowerThanAtlantis from './lower-than-atlantis';
@@ -19,7 +18,6 @@ export default {
     frankTurner,
     tomTheLion,
     tallChildren,
-    neilCowleyTrio,
     lewisFieldhouse,
     twinAtlantic,
     lowerThanAtlantis,

@@ -1,6 +1,8 @@
 import * as colors from '../colors';
 
-export default (player, end) => {
+export default (player, end, audio) => {
+    const t = audio.duration*1000;
+
     player.tracks.main
         .to({
             to: {
@@ -12,6 +14,7 @@ export default (player, end) => {
                 soundSmooth: 0.3,
                 meanFulcrum: 0.35,
                 spin: -0.0001,
+                ringRadius: 0.5,
                 ringAlpha: 0.5,
                 ringThick: 0.01,
                 noiseSpeed: 0.0001,
@@ -33,93 +36,87 @@ export default (player, end) => {
             },
             time: 210
         })
-        .smoothTo(2500, {
-            to: {
-                ringRadius: 0.5,
-            },
-            time: 210
-        })
-        .smoothOver(8000, {
+        .smoothOver(0.0311284046692607*t, {
             to: {
                 soundWarp: 0.00002,
                 silent: 0.0000002
             },
-            time: 19000,
+            time: 0.07392996108949416*t,
             ease: [0, 0, 1]
         })
-        .smoothOver(4000, {
+        .smoothOver(0.01556420233463035*t, {
             to: {
                 fadeAlpha: 0.98
             },
-            time: 25000,
+            time: 0.09727626459143969*t,
             ease: [0, 0, 1]
         })
-        .smoothOver(3000, {
+        .smoothOver(0.011673151750972763*t, {
             to: {
                 noiseWarp: 0.2,
                 noiseSpeed: 0.001
             },
-            time: 40000,
+            time: 0.1556420233463035*t,
             ease: [0, 0, 1]
         })
-        .smoothOver(6000, {
+        .smoothOver(0.023346303501945526*t, {
             to: {
                 otherEdge: 210
             },
-            time: 60000,
+            time: 0.23346303501945526*t,
             ease: [0, 0, 1]
         })
         .smoothTo({
             to: {
                 otherThick: 0.0025
             },
-            time: 67000,
+            time: 0.2607003891050584*t,
             ease: [0, 0, 1]
         })
-        .smoothOver(5000, {
+        .smoothOver(0.019455252918287938*t, {
             to: {
                 otherThick: 0.0008,
                 otherEdge: 254
             },
-            time: 70000,
+            time: 0.2723735408560311*t,
             ease: [0, 0, 1]
         })
-        .smoothOver(10000, {
+        .smoothOver(0.038910505836575876*t, {
             to: {
                 ringRadius: 0.7,
                 otherThick: 0.00001,
                 otherRadius: 200
             },
-            time: 90000,
+            time: 0.35019455252918286*t,
             ease: [0, 0, 1]
         })
-        .smoothOver(5000, {
+        .smoothOver(0.019455252918287938*t, {
             to: {
                 staticAlpha: 0
             },
-            time: 99000,
+            time: 0.3852140077821012*t,
             ease: [0, 0, 1]
         })
-        .smoothOver(3000, {
+        .smoothOver(0.011673151750972763*t, {
             to: {
                 grow: 0.1
             },
-            time: 122000,
+            time: 0.47470817120622566*t,
             ease: [0, 0, 1]
         })
-        .smoothOver(3000, {
+        .smoothOver(0.011673151750972763*t, {
             to: {
                 grow: 0.3
             },
-            time: 142000,
+            time: 0.5525291828793775*t,
             ease: [0, 0, 1]
         })
-        .smoothOver(6000, {
+        .smoothOver(0.023346303501945526*t, {
             to: {
                 soundWarp: 0.000001,
                 noiseWarp: 0.001
             },
-            time: 179000,
+            time: 0.6964980544747081*t,
             ease: [0, 0, 1]
         })
         .smoothTo({
@@ -128,7 +125,7 @@ export default (player, end) => {
                 ringAlpha: 0,
                 noiseWarp: 0.00001
             },
-            time: 184000,
+            time: 0.7159533073929961*t,
             ease: [0, 0, 1]
         })
         .smoothOver(500, {
@@ -137,10 +134,10 @@ export default (player, end) => {
                 noiseWarp: 0.0001,
                 spin: 0.0002
             },
-            time: 187500,
+            time: 0.7295719844357976*t,
             ease: [0, 0, 1]
         })
-        .smoothOver(6000, {
+        .smoothOver(0.023346303501945526*t, {
             to: {
                 ringThick: 0.1,
                 noiseWarp: 0.0003,
@@ -148,7 +145,7 @@ export default (player, end) => {
                 otherThick: 0.003,
                 otherRadius: 0.0000001
             },
-            time: 201000,
+            time: 0.7821011673151751*t,
             ease: [0, 0, 1]
         })
         .smoothTo({
@@ -156,14 +153,14 @@ export default (player, end) => {
                 noiseWarp: 0.002,
                 spin: -0.0002
             },
-            time: 207000,
+            time: 0.8054474708171206*t,
             ease: [0, 0, 1]
         })
         .smoothTo({
             to: {
                 noiseWarp: 0.1
             },
-            time: 217000,
+            time: 0.8443579766536965*t,
             ease: [0, 0, 1]
         })
         .smoothTo({
@@ -175,7 +172,7 @@ export default (player, end) => {
                 fadeAlpha: 0.93,
                 jitter: 0
             },
-            time: 220000,
+            time: 0.8560311284046692*t,
             ease: [0, 0, 1]
         })
         .smoothTo({
@@ -183,16 +180,16 @@ export default (player, end) => {
                 grow: 0.5,
                 growLimit: 1.8
             },
-            time: 236000,
+            time: 0.9182879377431906*t,
             ease: [0, 0, 1]
         })
-        .smoothOver(257000-254000, {
+        .smoothOver(0.011673151750972763*t, {
             to: {
                 grow: 1,
                 growLimit: 3,
                 ringThick: 2
             },
-            time: 257000,
+            time: 0.9999*t,
             ease: [0, 0, 1],
             call: [end]
         });
@@ -200,64 +197,64 @@ export default (player, end) => {
     player.tracks.lightColor
         .smoothTo({
             to: colors.pink,
-            time: 19000,
+            time: 0.07392996108949416*t,
             ease: [0, 0.95, 1]
         })
-        .smoothOver(3000, {
+        .smoothOver(0.011673151750972763*t, {
             to: colors.lightBlueA,
-            time: 56000,
+            time: 0.2178988326848249*t,
             ease: [0, 0, 1]
         })
-        .smoothOver(3000, {
+        .smoothOver(0.011673151750972763*t, {
             to: colors.yellow,
-            time: 90000,
+            time: 0.35019455252918286*t,
             ease: [0, 0, 1]
         })
-        .smoothOver(5000, {
+        .smoothOver(0.019455252918287938*t, {
             to: colors.orange,
-            time: 142000,
+            time: 0.5525291828793775*t,
             ease: [0, 0, 1]
         })
-        .smoothOver(8000, {
+        .smoothOver(0.0311284046692607*t, {
             to: colors.white,
-            time: 257000,
+            time: 0.9999*t,
             ease: [0, 0, 1]
         });
 
     player.tracks.fadeColor
         .smoothTo({
             to: colors.orange,
-            time: 19000,
+            time: 0.07392996108949416*t,
             ease: [0, 0.95, 1]
         })
-        .smoothOver(5000, {
+        .smoothOver(0.019455252918287938*t, {
             to: colors.white,
-            time: 142000,
+            time: 0.5525291828793775*t,
             ease: [0, 0, 1]
         })
         .smoothOver(500, {
             to: colors.lightBlueC,
-            time: 187500,
+            time: 0.7295719844357976*t,
             ease: [0, 0, 1]
         })
         .smoothTo({
             to: colors.lightBlueB,
-            time: 207000,
+            time: 0.8054474708171206*t,
             ease: [0, 0, 1]
         })
         .smoothTo({
             to: colors.lightBlueA,
-            time: 219000,
+            time: 0.8521400778210116*t,
             ease: [0, 0, 1]
         })
         .smoothTo({
             to: colors.orange,
-            time: 220000,
+            time: 0.8560311284046692*t,
             ease: [0, 0, 1]
         })
-        .smoothOver(8000, {
+        .smoothOver(0.0311284046692607*t, {
             to: colors.white,
-            time: 257000,
+            time: 0.9999*t,
             ease: [0, 0, 1]
         });
 };
