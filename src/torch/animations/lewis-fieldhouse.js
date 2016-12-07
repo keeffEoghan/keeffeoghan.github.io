@@ -6,9 +6,6 @@ export default (player, end, audio) => {
     player.tracks.main
         .to({
             to: {
-                audioMode: 'waveform',
-                audioOrder: 0,
-                audioScale: 1,
                 silent: 0,
                 soundWarp: 0.000007,
                 soundSmooth: 0.3,
@@ -38,7 +35,7 @@ export default (player, end, audio) => {
         .smoothOver(0.01567398119122257*t, {
             to: {
                 ringRadius: 0.35,
-                ringThick: 0,
+                ringThick: 0.001,
                 ringAlpha: 0.01,
                 grow: 0.003
             },
@@ -65,7 +62,7 @@ export default (player, end, audio) => {
             to: {
                 soundWarp: 0.000075,
                 ringRadius: 0,
-                ringThick: 0.001,
+                ringThick: 0.01,
                 fadeAlpha: 0.94
             },
             time: 0.1724137931034483*t,
@@ -178,7 +175,7 @@ export default (player, end, audio) => {
         .smoothTo({
             to: {
                 ringRadius: 0.6,
-                ringThick: 0.05,
+                ringThick: 0.1,
                 otherRadius: 0.01,
                 otherThick: 0.003
             },
