@@ -282,6 +282,9 @@ export default (canvas) => {
 
     const gui = new dat.GUI();
 
+    const configProxy = { ...config };
+    const stateProxy = { ...state };
+
     gui.domElement.parentNode.style.zIndex = 10000;
 
     const proxyURL = {
@@ -294,53 +297,62 @@ export default (canvas) => {
 
     const urlCtrl = gui.__controllers[gui.__controllers.length-1];
 
-    function updateURL() {
-        proxyURL.URL = location.href.replace(location.search, '?')+
-            querystring.stringify({ ...config, ...state });
+    function applyGUI(obj, name, value) {
+        obj[name] = value;
+
+        const oldRx = new RegExp('(^|\\&|\\?)'+name+'=.*?(?=\\&|$)', 'gi');
+
+        let url = location.href.replace(location.search,
+                location.search.replace(oldRx, ''));
+
+        proxyURL.URL = url+((url[url.length-1] === '?')? '' : '&')+
+                querystring.stringify({ [name]: value });
 
         urlCtrl.updateDisplay();
     }
 
 
-    const configGUI = gui.addFolder('Config: main settings');
+    const configGUI = gui.addFolder('Fixed settings');
 
 
     // This is an exception... need a multi-select
 
-    const animation = config.animation;
+    const animation = configProxy.animation;
 
-    delete config.animation;
+    delete configProxy.animation;
 
     each((value, name) =>
             configGUI[(typeof value === 'object')?
-                    'addColor' : 'add'](config, name)
-                .onFinishChange(updateURL),
-        config);
+                    'addColor' : 'add'](configProxy, name)
+                .onFinishChange((v) => applyGUI(config, name, v)),
+        configProxy);
 
-    config.animation = animation;
+    configProxy.animation = animation;
 
-    configGUI.add(config, 'animation', ['', ...Object.keys(animations)])
-        .onFinishChange(updateURL);
+    configGUI.add(configProxy, 'animation', ['', ...Object.keys(animations)])
+        .onFinishChange((v) => applyGUI(config, 'animation', v));
 
 
     setTimeout(() => configGUI.open(), 200);
 
 
-    const stateGUI = gui.addFolder('State: animated settings');
+    const stateGUI = gui.addFolder('Animatable settings');
 
     each((value, name) => {
             if(Array.isArray(value) && value.length === 4) {
                 const colorFolder = stateGUI.addFolder(name);
 
                 for(var i = 0; i < 4; ++i) {
-                    colorFolder.add(value, i).onFinishChange(updateURL);
+                    colorFolder.add(value, i).onFinishChange((v) =>
+                        applyGUI(state, name, stateProxy[name]));
                 }
             }
             else {
-                stateGUI.add(state, name).onFinishChange(updateURL);
+                stateGUI.add(stateProxy, name)
+                    .onFinishChange((v) => applyGUI(state, name, v));
             }
         },
-        state);
+        stateProxy);
 
     setTimeout(() => stateGUI.open(), 200);
 
@@ -645,7 +657,7 @@ export default (canvas) => {
         false);
 
     document.body.addEventListener('pointerdown',
-        (e) => bump = state.interact*0.1, false);
+        () => bump = state.interact*0.1, false);
 
 
     // The main loop
