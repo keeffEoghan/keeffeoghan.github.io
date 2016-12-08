@@ -11,7 +11,7 @@ export default (player, end, audio) => {
                 soundSmooth: 0.3,
                 meanFulcrum: 0.6,
                 ringRadius: 0,
-                ringAlpha: 10000,
+                ringAlpha: 60000,
                 ringThick: 0.1,
                 noiseSpeed: 0.0001,
                 noiseWarp: 0,
