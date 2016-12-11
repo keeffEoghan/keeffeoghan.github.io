@@ -43,6 +43,7 @@ export class GeometrySpawner extends spawnPixels.PixelSpawner {
     }
 
     shuffle() {
+        // @todo Make all this more open/configurable - not worth the time now
         const size = 2;
         const num = 3;
         const step = size*num;

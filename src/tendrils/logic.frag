@@ -2,6 +2,7 @@ precision highp float;
 
 uniform sampler2D particles;
 uniform sampler2D flow;
+uniform sampler2D targets;
 
 uniform vec2 dataRes;
 
@@ -22,12 +23,15 @@ uniform float flowDecay;
 uniform float noiseSpeed;
 uniform float noiseScale;
 
+uniform float target;
+
 // These are scaled by the values they correspond to
 uniform float varyForce;
 uniform float varyFlow;
 uniform float varyNoise;
 uniform float varyNoiseScale;
 uniform float varyNoiseSpeed;
+uniform float varyTarget;
 
 #pragma glslify: noise = require(glsl-noise/simplex/3d)
 
@@ -74,6 +78,9 @@ void main() {
             (vary(forceWeight, i, varyForce)*
                 ((flowForce*dt*vary(flowWeight, i, varyFlow))+
                 (wanderForce*dt*vary(noiseWeight, i, varyNoise))));
+
+        // Tend towards targets
+        newVel += (texture2D(targets, uv).xy-pos)*vary(target, i, varyTarget);
         
         // Normalize and clamp the velocity
         /**
