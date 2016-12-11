@@ -52,6 +52,9 @@ export const defaults = () => ({
         noiseSpeed: 0.00025,
         varyNoiseSpeed: 0.1,
 
+        target: 0,
+        varyTarget: 0,
+
         lineWidth: 1,
         speedAlpha: 0.000001,
         colorMapAlpha: 0.4,
@@ -92,7 +95,12 @@ export class Tendrils {
 
         this.screen = new Screen(this.gl);
 
+        // The FBO into which the particle flow will be rendered, creating the
+        // feedback/self-influence
         this.flow = FBO(this.gl, [1, 1], { float: true });
+
+        // Targets for the particles, to allow a degree of explicit control
+        this.targets = FBO(this.gl, [1, 1], { float: true });
 
         // Multiple bufferring
         this.buffers = [];
@@ -119,9 +127,9 @@ export class Tendrils {
 
 
         this.uniforms = {
-                render: {},
-                update: {}
-            };
+            render: {},
+            update: {}
+        };
 
 
         this.particles = null;
@@ -194,6 +202,8 @@ export class Tendrils {
 
         this.particles.setup(numBuffers);
 
+        this.targets.shape = shape;
+
         return this;
     }
 
@@ -245,6 +255,7 @@ export class Tendrils {
                     time: this.timer.time,
                     start: this.timer.since,
                     flow: this.flow.color[0].bind(1),
+                    targets: this.targets.color[0].bind(2),
                     viewSize: this.viewSize,
                     viewRes: this.viewRes
                 });
@@ -270,12 +281,12 @@ export class Tendrils {
 
         Object.assign(this.uniforms.render, this.state, {
                 time: this.timer.time,
-                previous: this.particles.buffers[1].color[0].bind(2),
+                previous: this.particles.buffers[1].color[0].bind(1),
                 viewSize: this.viewSize,
                 viewRes: this.viewRes,
 
                 colorMap: ((this.colorMap.color && this.colorMap.color[0])?
-                        this.colorMap.color[0] : this.colorMap).bind(3),
+                        this.colorMap.color[0] : this.colorMap).bind(2),
                 colorMapRes: this.colorMap.shape
             });
 

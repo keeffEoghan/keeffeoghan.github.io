@@ -52,7 +52,6 @@ import each from '../fp/each';
 import filter from '../fp/filter';
 
 toSource.defaultFnFormatter = (depth, f) => f.name;
-// toSource.defaultFnFormatter = toSource.simpleFnFormatter;
 
 export default (canvas, settings, debug) => {
     if(redirect()) {
@@ -140,7 +139,7 @@ export default (canvas, settings, debug) => {
     Object.assign(track, {
             crossOrigin: 'anonymous',
             controls: true,
-            autoplay: true,
+            autoplay: false,
             className: 'track'
         });
 
@@ -180,7 +179,6 @@ export default (canvas, settings, debug) => {
         if(old) {
             old.parentElement.removeChild(old);
         }
-
 
         if(trackURL.match(/^(https?)?(\:\/\/)?(www\.)?soundcloud\.com\//gi)) {
             soundCloud({
@@ -301,7 +299,7 @@ export default (canvas, settings, debug) => {
 
 
     const videoFrame = new Image();
-    
+
     videoFrame.src = '/build/images/max-kath.jpg';
 
     videoFrame.addEventListener('load', () => {
@@ -334,7 +332,7 @@ export default (canvas, settings, debug) => {
         },
         (e, stream) => {
             if(e) {
-                throw e;
+                console.warn(e);
             }
             else {
                 mediaStream = stream;
@@ -362,14 +360,13 @@ export default (canvas, settings, debug) => {
                 v.play();
                 // canvas.parentElement.appendChild(video);
 
-
-                // @todo Gain node to control unpredictable audio environment?
-
                 micAnalyser = analyser(stream, { audible: false });
                 micAnalyser.analyser.fftSize = Math.pow(2, 7);
 
                 micTrigger = new AudioTrigger(micAnalyser, 3);
             }
+
+            track.play();
         });
 
     const stopUserMedia = (stream = mediaStream) =>
@@ -403,7 +400,7 @@ export default (canvas, settings, debug) => {
             if(t) {
                 const cached = audioCache.get(key);
 
-                if(cached){
+                if(cached) {
                     return cached;
                 }
                 else {
