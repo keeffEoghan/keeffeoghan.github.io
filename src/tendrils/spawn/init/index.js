@@ -19,8 +19,8 @@ export const spawner = (gl, options) => {
                 shader(gl, ...params.shader)
             :   params.shader),
 
-        spawn(tendrils) {
-            tendrils.spawnShader(this.shader, this.uniforms);
+        spawn(tendrils, ...rest) {
+            tendrils.spawnShader(this.shader, this.uniforms, ...rest);
         }
     };
 };
