@@ -53,7 +53,7 @@ export const defaults = () => ({
         varyNoiseSpeed: 0.1,
 
         target: 0,
-        varyTarget: 0,
+        varyTarget: 1,
 
         lineWidth: 1,
         speedAlpha: 0.000001,
@@ -427,21 +427,24 @@ export class Tendrils {
     }
 
     // Respawn on the GPU using a given shader
-    spawnShader(shader, update) {
+    spawnShader(shader, update, ...rest) {
         this.timer.tick();
 
         this.particles.logic = shader;
+
+        // @todo Allow switching between the particles data and the targets.
 
         // Disabling blending here is important
         this.gl.disable(this.gl.BLEND);
 
         this.particles.step(Particles.applyUpdate({
-                ...this.state,
-                time: this.timer.time,
-                viewSize: this.viewSize,
-                viewRes: this.viewRes
-            },
-            update));
+                    ...this.state,
+                    time: this.timer.time,
+                    viewSize: this.viewSize,
+                    viewRes: this.viewRes
+                },
+                update),
+            ...rest);
 
         this.particles.logic = this.logicShader;
 
