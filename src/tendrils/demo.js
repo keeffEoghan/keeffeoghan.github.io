@@ -1564,7 +1564,7 @@ export default (canvas, settings, debug) => {
         tracks.tendrils
             .smoothTo({
                 to: {
-                    forceWeight: 0.014,
+                    forceWeight: 0.015,
                     flowWeight: -0.1,
                     speedAlpha: 0.002,
                     colorMapAlpha: 0.85
@@ -1583,7 +1583,7 @@ export default (canvas, settings, debug) => {
         tracks.tendrils2
             .smoothTo({
                 to: {
-                    noiseWeight: 0.003,
+                    noiseWeight: 0.005,
                     noiseScale: 1.2,
                     varyNoiseScale: -4,
                     noiseSpeed: 0.0003,
