@@ -742,32 +742,33 @@ export default (canvas, settings, debug) => {
             .to({
                 to: {
                     target: 0.00001,
-                    varyTarget: 5
+                    varyTarget: 3
                 },
                 time: 1000,
                 ease: [0, 1, 1]
             })
             .smoothTo({
                 to: {
-                    target: 0.006,
+                    target: 0.01,
                     noiseScale: 0.3,
                     noiseWeight: 0.001
                 },
                 time: 8500,
-                ease: [0, 0.2, 1]
+                ease: [0, 0, 0, 1]
             })
             .smoothTo({
                 to: {
                     target: 0.00006,
                     varyTarget: 1,
                     noiseScale: 1,
-                    noiseWeight: 0.0007
+                    noiseWeight: 0.0007,
+                    lineWidth: 2
                 },
                 time: 10000,
                 ease: [0, 0, 1]
             });
 
-        for(let t = 0; t < 1; t += 0.03) {
+        for(let t = 0; t < 1; t += 0.01) {
             tracks.tendrils2
                 .to({
                     time: lerp(1000, 12000, t),
@@ -823,17 +824,10 @@ export default (canvas, settings, debug) => {
                 ease: [0, 0, 1]
             });
 
-        tracks.flowColor
-            .to({
-                to: [1, 1, 1, 0.1],
-                time: 4000,
-                ease: [0, 0, 1]
-            });
-
         tracks.fadeColor
             .over(4000-1000, {
                 to: [0, 0, 0, 0.01],
-                time: 4000,
+                time: 6000,
                 ease: [0, 0, 1]
             });
 
@@ -845,7 +839,8 @@ export default (canvas, settings, debug) => {
                 to: {
                     forceWeight: 0.01,
                     flowWeight: 0.02,
-                    flowDecay: 0.003
+                    flowDecay: 0.003,
+                    lineWidth: 1
                 },
                 time: 13000,
                 ease: [0, 0.95, 1]
@@ -888,13 +883,6 @@ export default (canvas, settings, debug) => {
         tracks.baseColor
             .over(2000, {
                 to: [1, 1, 1, 0.9],
-                time: 15000,
-                ease: [0, 0, 1]
-            });
-
-        tracks.flowColor
-            .over(8000, {
-                to: [1, 1, 1, 0.1],
                 time: 15000,
                 ease: [0, 0, 1]
             });
