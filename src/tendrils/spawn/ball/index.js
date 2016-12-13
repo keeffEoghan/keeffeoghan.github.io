@@ -10,7 +10,9 @@ export const defaults = () => ({
     }
 });
 
+const baseOptions = defaults();
+
 export const spawnBall = (gl, options) =>
-    init.spawner(gl, Object.assign(defaults(), options));
+    init.spawner(gl, Object.assign(baseOptions, options));
 
 export default spawnBall;

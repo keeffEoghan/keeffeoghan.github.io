@@ -58,8 +58,8 @@ export class PixelSpawner {
             });
     }
 
-    spawn(tendrils, update = this.update.bind(this)) {
-        return tendrils.spawnShader(this.shader, update);
+    spawn(tendrils, update = this.update.bind(this), ...rest) {
+        return tendrils.spawnShader(this.shader, update, ...rest);
     }
 
     setPixels(pixels) {
