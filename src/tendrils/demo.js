@@ -122,7 +122,7 @@ export default (canvas, settings, debug) => {
         trackCamAt: 0.01,
         trackSpawnAt: 0.18,
 
-        mic: parseFloat((queries.mic_in || 1.2), 10),
+        mic: parseFloat((queries.mic_in || 1.4), 10),
         micFlowAt: 0.5,
         micFastAt: 0.6,
         micFormAt: 0.4,
@@ -796,6 +796,8 @@ export default (canvas, settings, debug) => {
                 call: [() => resetSpawner.spawn(tendrils, tendrils.targets)]
             });
 
+        let mic = audioState.mic;
+
         tracks.audio
             .over(100, {
                 to: {
@@ -805,7 +807,7 @@ export default (canvas, settings, debug) => {
             })
             .over(100, {
                 to: {
-                    mic: 1.2
+                    mic
                 },
                 time: 12000
             });
@@ -1259,8 +1261,8 @@ export default (canvas, settings, debug) => {
             })
             .to({
                 to: {
-                    trackCamAt: audioDefaults.trackCamAt*0.8,
-                    micCamAt: audioDefaults.micCamAt*0.9
+                    trackCamAt: audioDefaults.trackCamAt*0.7,
+                    micCamAt: audioDefaults.micCamAt*0.8
                 },
                 call: [() => spawnCam()],
                 time: 134000,
