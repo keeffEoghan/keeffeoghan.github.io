@@ -46,6 +46,8 @@ const deClass = (className, ...rest) =>
 export default (canvas) => {
     const queries = querystring.parse(location.search.slice(1));
 
+    const queryColor = (query) => map((c) => parseFloat(c, 10), query);
+
     const gl = glContext(canvas, { preserveDrawingBuffer: true }, render);
 
     const timers = {
@@ -80,8 +82,6 @@ export default (canvas) => {
 
         showTrack: (queries.showTrack === 'true'),
 
-        interact: (parseFloat(queries.interact, 10) || 1),
-
         showEndVideos: (queries.showEndVideos === 'true' ||
             queries.showTros === 'true'), // Legacy
 
@@ -105,27 +105,31 @@ export default (canvas) => {
         audioOrders: ((queries.audioOrders)?
             parseInt(queries.audioOrders, 10) : 3),
 
-        animation: (queries.animation || '')
+        animation: (queries.animation || ''),
     };
 
     // Animation, running
     const state = self.state = {
+        interact: (parseFloat(queries.interact, 10) || 1),
+
         /**
          * @note `waveform` seems to make everything about an order of magnitude
          *       more sensitive than `frequencies`.
          */
         audioMode: (queries.audioMode || 'frequencies'),
 
+        // for `audioOrder === 0`
+        audioScale: ((queries.audioScale)?
+                parseFloat(queries.audioScale, 10)
+            :   1),
+
         /**
-         * @note Each higher order seems to make everything aboutan order of
+         * @note Each higher order seems to make everything about an order of
          *       magnitude more sensitive.
          */
         audioOrder: ((queries.audioOrder)?
                 parseInt(queries.audioOrder, 10)
-            :   1),
-
-        // audioScale: 1, // audioOrder = 0
-        audioScale: 0.008, // audioOrder = 1
+            :   -1),
 
         // @todo Not actually meaningful for waveforms - check for this case
         meanFulcrum: ((queries.meanFulcrum)?
@@ -255,9 +259,13 @@ export default (canvas) => {
             :   0),
 
 
-        lightColor: (queries.lightColor || [...colors.white]),
+        lightColor: ((queries.lightColor)?
+                queryColor(queries.lightColor)
+            :   [...colors.white]),
 
-        fadeColor: (queries.fadeColor || [...colors.white]),
+        fadeColor: ((queries.fadeColor)?
+                queryColor(queries.fadeColor)
+            :   [...colors.white]),
 
         bokehRadius: ((queries.bokehRadius)?
                 parseFloat(queries.bokehRadius, 10)
@@ -274,6 +282,9 @@ export default (canvas) => {
 
     const gui = new dat.GUI();
 
+    const configProxy = { ...config };
+    const stateProxy = { ...state };
+
     gui.domElement.parentNode.style.zIndex = 10000;
 
     const proxyURL = {
@@ -286,47 +297,64 @@ export default (canvas) => {
 
     const urlCtrl = gui.__controllers[gui.__controllers.length-1];
 
-    function updateURL() {
-        proxyURL.URL = location.href.replace(location.search, '?')+
-            querystring.stringify({ ...config, ...state });
+    function applyGUI(obj, name, value) {
+        obj[name] = value;
+
+        const oldRx = new RegExp('(^|\\&|\\?)'+name+'=.*?(?=\\&|$)', 'gi');
+
+        let url = location.href.replace(location.search,
+                location.search.replace(oldRx, ''));
+
+        proxyURL.URL = url+((url[url.length-1] === '?')? '' : '&')+
+                querystring.stringify({ [name]: value });
 
         urlCtrl.updateDisplay();
     }
 
 
-    const configGUI = gui.addFolder('Config: main settings');
+    const configGUI = gui.addFolder('Fixed settings');
 
 
     // This is an exception... need a multi-select
 
-    const animation = config.animation;
+    const animation = configProxy.animation;
 
-    delete config.animation;
+    delete configProxy.animation;
 
     each((value, name) =>
             configGUI[(typeof value === 'object')?
-                    'addColor' : 'add'](config, name)
-                .onFinishChange(updateURL),
-        config);
+                    'addColor' : 'add'](configProxy, name)
+                .onFinishChange((v) => applyGUI(config, name, v)),
+        configProxy);
 
-    config.animation = animation;
+    configProxy.animation = animation;
 
-    configGUI.add(config, 'animation', ['', ...Object.keys(animations)])
-        .onFinishChange(updateURL);
-
-
-    configGUI.open();
+    configGUI.add(configProxy, 'animation', ['', ...Object.keys(animations)])
+        .onFinishChange((v) => applyGUI(config, 'animation', v));
 
 
-    const stateGUI = gui.addFolder('State: animated settings');
+    setTimeout(() => configGUI.open(), 200);
 
-    each((value, name) =>
-            stateGUI[(typeof value === 'object')?
-                    'addColor' : 'add'](state, name)
-                .onFinishChange(updateURL),
-        state);
 
-    stateGUI.close();
+    const stateGUI = gui.addFolder('Animatable settings');
+
+    each((value, name) => {
+            if(Array.isArray(value) && value.length === 4) {
+                const colorFolder = stateGUI.addFolder(name);
+
+                for(var i = 0; i < 4; ++i) {
+                    colorFolder.add(value, i).onFinishChange((v) =>
+                        applyGUI(state, name, stateProxy[name]));
+                }
+            }
+            else {
+                stateGUI.add(stateProxy, name)
+                    .onFinishChange((v) => applyGUI(state, name, v));
+            }
+        },
+        stateProxy);
+
+    setTimeout(() => stateGUI.open(), 200);
 
     if(!config.edit) {
         dat.GUI.toggleHide();
@@ -588,7 +616,9 @@ export default (canvas) => {
 
         track.to({
             to: start,
-            time: 200
+            time: 200,
+            call: [() => console.log('reset', key,
+                JSON.stringify(start).replace(/\,/gi, ',\n'))]
         });
 
         return { apply: start };
@@ -600,8 +630,6 @@ export default (canvas) => {
             () => animations[config.animation](player, endSequence, audio),
             false);
     }
-
-    self.t = (time = audio.currentTime) => time/audio.duration;
 
 
     const scrub = () => {
@@ -620,7 +648,7 @@ export default (canvas) => {
             if(e.isPrimary) {
                 offset(e, document.body, pointer);
 
-                const l = config.interact-1;
+                const l = state.interact-1;
 
                 pointer[0] = mapRange(pointer[0], 0, viewRes[0], -l, l);
                 pointer[1] = mapRange(pointer[1], 0, viewRes[1], l, -l);
@@ -629,7 +657,7 @@ export default (canvas) => {
         false);
 
     document.body.addEventListener('pointerdown',
-        (e) => bump = config.interact*0.1, false);
+        () => bump = state.interact*0.1, false);
 
 
     // The main loop
@@ -651,7 +679,7 @@ export default (canvas) => {
         // Sample audio
 
         audioTrigger.sample(dt, state.audioMode);
-        // @todo Hack, remove
+        // @todo Hack, remove - may cause breaks
         audioTexture.array.data = audioTrigger.dataOrder(state.audioOrder);
         audioTexture.apply();
 
@@ -682,6 +710,7 @@ export default (canvas) => {
                 viewRes,
 
                 audio: audioTexture.texture.bind(0),
+
                 audioScale: state.audioScale,
 
                 peak: audioPeak.peak,

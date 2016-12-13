@@ -6,15 +6,12 @@ export default (player, end, audio) => {
     player.tracks.main
         .smoothTo({
             to: {
-                audioMode: 'waveform',
-                audioScale: 1000,
-                audioOrder: 0,
                 silent: 0.0000001,
                 soundWarp: 0.005,
                 soundSmooth: 0.3,
                 meanFulcrum: 0.6,
                 ringRadius: 0,
-                ringAlpha: 0.5,
+                ringAlpha: 60000,
                 ringThick: 0.1,
                 noiseSpeed: 0.0001,
                 noiseWarp: 0,

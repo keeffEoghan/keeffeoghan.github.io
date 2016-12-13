@@ -6,9 +6,6 @@ export default (player, end, audio) => {
     player.tracks.main
         .to({
             to: {
-                audioMode: 'waveform',
-                audioOrder: 3,
-                audioScale: 1,
                 silent: 0.00001,
                 soundWarp: 0.000003,
                 meanFulcrum: 0.7,
