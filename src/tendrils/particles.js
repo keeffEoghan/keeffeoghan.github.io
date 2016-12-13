@@ -120,10 +120,15 @@ export class Particles {
      * @todo Find a way to use free texture bind units without having to
      *       manually remember them
      */
-    step(update) {
-        step(this.buffers);
+    step(update, buffer) {
+        if(buffer) {
+            buffer.bind();
+        }
+        else {
+            step(this.buffers);
+            this.buffers[0].bind();
+        }
 
-        this.buffers[0].bind();
         this.gl.viewport(0, 0, this.shape[0], this.shape[1]);
 
         this.logic.bind();
