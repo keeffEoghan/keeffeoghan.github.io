@@ -1023,7 +1023,7 @@ export default (canvas, settings, debug) => {
                     noiseScale: 20
                 },
                 time: 46000,
-                ease: [0, -0.1, 1.2, 1]
+                ease: [0, -0.1, 0.7, 1]
             })
             .smoothTo({
                 to: {
@@ -1032,7 +1032,7 @@ export default (canvas, settings, debug) => {
                     varyNoiseScale: 2
                 },
                 time: 50000,
-                ease: [0, -0.1, 1.2, 1]
+                ease: [0, 0, 1]
             });
 
         tracks.audio
@@ -1044,7 +1044,7 @@ export default (canvas, settings, debug) => {
                     micFlowAt: audioDefaults.micFlowAt,
                     micFastAt: audioDefaults.micFastAt
                 },
-                time: 46000,
+                time: 47000,
                 call: [
                     () => {
                         delete spawnTargets.spawnCam;
@@ -1205,7 +1205,7 @@ export default (canvas, settings, debug) => {
                     micFlowAt: 0,
                     trackFastAt: 0,
                     micFastAt: 0,
-                    trackSpawnAt: audioDefaults.trackSpawnAt,
+                    trackSpawnAt: audioDefaults.trackSpawnAt*0.6,
                     micSpawnAt: audioDefaults.micSpawnAt
                 },
                 time: 70100
@@ -2304,7 +2304,7 @@ export default (canvas, settings, debug) => {
 
         toggleGUI(false);
 
-        gui.main.open();
+        setTimeout(() => gui.main.open(), 200);
         gui.settings.open();
 
 
