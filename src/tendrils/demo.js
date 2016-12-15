@@ -14,7 +14,6 @@ import vec2 from 'gl-matrix/src/gl-matrix/vec2';
 import querystring from 'querystring';
 import toSource from 'to-source';
 import shader from 'gl-shader';
-import lerp from 'lerp';
 import prefixes from 'prefixes';
 import dat from 'dat-gui';
 
@@ -87,16 +86,29 @@ export default (canvas, settings, debug) => {
             numBuffers: 1
         });
 
+    /**
+     * Stateful but convenient way to set which buffer we spawn into.
+     * Set the properties to the targets used by the corresponding spawn
+     * functions: to a buffer (e.g: `tedrils.targets`) to spawn into it; or
+     * `undefined` to spawn into the default (the next particle step buffer).
+     *
+     * @type {Object.<(FBO|undefined)>}
+     */
+    const spawnTargets = {};
+
     const resetSpawner = spawnReset(gl);
 
 
     // Some convenient shorthands
 
-    const respawn = () => resetSpawner.spawn(tendrils);
+    const respawn = (buffer = spawnTargets.respawn) =>
+        resetSpawner.spawn(tendrils, buffer);
+
     const reset = () => tendrils.reset();
     const restart = () => {
         tendrils.clear();
         respawn();
+        respawn(tendrils.targets);
     };
     const clear = () => tendrils.clear();
     const clearView = () => tendrils.clearView();
@@ -140,7 +152,6 @@ export default (canvas, settings, debug) => {
     Object.assign(track, {
             crossOrigin: 'anonymous',
             controls: true,
-            autoplay: false,
             className: 'track'
         });
 
@@ -254,11 +265,11 @@ export default (canvas, settings, debug) => {
     };
     const flowPixelState = {...flowPixelDefaults};
 
-    function spawnFlow() {
+    function spawnFlow(buffer = spawnTargets.spawnFlow) {
         vec2.div(flowPixelSpawner.spawnSize,
             flowPixelScales[flowPixelState.scale], tendrils.viewSize);
 
-        flowPixelSpawner.spawn(tendrils);
+        flowPixelSpawner.spawn(tendrils, undefined, buffer);
     }
 
 
@@ -269,10 +280,10 @@ export default (canvas, settings, debug) => {
             buffer: null
         });
 
-    function spawnFastest() {
+    function spawnFastest(buffer = spawnTargets.spawnFastest) {
         simplePixelSpawner.buffer = tendrils.particles.buffers[0];
         simplePixelSpawner.spawnSize = tendrils.particles.shape;
-        simplePixelSpawner.spawn(tendrils);
+        simplePixelSpawner.spawn(tendrils, undefined, buffer);
     }
 
 
@@ -283,7 +294,8 @@ export default (canvas, settings, debug) => {
             bias: 100/0.005
         });
 
-    const spawnForm = () => geometrySpawner.shuffle().spawn(tendrils);
+    const spawnForm = (buffer = spawnTargets.spawnForm) =>
+        geometrySpawner.shuffle().spawn(tendrils, undefined, buffer);
 
 
     // Cam and mic
@@ -311,20 +323,19 @@ export default (canvas, settings, debug) => {
             }
         });
 
-
-    const spawnCam = (buffer) => {
+    function spawnCam(buffer = spawnTargets.spawnCam) {
         camSpawner.shader = camShaders.direct;
         camSpawner.speed = 0.3;
         camSpawner.setPixels(video || videoFrame);
         camSpawner.spawn(tendrils, undefined, buffer);
-    };
+    }
 
-    const spawnSampleCam = (buffer) => {
+    function spawnSampleCam(buffer = spawnTargets.spawnSampleCam) {
         camSpawner.shader = camShaders.sample;
         camSpawner.speed = 1;
         camSpawner.setPixels(video || videoFrame);
         camSpawner.spawn(tendrils, undefined, buffer);
-    };
+    }
 
 
     getUserMedia({
@@ -367,7 +378,7 @@ export default (canvas, settings, debug) => {
                 micTrigger = new AudioTrigger(micAnalyser, 3);
             }
 
-            track.play();
+            track.autoplay = true;
         });
 
     const stopUserMedia = (stream = mediaStream) =>
@@ -538,6 +549,7 @@ export default (canvas, settings, debug) => {
     const tracks = {
         tendrils: tendrils.state,
         tendrils2: tendrils.state,
+        tendrils3: tendrils.state,
         baseColor: tendrils.state.baseColor,
         flowColor: tendrils.state.flowColor,
         fadeColor: tendrils.state.fadeColor,
@@ -577,10 +589,6 @@ export default (canvas, settings, debug) => {
             flowDecay: 0.0025,
             flowWidth: 5,
 
-            target: 0.00003,
-            varyTarget: 1,
-
-            lineWidth: 1,
             speedAlpha: 0.0005,
             colorMapAlpha: 0.9
         },
@@ -594,11 +602,16 @@ export default (canvas, settings, debug) => {
             noiseSpeed: 0.0006,
             varyNoiseSpeed: 0.1,
         },
+        tendrils3: {
+            target: 0.00001,
+            varyTarget: 1,
+            lineWidth: 1
+        },
         baseColor: [1, 1, 1, 0.9],
         flowColor: [1, 1, 1, 0.1],
         fadeColor: [0, 0, 0, 0.1],
         spawn: {
-            radius: 0.98,
+            radius: 0.9,
             speed: 0.05
         },
         audio: {
@@ -608,8 +621,8 @@ export default (canvas, settings, debug) => {
             trackSampleAt: 0,
             trackCamAt: 0,
             trackSpawnAt: 0,
-            micFlowAt: audioDefaults.micFlowAt,
-            micFastAt: audioDefaults.micFastAt,
+            micFlowAt: 0,
+            micFastAt: 0,
             micFormAt: 0,
             micSampleAt: 0,
             micCamAt: 0,
@@ -620,15 +633,20 @@ export default (canvas, settings, debug) => {
 
     // Restart, clean slate; begin with the inert, big bang - flow only
 
-    const trackStartTime = 200;
+    const trackStartTime = 60;
 
     player.track.tracks.tendrils.to({
-            call: [reset],
-            time: 60
+            call: [() => reset()],
+            time: trackStartTime
         })
         .to({
-            call: [restart, () => canvas.classList.remove('light')],
-            time: trackStartTime
+            call: [
+                () => {
+                    restart();
+                    canvas.classList.remove('light')
+                }
+            ],
+            time: 200
         });
 
     player.track.apply((track, key) => {
@@ -736,101 +754,6 @@ export default (canvas, settings, debug) => {
     function setupSequence() {
         const tracks = player.track.tracks;
 
-        // Start off by gathering upon image
-
-        tracks.tendrils
-            .to({
-                to: {
-                    target: 0.00001,
-                    varyTarget: 3
-                },
-                time: 1000,
-                ease: [0, 1, 1]
-            })
-            .smoothTo({
-                to: {
-                    target: 0.01,
-                    noiseScale: 0.3,
-                    noiseWeight: 0.001
-                },
-                time: 8500,
-                ease: [0, 0, 0, 1]
-            })
-            .smoothTo({
-                to: {
-                    target: 0.00006,
-                    varyTarget: 1,
-                    noiseScale: 1,
-                    noiseWeight: 0.0007,
-                    lineWidth: 2
-                },
-                time: 10000,
-                ease: [0, 0, 1]
-            });
-
-        for(let t = 0; t < 1; t += 0.01) {
-            tracks.tendrils2
-                .to({
-                    time: lerp(1000, 12000, t),
-                    call: [() => spawnCam(tendrils.targets)]
-                });
-        }
-
-        tracks.spawn
-            .to({
-                to: {
-                    radius: 0.2
-                },
-                time: 11500
-            })
-            .to({
-                to: {
-                    radius: 0.9
-                },
-                time: 13000
-            });
-
-        tracks.tendrils2
-            .to({
-                time: 12000,
-                call: [() => resetSpawner.spawn(tendrils, tendrils.targets)]
-            });
-
-        tracks.audio
-            .over(100, {
-                to: {
-                    mic: 0
-                },
-                time: 1000
-            })
-            .over(100, {
-                to: {
-                    mic: 1.2
-                },
-                time: 12000
-            });
-
-        tracks.blend
-            .over(7000-1000, {
-                to: [0, 1],
-                time: 7000,
-                ease: [0, 0, 1]
-            });
-
-        tracks.baseColor
-            .to({
-                to: [1, 1, 1, 0.25],
-                time: 4000,
-                ease: [0, 0, 1]
-            });
-
-        tracks.fadeColor
-            .over(4000-1000, {
-                to: [0, 0, 0, 0.01],
-                time: 6000,
-                ease: [0, 0, 1]
-            });
-
 
         // Inert - broad wave, to isolated areas of activity
 
@@ -838,7 +761,7 @@ export default (canvas, settings, debug) => {
             .smoothTo({
                 to: {
                     forceWeight: 0.01,
-                    flowWeight: 0.02,
+                    flowWeight: 0.1,
                     flowDecay: 0.003,
                     lineWidth: 1
                 },
@@ -849,7 +772,7 @@ export default (canvas, settings, debug) => {
         tracks.tendrils2
             .smoothTo({
                 to: {
-                    noiseWeight: 0.002,
+                    noiseWeight: 0.001,
                 },
                 time: 13000,
                 ease: [0, 0.2, 1]
@@ -864,33 +787,69 @@ export default (canvas, settings, debug) => {
                 ease: [0, 0, 1.1, 1]
             });
 
-        tracks.audio
-            .over(100, {
+        tracks.tendrils3
+            // Gravitate towards center/eye
+            .smoothTo({
                 to: {
-                    micFlowAt: 0,
-                    micFastAt: 0
+                    varyTarget: 4
                 },
-                time: 13000
+                time: 1000,
+                ease: [0, 0, 1]
+            })
+            // Gathering upon image
+            .smoothTo({
+                to: {
+                    target: 0.00008
+                },
+                time: 13000,
+                ease: [0, 0, 1],
+                call: [() => spawnCam(tendrils.targets)]
+            });
+
+        tracks.spawn
+            .to({
+                time: 1000,
+                call: [
+                    (out) => {
+                        let radius = out.radius;
+
+                        out.radius = 0.05;
+                        respawn(tendrils.targets);
+                        out.radius = radius;
+                    }
+                ]
+            });
+
+        tracks.audio
+            .to({
+                time: 13000,
+                call: [
+                    (out) => {
+                        spawnTargets.spawnCam = tendrils.targets;
+                        spawnCam(tendrils.targets);
+                        out.trackCamAt = audioDefaults.trackCamAt*0.3
+                    }
+                ]
             });
 
         tracks.blend
-            .over(4000, {
+            .to({
                 to: [1, 0],
-                time: 16000,
+                time: 13000,
                 ease: [0, 0, 1]
             });
 
         tracks.baseColor
             .over(2000, {
                 to: [1, 1, 1, 0.9],
-                time: 15000,
+                time: 13000,
                 ease: [0, 0, 1]
             });
 
         tracks.fadeColor
             .over(3000, {
-                to: [0, 0, 0, 0.1],
-                time: 15000,
+                to: [0, 0, 0, 0.05],
+                time: 13000,
                 ease: [0, 0, 1]
             });
 
@@ -904,7 +863,7 @@ export default (canvas, settings, debug) => {
                 to: {
                     forceWeight: 0.014,
                     varyForce: 0.3,
-                    flowWeight: 0.1,
+                    flowWeight: 0.2,
                     varyFlow: 0.4
                 },
                 time: 23000,
@@ -917,93 +876,243 @@ export default (canvas, settings, debug) => {
                     noiseScale: 50,
                     varyNoiseScale: 0.2
                 },
-                time: 23500,
+                time: 24000,
                 ease: [0, -0.2, 1.5, 1]
             });
 
-
-        // Start the audio response, bit more life
-
-        tracks.audio
-            .over(100, {
+        tracks.tendrils3
+            .smoothOver(1000, {
                 to: {
-                    trackFlowAt: audioDefaults.trackFlowAt,
-                    trackFastAt: audioDefaults.trackFastAt,
-                    micFlowAt: audioDefaults.micFlowAt,
-                    micFastAt: audioDefaults.micFastAt
+                    target: 0.0001
                 },
-                call: [() => spawnFastest(), () => spawnFlow()],
-                time: 23000
-            });
-
-
-        // Flip colors
-
-        tracks.tendrils
-            .over(300, {
+                time: 24000,
+                ease: [0, 0, 1],
+                call: [() => spawnCam(tendrils.targets)]
+            })
+            .smoothOver(29000-26000, {
                 to: {
-                    colorMapAlpha: 0.1
+                    target: 0.0003
                 },
-                time: 25000
-            });
-
-        tracks.baseColor
-            .over(300, {
-                to: [0, 0, 0, 0.85],
-                time: 25000
-            });
-
-        tracks.flowColor
-            .over(300, {
-                to: [1, 1, 1, 0.08],
-                time: 25000
-            });
-
-        tracks.fadeColor
-            .over(500, {
-                to: [1, 1, 1, 0.1],
-                time: 25000
+                time: 29000,
+                ease: [0, 0, 1],
+                call: [() => spawnCam(tendrils.targets)]
+            })
+            .smoothOver(35000-32000, {
+                to: {
+                    target: 0.003
+                },
+                time: 35000,
+                ease: [0, 0, 1],
+                call: [() => spawnCam(tendrils.targets)]
+            })
+            .smoothTo({
+                to: {
+                    target: 0.02,
+                    lineWidth: 2
+                },
+                time: 38000,
+                ease: [0, 0, 1],
+                call: [() => spawnCam(tendrils.targets)]
+            })
+            .to({
+                to: {
+                    target: -0.0003
+                },
+                time: 40000,
+                ease: [0, 1, 1],
+                call: [() => spawnCam(tendrils.targets)]
+            })
+            .to({
+                to: {
+                    target: 0.03,
+                    lineWidth: 1
+                },
+                time: 41000,
+                ease: [0, 0, 1]
+            })
+            .to({
+                to: {
+                    target: -0.0003
+                },
+                time: 42000,
+                ease: [0, 1, 1]
+            })
+            .to({
+                to: {
+                    target: 0.03
+                },
+                time: 44000,
+                ease: [0, 0, 1]
+            })
+            .to({
+                to: {
+                    target: 0.00001
+                },
+                time: 47000,
+                ease: [0, 1, 1]
             });
 
 
         // Give it some more flow
 
         tracks.tendrils
-            .smoothOver(35000-26000, {
+            .smoothOver(29000-27000, {
                 to: {
                     flowWeight: 1,
                     varyFlow: 0.3
                 },
-                call: [() => spawnFlow()],
-                time: 35000,
+                time: 29000,
                 ease: [0, -0.1, 0.95, 1]
+            });
+
+        tracks.tendrils2
+            .smoothOver(29000-27000, {
+                to: {
+                    noiseScale: 30,
+                    varyNoiseScale: 0.6,
+                    noiseSpeed: 0.0002
+                },
+                time: 29000,
+                ease: [0, -0.1, 0.95, 1]
+            });
+
+
+        // Bring up the cam colours
+
+        tracks.blend
+            .to({
+                to: [0.1, 1],
+                time: 24000,
+                ease: [0, 0, 1]
+            })
+            .over(40000-36000, {
+                to: [0.4, 0.6],
+                time: 40000,
+                ease: [0, 0, 1]
+            });
+
+        tracks.baseColor
+            .to({
+                to: [1, 1, 1, 0.25],
+                time: 24000
+            });
+
+        tracks.flowColor
+            .over(1000, {
+                to: [1, 1, 1, 0.05],
+                time: 24000
+            });
+
+
+        // Leave the cam, start the audio response - bit more life
+        // Scale up again for the next drop, and free things up
+
+        tracks.tendrils
+            .over(1000, {
+                to: {
+                    colorMapAlpha: 0.1
+                },
+                ease: [0, 0, 1],
+                time: 46500
+            });
+
+        tracks.tendrils2
+            .smoothOver(46000-40000, {
+                to: {
+                    noiseWeight: 0.003,
+                    noiseScale: 20
+                },
+                time: 46000,
+                ease: [0, -0.1, 1.2, 1]
+            })
+            .smoothTo({
+                to: {
+                    noiseWeight: 0.002,
+                    noiseScale: 10,
+                    varyNoiseScale: 2
+                },
+                time: 50000,
+                ease: [0, -0.1, 1.2, 1]
+            });
+
+        tracks.audio
+            .over(100, {
+                to: {
+                    trackCamAt: 0,
+                    trackFlowAt: audioDefaults.trackFlowAt,
+                    trackFastAt: audioDefaults.trackFastAt,
+                    micFlowAt: audioDefaults.micFlowAt,
+                    micFastAt: audioDefaults.micFastAt
+                },
+                time: 46000,
+                call: [
+                    () => {
+                        delete spawnTargets.spawnCam;
+
+                        spawnFastest();
+                        spawnFlow();
+                    }
+                ]
+            });
+
+        tracks.spawn
+            .to({
+                time: 46500,
+                call: [
+                    (out) => {
+                        let radius = out.radius;
+
+                        out.radius = 0.05;
+                        respawn(tendrils.targets);
+                        out.radius = radius;
+                    }
+                ]
+            });
+
+
+        // Flip colors
+
+        tracks.blend
+            .over(46000-44000, {
+                to: [1, 0],
+                time: 46000,
+                ease: [0, 0, 1]
+            });
+
+        tracks.baseColor
+            .over(500, {
+                to: [0, 0, 0, 0.85],
+                time: 46000
+            });
+
+        tracks.flowColor
+            .over(1000, {
+                to: [1, 1, 1, 0.08],
+                time: 46000
+            });
+
+        tracks.fadeColor
+            .over(1000, {
+                to: [1, 1, 1, 0.1],
+                time: 46000
             });
 
 
         // Get the percussion in
 
         tracks.audio
-            .over(300, {
+            .over(100, {
                 to: {
                     trackFormAt: audioDefaults.trackFormAt,
                     micFormAt: audioDefaults.micFormAt
                 },
-                call: [() => spawnForm()],
-                time: 35000
-            });
-
-
-        // Scale up again for the next drop, and free things up
-
-        tracks.tendrils2
-            .smoothOver(60000-51000, {
-                to: {
-                    noiseScale: 15,
-                    varyNoiseScale: 2,
-                    noiseSpeed: 0.00025
-                },
-                time: 60000,
-                ease: [0, -0.1, 0.95, 1]
+                call: [
+                    () => {
+                        spawnForm();
+                        spawnFlow();
+                    }
+                ],
+                time: 50000
             });
 
 
@@ -1033,7 +1142,7 @@ export default (canvas, settings, debug) => {
             });
 
         tracks.tendrils2
-            .smoothOver(70000-63000, {
+            .smoothOver(70000-55000, {
                 to: {
                     noiseScale: 2.5
                 },
@@ -2378,14 +2487,14 @@ export default (canvas, settings, debug) => {
                     player.track.trackAt(timer.track.time)
                         .spliceAt(timer.track.time),
 
-                '\\': keyframeCaller(() => tendrils.reset()),
-                "'": keyframeCaller(spawnFlow),
-                ';': keyframeCaller(spawnFastest),
+                '\\': keyframeCaller(() => reset()),
+                "'": keyframeCaller(() => spawnFlow()),
+                ';': keyframeCaller(() => spawnFastest()),
 
-                '<shift>': keyframeCaller(restart),
-                '/': keyframeCaller(spawnSampleCam),
-                '.': keyframeCaller(spawnCam),
-                ',': keyframeCaller(spawnForm)
+                '<shift>': keyframeCaller(() => restart()),
+                '/': keyframeCaller(() => spawnSampleCam()),
+                '.': keyframeCaller(() => spawnCam()),
+                ',': keyframeCaller(() => spawnForm())
             };
 
             // @todo Throttle so multiple states can go into one keyframe.

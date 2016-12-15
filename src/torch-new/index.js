@@ -343,7 +343,7 @@ export default (canvas) => {
                 const colorFolder = stateGUI.addFolder(name);
 
                 for(var i = 0; i < 4; ++i) {
-                    colorFolder.add(value, i).onFinishChange((v) =>
+                    colorFolder.add(value, i).onFinishChange(() =>
                         applyGUI(state, name, stateProxy[name]));
                 }
             }

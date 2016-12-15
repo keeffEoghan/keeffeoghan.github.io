@@ -14,6 +14,7 @@ export function apply(span, out = {}) {
     if(span) {
         Object.assign(out, span.apply);
         tween(span, out);
+        // @todo No need for iteration here, just use on `call` function
         each((f) => f(out, span), span.call);
     }
 
