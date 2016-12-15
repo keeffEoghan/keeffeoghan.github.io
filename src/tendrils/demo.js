@@ -910,7 +910,7 @@ export default (canvas, settings, debug) => {
                     target: 0.02,
                     lineWidth: 2
                 },
-                time: 38000,
+                time: 37000,
                 ease: [0, 0, 1],
                 call: [() => spawnCam(tendrils.targets)]
             })
@@ -924,8 +924,7 @@ export default (canvas, settings, debug) => {
             })
             .to({
                 to: {
-                    target: 0.03,
-                    lineWidth: 1
+                    target: 0.03
                 },
                 time: 41000,
                 ease: [0, 0, 1]
@@ -946,7 +945,8 @@ export default (canvas, settings, debug) => {
             })
             .to({
                 to: {
-                    target: 0.00001
+                    target: 0.00001,
+                    lineWidth: 1
                 },
                 time: 47000,
                 ease: [0, 1, 1]
@@ -985,9 +985,9 @@ export default (canvas, settings, debug) => {
                 time: 24000,
                 ease: [0, 0, 1]
             })
-            .over(40000-36000, {
+            .over(47000-40000, {
                 to: [0.4, 0.6],
-                time: 40000,
+                time: 47000,
                 ease: [0, 0, 1]
             });
 
@@ -1001,6 +1001,13 @@ export default (canvas, settings, debug) => {
             .over(1000, {
                 to: [1, 1, 1, 0.05],
                 time: 24000
+            });
+
+        tracks.fadeColor
+            .over(1000, {
+                to: [0, 0, 0, 0.01],
+                time: 35000,
+                ease: [0, 0, 1]
             });
 
 
@@ -1017,13 +1024,13 @@ export default (canvas, settings, debug) => {
             });
 
         tracks.tendrils2
-            .smoothOver(46000-40000, {
+            .smoothOver(47000-40000, {
                 to: {
                     noiseWeight: 0.003,
                     noiseScale: 20
                 },
-                time: 46000,
-                ease: [0, -0.1, 0.7, 1]
+                time: 47000,
+                ease: [0, -0.1, 0.6, 1]
             })
             .smoothTo({
                 to: {
