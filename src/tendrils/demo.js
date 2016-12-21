@@ -127,18 +127,18 @@ export default (canvas, settings, debug) => {
         audible: (''+queries.mute !== 'true'),
 
         track: parseFloat((queries.track_in || 1), 10),
-        trackFlowAt: 1.15,
-        trackFastAt: 0.077,
-        trackFormAt: 0.04,
+        trackFlowAt: 1.13,
+        trackFastAt: 0.12,
+        trackFormAt: 0.047,
         trackSampleAt: 0.15,
-        trackCamAt: 0.01,
+        trackCamAt: 0.008,
         trackSpawnAt: 0.18,
 
-        mic: parseFloat((queries.mic_in || 1.2), 10),
+        mic: parseFloat((queries.mic_in || 1), 10),
         micFlowAt: 0.5,
         micFastAt: 0.6,
         micFormAt: 0.4,
-        micSampleAt: 0.6,
+        micSampleAt: 0.74,
         micCamAt: 0.06,
         micSpawnAt: 0.09
     };
@@ -263,7 +263,8 @@ export default (canvas, settings, debug) => {
     const flowPixelDefaults = {
         scale: 'mirror xy'
     };
-    const flowPixelState = {...flowPixelDefaults};
+
+    const flowPixelState = { ...flowPixelDefaults };
 
     function spawnFlow(buffer = spawnTargets.spawnFlow) {
         vec2.div(flowPixelSpawner.spawnSize,
@@ -555,7 +556,10 @@ export default (canvas, settings, debug) => {
         fadeColor: tendrils.state.fadeColor,
         spawn: resetSpawner.uniforms,
         audio: audioState,
-        blend: blend.alphas
+        blend: blend.alphas,
+        // Just for calls
+        // @todo Fix the animation lib properly, not just by convention
+        calls: {}
     };
 
     const player = {
@@ -568,6 +572,9 @@ export default (canvas, settings, debug) => {
 
     // timer.track.end = player.track.end()+2000;
     // timer.track.loop = true;
+
+    track.addEventListener('seeked',
+        () => player.track.playFrom(track.currentTime*1000, 0));
 
 
     // @todo Test sequence - move to own file?
@@ -586,14 +593,14 @@ export default (canvas, settings, debug) => {
             flowWeight: 1,
             varyFlow: 0.3,
 
-            flowDecay: 0.0025,
+            flowDecay: 0.003,
             flowWidth: 5,
 
             speedAlpha: 0.0005,
             colorMapAlpha: 0.9
         },
         tendrils2: {
-            noiseWeight: 0.00025,
+            noiseWeight: 0.0003,
             varyNoise: 0.3,
 
             noiseScale: 1.5,
@@ -628,14 +635,15 @@ export default (canvas, settings, debug) => {
             micCamAt: 0,
             micSpawnAt: 0
         },
-        blend: [0, 1]
+        blend: [0, 1],
+        calls: null
     };
 
     // Restart, clean slate; begin with the inert, big bang - flow only
 
     const trackStartTime = 60;
 
-    player.track.tracks.tendrils.to({
+    player.track.tracks.calls.to({
             call: [() => reset()],
             time: trackStartTime
         })
@@ -752,65 +760,79 @@ export default (canvas, settings, debug) => {
     respawn();
 
     function setupSequence() {
-        const tracks = player.track.tracks;
+        const trackTracks = player.track.tracks;
+        const trackOutputs = player.track.outputs;
 
 
         // Inert - broad wave, to isolated areas of activity
 
-        tracks.tendrils
+        trackTracks.tendrils
             .smoothTo({
                 to: {
                     forceWeight: 0.01,
-                    flowWeight: 0.1,
-                    flowDecay: 0.003,
                     lineWidth: 1
                 },
                 time: 13000,
                 ease: [0, 0.95, 1]
             });
 
-        tracks.tendrils2
+        trackTracks.tendrils2
             .smoothTo({
                 to: {
                     noiseWeight: 0.001,
+                    varyNoiseScale: 5
                 },
                 time: 13000,
                 ease: [0, 0.2, 1]
             })
             .smoothTo({
                 to: {
-                    noiseScale: 100,
-                    varyNoiseScale: 0.75,
+                    noiseScale: 80,
+                    varyNoiseScale: 2,
                     noiseSpeed: 0
                 },
                 time: 18000,
                 ease: [0, 0, 1.1, 1]
             });
 
-        tracks.tendrils3
+        trackTracks.tendrils3
             // Gravitate towards center/eye
             .smoothTo({
                 to: {
                     varyTarget: 4
                 },
-                time: 4000,
+                time: 1000,
                 ease: [0, 0, 1]
             })
             // Gathering upon image
             .smoothTo({
                 to: {
-                    target: 0.00006
+                    target: 0.00003
                 },
-                time: 13000,
-                ease: [0, 0, 1],
-                call: [() => spawnCam(tendrils.targets)]
+                time: 10000,
+                ease: [0, 0.1, 1]
             });
 
-        tracks.spawn
+        trackTracks.audio
+            .over(100, {
+                to: {
+                    mic: 0
+                },
+                time: 1000
+            })
+            .over(100, {
+                to: {
+                    trackCamAt: audioDefaults.trackCamAt*0.1
+                },
+                time: 13100
+            });
+
+        trackTracks.calls
             .to({
                 time: 1000,
                 call: [
-                    (out) => {
+                    () => {
+                        const out = trackOutputs.spawn;
                         let radius = out.radius;
 
                         out.radius = 0.1;
@@ -818,35 +840,32 @@ export default (canvas, settings, debug) => {
                         out.radius = radius;
                     }
                 ]
-            });
-
-        tracks.audio
+            })
             .to({
                 time: 13000,
                 call: [
-                    (out) => {
+                    () => {
                         spawnTargets.spawnCam = tendrils.targets;
                         spawnCam(tendrils.targets);
-                        out.trackCamAt = audioDefaults.trackCamAt*0.1
                     }
                 ]
             });
 
-        tracks.blend
+        trackTracks.blend
             .to({
                 to: [1, 0],
                 time: 13000,
                 ease: [0, 0, 1]
             });
 
-        tracks.baseColor
+        trackTracks.baseColor
             .over(2000, {
                 to: [1, 1, 1, 0.9],
                 time: 13000,
                 ease: [0, 0, 1]
             });
 
-        tracks.fadeColor
+        trackTracks.fadeColor
             .over(3000, {
                 to: [0, 0, 0, 0.05],
                 time: 13000,
@@ -858,82 +877,63 @@ export default (canvas, settings, debug) => {
 
         // Start scaling, and suggest some life
 
-        tracks.tendrils
+        trackTracks.tendrils
             .smoothTo({
                 to: {
                     forceWeight: 0.014,
                     varyForce: 0.3,
-                    flowWeight: 0.2,
                     varyFlow: 0.5
                 },
                 time: 23000,
                 ease: [0, 0.95, 1]
             });
 
-        tracks.tendrils2
+        trackTracks.tendrils2
             .smoothTo({
                 to: {
                     noiseScale: 50,
-                    varyNoiseScale: 0.4
+                    varyNoiseScale: 0
                 },
                 time: 24000,
                 ease: [0, -0.2, 1.5, 1]
             });
 
-        tracks.tendrils3
+        trackTracks.tendrils3
             .smoothOver(1000, {
                 to: {
                     target: 0.0001
                 },
                 time: 24000,
-                ease: [0, 0, 1],
-                call: [() => spawnCam(tendrils.targets)]
+                ease: [0, 0, 1]
             })
+
             .smoothOver(29000-26000, {
                 to: {
                     target: 0.0003
                 },
                 time: 29000,
-                ease: [0, 0, 1],
-                call: [() => spawnCam(tendrils.targets)]
+                ease: [0, 0, 1]
             })
             .smoothOver(35000-32000, {
                 to: {
                     target: 0.003
                 },
                 time: 35000,
-                ease: [0, 0, 1],
-                call: [() => spawnCam(tendrils.targets)]
+                ease: [0, 0, 1]
             })
             .smoothTo({
                 to: {
-                    target: 0.02,
+                    target: 0.03,
                     lineWidth: 2
                 },
                 time: 37000,
-                ease: [0, 0, 1],
-                call: [() => spawnCam(tendrils.targets)]
-            })
-            .to({
-                to: {
-                    target: -0.0003
-                },
-                time: 40000,
-                ease: [0, 1, 1],
-                call: [() => spawnCam(tendrils.targets)]
-            })
-            .to({
-                to: {
-                    target: 0.03
-                },
-                time: 41000,
                 ease: [0, 0, 1]
             })
             .to({
                 to: {
-                    target: -0.0003
+                    target: 0
                 },
-                time: 42000,
+                time: 40000,
                 ease: [0, 1, 1]
             })
             .to({
@@ -948,14 +948,36 @@ export default (canvas, settings, debug) => {
                 to: {
                     target: 0.00003
                 },
-                time: 47000,
+                time: 46000,
                 ease: [0, 1, 1]
+            });
+
+        trackTracks.calls
+            .to({
+                time: 24100,
+                call: [() => spawnCam(tendrils.targets)]
+            })
+            .to({
+                time: 29100,
+                call: [() => spawnCam(tendrils.targets)]
+            })
+            .to({
+                time: 35100,
+                call: [() => spawnCam(tendrils.targets)]
+            })
+            .to({
+                time: 37100,
+                call: [() => spawnCam(tendrils.targets)]
+            })
+            .to({
+                time: 40100,
+                call: [() => spawnCam(tendrils.targets)]
             });
 
 
         // Give it some more flow
 
-        tracks.tendrils
+        trackTracks.tendrils
             .smoothOver(29000-27000, {
                 to: {
                     flowWeight: 1,
@@ -965,11 +987,12 @@ export default (canvas, settings, debug) => {
                 ease: [0, -0.1, 0.95, 1]
             });
 
-        tracks.tendrils2
+        trackTracks.tendrils2
             .smoothOver(29000-27000, {
                 to: {
+                    noiseWeight: 0.003,
                     noiseScale: 30,
-                    varyNoiseScale: 0.8,
+                    varyNoiseScale: 1.5,
                     noiseSpeed: 0.0002
                 },
                 time: 29000,
@@ -979,7 +1002,7 @@ export default (canvas, settings, debug) => {
 
         // Bring up the cam colours
 
-        tracks.blend
+        trackTracks.blend
             .to({
                 to: [0.1, 1],
                 time: 24000,
@@ -991,19 +1014,19 @@ export default (canvas, settings, debug) => {
                 ease: [0, 0, 1]
             });
 
-        tracks.baseColor
+        trackTracks.baseColor
             .to({
                 to: [1, 1, 1, 0.25],
                 time: 24000
             });
 
-        tracks.flowColor
+        trackTracks.flowColor
             .over(1000, {
                 to: [1, 1, 1, 0.05],
                 time: 24000
             });
 
-        tracks.fadeColor
+        trackTracks.fadeColor
             .over(1000, {
                 to: [0, 0, 0, 0.03],
                 time: 35000,
@@ -1014,21 +1037,21 @@ export default (canvas, settings, debug) => {
         // Leave the cam, start the audio response - bit more life
         // Scale up again for the next drop, and free things up
 
-        tracks.tendrils
+        trackTracks.tendrils
             .over(1000, {
                 to: {
                     colorMapAlpha: 0.1
                 },
                 ease: [0, 0, 1],
-                time: 46500
+                time: 47000
             });
 
-        tracks.tendrils2
+        trackTracks.tendrils2
             .smoothOver(47000-40000, {
                 to: {
                     noiseWeight: 0.003,
                     noiseScale: 20,
-                    varyNoiseScale: 0.3
+                    varyNoiseScale: 0.1
                 },
                 time: 47000,
                 ease: [0, -0.2, 0.7, 1]
@@ -1036,14 +1059,14 @@ export default (canvas, settings, debug) => {
             .smoothTo({
                 to: {
                     noiseWeight: 0.002,
-                    noiseScale: 12,
-                    varyNoiseScale: 1
+                    noiseScale: 10,
+                    varyNoiseScale: 0.5
                 },
                 time: 50000,
                 ease: [0, 0, 1]
             });
 
-        tracks.audio
+        trackTracks.audio
             .over(100, {
                 to: {
                     trackCamAt: 0,
@@ -1052,22 +1075,65 @@ export default (canvas, settings, debug) => {
                     micFlowAt: audioDefaults.micFlowAt,
                     micFastAt: audioDefaults.micFastAt
                 },
-                time: 47000,
+                time: 47000
+            });
+
+
+        // Flip colors
+
+        trackTracks.blend
+            .over(46000-45500, {
+                to: [1, 0],
+                time: 46000,
+                ease: [0, 0, 1]
+            });
+
+        trackTracks.baseColor
+            .over(46000-45500, {
+                to: [0, 0, 0, 0.85],
+                time: 46000
+            });
+
+        trackTracks.flowColor
+            .over(1000, {
+                to: [1, 1, 1, 0.05],
+                time: 46000
+            });
+
+        trackTracks.fadeColor
+            .over(48000-45000, {
+                to: [1, 1, 1, 0.05],
+                time: 48000,
+                ease: [0, 0, 1]
+            });
+
+
+        // Punchy transition
+
+        trackTracks.spawn
+            .over(100, {
+                to: {
+                    radius: 0.4,
+                    speed: 0
+                },
+                time: 46600
+            })
+            .over(100, {
+                to: tracksStart.respawn,
+                time: 47000
+            });
+
+        trackTracks.calls
+            .to({
+                time: 49000,
                 call: [
                     () => {
                         delete spawnTargets.spawnCam;
 
                         spawnFastest();
                         spawnFlow();
-                    }
-                ]
-            });
 
-        tracks.spawn
-            .to({
-                time: 47500,
-                call: [
-                    (out) => {
+                        const out = trackOutputs.spawn;
                         let radius = out.radius;
 
                         out.radius = 0.1;
@@ -1075,40 +1141,16 @@ export default (canvas, settings, debug) => {
                         out.radius = radius;
                     }
                 ]
-            });
-
-
-        // Flip colors
-
-        tracks.blend
-            .over(46000-44000, {
-                to: [1, 0],
-                time: 46000,
-                ease: [0, 0, 1]
-            });
-
-        tracks.baseColor
-            .over(500, {
-                to: [0, 0, 0, 0.85],
-                time: 46000
-            });
-
-        tracks.flowColor
-            .over(1000, {
-                to: [1, 1, 1, 0.06],
-                time: 46000
-            });
-
-        tracks.fadeColor
-            .over(1000, {
-                to: [1, 1, 1, 0.05],
-                time: 46000
+            })
+            .to({
+                time: 46800,
+                call: [() => respawn()]
             });
 
 
         // Break to ovum, seed
 
-        tracks.tendrils
+        trackTracks.tendrils
             .smoothOver(70000-63000, {
                 to: {
                     forceWeight: 0.015,
@@ -1119,19 +1161,27 @@ export default (canvas, settings, debug) => {
                 time: 70000,
                 ease: [0, -0.1, 0.95, 1]
             })
+            .to({
+                to: {
+                    flowWeight: 0.9,
+                    flowDecay: 0.0000001
+                },
+                time: 70100
+            })
             .smoothTo({
                 to: {
                     forceWeight: 0.017,
                     varyForce: 0,
+                    flowWeight: 1,
                     varyFlow: 0,
                     speedAlpha: 0.0005,
                     colorMapAlpha: 0.12
                 },
                 time: 94000,
-                ease: [0, 0.95, 1]
+                ease: [0, 1, 1]
             });
 
-        tracks.tendrils2
+        trackTracks.tendrils2
             .smoothOver(70000-55000, {
                 to: {
                     noiseScale: 2.5,
@@ -1152,10 +1202,10 @@ export default (canvas, settings, debug) => {
 
         // Set up the circle seed spawn
 
-        tracks.spawn
-            .over(50, {
+        trackTracks.spawn
+            .over(100, {
                 to: {
-                    radius: 0.05,
+                    radius: 0.1,
                     speed: 0.2
                 },
                 time: 70000
@@ -1163,41 +1213,52 @@ export default (canvas, settings, debug) => {
             .smoothTo({
                 to: {
                     radius: 0.9,
-                    speed: 0
+                    speed: 0.01
+                },
+                time: 93000,
+                ease: [0, 0.3, 1]
+            })
+            .to({
+                to: {
+                    radius: 0.4,
+                    speed: 0.2
                 },
                 time: 94000,
-                ease: [0, 0, 0.3, 1]
+                ease: [0, 0, 1]
+            })
+            .to({
+                to: tracksStart.spawn,
+                time: 96000,
+                ease: [0, 0, 1]
             });
 
-        tracks.baseColor
+        trackTracks.baseColor
             .over(100, {
                 to: [0, 0, 0, 0.85],
                 time: 70100
             });
 
-        tracks.flowColor
+        trackTracks.flowColor
             .over(94000-70000, {
-                to: [1, 1, 1, 0.05],
+                to: [1, 1, 1, 0.07],
                 ease: [0, 0, 1],
                 time: 94000
             });
 
-        tracks.fadeColor
-            .over(50, {
+        trackTracks.fadeColor
+            .over(100, {
                 to: [1, 1, 1, 0],
-                call: [() => canvas.classList.add('light'), restart],
-                time: 70050
+                time: 70100
             })
-            .over(50, {
+            .over(100, {
                 to: [1, 1, 1, 0.1],
-                call: [() => canvas.classList.remove('light'), restart],
-                time: 94000
+                time: 94100
             });
 
 
         // Percussion - bass transition
 
-        tracks.audio
+        trackTracks.audio
             .over(50, {
                 to: {
                     trackFlowAt: 0,
@@ -1205,34 +1266,74 @@ export default (canvas, settings, debug) => {
                     trackFastAt: 0,
                     micFastAt: 0,
                     trackFormAt: audioDefaults.trackFormAt*1.2,
-                    micFormAt: audioDefaults.micFormAt*1.2,
-                    trackSpawnAt: audioDefaults.trackSpawnAt*0.6,
-                    micSpawnAt: audioDefaults.micSpawnAt
+                    micFormAt: audioDefaults.micFormAt*1.2
                 },
                 time: 70100
             })
             .over(50, {
                 to: {
-                    trackFlowAt: audioDefaults.trackFlowAt,
+                    trackFlowAt: audioDefaults.trackFlowAt*0.8,
                     micFlowAt: audioDefaults.micFlowAt,
                     trackFastAt: audioDefaults.trackFastAt,
-                    micFastAt: audioDefaults.micFastAt,
-                    trackSpawnAt: 0,
-                    micSpawnAt: 0
+                    micFastAt: audioDefaults.micFastAt
                 },
                 time: 94000
             });
 
 
+        // Seed breaks
+
+        trackTracks.calls
+            .to({
+                time: 70100,
+                call: [
+                    () => {
+                        canvas.classList.add('light');
+                        restart();
+                    }
+                ]
+            })
+            .to({
+                time: 73000,
+                call: [() => restart()]
+            })
+            .to({
+                time: 76000,
+                call: [() => restart()]
+            })
+            .to({
+                time: 82000,
+                call: [() => restart()]
+            })
+            .to({
+                time: 85000,
+                call: [() => restart()]
+            })
+            .to({
+                time: 88000,
+                call: [() => restart()]
+            })
+            .to({
+                time: 94000,
+                call: [
+                    () => {
+                        canvas.classList.remove('light');
+                        restart();
+                    }
+                ]
+            });
+
+
         // To face
 
-        tracks.tendrils
+        trackTracks.tendrils
             .to({
                 to: {
-                    forceWeight: 0.015,
+                    forceWeight: 0.016,
                     varyForce: 0.3,
                     flowWeight: 1.2,
                     varyFlow: -0.7,
+                    flowDecay: 0.003,
                     colorMapAlpha: 0.05
                 },
                 time: 94100
@@ -1246,10 +1347,10 @@ export default (canvas, settings, debug) => {
                 ease: [0, 0.95, 1]
             });
 
-        tracks.tendrils2
+        trackTracks.tendrils2
             .to({
                 to: {
-                    noiseWeight: 0.0015,
+                    noiseWeight: 0.002,
                     varyNoise: 0.3,
                     noiseScale: 4,
                     varyNoiseScale: 0.3,
@@ -1267,13 +1368,31 @@ export default (canvas, settings, debug) => {
                 ease: [0, 0.95, 1]
             });
 
-        tracks.flowColor
+        trackTracks.audio
+            .to({
+                to: {
+                    trackFormAt: audioDefaults.trackFormAt,
+                    micFormAt: audioDefaults.micFormAt
+                },
+                time: 96000,
+                ease: [0, 1, 1]
+            })
+            .to({
+                to: {
+                    trackFastAt: audioDefaults.trackFastAt*0.9,
+                    micFastAt: audioDefaults.micFastAt*0.9
+                },
+                time: 107000,
+                ease: [0, 0, 1]
+            });
+
+        trackTracks.flowColor
             .to({
                 to: [1, 1, 1, 0.05],
                 time: 94100
             });
 
-        tracks.fadeColor
+        trackTracks.fadeColor
             .to({
                 to: [1, 1, 1, 0.1],
                 time: 107000
@@ -1286,7 +1405,7 @@ export default (canvas, settings, debug) => {
         // 2:08.5-2:17 - high vocal
         // 2:17-2:22 - "trust"
 
-        tracks.tendrils
+        trackTracks.tendrils
             .to({
                 to: {
                     colorMapAlpha: 0.08
@@ -1294,28 +1413,47 @@ export default (canvas, settings, debug) => {
                 time: 107000
             })
             .to({
-                time: 124000,
-                call: [() => spawnCam(tendrils.targets)]
-            })
-            .to({
                 to: {
-                    colorMapAlpha: 0.9,
-                    target: 0.01
+                    colorMapAlpha: 0.9
                 },
                 time: 134000,
-                ease: [0, 0, 0, 1]
+                ease: [0, 0, 1]
             })
             .smoothTo({
                 to: {
-                    colorMapAlpha: 0.3,
-                    target: 0.00003
+                    colorMapAlpha: 0.3
                 },
                 time: 138000,
                 ease: [0, 0.2, 1],
+            });
+
+        trackTracks.tendrils3
+            .over(134000-107000, {
+                to: {
+                    target: 0.00001
+                },
+                time: 134000,
+                ease: [0, 0, 1]
+            })
+            .to({
+                to: {
+                    target: 0.00003
+                },
+                time: 138000,
+                ease: [0, 0, 1]
+            });
+
+        trackTracks.calls
+            .to({
+                time: 107000,
+                call: [() => spawnCam(tendrils.targets)]
+            })
+            .to({
+                time: 138000,
                 call: [() => resetSpawner.spawn(tendrils, tendrils.targets)]
             });
 
-        tracks.tendrils2
+        trackTracks.tendrils2
             .smoothOver(129000-124000, {
                 to: {
                     varyNoise: 0.8,
@@ -1345,7 +1483,7 @@ export default (canvas, settings, debug) => {
                 ease: [0, -0.05, 1.05, 1]
             });
 
-        tracks.tendrils3
+        trackTracks.tendrils3
             .over(134000-124000, {
                 to: {
                     lineWidth: 2
@@ -1361,30 +1499,29 @@ export default (canvas, settings, debug) => {
                 ease: [0, 0.9, 1]
             });
 
-        tracks.audio
-            .over(50, {
+        trackTracks.audio
+            .to({
                 to: {
-                    trackSampleAt: audioDefaults.trackSampleAt,
-                    micSampleAt: audioDefaults.micSampleAt
+                    trackFastAt: 0,
+                    micFastAt: 0,
+                    trackSampleAt: audioDefaults.trackSampleAt*0.8,
+                    micSampleAt: audioDefaults.micSampleAt*0.8
                 },
-                time: 107000
+                time: 107100
             })
             .over(50, {
                 to: {
                     trackFlowAt: 0,
-                    trackFastAt: 0,
                     trackFormAt: 0,
                     trackSampleAt: 0,
                     trackSpawnAt: 0,
                     micFlowAt: 0,
-                    micFastAt: 0,
                     micFormAt: 0,
                     micSampleAt: 0,
                     micSpawnAt: 0,
                     trackCamAt: audioDefaults.trackCamAt*1.2,
                     micCamAt: audioDefaults.micCamAt*1.2
                 },
-                call: [() => spawnCam()],
                 time: 124000
             })
             .to({
@@ -1392,7 +1529,6 @@ export default (canvas, settings, debug) => {
                     trackCamAt: audioDefaults.trackCamAt*0.6,
                     micCamAt: audioDefaults.micCamAt*0.9
                 },
-                call: [() => spawnCam()],
                 time: 134000,
                 ease: [0, 0, 1]
             })
@@ -1401,7 +1537,6 @@ export default (canvas, settings, debug) => {
                     trackCamAt: audioDefaults.trackCamAt,
                     micCamAt: audioDefaults.micCamAt
                 },
-                call: [() => spawnCam()],
                 time: 137000,
                 ease: [0, 0.9, 1]
             })
@@ -1419,7 +1554,21 @@ export default (canvas, settings, debug) => {
                 time: 146000
             });
 
-        tracks.blend
+        trackTracks.calls
+            .to({
+                time: 124000,
+                call: [() => spawnCam()]
+            })
+            .to({
+                time: 134000,
+                call: [() => spawnCam()]
+            })
+            .to({
+                time: 137000,
+                call: [() => spawnCam()]
+            });
+
+        trackTracks.blend
             .over(134000-129000, {
                 to: [0, 1],
                 time: 134000,
@@ -1436,7 +1585,7 @@ export default (canvas, settings, debug) => {
                 ease: [0, 0, 1]
             });
 
-        tracks.flowColor
+        trackTracks.flowColor
             .over(134000-129000, {
                 to: [0, 0, 0, 0],
                 time: 134000
@@ -1446,7 +1595,7 @@ export default (canvas, settings, debug) => {
                 time: 146000
             });
 
-        tracks.fadeColor
+        trackTracks.fadeColor
             .over(134000-129000, {
                 to: [1, 1, 1, 0.05],
                 time: 134000,
@@ -1461,7 +1610,7 @@ export default (canvas, settings, debug) => {
 
         // 2:32-2:40-2:50 - quiet to vocal build
 
-        tracks.tendrils
+        trackTracks.tendrils
             .smoothTo({
                 to: {
                     colorMapAlpha: 0.4
@@ -1470,27 +1619,27 @@ export default (canvas, settings, debug) => {
                 ease: [0, 0, 1]
             });
 
-        tracks.blend
+        trackTracks.blend
             .over(174000-160000, {
                 to: [1, 0.2],
                 time: 174000
             });
 
-        tracks.baseColor
+        trackTracks.baseColor
             .over(174000-160000, {
                 to: [0, 0, 0, 0.75],
                 time: 174000,
                 ease: [0, 0.1, 1]
             });
 
-        tracks.flowColor
+        trackTracks.flowColor
             .over(174000-160000, {
                 to: [1, 1, 1, 0.03],
                 time: 174000,
                 ease: [0, 0.7, 1]
             });
 
-        tracks.audio
+        trackTracks.audio
             .over(50, {
                 to: {
                     trackSampleAt: 0,
@@ -1510,7 +1659,7 @@ export default (canvas, settings, debug) => {
         // To cohesive forms
         // 2:54-2:56-3:07-3:19 - big vocal build, drop, fade vocal
 
-        tracks.tendrils
+        trackTracks.tendrils
             .smoothTo({
                 to: {
                     flowWeight: -0.4
@@ -1527,7 +1676,7 @@ export default (canvas, settings, debug) => {
                 ease: [0, 0.95, 1]
             });
 
-        tracks.tendrils2
+        trackTracks.tendrils2
             .smoothTo({
                 to: {
                     noiseScale: 2.1,
@@ -1564,11 +1713,11 @@ export default (canvas, settings, debug) => {
                 time: 187500
             });
 
-        tracks.audio
+        trackTracks.audio
             .over(185000-176000, {
                 to: {
                     trackFlowAt: audioDefaults.trackFlowAt*0.2,
-                    trackFastAt: audioDefaults.trackFastAt*0.12
+                    trackFastAt: audioDefaults.trackFastAt*0.06
                 },
                 time: 185000,
                 ease: [0, 0.1, 1]
@@ -1583,10 +1732,9 @@ export default (canvas, settings, debug) => {
             })
             .over(50, {
                 to: {
-                    trackSpawnAt: audioDefaults.trackSpawnAt*0.2,
+                    trackSpawnAt: audioDefaults.trackSpawnAt*0.1,
                     micSpawnAt: audioDefaults.micSpawnAt*0.2
                 },
-                call: [() => respawn()],
                 time: 187200
             })
             .over(50, {
@@ -1599,7 +1747,13 @@ export default (canvas, settings, debug) => {
                 time: 188000
             });
 
-        tracks.spawn
+        trackTracks.calls
+            .to({
+                time: 187200,
+                call: [() => respawn()]
+            });
+
+        trackTracks.spawn
             .over(50, {
                 to: {
                     radius: 0.05
@@ -1613,7 +1767,7 @@ export default (canvas, settings, debug) => {
                 time: 190000
             });
 
-        tracks.blend
+        trackTracks.blend
             .to({
                 to: [1, 0.1],
                 time: 180000
@@ -1627,28 +1781,30 @@ export default (canvas, settings, debug) => {
                 time: 187400
             });
 
-        tracks.baseColor
+        const rayColor = map((v) => v/255, [255, 232, 120]);
+
+        trackTracks.baseColor
             .to({
-                to: [1, 0.9, 0.4, 0.7],
+                to: [...rayColor, 0.8],
                 time: 182000,
                 ease: [0, 1, 1]
             })
-            .over(200, {
+            .over(500, {
                 to: [1, 1, 1, 0.7],
                 time: 188000
             });
 
-        tracks.flowColor
+        trackTracks.flowColor
             .to({
-                to: [1, 0.9, 0.4, 0.25],
+                to: [...rayColor, 0.25],
                 time: 186000
             })
             .to({
-                to: [1, 0.9, 0.4, 0.05],
+                to: [...rayColor, 0.05],
                 time: 190000
             });
 
-        tracks.fadeColor
+        trackTracks.fadeColor
             .over(187000-173000, {
                 to: [0, 0, 0, 0.1],
                 time: 187000
@@ -1661,7 +1817,7 @@ export default (canvas, settings, debug) => {
 
         // 3:20-3:42.5-4:15 - "reveal"-"before"-repeating
 
-        tracks.tendrils
+        trackTracks.tendrils
             .smoothTo({
                 to: {
                     forceWeight: 0.014,
@@ -1673,18 +1829,18 @@ export default (canvas, settings, debug) => {
                 ease: [0, 0.1, 0.4, 1]
             });
 
-        tracks.tendrils2
+        trackTracks.tendrils2
             .smoothTo({
                 to: {
                     noiseScale: 0.4,
                     varyNoiseScale: 12,
                     noiseSpeed: 0.0001
                 },
-                time: 254000,
+                time: 257000,
                 ease: [0, 0, 1]
             });
 
-        tracks.audio
+        trackTracks.audio
             .over(50, {
                 to: {
                     trackSampleAt: audioDefaults.trackSampleAt,
@@ -1709,7 +1865,7 @@ export default (canvas, settings, debug) => {
                 time: 250000
             });
 
-        tracks.blend
+        trackTracks.blend
             .over(211000-196000, {
                 to: [0.75, 0.9],
                 time: 211000
@@ -1718,7 +1874,7 @@ export default (canvas, settings, debug) => {
 
         // To artefact - bassy outro, artefact
 
-        tracks.tendrils
+        trackTracks.tendrils
             .smoothTo({
                 to: {
                     forceWeight: 0.015,
@@ -1737,7 +1893,7 @@ export default (canvas, settings, debug) => {
                 ease: [0, 0, 1]
             });
 
-        tracks.tendrils2
+        trackTracks.tendrils2
             .smoothTo({
                 to: {
                     noiseWeight: 0.005,
@@ -1756,11 +1912,11 @@ export default (canvas, settings, debug) => {
                     noiseSpeed: 0.0001,
                     varyNoiseSpeed: 0
                 },
-                time: 262000,
+                time: 261000,
                 ease: [0, 0.1, 1.1, 1]
             });
 
-        tracks.audio
+        trackTracks.audio
             .over(50, {
                 to: {
                     trackFlowAt: 0,
@@ -1788,6 +1944,7 @@ export default (canvas, settings, debug) => {
             .over(50, {
                 to: {
                     trackFastAt: 0,
+                    mic: audioDefaults.mic,
                     micFlowAt: audioDefaults.micFlowAt,
                     micFastAt: audioDefaults.micFastAt,
                     micFormAt: audioDefaults.micFormAt,
@@ -1797,7 +1954,7 @@ export default (canvas, settings, debug) => {
                 time: 283000
             });
 
-        tracks.spawn
+        trackTracks.spawn
             .over(50, {
                 to: {
                     radius: 0.6,
@@ -1806,37 +1963,39 @@ export default (canvas, settings, debug) => {
                 time: 257600
             });
 
-        tracks.blend
+        trackTracks.blend
             .over(1000, {
                 to: [1, 0.05],
                 time: 259000
             });
 
-        tracks.baseColor
+        const emberColor = map((v) => v/255, [255, 209, 71]);
+
+        trackTracks.baseColor
             .over(1000, {
-                to: [1, 0.8, 0.2, 0.7],
+                to: [...emberColor, 0.85],
                 time: 259000
             })
             .over(300, {
-                to: [1, 1, 1, 0.85],
+                to: [1, 1, 1, 0.9],
                 time: 281000,
                 ease: [0, 0, 1]
             });
 
-        tracks.flowColor
+        trackTracks.flowColor
             .over(1000, {
-                to: [1, 0.8, 0.2, 0.2],
+                to: [...emberColor, 0.15],
                 time: 259000
             })
             .over(300, {
-                to: [1, 1, 1, 0.05],
+                to: [1, 1, 1, 0.1],
                 time: 281000,
                 ease: [0, 0, 1]
             });
 
-        tracks.fadeColor
+        trackTracks.fadeColor
             .over(2000, {
-                to: [0.12, 0.08, 0.04, 0.1],
+                to: [...map((v) => v*0.01, emberColor), 0.1],
                 time: 259000,
                 ease: [0, 0, 1]
             })
@@ -1849,6 +2008,10 @@ export default (canvas, settings, debug) => {
 
 
     if(debug) {
+        window.state = state;
+        window.audioState = audioState;
+        window.spawnTargets = spawnTargets;
+
         const gui = {
             main: new dat.GUI()
         };
