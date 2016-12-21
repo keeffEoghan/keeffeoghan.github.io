@@ -14,7 +14,7 @@ export function apply(span, out = {}) {
     if(span) {
         Object.assign(out, span.apply);
         tween(span, out);
-        // @todo No need for iteration here, just use on `call` function
+        // @todo No need for iteration here, just use one `call` function
         each((f) => f(out, span), span.call);
     }
 
@@ -58,10 +58,20 @@ export class Player {
     // Apply the outputs of calling the given function on each track - into the
     // `out` object if given, or the object in `outputs` corresponding to the
     // track's key otherwise.
-    apply(f, out) {
+    /**
+     * @todo The accumulation needs to be over a flattened list ordered by time
+     *       across *all* tracks, in order for the functions to be called in
+     *       order. In fact, so should the values, to avoid the thing of
+     *       ensuring they don't clash just by convention of separating them.
+     *       So, we should either:
+     *           - Separate the value curves from time somehow, at the point of
+     *           addition; or
+     *           - Iterate over all tracks according to time somehow, using an
+     *           array of iterators, one for each track?
+     */
+    apply(f, out = this.outputs) {
         this.each((track, key, ...rest) => {
-            const trackOut = (out || this.outputs[key] ||
-                    (this.outputs[key] = {}));
+            const trackOut = (out[key] || (out[key] = {}));
 
             return apply(f(track, key, ...rest, trackOut), trackOut);
         });
