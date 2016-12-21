@@ -1164,7 +1164,7 @@ export default (canvas, settings, debug) => {
             .to({
                 to: {
                     flowWeight: 0.9,
-                    flowDecay: 0.0000001
+                    flowDecay: 0.0003
                 },
                 time: 70100
             })
@@ -1331,8 +1331,8 @@ export default (canvas, settings, debug) => {
                 to: {
                     forceWeight: 0.016,
                     varyForce: 0.3,
-                    flowWeight: 1.2,
-                    varyFlow: -0.7,
+                    flowWeight: 1,
+                    varyFlow: 0.4,
                     flowDecay: 0.003,
                     colorMapAlpha: 0.05
                 },
