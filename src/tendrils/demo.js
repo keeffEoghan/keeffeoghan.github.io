@@ -1329,10 +1329,9 @@ export default (canvas, settings, debug) => {
         trackTracks.tendrils
             .to({
                 to: {
-                    forceWeight: 0.016,
-                    varyForce: 0.3,
+                    forceWeight: 0.014,
+                    varyForce: 0.4,
                     flowWeight: 1,
-                    varyFlow: 0.4,
                     flowDecay: 0.003,
                     colorMapAlpha: 0.05
                 },
@@ -1352,7 +1351,7 @@ export default (canvas, settings, debug) => {
                 to: {
                     noiseWeight: 0.002,
                     varyNoise: 0.3,
-                    noiseScale: 4,
+                    noiseScale: 5,
                     varyNoiseScale: 0.3,
                     varyNoiseSpeed: 0.1
                 },
@@ -1362,7 +1361,7 @@ export default (canvas, settings, debug) => {
                 to: {
                     noiseWeight: 0.003,
                     noiseScale: 2.1,
-                    varyNoiseScale: 1
+                    varyNoiseScale: 0
                 },
                 time: 107000,
                 ease: [0, 0.95, 1]
@@ -1833,8 +1832,9 @@ export default (canvas, settings, debug) => {
             .smoothTo({
                 to: {
                     forceWeight: 0.014,
-                    varyForce: 0.8,
-                    flowWeight: 0.8,
+                    varyForce: 0.5,
+                    flowWeight: 0.9,
+                    varyFlow: 0.1,
                     colorMapAlpha: 0.9
                 },
                 time: 255000,
