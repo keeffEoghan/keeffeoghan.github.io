@@ -1613,10 +1613,16 @@ export default (canvas, settings, debug) => {
         trackTracks.tendrils
             .smoothTo({
                 to: {
-                    colorMapAlpha: 0.4
+                    colorMapAlpha: 0.6
                 },
                 time: 174000,
-                ease: [0, 0, 1]
+                ease: [0, 0.4, 1]
+            })
+            .to({
+                to: {
+                    colorMapAlpha: 0.3
+                },
+                time: 174500
             });
 
         trackTracks.blend
@@ -1634,8 +1640,13 @@ export default (canvas, settings, debug) => {
 
         trackTracks.flowColor
             .over(174000-160000, {
-                to: [1, 1, 1, 0.03],
+                to: [1, 1, 1, 0.02],
                 time: 174000,
+                ease: [0, 0.7, 1]
+            })
+            .to({
+                to: [1, 1, 1, 0],
+                time: 174500,
                 ease: [0, 0.7, 1]
             });
 
@@ -1662,7 +1673,8 @@ export default (canvas, settings, debug) => {
         trackTracks.tendrils
             .smoothTo({
                 to: {
-                    flowWeight: -0.4
+                    flowWeight: -0.4,
+                    colorMapAlpha: 0.7
                 },
                 time: 187000,
                 ease: [0, 0.1, 1]
@@ -1796,7 +1808,7 @@ export default (canvas, settings, debug) => {
 
         trackTracks.flowColor
             .to({
-                to: [...rayColor, 0.25],
+                to: [...rayColor, 0.2],
                 time: 186000
             })
             .to({
@@ -1823,7 +1835,7 @@ export default (canvas, settings, debug) => {
                     forceWeight: 0.014,
                     varyForce: 0.8,
                     flowWeight: 0.8,
-                    colorMapAlpha: 0.4
+                    colorMapAlpha: 0.9
                 },
                 time: 255000,
                 ease: [0, 0.1, 0.4, 1]
@@ -1866,8 +1878,8 @@ export default (canvas, settings, debug) => {
             });
 
         trackTracks.blend
-            .over(211000-196000, {
-                to: [0.75, 0.9],
+            .over(211000-190000, {
+                to: [1, 0.7],
                 time: 211000
             });
 
@@ -1880,7 +1892,7 @@ export default (canvas, settings, debug) => {
                     forceWeight: 0.015,
                     flowWeight: -0.1,
                     speedAlpha: 0.002,
-                    colorMapAlpha: 0.85
+                    colorMapAlpha: 0.9
                 },
                 time: 257600,
                 ease: [0, 1, 1]
