@@ -39,6 +39,31 @@ canvas {
     bottom: 1em;
 }
 
-.dg {
-    z-index: 1000 !important;
+.controls {
+    position: fixed;
+    display: flex;
+    flex-flow: column nowrap;
+    justify-content: stretch;
+    top: 0;
+    right: 0;
+    max-height: 100%;
+    padding-bottom: 20px;
+    z-index: 1000;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 300ms ease-out;
+
+    &.show {
+        opacity: 1;
+        visibility: visible;
+    }
+
+    .dg.main {
+        overflow-y: auto;
+    }
+
+    .close-button {
+        position: absolute;
+        bottom: 0;
+    }
 }
