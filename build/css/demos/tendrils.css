@@ -39,6 +39,12 @@ canvas.light { background: #fff; }
 
 .cam-stream { position: absolute; left: 1em; bottom: 1em; }
 
-.dg { z-index: 1000 !important; }
+.controls { position: fixed; display: -webkit-box; display: -webkit-flex; display: -ms-flexbox; display: flex; -webkit-flex-flow: column nowrap; -ms-flex-flow: column nowrap; flex-flow: column nowrap; -webkit-box-pack: stretch; -webkit-justify-content: stretch; -ms-flex-pack: stretch; justify-content: stretch; top: 0; right: 0; max-height: 100%; padding-bottom: 20px; z-index: 1000; opacity: 0; visibility: hidden; -webkit-transition: opacity 300ms ease-out; transition: opacity 300ms ease-out; }
+
+.controls.show { opacity: 1; visibility: visible; }
+
+.controls .dg.main { overflow-y: auto; }
+
+.controls .close-button { position: absolute; bottom: 0; }
 
 /*# sourceMappingURL=tendrils.css.map */
