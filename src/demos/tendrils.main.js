@@ -14,7 +14,7 @@ let readyCallbacks = {
             document.addEventListener('readystatechange', updateState);
         },
         interactive() {
-            tendrilsApp(document.querySelector('canvas'), null, true);
+            tendrilsApp(document.querySelector('canvas'));
 
             document.removeEventListener('readystatechange', updateState);
         }
