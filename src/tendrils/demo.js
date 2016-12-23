@@ -596,7 +596,8 @@ export default (canvas) => {
     // timer.track.loop = true;
 
     track.addEventListener('seeked',
-        () => player.track.playFrom(track.currentTime*1000, 0));
+        () => (appSettings.animate &&
+            player.track.playFrom(track.currentTime*1000, 0)));
 
 
     // @todo Test sequence - move to own file?
@@ -2615,7 +2616,6 @@ export default (canvas) => {
 
         const scrub = (by) => {
             track.currentTime += by*0.001;
-            player.track.playFrom(track.currentTime*1000, 0);
             togglePlay(true);
         };
 
