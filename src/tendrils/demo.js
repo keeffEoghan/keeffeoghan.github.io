@@ -2138,12 +2138,12 @@ export default (canvas) => {
             keyframe
         });
 
+    each((f, control) => gui.main.add(rootControls, control), rootControls);
+
     gui.main.add(appSettings, 'useMedia').onFinishChange(() =>
             ((appSettings.useMedia)? getMedia : stopMedia)());
 
     gui.main.add(appSettings, 'animate');
-
-    each((f, control) => gui.main.add(rootControls, control), rootControls);
 
 
     // Settings
