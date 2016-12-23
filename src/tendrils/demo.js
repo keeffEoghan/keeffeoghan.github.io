@@ -120,8 +120,8 @@ export default (canvas) => {
 
 
     const appSettings = {
-        useMedia: (queries.use_media !== false),
-        animate: (queries.animate !== false)
+        useMedia: (''+queries.use_media !== 'false'),
+        animate: (''+queries.animate !== 'false')
     };
 
 
@@ -132,7 +132,7 @@ export default (canvas) => {
                 decodeURIComponent(queries.track)
             :   'https://soundcloud.com/max-cooper/trust-feat-kathrin-deboer'),
 
-        audible: (queries.mute !== true),
+        audible: (''+queries.mute !== 'true'),
 
         track: parseFloat((queries.track_in || 1), 10),
         trackFlowAt: 1.13,
@@ -2115,7 +2115,7 @@ export default (canvas) => {
             ease: [0, 0.95, 1]
         });
 
-    const showExport = ((queries.prompt_show)?
+    const showExport = ((''+queries.prompt_show !== 'true')?
             (...rest) => self.prompt(...rest)
         :   (...rest) => console.log(...rest));
 
