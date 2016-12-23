@@ -137,7 +137,7 @@ export default (canvas) => {
         track: parseFloat((queries.track_in || 1), 10),
         trackFlowAt: 1.13,
         trackFastAt: 0.12,
-        trackFormAt: 0.047,
+        trackFormAt: 0.05,
         trackSampleAt: 0.15,
         trackCamAt: 0.008,
         trackSpawnAt: 0.18,
@@ -160,6 +160,7 @@ export default (canvas) => {
     Object.assign(track, {
             crossOrigin: 'anonymous',
             controls: true,
+            autoplay: true,
             className: 'track'
         });
 
@@ -395,8 +396,6 @@ export default (canvas) => {
                     micTrigger = (micTrigger ||
                         new AudioTrigger(micAnalyser, 3));
                 }
-
-                track.autoplay = true;
             });
     }
 
@@ -861,7 +860,7 @@ export default (canvas) => {
                         const out = trackOutputs.spawn;
                         let radius = out.radius;
 
-                        out.radius = 0.1;
+                        out.radius = 0.2;
                         respawn(tendrils.targets);
                         out.radius = radius;
                     }
@@ -1162,7 +1161,7 @@ export default (canvas) => {
                         const out = trackOutputs.spawn;
                         let radius = out.radius;
 
-                        out.radius = 0.1;
+                        out.radius = 0.2;
                         respawn(tendrils.targets);
                         out.radius = radius;
                     }
@@ -1179,13 +1178,13 @@ export default (canvas) => {
         trackTracks.tendrils
             .smoothOver(70000-63000, {
                 to: {
-                    forceWeight: 0.015,
-                    varyForce: 0.2,
+                    forceWeight: 0.016,
+                    varyForce: 0.25,
                     speedAlpha: 0,
                     colorMapAlpha: 0
                 },
                 time: 70000,
-                ease: [0, -0.1, 0.95, 1]
+                ease: [0, -0.1, 0.5, 1]
             })
             .to({
                 to: {
@@ -1376,22 +1375,24 @@ export default (canvas) => {
         trackTracks.tendrils2
             .to({
                 to: {
-                    noiseWeight: 0.002,
+                    noiseWeight: 0.003,
                     varyNoise: 0.3,
-                    noiseScale: 8,
+                    noiseScale: 9,
                     varyNoiseScale: 0.3,
-                    varyNoiseSpeed: 0.1
+                    noiseSpeed: 0.00025,
+                    varyNoiseSpeed: 0.25
                 },
                 time: 94100
             })
             .smoothTo({
                 to: {
-                    noiseWeight: 0.003,
                     noiseScale: 2,
-                    varyNoiseScale: 0
+                    varyNoiseScale: 0,
+                    noiseSpeed: 0.0004,
+                    varyNoiseSpeed: 0.1
                 },
                 time: 107000,
-                ease: [0, 0.95, 1]
+                ease: [0, 1, 1]
             });
 
         trackTracks.audio
@@ -1748,8 +1749,8 @@ export default (canvas) => {
         trackTracks.audio
             .over(185000-176000, {
                 to: {
-                    trackFlowAt: audioDefaults.trackFlowAt*0.4,
-                    trackFastAt: audioDefaults.trackFastAt*0.06
+                    trackFlowAt: audioDefaults.trackFlowAt*0.2,
+                    trackFastAt: audioDefaults.trackFastAt*0.065
                 },
                 time: 185000,
                 ease: [0, 0.1, 1]
@@ -1920,6 +1921,7 @@ export default (canvas) => {
             })
             .smoothOver(300, {
                 to: {
+                    varyFlow: 0.4,
                     colorMapAlpha: 0.3
                 },
                 time: 281000,
@@ -2116,7 +2118,7 @@ export default (canvas) => {
             ease: [0, 0.95, 1]
         });
 
-    const showExport = ((''+queries.prompt_show !== 'true')?
+    const showExport = ((''+queries.prompt_show === 'true')?
             (...rest) => self.prompt(...rest)
         :   (...rest) => console.log(...rest));
 
@@ -2774,6 +2776,10 @@ export default (canvas) => {
             '.': keyframeCaller(() => spawnImage()),
             ',': keyframeCaller(() => spawnForm())
         };
+
+        if(requestFullscreen) {
+            callMap['F'] = () => rootControls.fullScreen();
+        }
 
         // @todo Throttle so multiple states can go into one keyframe.
         document.body.addEventListener('keydown', (e) => {
