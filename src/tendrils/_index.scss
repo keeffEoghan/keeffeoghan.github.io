@@ -19,13 +19,19 @@ canvas {
     width: 13px !important;
 }
 
-.npm-scb-wrap.open {
-    .npm-scb-now-playing {
-        opacity: 0;
+.npm-scb-wrap {
+    text-shadow: 0 0 2px #000 1px;
+
+    .track {
+        visibility: hidden;
     }
 
-    .npm-scb-inner {
-        top: 0;
+    &::hover,
+    &::focus,
+    &.open {
+        .track {
+            visibility: visible;
+        }
     }
 }
 
