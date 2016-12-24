@@ -697,6 +697,13 @@ export default (canvas) => {
     const screen = new Screen(gl);
     const blurShader = shader(gl, screenVert, blurFrag);
 
+    const blurDefaults = {
+        radius: 3,
+        limit: 0.5
+    };
+
+    const blurState = { ...blurDefaults };
+
 
     // The main loop
     function render() {
@@ -737,7 +744,8 @@ export default (canvas) => {
                     view: tendrils.buffers[0].color[0].bind(0),
                     resolution: tendrils.viewRes,
                     time: tendrils.timer.time
-                });
+                },
+                blurState);
 
             screen.render();
 
@@ -2296,6 +2304,17 @@ export default (canvas) => {
                     out.disconnect();
                 }
             });
+        }
+    }
+
+
+    // Blur
+
+    gui.blur = gui.main.addFolder('blur');
+
+    for(let s in blurDefaults) {
+        if(!(typeof blurState[s]).match(/^(object|array|undefined|null)$/gi)) {
+            gui.blur.add(blurState, s);
         }
     }
 
