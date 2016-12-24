@@ -120,6 +120,10 @@ export default (canvas) => {
 
 
     const appSettings = {
+        trackURL: ((queries.track)?
+                decodeURIComponent(queries.track)
+            :   'https://soundcloud.com/max-cooper/trust-feat-kathrin-deboer'),
+
         useMedia: (''+queries.use_media !== 'false'),
         animate: (''+queries.animate !== 'false')
     };
@@ -128,15 +132,11 @@ export default (canvas) => {
     // Audio init
 
     const audioDefaults = {
-        trackURL: ((queries.track)?
-                decodeURIComponent(queries.track)
-            :   'https://soundcloud.com/max-cooper/trust-feat-kathrin-deboer'),
-
         audible: (''+queries.mute !== 'true'),
 
         track: parseFloat((queries.track_in || 1), 10),
-        trackFlowAt: 1.13,
-        trackFastAt: 0.12,
+        trackFlowAt: 1.16,
+        trackFastAt: 0.13,
         trackFormAt: 0.05,
         trackSampleAt: 0.15,
         trackCamAt: 0.008,
@@ -194,7 +194,7 @@ export default (canvas) => {
         return track;
     };
 
-    const setupTrackURL = (trackURL = audioState.trackURL) => {
+    const setupTrackURL = (trackURL = appSettings.trackURL) => {
         const old = document.querySelector('.npm-scb-white');
 
         if(old) {
@@ -202,6 +202,7 @@ export default (canvas) => {
         }
 
         if(trackURL.match(/^(https?)?(\:\/\/)?(www\.)?soundcloud\.com\//gi)) {
+            // Special setup for SoundCloud links
             soundCloud({
                     client_id: '75aca2e2b815f9f5d4e92916c7b80846',
                     song: trackURL,
@@ -209,15 +210,16 @@ export default (canvas) => {
                 },
                 (e, src, data, el) => {
                     if(e) {
-                        throw e;
+                        console.warn('Error loading track', e);
                     }
                     else {
                         setupTrack(src, el.querySelector('.npm-scb-info'));
-                        el.querySelector('.npm-scb-wrap').classList.add('open');
+                        // el.querySelector('.npm-scb-wrap').classList.add('open');
                     }
                 });
         }
         else if(trackURL.match(/^(https)?(:\/\/)?(www\.)?dropbox\.com\/s\//gi)) {
+            // Handle Dropbox share links
             setupTrack(trackURL.replace(/^((https)?(:\/\/)?(www\.)?)dropbox\.com\/s\/(.*)\?dl=(0)$/gi,
                 'https://dl.dropboxusercontent.com/s/$5?dl=1&raw=1'));
         }
@@ -1178,7 +1180,7 @@ export default (canvas) => {
         trackTracks.tendrils
             .smoothOver(70000-63000, {
                 to: {
-                    forceWeight: 0.016,
+                    forceWeight: 0.014,
                     varyForce: 0.25,
                     speedAlpha: 0,
                     colorMapAlpha: 0
@@ -1188,6 +1190,8 @@ export default (canvas) => {
             })
             .to({
                 to: {
+                    forceWeight: 0.017,
+                    varyForce: 0,
                     flowWeight: 0.9,
                     flowDecay: 0.0003
                 },
@@ -1196,7 +1200,6 @@ export default (canvas) => {
             .smoothTo({
                 to: {
                     forceWeight: 0.017,
-                    varyForce: 0,
                     flowWeight: 1,
                     varyFlow: 0,
                     speedAlpha: 0.0005,
@@ -1219,7 +1222,7 @@ export default (canvas) => {
             })
             .smoothTo({
                 to: {
-                    noiseScale: 0.7
+                    noiseScale: 0.5
                 },
                 time: 94000,
                 ease: [0, -0.1, 0.95, 1]
@@ -1356,7 +1359,7 @@ export default (canvas) => {
                 to: {
                     forceWeight: 0.014,
                     varyForce: 0.4,
-                    flowWeight: 0.8,
+                    flowWeight: 0.75,
                     flowDecay: 0.003,
                     colorMapAlpha: 0.05
                 },
@@ -1364,7 +1367,9 @@ export default (canvas) => {
             })
             .smoothTo({
                 to: {
-                    flowWeight: 1,
+                    forceWeight: 0.015,
+                    varyForce: 0.2,
+                    flowWeight: 0.9,
                     varyFlow: 0.3,
                     colorMapAlpha: 0.08
                 },
@@ -1379,7 +1384,7 @@ export default (canvas) => {
                     varyNoise: 0.3,
                     noiseScale: 9,
                     varyNoiseScale: 0.3,
-                    noiseSpeed: 0.00025,
+                    noiseSpeed: 0.0002,
                     varyNoiseSpeed: 0.25
                 },
                 time: 94100
@@ -2118,15 +2123,16 @@ export default (canvas) => {
             ease: [0, 0.95, 1]
         });
 
-    const showExport = ((''+queries.prompt_show === 'true')?
+    const showExport = ((''+queries.prompt_show !== 'false')?
             (...rest) => self.prompt(...rest)
         :   (...rest) => console.log(...rest));
 
     Object.assign(rootControls, {
             showLink: () => showExport('Link:',
-                location.href.replace(location.search.slice(1), querystring.encode({
+                location.href.replace((location.search || /$/gi),
+                    '?'+querystring.encode({
                         ...queries,
-                        track: encodeURIComponent(audioState.trackURL),
+                        track: encodeURIComponent(appSettings.trackURL),
                         mute: !audioState.audible,
                         track_in: audioState.track,
                         mic_in: audioState.mic,
@@ -2141,12 +2147,14 @@ export default (canvas) => {
             keyframe
         });
 
-    each((f, control) => gui.main.add(rootControls, control), rootControls);
+    gui.main.add(appSettings, 'trackURL').onFinishChange(setupTrackURL);
 
     gui.main.add(appSettings, 'useMedia').onFinishChange(() =>
             ((appSettings.useMedia)? getMedia : stopMedia)());
 
     gui.main.add(appSettings, 'animate');
+
+    each((f, control) => gui.main.add(rootControls, control), rootControls);
 
 
     // Settings
@@ -2276,10 +2284,6 @@ export default (canvas) => {
 
     for(let s in audioState) {
         const control = gui.audio.add(audioState, s);
-
-        if(s === 'trackURL') {
-            control.onFinishChange(setupTrackURL);
-        }
 
         if(s === 'audible') {
             control.onChange((v) => {
