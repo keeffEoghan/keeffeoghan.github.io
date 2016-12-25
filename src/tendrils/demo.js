@@ -567,6 +567,22 @@ export default (canvas) => {
     };
 
 
+    // Blur vignette
+
+    const screen = new Screen(gl);
+    const blurShader = shader(gl, screenVert, blurFrag);
+
+    const blurDefaults = {
+        radius: 3,
+        limit: 0.5
+    };
+
+    const blurState = {
+        radius: 7,
+        limit: 0.3
+    };
+
+
     // Animation setup
 
     const tracks = {
@@ -579,6 +595,7 @@ export default (canvas) => {
         spawn: resetSpawner.uniforms,
         audio: audioState,
         blend: blend.alphas,
+        blur: blurState,
         // Just for calls
         // @todo Fix the animation lib properly, not just by convention
         calls: {}
@@ -633,7 +650,7 @@ export default (canvas) => {
             varyNoiseSpeed: 0.1,
         },
         tendrils3: {
-            target: 0.00001,
+            target: 0.000005,
             varyTarget: 1,
             lineWidth: 1
         },
@@ -659,6 +676,7 @@ export default (canvas) => {
             micSpawnAt: 0
         },
         blend: [0, 1],
+        blur: { ...blurState },
         calls: null
     };
 
@@ -690,19 +708,6 @@ export default (canvas) => {
 
         return { apply };
     });
-
-
-    // Blur vignette
-
-    const screen = new Screen(gl);
-    const blurShader = shader(gl, screenVert, blurFrag);
-
-    const blurDefaults = {
-        radius: 3,
-        limit: 0.5
-    };
-
-    const blurState = { ...blurDefaults };
 
 
     // Intro info
@@ -908,6 +913,13 @@ export default (canvas) => {
             .to({
                 to: [1, 0],
                 time: 13000,
+                ease: [0, 0, 1]
+            });
+
+        trackTracks.blur
+            .to({
+                to: blurDefaults,
+                time: 3000,
                 ease: [0, 0, 1]
             });
 
