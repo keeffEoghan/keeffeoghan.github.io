@@ -33,29 +33,30 @@ canvas {
         padding: 0.75em 1.75em;
         margin: 0.5em 0;
         color: #efefef;
-        background-color: rgba(#121212, 0.75);
+        background-color: rgba(#121212, 0.9);
     }
 
     button {
         display: block;
         font-size: 1.5em;
         padding: 0.5em 1.75em;
-        margin: 0.75em 0;
-        color: #121212;
-        background: #fff;
+        margin: 0.5em 0;
+        color: #000;
+        background: #efefef;
         border: none;
         cursor: pointer;
         font-weight: 600;
         border-radius: 1px;
-        box-shadow: 0 0 0 4px rgba(#121212, 0.75);
+        box-shadow: 0 0 0 4px rgba(#121212, 0.9);
 
         &:hover,
         &:focus {
-            color: #414141;
+            color: #121212;
+            background-color: #fff;
         }
 
         &:active {
-            color: #000;
+            color: #414141;
         }
     }
 
