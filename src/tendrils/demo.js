@@ -1274,7 +1274,7 @@ export default (canvas) => {
             })
             .to({
                 to: {
-                    radius: 0.4,
+                    radius: 0.3,
                     speed: 0.2
                 },
                 time: 94000,
@@ -1395,8 +1395,8 @@ export default (canvas) => {
                 to: {
                     forceWeight: 0.015,
                     varyForce: 0.2,
-                    flowWeight: 0.9,
-                    varyFlow: 0.3,
+                    flowWeight: 1,
+                    varyFlow: 0.2,
                     colorMapAlpha: 0.08
                 },
                 time: 107000,
@@ -1406,10 +1406,10 @@ export default (canvas) => {
         trackTracks.tendrils2
             .to({
                 to: {
-                    noiseWeight: 0.003,
-                    varyNoise: 0.3,
-                    noiseScale: 9,
-                    varyNoiseScale: 0.3,
+                    noiseWeight: 0.0015,
+                    varyNoise: 0.1,
+                    noiseScale: 15,
+                    varyNoiseScale: 0,
                     noiseSpeed: 0.0002,
                     varyNoiseSpeed: 0.25
                 },
@@ -1417,8 +1417,9 @@ export default (canvas) => {
             })
             .smoothTo({
                 to: {
+                    noiseWeight: 0.003,
                     noiseScale: 2,
-                    varyNoiseScale: 0,
+                    varyNoiseScale: 0.2,
                     noiseSpeed: 0.0004,
                     varyNoiseSpeed: 0.1
                 },
@@ -1476,33 +1477,15 @@ export default (canvas) => {
                     colorMapAlpha: 0.3
                 },
                 time: 138000,
-                ease: [0, 0.2, 1],
-            });
-
-        trackTracks.tendrils3
-            .over(134000-107000, {
-                to: {
-                    target: 0.00001
-                },
-                time: 134000,
-                ease: [0, 0, 1]
+                ease: [0, 0.2, 1]
             })
-            .to({
+            .smoothTo({
                 to: {
-                    target: 0.00003
+                    varyForce: 0.3,
+                    varyFlow: 0.25
                 },
-                time: 138000,
+                time: 145000,
                 ease: [0, 0, 1]
-            });
-
-        trackTracks.calls
-            .to({
-                time: 107000,
-                call: [() => spawnImage(tendrils.targets)]
-            })
-            .to({
-                time: 138000,
-                call: [() => resetSpawner.spawn(tendrils, tendrils.targets)]
             });
 
         trackTracks.tendrils2
@@ -1527,8 +1510,8 @@ export default (canvas) => {
             })
             .smoothTo({
                 to: {
-                    varyNoise: 0.1,
-                    noiseScale: 1.8,
+                    varyNoise: 0.2,
+                    noiseScale: 1.85,
                     varyNoiseScale: 2
                 },
                 time: 142000,
@@ -1536,30 +1519,48 @@ export default (canvas) => {
             });
 
         trackTracks.tendrils3
-            .over(134000-124000, {
+            .over(134000-107000, {
                 to: {
-                    lineWidth: 2
+                    target: 0.00001
                 },
                 time: 134000,
-                ease: [0, 0.9, 1]
+                ease: [0, 0, 1]
             })
-            .to(138000, {
+            .to({
                 to: {
+                    target: 0.00003,
                     lineWidth: 2
                 },
                 time: 138000,
-                ease: [0, 0.9, 1]
+                ease: [0, 0, 1]
+            })
+            .to({
+                to: {
+                    lineWidth: 1
+                },
+                time: 142000,
+                ease: [0, 0, 1]
+            });
+
+        trackTracks.calls
+            .to({
+                time: 107000,
+                call: [() => spawnImage(tendrils.targets)]
+            })
+            .to({
+                time: 138000,
+                call: [() => resetSpawner.spawn(tendrils, tendrils.targets)]
             });
 
         trackTracks.audio
-            .to({
+            .over(100, {
                 to: {
                     trackFastAt: 0,
                     micFastAt: 0,
                     trackSampleAt: audioDefaults.trackSampleAt*0.8,
                     micSampleAt: audioDefaults.micSampleAt*0.8
                 },
-                time: 107100
+                time: 117000
             })
             .over(50, {
                 to: {
