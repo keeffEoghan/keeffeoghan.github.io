@@ -1149,7 +1149,7 @@ export default (canvas) => {
 
         trackTracks.flowColor
             .over(1000, {
-                to: [1, 1, 1, 0.05],
+                to: [1, 1, 1, 0.04],
                 time: 46000
             });
 
@@ -1445,6 +1445,17 @@ export default (canvas) => {
                 ease: [0, 0, 1]
             });
 
+        trackTracks.baseColor
+            .over(100, {
+                to: [0, 0, 0, 0.65],
+                time: 94100
+            })
+            .to({
+                to: [0, 0, 0, 0.8],
+                time: 117000,
+                ease: [0, 0, 1]
+            });
+
         trackTracks.flowColor
             .to({
                 to: [1, 1, 1, 0.03],
@@ -1481,7 +1492,7 @@ export default (canvas) => {
             })
             .smoothTo({
                 to: {
-                    varyForce: 0.3,
+                    varyForce: 0.25,
                     varyFlow: 0.25
                 },
                 time: 145000,
@@ -1510,9 +1521,9 @@ export default (canvas) => {
             })
             .smoothTo({
                 to: {
-                    varyNoise: 0.2,
-                    noiseScale: 1.85,
-                    varyNoiseScale: 2
+                    varyNoise: 0.3,
+                    noiseScale: 1.8,
+                    varyNoiseScale: 1
                 },
                 time: 142000,
                 ease: [0, -0.05, 1.05, 1]
@@ -1544,7 +1555,7 @@ export default (canvas) => {
 
         trackTracks.calls
             .to({
-                time: 107000,
+                time: 117000,
                 call: [() => spawnImage(tendrils.targets)]
             })
             .to({
@@ -1850,7 +1861,7 @@ export default (canvas) => {
 
         trackTracks.baseColor
             .to({
-                to: [...rayColor, 0.8],
+                to: [...rayColor, 0.7],
                 time: 182000,
                 ease: [0, 1, 1]
             })
@@ -1938,7 +1949,7 @@ export default (canvas) => {
             });
 
 
-        // To artefact - bassy outro, artefact
+        // To artefact - bassy outro
 
         trackTracks.tendrils
             .smoothTo({
@@ -2248,7 +2259,7 @@ export default (canvas) => {
 
     // Color map blend
 
-    gui.blend = gui.main.addFolder('blend');
+    gui.blend = gui.main.addFolder('color blend');
 
     const blendKeys = ['audio', 'video'];
     const blendProxy = reduce((proxy, k, i) => {
