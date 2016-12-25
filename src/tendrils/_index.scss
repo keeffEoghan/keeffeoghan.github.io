@@ -14,29 +14,21 @@ canvas {
     }
 }
 
+.track {
+    margin: 1em;
+}
+
 /* Quick fix for a broken DAT.GUI style */
 .hue-field {
     width: 13px !important;
 }
 
 .npm-scb-wrap {
-    text-shadow: 0 0 2px #000 1px;
+    text-shadow: 0 0 1px #000;
 
     .track {
-        visibility: hidden;
+        margin: 0;
     }
-
-    &::hover,
-    &::focus,
-    &.open {
-        .track {
-            visibility: visible;
-        }
-    }
-}
-
-.track {
-    margin: 1em;
 }
 
 .cam-stream {
