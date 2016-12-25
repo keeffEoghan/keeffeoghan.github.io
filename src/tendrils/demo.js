@@ -1763,7 +1763,7 @@ export default (canvas) => {
             .over(185000-176000, {
                 to: {
                     trackFlowAt: audioDefaults.trackFlowAt*0.2,
-                    trackFastAt: audioDefaults.trackFastAt*0.065
+                    trackFastAt: audioDefaults.trackFastAt*0.06
                 },
                 time: 185000,
                 ease: [0, 0.1, 1]
