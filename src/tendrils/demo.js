@@ -120,6 +120,10 @@ export default (canvas) => {
 
 
     const appSettings = {
+        trackURL: ((queries.track)?
+                decodeURIComponent(queries.track)
+            :   'https://soundcloud.com/max-cooper/trust-feat-kathrin-deboer'),
+
         useMedia: (''+queries.use_media !== 'false'),
         animate: (''+queries.animate !== 'false')
     };
@@ -128,15 +132,11 @@ export default (canvas) => {
     // Audio init
 
     const audioDefaults = {
-        trackURL: ((queries.track)?
-                decodeURIComponent(queries.track)
-            :   'https://soundcloud.com/max-cooper/trust-feat-kathrin-deboer'),
-
         audible: (''+queries.mute !== 'true'),
 
         track: parseFloat((queries.track_in || 1), 10),
-        trackFlowAt: 1.13,
-        trackFastAt: 0.12,
+        trackFlowAt: 1.16,
+        trackFastAt: 0.13,
         trackFormAt: 0.05,
         trackSampleAt: 0.15,
         trackCamAt: 0.008,
@@ -160,7 +160,6 @@ export default (canvas) => {
     Object.assign(track, {
             crossOrigin: 'anonymous',
             controls: true,
-            autoplay: true,
             className: 'track'
         });
 
@@ -194,7 +193,7 @@ export default (canvas) => {
         return track;
     };
 
-    const setupTrackURL = (trackURL = audioState.trackURL) => {
+    const setupTrackURL = (trackURL = appSettings.trackURL) => {
         const old = document.querySelector('.npm-scb-white');
 
         if(old) {
@@ -202,6 +201,7 @@ export default (canvas) => {
         }
 
         if(trackURL.match(/^(https?)?(\:\/\/)?(www\.)?soundcloud\.com\//gi)) {
+            // Special setup for SoundCloud links
             soundCloud({
                     client_id: '75aca2e2b815f9f5d4e92916c7b80846',
                     song: trackURL,
@@ -209,15 +209,16 @@ export default (canvas) => {
                 },
                 (e, src, data, el) => {
                     if(e) {
-                        throw e;
+                        console.warn('Error loading track', e);
                     }
                     else {
                         setupTrack(src, el.querySelector('.npm-scb-info'));
-                        el.querySelector('.npm-scb-wrap').classList.add('open');
+                        // el.querySelector('.npm-scb-wrap').classList.add('open');
                     }
                 });
         }
         else if(trackURL.match(/^(https)?(:\/\/)?(www\.)?dropbox\.com\/s\//gi)) {
+            // Handle Dropbox share links
             setupTrack(trackURL.replace(/^((https)?(:\/\/)?(www\.)?)dropbox\.com\/s\/(.*)\?dl=(0)$/gi,
                 'https://dl.dropboxusercontent.com/s/$5?dl=1&raw=1'));
         }
@@ -692,8 +693,34 @@ export default (canvas) => {
 
 
     // Blur vignette
+
     const screen = new Screen(gl);
     const blurShader = shader(gl, screenVert, blurFrag);
+
+    const blurDefaults = {
+        radius: 3,
+        limit: 0.5
+    };
+
+    const blurState = { ...blurDefaults };
+
+
+    // Intro info
+
+    const introElements = {
+        info: document.querySelector('.info'),
+        start: document.querySelector('.info > button')
+    };
+
+    introElements.start.addEventListener('click', () => {
+        introElements.info.classList.add('hide');
+
+        track.autoplay = true;
+
+        if(track.duration) {
+            track.play();
+        }
+    });
 
 
     // The main loop
@@ -735,7 +762,8 @@ export default (canvas) => {
                     view: tendrils.buffers[0].color[0].bind(0),
                     resolution: tendrils.viewRes,
                     time: tendrils.timer.time
-                });
+                },
+                blurState);
 
             screen.render();
 
@@ -1178,7 +1206,7 @@ export default (canvas) => {
         trackTracks.tendrils
             .smoothOver(70000-63000, {
                 to: {
-                    forceWeight: 0.016,
+                    forceWeight: 0.014,
                     varyForce: 0.25,
                     speedAlpha: 0,
                     colorMapAlpha: 0
@@ -1188,6 +1216,8 @@ export default (canvas) => {
             })
             .to({
                 to: {
+                    forceWeight: 0.017,
+                    varyForce: 0,
                     flowWeight: 0.9,
                     flowDecay: 0.0003
                 },
@@ -1196,7 +1226,6 @@ export default (canvas) => {
             .smoothTo({
                 to: {
                     forceWeight: 0.017,
-                    varyForce: 0,
                     flowWeight: 1,
                     varyFlow: 0,
                     speedAlpha: 0.0005,
@@ -1219,7 +1248,7 @@ export default (canvas) => {
             })
             .smoothTo({
                 to: {
-                    noiseScale: 0.7
+                    noiseScale: 0.5
                 },
                 time: 94000,
                 ease: [0, -0.1, 0.95, 1]
@@ -1245,7 +1274,7 @@ export default (canvas) => {
             })
             .to({
                 to: {
-                    radius: 0.4,
+                    radius: 0.3,
                     speed: 0.2
                 },
                 time: 94000,
@@ -1356,7 +1385,7 @@ export default (canvas) => {
                 to: {
                     forceWeight: 0.014,
                     varyForce: 0.4,
-                    flowWeight: 0.8,
+                    flowWeight: 0.75,
                     flowDecay: 0.003,
                     colorMapAlpha: 0.05
                 },
@@ -1364,8 +1393,10 @@ export default (canvas) => {
             })
             .smoothTo({
                 to: {
+                    forceWeight: 0.015,
+                    varyForce: 0.2,
                     flowWeight: 1,
-                    varyFlow: 0.3,
+                    varyFlow: 0.2,
                     colorMapAlpha: 0.08
                 },
                 time: 107000,
@@ -1375,19 +1406,20 @@ export default (canvas) => {
         trackTracks.tendrils2
             .to({
                 to: {
-                    noiseWeight: 0.003,
-                    varyNoise: 0.3,
-                    noiseScale: 9,
-                    varyNoiseScale: 0.3,
-                    noiseSpeed: 0.00025,
+                    noiseWeight: 0.0015,
+                    varyNoise: 0.1,
+                    noiseScale: 15,
+                    varyNoiseScale: 0,
+                    noiseSpeed: 0.0002,
                     varyNoiseSpeed: 0.25
                 },
                 time: 94100
             })
             .smoothTo({
                 to: {
+                    noiseWeight: 0.003,
                     noiseScale: 2,
-                    varyNoiseScale: 0,
+                    varyNoiseScale: 0.2,
                     noiseSpeed: 0.0004,
                     varyNoiseSpeed: 0.1
                 },
@@ -1445,33 +1477,15 @@ export default (canvas) => {
                     colorMapAlpha: 0.3
                 },
                 time: 138000,
-                ease: [0, 0.2, 1],
-            });
-
-        trackTracks.tendrils3
-            .over(134000-107000, {
-                to: {
-                    target: 0.00001
-                },
-                time: 134000,
-                ease: [0, 0, 1]
+                ease: [0, 0.2, 1]
             })
-            .to({
+            .smoothTo({
                 to: {
-                    target: 0.00003
+                    varyForce: 0.3,
+                    varyFlow: 0.25
                 },
-                time: 138000,
+                time: 145000,
                 ease: [0, 0, 1]
-            });
-
-        trackTracks.calls
-            .to({
-                time: 107000,
-                call: [() => spawnImage(tendrils.targets)]
-            })
-            .to({
-                time: 138000,
-                call: [() => resetSpawner.spawn(tendrils, tendrils.targets)]
             });
 
         trackTracks.tendrils2
@@ -1496,8 +1510,8 @@ export default (canvas) => {
             })
             .smoothTo({
                 to: {
-                    varyNoise: 0.1,
-                    noiseScale: 1.8,
+                    varyNoise: 0.2,
+                    noiseScale: 1.85,
                     varyNoiseScale: 2
                 },
                 time: 142000,
@@ -1505,30 +1519,48 @@ export default (canvas) => {
             });
 
         trackTracks.tendrils3
-            .over(134000-124000, {
+            .over(134000-107000, {
                 to: {
-                    lineWidth: 2
+                    target: 0.00001
                 },
                 time: 134000,
-                ease: [0, 0.9, 1]
+                ease: [0, 0, 1]
             })
-            .to(138000, {
+            .to({
                 to: {
+                    target: 0.00003,
                     lineWidth: 2
                 },
                 time: 138000,
-                ease: [0, 0.9, 1]
+                ease: [0, 0, 1]
+            })
+            .to({
+                to: {
+                    lineWidth: 1
+                },
+                time: 142000,
+                ease: [0, 0, 1]
+            });
+
+        trackTracks.calls
+            .to({
+                time: 107000,
+                call: [() => spawnImage(tendrils.targets)]
+            })
+            .to({
+                time: 138000,
+                call: [() => resetSpawner.spawn(tendrils, tendrils.targets)]
             });
 
         trackTracks.audio
-            .to({
+            .over(100, {
                 to: {
                     trackFastAt: 0,
                     micFastAt: 0,
                     trackSampleAt: audioDefaults.trackSampleAt*0.8,
                     micSampleAt: audioDefaults.micSampleAt*0.8
                 },
-                time: 107100
+                time: 117000
             })
             .over(50, {
                 to: {
@@ -1750,7 +1782,7 @@ export default (canvas) => {
             .over(185000-176000, {
                 to: {
                     trackFlowAt: audioDefaults.trackFlowAt*0.2,
-                    trackFastAt: audioDefaults.trackFastAt*0.065
+                    trackFastAt: audioDefaults.trackFastAt*0.06
                 },
                 time: 185000,
                 ease: [0, 0.1, 1]
@@ -1853,8 +1885,8 @@ export default (canvas) => {
         trackTracks.tendrils
             .smoothTo({
                 to: {
-                    forceWeight: 0.014,
-                    varyForce: 0.5,
+                    forceWeight: 0.016,
+                    varyForce: 0.3,
                     flowWeight: 0.9,
                     varyFlow: 0.1,
                     colorMapAlpha: 0.9
@@ -2118,15 +2150,16 @@ export default (canvas) => {
             ease: [0, 0.95, 1]
         });
 
-    const showExport = ((''+queries.prompt_show === 'true')?
+    const showExport = ((''+queries.prompt_show !== 'false')?
             (...rest) => self.prompt(...rest)
         :   (...rest) => console.log(...rest));
 
     Object.assign(rootControls, {
             showLink: () => showExport('Link:',
-                location.href.replace(location.search.slice(1), querystring.encode({
+                location.href.replace((location.search || /$/gi),
+                    '?'+querystring.encode({
                         ...queries,
-                        track: encodeURIComponent(audioState.trackURL),
+                        track: encodeURIComponent(appSettings.trackURL),
                         mute: !audioState.audible,
                         track_in: audioState.track,
                         mic_in: audioState.mic,
@@ -2141,12 +2174,14 @@ export default (canvas) => {
             keyframe
         });
 
-    each((f, control) => gui.main.add(rootControls, control), rootControls);
+    gui.main.add(appSettings, 'trackURL').onFinishChange(setupTrackURL);
 
     gui.main.add(appSettings, 'useMedia').onFinishChange(() =>
             ((appSettings.useMedia)? getMedia : stopMedia)());
 
     gui.main.add(appSettings, 'animate');
+
+    each((f, control) => gui.main.add(rootControls, control), rootControls);
 
 
     // Settings
@@ -2277,10 +2312,6 @@ export default (canvas) => {
     for(let s in audioState) {
         const control = gui.audio.add(audioState, s);
 
-        if(s === 'trackURL') {
-            control.onFinishChange(setupTrackURL);
-        }
-
         if(s === 'audible') {
             control.onChange((v) => {
                 const out = (trackAnalyser.merger || trackAnalyser.analyser);
@@ -2292,6 +2323,17 @@ export default (canvas) => {
                     out.disconnect();
                 }
             });
+        }
+    }
+
+
+    // Blur
+
+    gui.blur = gui.main.addFolder('blur');
+
+    for(let s in blurDefaults) {
+        if(!(typeof blurState[s]).match(/^(object|array|undefined|null)$/gi)) {
+            gui.blur.add(blurState, s);
         }
     }
 

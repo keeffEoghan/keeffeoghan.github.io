@@ -8,6 +8,8 @@ precision highp float;
 uniform sampler2D view;
 uniform vec2 resolution;
 uniform float time;
+uniform float radius;
+uniform float limit;
 
 vec3 sampler(vec2 uv) {
     return texture2D(view, uv).rgb;
@@ -18,9 +20,6 @@ vec3 sampler(vec2 uv) {
 
 const vec3 falloff = vec3(0.0, 1.0, 1.0);
 const vec2 mid = vec2(0.5);
-const float limit = 0.5;
-
-const float radius = 3.0;
 
 void main() {
     vec2 uv = gl_FragCoord.xy/resolution;
