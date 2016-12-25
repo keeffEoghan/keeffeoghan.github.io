@@ -137,8 +137,8 @@ export default (canvas) => {
         track: parseFloat((queries.track_in || 1), 10),
         trackFlowAt: 1.16,
         trackFastAt: 0.13,
-        trackFormAt: 0.05,
-        trackSampleAt: 0.15,
+        trackFormAt: 0.06,
+        trackSampleAt: 0.14,
         trackCamAt: 0.008,
         trackSpawnAt: 0.18,
 
@@ -1459,7 +1459,7 @@ export default (canvas) => {
 
         trackTracks.baseColor
             .over(100, {
-                to: [0, 0, 0, 0.65],
+                to: [0, 0, 0, 0.7],
                 time: 94100
             })
             .to({
