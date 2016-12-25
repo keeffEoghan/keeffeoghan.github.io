@@ -160,7 +160,6 @@ export default (canvas) => {
     Object.assign(track, {
             crossOrigin: 'anonymous',
             controls: true,
-            autoplay: true,
             className: 'track'
         });
 
@@ -694,6 +693,7 @@ export default (canvas) => {
 
 
     // Blur vignette
+
     const screen = new Screen(gl);
     const blurShader = shader(gl, screenVert, blurFrag);
 
@@ -703,6 +703,24 @@ export default (canvas) => {
     };
 
     const blurState = { ...blurDefaults };
+
+
+    // Intro info
+
+    const introElements = {
+        info: document.querySelector('.info'),
+        start: document.querySelector('.info > button')
+    };
+
+    introElements.start.addEventListener('click', () => {
+        introElements.info.classList.add('hide');
+
+        track.autoplay = true;
+
+        if(track.duration) {
+            track.play();
+        }
+    });
 
 
     // The main loop
@@ -1866,8 +1884,8 @@ export default (canvas) => {
         trackTracks.tendrils
             .smoothTo({
                 to: {
-                    forceWeight: 0.014,
-                    varyForce: 0.5,
+                    forceWeight: 0.016,
+                    varyForce: 0.3,
                     flowWeight: 0.9,
                     varyFlow: 0.1,
                     colorMapAlpha: 0.9
