@@ -14,7 +14,7 @@ blockquote:before, blockquote:after, q:before, q:after { content: ''; content: n
 
 table { border-collapse: collapse; border-spacing: 0; }
 
-html { box-sizing: border-box; }
+html { box-sizing: border-box; font-family: sans-serif; }
 
 *, *:before, *:after { box-sizing: inherit; }
 
