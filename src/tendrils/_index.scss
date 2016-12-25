@@ -22,10 +22,9 @@ canvas {
     width: 60%;
     max-width: 36em;
     z-index: 10;
-    transition: opacity 600ms ease-in-out;
 
     &.hide {
-        opacity: 0;
+        display: none;
     }
 
     p {
@@ -48,7 +47,7 @@ canvas {
         cursor: pointer;
         font-weight: 600;
         border-radius: 1px;
-        box-shadow: 0 0 0 5px rgba(#121212, 0.75);
+        box-shadow: 0 0 0 4px rgba(#121212, 0.75);
 
         &:hover,
         &:focus {
