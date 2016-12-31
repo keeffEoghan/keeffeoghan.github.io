@@ -30,6 +30,7 @@ export const defaults = () => ({
         rootNum: Math.pow(2, 9),
 
         autoClearView: false,
+        autoFade: true,
 
         damping: 0.043,
         speedLimit: 0.01,
@@ -74,7 +75,8 @@ export const defaults = () => ({
 });
 
 export const glSettings = {
-    preserveDrawingBuffer: true
+    preserveDrawingBuffer: true,
+    antialias: true
 };
 
 
@@ -273,7 +275,7 @@ export class Tendrils {
      * @todo Find a way to use free texture bind units without having to
      *       manually remember them
      */
-    draw(fade = true) {
+    draw() {
         this.viewport();
 
 
@@ -325,7 +327,7 @@ export class Tendrils {
             this.gl.clear(this.gl.COLOR_BUFFER_BIT);
         }
 
-        if(fade) {
+        if(this.state.autoFade) {
             this.drawFade();
         }
 
