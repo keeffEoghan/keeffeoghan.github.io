@@ -1995,7 +1995,7 @@ export default (canvas) => {
                     trackFormAt: audioDefaults.trackFormAt,
                     micFormAt: audioDefaults.micFormAt
                 },
-                ease: [0, 0, 1],
+                ease: [0, 1, 1],
                 time: 218000
             })
             .to({
