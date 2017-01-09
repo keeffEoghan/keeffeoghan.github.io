@@ -972,7 +972,7 @@ export default (canvas) => {
         trackTracks.tendrils3
             .smoothOver(1000, {
                 to: {
-                    target: 0.00008
+                    target: 0.00006
                 },
                 time: 24000,
                 ease: [0, 0, 1]
@@ -980,7 +980,7 @@ export default (canvas) => {
 
             .smoothOver(29000-26000, {
                 to: {
-                    target: 0.00036
+                    target: 0.0004
                 },
                 time: 29000,
                 ease: [0, 0, 1]
@@ -1123,7 +1123,8 @@ export default (canvas) => {
                 to: {
                     noiseWeight: 0.002,
                     noiseScale: 20,
-                    varyNoiseScale: 0.1
+                    varyNoiseScale: 0,
+                    noiseSpeed: 0.0003
                 },
                 time: 47000,
                 ease: [0, -0.2, 0.7, 1]
@@ -1131,8 +1132,8 @@ export default (canvas) => {
             .smoothTo({
                 to: {
                     noiseWeight: 0.0025,
-                    noiseScale: 10,
-                    varyNoiseScale: 0.5
+                    noiseScale: 15,
+                    varyNoiseScale: 0.3
                 },
                 time: 50000,
                 ease: [0, 0, 1]
@@ -1162,7 +1163,7 @@ export default (canvas) => {
 
         trackTracks.baseColor
             .over(46000-45500, {
-                to: [0, 0, 0, 0.75],
+                to: [0, 0, 0, 0.8],
                 time: 46000
             });
 
@@ -1252,7 +1253,6 @@ export default (canvas) => {
             })
             .smoothTo({
                 to: {
-                    forceWeight: 0.017,
                     flowWeight: 1,
                     varyFlow: 0,
                     speedAlpha: 0.0005,
@@ -1265,7 +1265,7 @@ export default (canvas) => {
         trackTracks.tendrils2
             .smoothOver(70000-55000, {
                 to: {
-                    noiseWeight: 0.003,
+                    noiseWeight: 0.0025,
                     noiseScale: 2.5,
                     varyNoise: 0,
                     varyNoiseScale: 0,
@@ -1316,13 +1316,13 @@ export default (canvas) => {
 
         trackTracks.baseColor
             .over(100, {
-                to: [0, 0, 0, 0.8],
+                to: [0, 0, 0, 0.85],
                 time: 70100
             });
 
         trackTracks.flowColor
             .over(93600-70000, {
-                to: [1, 1, 1, 0.06],
+                to: [1, 1, 1, 0.05],
                 ease: [0, 0, 1],
                 time: 93600
             });
@@ -1419,45 +1419,52 @@ export default (canvas) => {
                 to: {
                     forceWeight: 0.014,
                     varyForce: 0.2,
-                    flowWeight: 0.75,
+                    flowWeight: 1,
+                    varyFlow: 0.8,
                     flowDecay: 0.003,
                     colorMapAlpha: 0.05,
                     autoFade: true
                 },
                 time: 93800
             })
+            .to({
+                to: {
+                    flowWeight: 0.8,
+                    varyFlow: 0.3
+                },
+                time: 95500
+            })
             .smoothTo({
                 to: {
                     forceWeight: 0.015,
                     varyForce: 0.1,
                     flowWeight: 1,
-                    varyFlow: 0.3,
                     colorMapAlpha: 0.08
                 },
                 time: 107000,
-                ease: [0, 0.95, 1]
+                ease: [0, 0.8, 1]
             });
 
         trackTracks.tendrils2
             .to({
                 to: {
-                    noiseWeight: 0.0025,
+                    noiseWeight: 0.0012,
                     varyNoise: 0.1,
-                    noiseScale: 18,
+                    noiseScale: 26,
                     varyNoiseScale: 0,
-                    noiseSpeed: 0.00022
+                    noiseSpeed: 0.00023
                 },
                 time: 93800
             })
             .smoothTo({
                 to: {
                     noiseWeight: 0.003,
-                    noiseScale: 2,
-                    varyNoiseScale: 0.2,
-                    noiseSpeed: 0.0004
+                    noiseScale: 1.8,
+                    varyNoiseScale: 0.3,
+                    noiseSpeed: 0.00025
                 },
-                time: 107000,
-                ease: [0, 1, 1]
+                time: 109000,
+                ease: [0, 0.3, 1]
             });
 
         trackTracks.audio
@@ -1509,8 +1516,9 @@ export default (canvas) => {
         // 2:17-2:22 - "trust"
 
         trackTracks.tendrils
-            .to({
+            .over(134000-128000, {
                 to: {
+                    flowWeight: 0.7,
                     colorMapAlpha: 0.9
                 },
                 time: 134000,
@@ -1518,6 +1526,7 @@ export default (canvas) => {
             })
             .smoothTo({
                 to: {
+                    flowWeight: 1,
                     colorMapAlpha: 0.3
                 },
                 time: 138000,
@@ -1526,14 +1535,14 @@ export default (canvas) => {
             .smoothTo({
                 to: {
                     varyForce: 0.25,
-                    varyFlow: 0.25
+                    varyFlow: 0.4
                 },
                 time: 145000,
                 ease: [0, 0, 1]
             });
 
         trackTracks.tendrils2
-            .smoothOver(129000-124000, {
+            .smoothOver(129000-126000, {
                 to: {
                     varyNoise: 0.8,
                     noiseScale: -1.5,
@@ -1542,30 +1551,32 @@ export default (canvas) => {
                     varyNoiseSpeed: 0
                 },
                 time: 129000,
-                ease: [0, 0, 1]
+                ease: [0, 0.2, 1]
             })
             .smoothTo({
                 to: {
+                    noiseWeight: 0.0025,
                     noiseScale: 5,
                     varyNoiseScale: -4
                 },
                 time: 134000,
-                ease: [0, -0.1, 1.1, 1]
+                ease: [0, 0, 1, 1]
             })
             .smoothTo({
                 to: {
+                    noiseWeight: 0.003,
                     varyNoise: 0.3,
                     noiseScale: 1.8,
                     varyNoiseScale: 1
                 },
                 time: 142000,
-                ease: [0, -0.05, 1.05, 1]
+                ease: [0, 0, 1, 1]
             });
 
         trackTracks.tendrils3
-            .over(134000-107000, {
+            .over(134000-128000, {
                 to: {
-                    target: 0.00001
+                    target: 0.003
                 },
                 time: 134000,
                 ease: [0, 0, 1]
@@ -1626,8 +1637,8 @@ export default (canvas) => {
             })
             .to({
                 to: {
-                    trackCamAt: audioDefaults.trackCamAt*0.6,
-                    micCamAt: audioDefaults.micCamAt*0.9
+                    trackCamAt: audioDefaults.trackCamAt*0.8,
+                    micCamAt: audioDefaults.micCamAt*0.8
                 },
                 time: 134000,
                 ease: [0, 0.8, 1]
@@ -1644,19 +1655,17 @@ export default (canvas) => {
                 to: {
                     trackCamAt: 0,
                     micCamAt: 0,
-                    trackFlowAt: audioDefaults.trackFlowAt,
-                    micFlowAt: audioDefaults.micFlowAt,
+                    trackFlowAt: audioDefaults.trackFlowAt*1.2,
+                    micFlowAt: audioDefaults.micFlowAt*1.2,
                     trackFastAt: audioDefaults.trackFastAt,
-                    micFastAt: audioDefaults.micFastAt,
-                    trackSampleAt: audioDefaults.trackSampleAt,
-                    micSampleAt: audioDefaults.micSampleAt
+                    micFastAt: audioDefaults.micFastAt
                 },
                 time: 146000
             });
 
         trackTracks.calls
             .to({
-                time: 124000,
+                time: 128000,
                 call: [() => spawnImage()]
             })
             .to({
@@ -1725,6 +1734,17 @@ export default (canvas) => {
                 time: 174500
             });
 
+        trackTracks.tendrils2
+            .smoothTo({
+                to: {
+                    noiseWeight: 0.0045,
+                    noiseScale: 0.4,
+                    varyNoiseScale: 2.5
+                },
+                time: 174000,
+                ease: [0, 0.1, 1]
+            });
+
         trackTracks.blend
             .over(174000-160000, {
                 to: [1, 0.2],
@@ -1791,14 +1811,6 @@ export default (canvas) => {
         trackTracks.tendrils2
             .smoothTo({
                 to: {
-                    noiseScale: 2.1,
-                    varyNoiseScale: 3
-                },
-                time: 174000,
-                ease: [0, 0.1, 1]
-            })
-            .smoothTo({
-                to: {
                     noiseWeight: 0.008,
                     noiseScale: 0.5,
                     varyNoiseScale: 80,
@@ -1809,11 +1821,19 @@ export default (canvas) => {
             })
             .smoothTo({
                 to: {
-                    noiseScale: 1.5,
+                    noiseScale: 2,
                     varyNoiseScale: 100
                 },
-                time: 187000,
+                time: 183000,
                 ease: [0, 1, 1]
+            })
+            .smoothTo({
+                to: {
+                    noiseScale: 8,
+                    varyNoiseScale: 0,
+                    noiseSpeed: 0.0002
+                },
+                time: 187000
             })
             .to({
                 to: {
@@ -1891,6 +1911,21 @@ export default (canvas) => {
             .to({
                 to: [0.9, 0.3],
                 time: 187400
+            });
+
+        trackTracks.blur
+            .over(187000-175000, {
+                to: {
+                    radius: 12,
+                    limit: 0.2
+                },
+                time: 187000,
+                ease: [0, 0, 1]
+            })
+            .to({
+                to: blurDefaults,
+                time: 188000,
+                ease: [0, 1, 1]
             });
 
         const rayColor = map((v) => v/255, [255, 232, 120]);
@@ -1988,15 +2023,15 @@ export default (canvas) => {
             })
             .to({
                 to: {
-                    trackSampleAt: audioDefaults.trackSampleAt*0.5,
-                    micSampleAt: audioDefaults.micSampleAt*0.5,
+                    trackSampleAt: audioDefaults.trackSampleAt*0.55,
+                    micSampleAt: audioDefaults.micSampleAt*0.55,
                     trackFastAt: audioDefaults.trackFastAt,
                     micFastAt: audioDefaults.micFastAt,
                     trackFormAt: audioDefaults.trackFormAt,
                     micFormAt: audioDefaults.micFormAt
                 },
                 ease: [0, 1, 1],
-                time: 218000
+                time: 217000
             })
             .to({
                 to: {
@@ -2010,8 +2045,8 @@ export default (canvas) => {
                 to: {
                     trackFormAt: audioDefaults.trackFormAt*0.8,
                     micFormAt: audioDefaults.micFormAt*0.8,
-                    trackSampleAt: audioDefaults.trackSampleAt*2,
-                    micSampleAt: audioDefaults.micSampleAt*2
+                    trackSampleAt: audioDefaults.trackSampleAt*3,
+                    micSampleAt: audioDefaults.micSampleAt*3
                 },
                 time: 234000
             })
@@ -2043,6 +2078,14 @@ export default (canvas) => {
         trackTracks.calls
             .to({
                 time: 211000,
+                call: [() => spawnSamples()]
+            })
+            .to({
+                time: 214000,
+                call: [() => spawnSamples()]
+            })
+            .to({
+                time: 217000,
                 call: [() => spawnSamples()]
             });
 
@@ -2089,7 +2132,7 @@ export default (canvas) => {
             })
             .smoothTo({
                 to: {
-                    noiseScale: 1.8,
+                    noiseScale: 0.9,
                     varyNoiseScale: 3,
                     noiseSpeed: 0.0001,
                     varyNoiseSpeed: 0
@@ -2149,6 +2192,21 @@ export default (canvas) => {
             .over(1000, {
                 to: [1, 0.05],
                 time: 259000
+            });
+
+        trackTracks.blur
+            .over(281000-258000, {
+                to: {
+                    radius: 6,
+                    limit: 0.4
+                },
+                time: 281000,
+                ease: [0, 0, 1]
+            })
+            .to({
+                to: blurDefaults,
+                time: 283000,
+                ease: [0, 1, 1]
             });
 
         const emberColor = map((v) => v/255, [255, 209, 71]);
