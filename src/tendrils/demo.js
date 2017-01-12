@@ -196,6 +196,8 @@ export default (canvas) => {
         trackControls.timeFormat.hour = ((total >= 60*60*1000)?
             'numeric' : undefined);
 
+        trackControls.els.current.innerText = 0;
+
         trackControls.els.total.innerText = trackControls.times.total
             .toLocaleTimeString('en-gb', trackControls.timeFormat);
     };
@@ -2334,7 +2336,7 @@ export default (canvas) => {
     };
 
     const containGUI = Object.assign(document.createElement('div'), {
-            className: 'controls'
+            className: 'edit-controls'
         });
 
     const preventKeyClash = (e) => e.stopPropagation();
