@@ -108,7 +108,37 @@ canvas {
     bottom: 1em;
 }
 
-.controls {
+.main-controls {
+    display: none;
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    padding: 0.4em 1.2em;
+    text-shadow: 0 0 2px #000;
+}
+
+.main-control {
+    font-size: 1.3rem;
+    border: none;
+    background: transparent;
+    color: #fff;
+    cursor: pointer;
+
+    &.capture-button {
+        font-size: 1.5rem;
+    }
+
+    &.fullscreen-button {
+        font-size: 1.6rem;
+        transform: rotate(-45deg);
+    }
+
+    &.video-button {
+        font-size: 1.5rem;
+    }
+}
+
+.edit-controls {
     position: fixed;
     display: flex;
     flex-flow: column nowrap;
@@ -185,6 +215,7 @@ canvas {
         padding: 0;
         border: none;
         margin: 0;
+        cursor: pointer;
 
         &:checked + .play-indicator::after {
             content: '\25BA';
@@ -194,5 +225,6 @@ canvas {
     .progress {
         flex: 1 1 auto;
         margin: 0 1em;
+        cursor: pointer;
     }
 }
