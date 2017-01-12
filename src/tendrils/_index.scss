@@ -79,20 +79,26 @@ canvas {
     }
 }
 
-.track {
-    margin: 1em;
-}
-
 /* Quick fix for a broken DAT.GUI style */
 .hue-field {
     width: 13px !important;
 }
 
 .npm-scb-wrap {
-    text-shadow: 0 0 1px #000;
+    text-shadow: 0 0 2px #000;
 
     .track {
         margin: 0;
+    }
+}
+
+.show {
+    .npm-scb-inner {
+        top: 0;
+    }
+
+    .npm-scb-now-playing {
+        opacity: 0;
     }
 }
 
@@ -128,5 +134,64 @@ canvas {
     .close-button {
         position: absolute;
         bottom: 0;
+    }
+}
+
+.track {
+    visibility: hidden;
+}
+
+.audio-controls {
+    display: none;
+    flex-flow: row nowrap;
+    align-items: stretch;
+    justify-content: center;
+    padding: 1em;
+    color: #fff;
+    text-shadow: 0 0 2px #000;
+
+    &.show {
+        display: flex;
+    }
+
+    .play-state {
+        position: relative;
+    }
+
+    .play-toggle,
+    .play-indicator {
+        width: 1.2rem;
+        height: 1.2rem;
+    }
+
+    .play-indicator {
+        position: absolute;
+        top: 0;
+        right: 0;
+        bottom: 0;
+        left: 0;
+        text-align: center;
+
+        &::after {
+            content: '\2759\2759';
+        }
+    }
+
+    .play-toggle {
+        position: relative;
+        z-index: 10;
+        opacity: 0;
+        padding: 0;
+        border: none;
+        margin: 0;
+
+        &:checked + .play-indicator::after {
+            content: '\25BA';
+        }
+    }
+
+    .progress {
+        flex: 1 1 auto;
+        margin: 0 1em;
     }
 }
