@@ -61,13 +61,23 @@ canvas.light { background: #fff; }
 
 .cam-stream { position: absolute; left: 1em; bottom: 1em; }
 
-.controls { position: fixed; display: -webkit-box; display: -webkit-flex; display: -ms-flexbox; display: flex; -webkit-flex-flow: column nowrap; -ms-flex-flow: column nowrap; flex-flow: column nowrap; -webkit-box-pack: stretch; -webkit-justify-content: stretch; -ms-flex-pack: stretch; justify-content: stretch; top: 0; right: 0; max-height: 100%; padding-bottom: 20px; z-index: 1000; opacity: 0; visibility: hidden; -webkit-transition: opacity 300ms ease-out; transition: opacity 300ms ease-out; }
+.main-controls { display: none; position: fixed; bottom: 0; left: 0; padding: 0.4em 1.2em; text-shadow: 0 0 2px #000; }
 
-.controls.show { opacity: 1; visibility: visible; }
+.main-control { font-size: 1.3rem; border: none; background: transparent; color: #fff; cursor: pointer; }
 
-.controls .dg.main { overflow-y: auto; }
+.main-control.capture-button { font-size: 1.5rem; }
 
-.controls .close-button { position: absolute; bottom: 0; }
+.main-control.fullscreen-button { font-size: 1.6rem; -webkit-transform: rotate(-45deg); transform: rotate(-45deg); }
+
+.main-control.video-button { font-size: 1.5rem; }
+
+.edit-controls { position: fixed; display: -webkit-box; display: -webkit-flex; display: -ms-flexbox; display: flex; -webkit-flex-flow: column nowrap; -ms-flex-flow: column nowrap; flex-flow: column nowrap; -webkit-box-pack: stretch; -webkit-justify-content: stretch; -ms-flex-pack: stretch; justify-content: stretch; top: 0; right: 0; max-height: 100%; padding-bottom: 20px; z-index: 1000; opacity: 0; visibility: hidden; -webkit-transition: opacity 300ms ease-out; transition: opacity 300ms ease-out; }
+
+.edit-controls.show { opacity: 1; visibility: visible; }
+
+.edit-controls .dg.main { overflow-y: auto; }
+
+.edit-controls .close-button { position: absolute; bottom: 0; }
 
 .track { visibility: hidden; }
 
@@ -77,16 +87,16 @@ canvas.light { background: #fff; }
 
 .audio-controls .play-state { position: relative; }
 
-.audio-controls .play-toggle, .audio-controls .play-indicator { width: 1.2rem; height: 1.2rem; }
+.audio-controls .play-toggle, .audio-controls .play-indicator { width: 1.2rem; height: 1.2rem; line-height: 1.2rem; }
 
 .audio-controls .play-indicator { position: absolute; top: 0; right: 0; bottom: 0; left: 0; text-align: center; }
 
 .audio-controls .play-indicator::after { content: '\2759\2759'; }
 
-.audio-controls .play-toggle { position: relative; z-index: 10; opacity: 0; padding: 0; border: none; margin: 0; }
+.audio-controls .play-toggle { position: relative; z-index: 10; opacity: 0; padding: 0; border: none; margin: 0; cursor: pointer; }
 
 .audio-controls .play-toggle:checked + .play-indicator::after { content: '\25BA'; }
 
-.audio-controls .progress { -webkit-box-flex: 1; -webkit-flex: 1 1 auto; -ms-flex: 1 1 auto; flex: 1 1 auto; margin: 0 1em; }
+.audio-controls .progress { -webkit-box-flex: 1; -webkit-flex: 1 1 auto; -ms-flex: 1 1 auto; flex: 1 1 auto; margin: 0 1em; cursor: pointer; }
 
 /*# sourceMappingURL=index.css.map */
