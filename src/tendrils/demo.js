@@ -269,7 +269,7 @@ export default (canvas) => {
                     }
                     else {
                         setupTrack(src, el.querySelector('.npm-scb-info'));
-                        el.classList.add('show');
+                        // el.classList.add('show');
                     }
                 });
         }
