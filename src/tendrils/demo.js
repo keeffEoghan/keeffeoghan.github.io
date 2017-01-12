@@ -154,14 +154,70 @@ export default (canvas) => {
 
     // Track and analyser init
 
-    const track = new Audio();
-    const audioState = { ...audioDefaults };
-
-    Object.assign(track, {
+    const track = Object.assign(new Audio(), {
             crossOrigin: 'anonymous',
-            controls: true,
             className: 'track'
         });
+
+    const trackControlsEl = document.querySelector('.audio-controls');
+
+    const trackControls = {
+        els: {
+            main: trackControlsEl,
+            toggle: trackControlsEl.querySelector('.play-toggle'),
+            progress: trackControlsEl.querySelector('.progress'),
+            current: trackControlsEl.querySelector('.current'),
+            total: trackControlsEl.querySelector('.total')
+        },
+        times: {
+            current: new Date(0),
+            total: new Date(0)
+        },
+        timeFormat: {
+            second: 'numeric'
+        },
+        seeking: false
+    };
+
+    trackControls.els.main.parentElement.removeChild(trackControls.els.main);
+    trackControls.els.main.appendChild(track);
+    trackControls.els.main.classList.add('show');
+
+    const trackTimeChanged = () => {
+        trackControls.els.progress.max = track.duration;
+
+        const total = track.duration*1000;
+
+        trackControls.times.total.setTime(total);
+
+        trackControls.timeFormat.minute = ((total >= 60*1000)?
+            'numeric' : undefined);
+
+        trackControls.timeFormat.hour = ((total >= 60*60*1000)?
+            'numeric' : undefined);
+
+        trackControls.els.total.innerText = trackControls.times.total
+            .toLocaleTimeString('en-gb', trackControls.timeFormat);
+    };
+
+    track.addEventListener('durationchange', trackTimeChanged);
+
+    trackControls.els.toggle.addEventListener('change',
+        () => ((trackControls.els.toggle.checked)?
+            track.play() : track.pause()));
+
+    trackControls.els.progress.addEventListener('pointerdown',
+        () => trackControls.seeking = true);
+
+    trackControls.els.progress.addEventListener('change',
+        () => {
+            if(trackControls.seeking) {
+                track.currentTime = trackControls.els.progress.value;
+                trackControls.seeking = false;
+            }
+        });
+
+    const audioState = { ...audioDefaults };
 
     // @todo Stereo: true
     // @todo Delay node to compensate for wait in analysing values?
@@ -186,8 +242,8 @@ export default (canvas) => {
             track.currentTime = 0;
         }
 
-        if(track.parentElement !== el) {
-            el.appendChild(track);
+        if(trackControls.els.main.parentElement !== el) {
+            el.appendChild(trackControls.els.main);
         }
 
         return track;
@@ -213,7 +269,7 @@ export default (canvas) => {
                     }
                     else {
                         setupTrack(src, el.querySelector('.npm-scb-info'));
-                        // el.querySelector('.npm-scb-wrap').classList.add('open');
+                        el.classList.add('show');
                     }
                 });
         }
@@ -745,6 +801,20 @@ export default (canvas) => {
             if(appSettings.animate) {
                 player.track.play(timer.track.time);
             }
+
+            trackControls.times.current.setTime(timer.track.time);
+
+            trackControls.els.current.innerText = trackControls.times.current
+                .toLocaleTimeString('en-gb', trackControls.timeFormat);
+
+            if(!trackControls.seeking) {
+                trackControls.els.progress.value = track.currentTime;
+            }
+
+            trackControls.els.toggle.checked = true;
+        }
+        else {
+            trackControls.els.toggle.checked = false;
         }
 
         /**
