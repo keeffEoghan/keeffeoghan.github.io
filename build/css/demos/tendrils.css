@@ -48,14 +48,16 @@ canvas.light { background: #fff; }
 
 .info a:active { color: #414141; }
 
-.track { margin: 1em; }
-
 /* Quick fix for a broken DAT.GUI style */
 .hue-field { width: 13px !important; }
 
-.npm-scb-wrap { text-shadow: 0 0 1px #000; }
+.npm-scb-wrap { text-shadow: 0 0 2px #000; }
 
 .npm-scb-wrap .track { margin: 0; }
+
+.show .npm-scb-inner { top: 0; }
+
+.show .npm-scb-now-playing { opacity: 0; }
 
 .cam-stream { position: absolute; left: 1em; bottom: 1em; }
 
@@ -66,5 +68,25 @@ canvas.light { background: #fff; }
 .controls .dg.main { overflow-y: auto; }
 
 .controls .close-button { position: absolute; bottom: 0; }
+
+.track { visibility: hidden; }
+
+.audio-controls { display: none; -webkit-flex-flow: row nowrap; -ms-flex-flow: row nowrap; flex-flow: row nowrap; -webkit-box-align: stretch; -webkit-align-items: stretch; -ms-flex-align: stretch; align-items: stretch; -webkit-box-pack: center; -webkit-justify-content: center; -ms-flex-pack: center; justify-content: center; padding: 1em; color: #fff; text-shadow: 0 0 2px #000; }
+
+.audio-controls.show { display: -webkit-box; display: -webkit-flex; display: -ms-flexbox; display: flex; }
+
+.audio-controls .play-state { position: relative; }
+
+.audio-controls .play-toggle, .audio-controls .play-indicator { width: 1.2rem; height: 1.2rem; }
+
+.audio-controls .play-indicator { position: absolute; top: 0; right: 0; bottom: 0; left: 0; text-align: center; }
+
+.audio-controls .play-indicator::after { content: '\2759\2759'; }
+
+.audio-controls .play-toggle { position: relative; z-index: 10; opacity: 0; padding: 0; border: none; margin: 0; }
+
+.audio-controls .play-toggle:checked + .play-indicator::after { content: '\25BA'; }
+
+.audio-controls .progress { -webkit-box-flex: 1; -webkit-flex: 1 1 auto; -ms-flex: 1 1 auto; flex: 1 1 auto; margin: 0 1em; }
 
 /*# sourceMappingURL=tendrils.css.map */
