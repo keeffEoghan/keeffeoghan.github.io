@@ -791,6 +791,19 @@ export default (canvas) => {
     });
 
 
+    // Fullscreen
+
+    // Needs to be called this way because calling the below is an `Illegal
+    // Invocation`
+    // const requestFullscreen = prefixes('requestFullscreen', canvas);
+    const requestFullscreen = prefixes('requestFullscreen', canvas).name;
+    const fullscreen = (requestFullscreen &&
+        (() => canvas[requestFullscreen]()));
+
+    document.querySelector('.fullscreen-button')
+        .addEventListener('click', fullscreen);
+
+
     // The main loop
     function render() {
         const dt = timer.app.tick().dt;
@@ -1989,7 +2002,7 @@ export default (canvas) => {
             .over(187000-175000, {
                 to: {
                     radius: 12,
-                    limit: 0.2
+                    limit: 0.3
                 },
                 time: 187000,
                 ease: [0, 0, 1]
@@ -2374,13 +2387,8 @@ export default (canvas) => {
 
     const rootControls = {};
 
-    const requestFullscreen = prefixes('requestFullscreen', canvas).name;
-    // Needs to be called this way because calling the below is an Illegal
-    // Invocation
-    // const fullscreen = prefixes('requestFullscreen', canvas);
-
-    if(requestFullscreen) {
-        rootControls.fullScreen = () => canvas[requestFullscreen]();
+    if(fullscreen) {
+        rootControls.fullscreen = fullscreen;
     }
 
 
@@ -3064,8 +3072,8 @@ export default (canvas) => {
             ',': keyframeCaller(() => spawnForm())
         };
 
-        if(requestFullscreen) {
-            callMap['F'] = () => rootControls.fullScreen();
+        if(fullscreen) {
+            callMap['F'] = fullscreen;
         }
 
         // @todo Throttle so multiple states can go into one keyframe.

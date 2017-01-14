@@ -85,7 +85,8 @@ canvas {
 }
 
 .npm-scb-wrap {
-    text-shadow: 0 0 2px #000;
+    text-shadow: 0 0 2px #000,
+        0 0 2px #000;
 
     .track {
         margin: 0;
@@ -109,12 +110,10 @@ canvas {
 }
 
 .main-controls {
-    display: none;
     position: fixed;
     bottom: 0;
     left: 0;
     padding: 0.4em 1.2em;
-    text-shadow: 0 0 2px #000;
 }
 
 .main-control {
@@ -123,6 +122,17 @@ canvas {
     background: transparent;
     color: #fff;
     cursor: pointer;
+    outline: none;
+    text-shadow: 0 0 2px #000,
+        0 0 2px #000;
+
+    &:hover {
+        opacity: 0.8;
+    }
+
+    &:active {
+        opacity: 0.6;
+    }
 
     &.capture-button {
         font-size: 1.5rem;
@@ -178,7 +188,8 @@ canvas {
     justify-content: center;
     padding: 1em;
     color: #fff;
-    text-shadow: 0 0 2px #000;
+    text-shadow: 0 0 2px #000,
+        0 0 2px #000;
 
     &.show {
         display: flex;
