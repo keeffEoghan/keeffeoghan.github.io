@@ -780,8 +780,13 @@ export default (canvas) => {
         start: document.querySelector('.info > button')
     };
 
+    const toggleInfo = () =>
+        ((introElements.info.classList.contains('hide'))?
+            introElements.info.classList.remove('hide')
+        :   introElements.info.classList.add('hide'));
+
     introElements.start.addEventListener('click', () => {
-        introElements.info.classList.add('hide');
+        toggleInfo();
 
         track.autoplay = true;
 
@@ -789,6 +794,9 @@ export default (canvas) => {
             track.play();
         }
     });
+
+    document.querySelector('.info-button')
+        .addEventListener('click', toggleInfo);
 
 
     // Fullscreen
