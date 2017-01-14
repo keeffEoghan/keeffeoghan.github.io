@@ -2390,6 +2390,9 @@ export default (canvas) => {
         guiShowing = show;
     }
 
+    document.querySelector('.editor-button')
+        .addEventListener('click', () => toggleShowGUI());
+
 
     // Root level
 
