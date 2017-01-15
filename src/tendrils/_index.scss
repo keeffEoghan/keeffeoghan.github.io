@@ -12,6 +12,10 @@ canvas {
     &.light {
         background: #fff;
     }
+
+    &.no-cursor {
+        cursor: none;
+    }
 }
 
 .info {
@@ -121,8 +125,9 @@ canvas {
 .main-control {
     display: inline-block;
     font-size: 1.3rem;
-    width: 2.2rem;
+    padding: 0;
     border: none;
+    margin: 0.5rem;
     background: transparent;
     color: #fff;
     cursor: pointer;
@@ -139,19 +144,6 @@ canvas {
     &:active {
         opacity: 0.6;
     }
-
-    &.capture-button {
-        font-size: 1.5rem;
-    }
-
-    &.fullscreen-button {
-        font-size: 1.6rem;
-        transform: rotate(-45deg);
-    }
-
-    &.video-button {
-        font-size: 1.5rem;
-    }
 }
 
 .edit-controls {
@@ -164,13 +156,11 @@ canvas {
     max-height: 100%;
     padding-bottom: 20px;
     z-index: 1000;
-    opacity: 0;
-    visibility: hidden;
     transition: opacity 300ms ease-out;
 
-    &.show {
-        opacity: 1;
-        visibility: visible;
+    &.hide {
+        opacity: 0;
+        pointer-events: none;
     }
 
     .dg.main {
@@ -221,7 +211,7 @@ canvas {
         text-align: center;
 
         &::after {
-            content: '\2759\2759';
+            content: '\25BA';
         }
     }
 
@@ -235,7 +225,7 @@ canvas {
         cursor: pointer;
 
         &:checked + .play-indicator::after {
-            content: '\25BA';
+            content: '\2759\2759';
         }
     }
 
