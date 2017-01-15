@@ -828,7 +828,11 @@ export default (canvas) => {
                         data_uri: dataAPIURI
                     }
                 },
-                // withCredentials: false
+                headers: {
+                    'Access-Control-Allow-Origin': '*'
+                },
+                withCredentials: false,
+                json: true
             },
             (e, response, body) => {
                 console.log(e);
@@ -838,7 +842,7 @@ export default (canvas) => {
                 if(e) {
                     console.error(e, response);
                 }
-                else if(body.status !== '200') {
+                else if(body.status !== 200) {
                     console.error(e, response, body.status);
                 }
                 else {
