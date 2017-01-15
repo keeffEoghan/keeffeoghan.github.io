@@ -119,13 +119,16 @@ canvas {
 }
 
 .main-control {
+    display: inline-block;
     font-size: 1.3rem;
+    width: 2.2rem;
     border: none;
     background: transparent;
     color: #fff;
     cursor: pointer;
     outline: none;
     text-decoration: none;
+    text-align: center;
     text-shadow: 0 0 2px #000,
         0 0 2px #000;
 

@@ -60,7 +60,8 @@
     "soundcloud-badge": "^1.1.0",
     "to-source": "^2.0.3",
     "vkey": "^1.0.0",
-    "web-audio-analyser": "^2.0.1"
+    "web-audio-analyser": "^2.0.1",
+    "xhr": "^2.3.3"
   },
   "devDependencies": {
     "babel-core": "^6.10.4",

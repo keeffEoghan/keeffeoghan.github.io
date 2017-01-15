@@ -15,6 +15,7 @@ import querystring from 'querystring';
 import toSource from 'to-source';
 import shader from 'gl-shader';
 import prefixes from 'prefixes';
+import xhr from 'xhr';
 // import dat from 'dat-gui';
 
 import dat from '../../libs/dat.gui/build/dat.gui';
@@ -810,6 +811,44 @@ export default (canvas) => {
 
     document.querySelector('.fullscreen-button')
         .addEventListener('click', fullscreen);
+
+
+    // Screen capture
+    // @see http://aminariana.github.io/data-uri-to-img-url/
+
+    function captureImage() {
+        const dataURI = canvas.toDataURL('image/png');
+        const dataAPIURI = dataURI.replace(/^data:image\/\w+;base64,/, '');
+
+        xhr({
+                url: 'https://data-uri-to-img-url.herokuapp.com/images.json',
+                method: 'POST',
+                body: {
+                    image: {
+                        data_uri: dataAPIURI
+                    }
+                },
+                // withCredentials: false
+            },
+            (e, response, body) => {
+                console.log(e);
+                console.log(response);
+                console.log(body);
+
+                if(e) {
+                    console.error(e, response);
+                }
+                else if(body.status !== '200') {
+                    console.error(e, response, body.status);
+                }
+                else {
+                    console.log(body.url);
+                }
+            });
+    }
+
+    document.querySelector('.capture-button')
+        .addEventListener('click', captureImage);
 
 
     // The main loop
