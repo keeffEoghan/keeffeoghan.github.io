@@ -15,6 +15,7 @@ import querystring from 'querystring';
 import toSource from 'to-source';
 import shader from 'gl-shader';
 import prefixes from 'prefixes';
+import xhr from 'xhr';
 // import dat from 'dat-gui';
 
 import dat from '../../libs/dat.gui/build/dat.gui';
@@ -780,8 +781,13 @@ export default (canvas) => {
         start: document.querySelector('.info > button')
     };
 
+    const toggleInfo = () =>
+        ((introElements.info.classList.contains('hide'))?
+            introElements.info.classList.remove('hide')
+        :   introElements.info.classList.add('hide'));
+
     introElements.start.addEventListener('click', () => {
-        introElements.info.classList.add('hide');
+        toggleInfo();
 
         track.autoplay = true;
 
@@ -789,6 +795,60 @@ export default (canvas) => {
             track.play();
         }
     });
+
+    document.querySelector('.info-button')
+        .addEventListener('click', toggleInfo);
+
+
+    // Fullscreen
+
+    // Needs to be called this way because calling the below is an `Illegal
+    // Invocation`
+    // const requestFullscreen = prefixes('requestFullscreen', canvas);
+    const requestFullscreen = prefixes('requestFullscreen', canvas).name;
+    const fullscreen = (requestFullscreen &&
+        (() => canvas[requestFullscreen]()));
+
+    document.querySelector('.fullscreen-button')
+        .addEventListener('click', fullscreen);
+
+
+    // Screen capture
+    // @see http://aminariana.github.io/data-uri-to-img-url/
+
+    function captureImage() {
+        const dataURI = canvas.toDataURL('image/png');
+        const dataAPIURI = dataURI.replace(/^data:image\/\w+;base64,/, '');
+
+        xhr({
+                url: 'https://data-uri-to-img-url.herokuapp.com/images.json',
+                method: 'POST',
+                body: {
+                    image: {
+                        data_uri: dataAPIURI
+                    }
+                },
+                // withCredentials: false
+            },
+            (e, response, body) => {
+                console.log(e);
+                console.log(response);
+                console.log(body);
+
+                if(e) {
+                    console.error(e, response);
+                }
+                else if(body.status !== '200') {
+                    console.error(e, response, body.status);
+                }
+                else {
+                    console.log(body.url);
+                }
+            });
+    }
+
+    document.querySelector('.capture-button')
+        .addEventListener('click', captureImage);
 
 
     // The main loop
@@ -1989,7 +2049,7 @@ export default (canvas) => {
             .over(187000-175000, {
                 to: {
                     radius: 12,
-                    limit: 0.2
+                    limit: 0.3
                 },
                 time: 187000,
                 ease: [0, 0, 1]
@@ -2369,18 +2429,16 @@ export default (canvas) => {
         guiShowing = show;
     }
 
+    document.querySelector('.editor-button')
+        .addEventListener('click', () => toggleShowGUI());
+
 
     // Root level
 
     const rootControls = {};
 
-    const requestFullscreen = prefixes('requestFullscreen', canvas).name;
-    // Needs to be called this way because calling the below is an Illegal
-    // Invocation
-    // const fullscreen = prefixes('requestFullscreen', canvas);
-
-    if(requestFullscreen) {
-        rootControls.fullScreen = () => canvas[requestFullscreen]();
+    if(fullscreen) {
+        rootControls.fullscreen = fullscreen;
     }
 
 
@@ -3064,8 +3122,8 @@ export default (canvas) => {
             ',': keyframeCaller(() => spawnForm())
         };
 
-        if(requestFullscreen) {
-            callMap['F'] = () => rootControls.fullScreen();
+        if(fullscreen) {
+            callMap['F'] = fullscreen;
         }
 
         // @todo Throttle so multiple states can go into one keyframe.
