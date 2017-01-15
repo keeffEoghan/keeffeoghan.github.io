@@ -125,9 +125,16 @@ export default (canvas) => {
                 decodeURIComponent(queries.track)
             :   'https://soundcloud.com/max-cooper/trust-feat-kathrin-deboer'),
 
+        animate: (''+queries.animate !== 'false'),
         useMedia: (''+queries.use_media !== 'false'),
-        animate: (''+queries.animate !== 'false')
+        staticImage: ((queries.static_image)?
+                decodeURIComponent(queries.static_image)
+            :   '/build/images/max-crop-gradient.png')
     };
+
+    if(''+queries.cursor === 'false') {
+        canvas.classList.add('no-cursor');
+    }
 
 
     // Audio init
@@ -391,7 +398,7 @@ export default (canvas) => {
 
     const image = new Image();
 
-    image.src = '/build/images/max.jpg';
+    image.src = appSettings.staticImage;
 
     image.addEventListener('load',
         () => rasterShape.image = [image.width, image.height]);
@@ -1198,7 +1205,7 @@ export default (canvas) => {
             .smoothOver(29000-27000, {
                 to: {
                     noiseWeight: 0.003,
-                    noiseScale: 30,
+                    noiseScale: 35,
                     varyNoiseScale: 1.5,
                     noiseSpeed: 0.0002
                 },
@@ -1258,7 +1265,7 @@ export default (canvas) => {
             .smoothOver(47000-40000, {
                 to: {
                     noiseWeight: 0.002,
-                    noiseScale: 20,
+                    noiseScale: 25,
                     varyNoiseScale: 0,
                     noiseSpeed: 0.0003
                 },
@@ -1268,7 +1275,7 @@ export default (canvas) => {
             .smoothTo({
                 to: {
                     noiseWeight: 0.0025,
-                    noiseScale: 15,
+                    noiseScale: 18,
                     varyNoiseScale: 0.3
                 },
                 time: 50000,
@@ -2429,7 +2436,7 @@ export default (canvas) => {
     let guiShowing = false;
 
     function toggleShowGUI(show = !guiShowing) {
-        containGUI.classList[(show)? 'add' : 'remove']('show');
+        containGUI.classList[(show)? 'remove' : 'add']('hide');
         guiShowing = show;
     }
 
@@ -2483,10 +2490,13 @@ export default (canvas) => {
 
     gui.main.add(appSettings, 'trackURL').onFinishChange(setupTrackURL);
 
+    gui.main.add(appSettings, 'animate');
+
     gui.main.add(appSettings, 'useMedia').onFinishChange(() =>
             ((appSettings.useMedia)? getMedia : stopMedia)());
 
-    gui.main.add(appSettings, 'animate');
+    gui.main.add(appSettings, 'staticImage').onFinishChange(() =>
+            image.src = appSettings.staticImage);
 
     each((f, control) => gui.main.add(rootControls, control), rootControls);
 
@@ -2928,7 +2938,7 @@ export default (canvas) => {
 
     toggleOpenGUI(true);
 
-    setTimeout(() => toggleShowGUI(false), 10);
+    toggleShowGUI(false);
     setTimeout(() => gui.main.open(), 200);
 
     // Add to the DOM
