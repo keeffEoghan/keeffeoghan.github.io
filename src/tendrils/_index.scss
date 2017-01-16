@@ -91,8 +91,14 @@ canvas {
 }
 
 .npm-scb-wrap {
+    opacity: 0.7;
     text-shadow: 0 0 2px #000,
         0 0 2px #000;
+        transition: opacity 300ms ease-in-out;
+
+    &:hover {
+        opacity: 1;
+    }
 
     .track {
         margin: 0;
@@ -140,9 +146,11 @@ canvas {
     text-align: center;
     text-shadow: 0 0 2px #000,
         0 0 2px #000;
+    opacity: 0.7;
+    transition: opacity 300ms ease-in-out;
 
     &:hover {
-        opacity: 0.8;
+        opacity: 1;
     }
 
     &:active {
