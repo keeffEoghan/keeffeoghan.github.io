@@ -53,7 +53,9 @@ canvas.no-cursor { cursor: none; }
 /* Quick fix for a broken DAT.GUI style */
 .hue-field { width: 13px !important; }
 
-.npm-scb-wrap { text-shadow: 0 0 2px #000, 0 0 2px #000; }
+.npm-scb-wrap { opacity: 0.7; text-shadow: 0 0 2px #000, 0 0 2px #000; -webkit-transition: opacity 300ms ease-in-out; transition: opacity 300ms ease-in-out; }
+
+.npm-scb-wrap:hover { opacity: 1; }
 
 .npm-scb-wrap .track { margin: 0; }
 
@@ -67,9 +69,9 @@ canvas.no-cursor { cursor: none; }
 
 .main-controls { position: fixed; bottom: 0; left: 0; padding: 0.4em 1.2em; }
 
-.main-control { display: inline-block; font-size: 1.3rem; padding: 0; border: none; margin: 0.5rem; background: transparent; color: #fff; cursor: pointer; outline: none; text-decoration: none; text-align: center; text-shadow: 0 0 2px #000, 0 0 2px #000; }
+.main-control { display: inline-block; font-size: 1.3rem; padding: 0; border: none; margin: 0.5rem; background: transparent; color: #fff; cursor: pointer; outline: none; text-decoration: none; text-align: center; text-shadow: 0 0 2px #000, 0 0 2px #000; opacity: 0.7; -webkit-transition: opacity 300ms ease-in-out; transition: opacity 300ms ease-in-out; }
 
-.main-control:hover { opacity: 0.8; }
+.main-control:hover { opacity: 1; }
 
 .main-control:active { opacity: 0.6; }
 
