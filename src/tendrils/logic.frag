@@ -60,6 +60,8 @@ void main() {
         // Wander force
 
         vec2 noisePos = pos*vary(noiseScale, i, varyNoiseScale);
+
+        // @todo This doesn't progress linearly - the speed grows with time...
         float noiseTime = time*vary(noiseSpeed, i, varyNoiseSpeed);
 
         vec2 wanderForce = vec2(noise(vec3(noisePos, uv.x+noiseTime)),
