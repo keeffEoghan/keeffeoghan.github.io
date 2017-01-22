@@ -1115,14 +1115,14 @@ export default (canvas) => {
         trackTracks.tendrils3
             .smoothOver(1000, {
                 to: {
-                    target: 0.00006
+                    target: 0.00005
                 },
                 time: 24000,
                 ease: [0, 0, 1]
             })
             .smoothOver(29000-26000, {
                 to: {
-                    target: 0.0003
+                    target: 0.0004
                 },
                 time: 29000,
                 ease: [0, 0, 1]
@@ -1349,7 +1349,7 @@ export default (canvas) => {
         trackTracks.spawn
             .over(100, {
                 to: {
-                    radius: 0.4,
+                    radius: 0.25,
                     speed: 0
                 },
                 time: 46600
@@ -1465,8 +1465,8 @@ export default (canvas) => {
             })
             .to({
                 to: {
-                    radius: 0.3,
-                    speed: 0.2
+                    radius: 0.25,
+                    speed: 0
                 },
                 time: 93600,
                 ease: [0, 0, 1]
@@ -1679,13 +1679,13 @@ export default (canvas) => {
         // 2:17-2:22 - "trust"
 
         trackTracks.tendrils
-            .over(132000-128000, {
+            .over(132000-127000, {
                 to: {
                     flowWeight: 0.7,
                     colorMapAlpha: 0.95
                 },
                 time: 132000,
-                ease: [0, 0, 1]
+                ease: [0, 0.2, 1]
             })
             .smoothOver(141000-137000, {
                 to: {
