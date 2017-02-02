@@ -446,8 +446,7 @@ export default (canvas) => {
                             src: self.URL.createObjectURL(stream),
                             controls: true,
                             muted: true,
-                            autoplay: true,
-                            className: 'cam-stream'
+                            autoplay: true
                         });
 
                     v.addEventListener('canplay', () => {
@@ -2781,18 +2780,25 @@ export default (canvas) => {
                 });
         },
         'Wings'() {
-            Object.assign(resetSpawner.uniforms, {
-                    radius: 0.1,
-                    speed: 0,
+            Object.assign(state, {
+                    flowDecay: 0,
                     colorMapAlpha: 0
+                });
+
+            Object.assign(resetSpawner.uniforms, {
+                    radius: 0.05,
+                    speed: 0.05,
                 });
 
             Object.assign(colorProxy, {
                     flowAlpha: 0.01,
-                    baseAlpha: 0.2
+                    baseAlpha: 0.8,
+                    fadeAlpha: 0
                 });
 
             Object.assign(colorProxy);
+
+            restart();
         },
         'Fluid'() {
             Object.assign(state, {
@@ -2835,14 +2841,15 @@ export default (canvas) => {
                 });
 
             Object.assign(colorProxy, {
-                    baseAlpha: 0.1,
+                    baseAlpha: 0.4,
                     baseColor: [255, 150, 0],
-                    fadeAlpha: 0.05
+                    fadeAlpha: 0.05,
+                    flowAlpha: 0
                 });
 
             Object.assign(blendProxy, {
                     audio: 0.9,
-                    cam: 0
+                    video: 0
                 });
         },
         'Sea'() {
@@ -2874,8 +2881,11 @@ export default (canvas) => {
                 });
 
             Object.assign(colorProxy, {
-                    baseAlpha: 0.01,
-                    flowAlpha: 0.05
+                    baseAlpha: 0.25,
+                    baseColor: [255, 255, 255],
+                    flowAlpha: 0.03,
+                    fadeAlpha: 0.03,
+                    fadeColor: [0, 0, 0]
                 });
         },
         'Petri'() {
@@ -2888,10 +2898,10 @@ export default (canvas) => {
                 });
 
             Object.assign(colorProxy, {
-                    baseAlpha: 0.3,
+                    baseAlpha: 0.4,
                     baseColor:[255, 203, 37],
                     flowAlpha: 0.05,
-                    fadeAlpha: 0.01
+                    fadeAlpha: 0.03
                 });
 
             Object.assign(resetSpawner.uniforms, {
@@ -2955,9 +2965,10 @@ export default (canvas) => {
                 });
 
             Object.assign(colorProxy, {
-                    baseAlpha: 0.02,
+                    baseAlpha: 0.2,
                     baseColor: [50, 255, 50],
-                    flowAlpha: 0.05
+                    flowAlpha: 0.05,
+                    fadeAlpha: 0
                 });
         },
         'Funhouse'() {

@@ -260,7 +260,7 @@ canvas {
         margin: 0;
         cursor: pointer;
 
-        &:checked + .play-indicator::after {
+        &:checked + .epok-play-indicator::after {
             content: '\2759\2759';
         }
     }
