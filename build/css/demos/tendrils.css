@@ -30,30 +30,38 @@ canvas.light { background: #fff; }
 
 canvas.no-cursor { cursor: none; }
 
+.material-icons { vertical-align: middle; }
+
+.button { display: inline-block; padding: 0.5em 1.75em; margin: 0.5em 0.1em; color: #000; background: #efefef; border: none; cursor: pointer; font-weight: 600; border-radius: 2px; box-shadow: 0 0 0 4px rgba(18, 18, 18, 0.9); vertical-align: middle; }
+
+.button:hover, .button:focus { color: #121212; background-color: #fff; }
+
+.button:active { color: #414141; }
+
+a { color: #efefef; }
+
+a:visited { color: #efefef; }
+
+a:hover, a:focus { color: #fff; }
+
+a:active { color: #414141; }
+
+input { display: inline-block; color: #efefef; background: transparent; padding: 0.3em; border: 1px solid #efefef; border-radius: 2px; vertical-align: middle; text-shadow: 0 0 3px #000, 0 0 3px #000; box-shadow: 0 0 4px #000; }
+
+input:hover, input:focus { color: #fff; }
+
 .info { position: absolute; left: 0; top: 50%; -webkit-transform: translateY(-50%); transform: translateY(-50%); width: 60%; max-width: 36em; z-index: 10; -webkit-transition: opacity 300ms ease-in-out; transition: opacity 300ms ease-in-out; }
 
 .info.hide { opacity: 0; pointer-events: none; }
 
 .info p { display: inline-block; line-height: 1.75em; padding: 0.75em 1.75em; margin: 0.5em 0; color: #efefef; background-color: rgba(18, 18, 18, 0.9); }
 
-.info button { display: block; font-size: 1.5em; padding: 0.5em 1.75em; margin: 0.5em 0; color: #000; background: #efefef; border: none; cursor: pointer; font-weight: 600; border-radius: 1px; box-shadow: 0 0 0 4px rgba(18, 18, 18, 0.9); }
-
-.info button:hover, .info button:focus { color: #121212; background-color: #fff; }
-
-.info button:active { color: #414141; }
-
-.info a { color: #efefef; }
-
-.info a:visited { color: #efefef; }
-
-.info a:hover, .info a:focus { color: #fff; }
-
-.info a:active { color: #414141; }
+.info .button { display: block; font-size: 1.5em; }
 
 /* Quick fix for a broken DAT.GUI style */
 .hue-field { width: 13px !important; }
 
-.npm-scb-wrap { opacity: 0.7; text-shadow: 0 0 2px #000, 0 0 2px #000; -webkit-transition: opacity 300ms ease-in-out; transition: opacity 300ms ease-in-out; }
+.npm-scb-wrap { opacity: 0.7; text-shadow: 0 0 3px #000, 0 0 3px #000; -webkit-transition: opacity 300ms ease-in-out; transition: opacity 300ms ease-in-out; }
 
 .npm-scb-wrap:hover { opacity: 1; }
 
@@ -69,7 +77,7 @@ canvas.no-cursor { cursor: none; }
 
 .main-controls { position: fixed; bottom: 0; left: 0; padding: 0.4em 1.2em; }
 
-.main-control { display: inline-block; font-size: 1.3rem; padding: 0; border: none; margin: 0.5rem; background: transparent; color: #fff; cursor: pointer; outline: none; text-decoration: none; text-align: center; text-shadow: 0 0 2px #000, 0 0 2px #000; opacity: 0.7; -webkit-transition: opacity 300ms ease-in-out; transition: opacity 300ms ease-in-out; }
+.main-control { display: inline-block; font-size: 1.3rem; padding: 0; border: none; margin: 0.5rem; background: transparent; color: #fff; cursor: pointer; outline: none; text-decoration: none; text-align: center; text-shadow: 0 0 3px #000, 0 0 3px #000; opacity: 0.7; -webkit-transition: opacity 300ms ease-in-out; transition: opacity 300ms ease-in-out; }
 
 .main-control:hover { opacity: 1; }
 
@@ -85,7 +93,7 @@ canvas.no-cursor { cursor: none; }
 
 .track { visibility: hidden; }
 
-.audio-controls { display: none; -webkit-flex-flow: row nowrap; -ms-flex-flow: row nowrap; flex-flow: row nowrap; -webkit-box-align: stretch; -webkit-align-items: stretch; -ms-flex-align: stretch; align-items: stretch; -webkit-box-pack: center; -webkit-justify-content: center; -ms-flex-pack: center; justify-content: center; padding: 1em; color: #fff; text-shadow: 0 0 2px #000, 0 0 2px #000; }
+.audio-controls { display: none; -webkit-flex-flow: row nowrap; -ms-flex-flow: row nowrap; flex-flow: row nowrap; -webkit-box-align: stretch; -webkit-align-items: stretch; -ms-flex-align: stretch; align-items: stretch; -webkit-box-pack: center; -webkit-justify-content: center; -ms-flex-pack: center; justify-content: center; padding: 0.7em 1em; color: #fff; text-shadow: 0 0 3px #000, 0 0 3px #000; }
 
 .audio-controls.show { display: -webkit-box; display: -webkit-flex; display: -ms-flexbox; display: flex; }
 
@@ -102,5 +110,11 @@ canvas.no-cursor { cursor: none; }
 .audio-controls .play-toggle:checked + .play-indicator::after { content: '\2759\2759'; }
 
 .audio-controls .progress { -webkit-box-flex: 1; -webkit-flex: 1 1 auto; -ms-flex: 1 1 auto; flex: 1 1 auto; margin: 0 1em; cursor: pointer; }
+
+.captured-overlay { position: fixed; display: -webkit-box; display: -webkit-flex; display: -ms-flexbox; display: flex; -webkit-flex-flow: row nowrap; -ms-flex-flow: row nowrap; flex-flow: row nowrap; -webkit-box-pack: center; -webkit-justify-content: center; -ms-flex-pack: center; justify-content: center; -webkit-box-align: center; -webkit-align-items: center; -ms-flex-align: center; align-items: center; top: 0; left: 0; bottom: 0; right: 0; opacity: 0; pointer-events: none; z-index: 10001; background-color: rgba(0, 0, 0, 0.9); -webkit-transition: opacity 300ms ease-out; transition: opacity 300ms ease-out; }
+
+.captured-overlay.show { opacity: 1; pointer-events: all; }
+
+.captured-overlay .main-controls { z-index: 10002; }
 
 /*# sourceMappingURL=tendrils.css.map */
