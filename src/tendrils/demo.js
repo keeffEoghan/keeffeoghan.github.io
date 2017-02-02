@@ -688,15 +688,18 @@ export default (canvas) => {
 
     // @todo Test sequence - move to own file?
 
+    // The values to reset everything to on restart - commented-out ones are
+    // omitted so global settings can be applied more easily.
+    // Use this as a guide to see which track should change which values.
     const tracksStart = {
         tendrils: {
-            rootNum: 512,
+            // rootNum: 512,
 
             autoClearView: false,
             autoFade: true,
 
-            damping: 0.043,
-            speedLimit: 0.01,
+            // damping: 0.043,
+            // speedLimit: 0.01,
 
             forceWeight: 0.016,
             varyForce: -0.25,
@@ -820,40 +823,80 @@ export default (canvas) => {
         .addEventListener('click', fullscreen);
 
 
-    // Screen capture
-    // @see http://aminariana.github.io/data-uri-to-img-url/
+    // Screen capture - save data URI to host, show resulting link
+    // @see http://stackoverflow.com/questions/17805456/upload-a-canvas-image-to-imgur-api-v3-with-javascript
+
+    const capture = {
+        canvas: document.createElement('canvas'),
+        overlay: document.querySelector('.captured-overlay'),
+        exit: document.querySelector('.exit-overlay'),
+        url: document.querySelector('.captured-url'),
+        image: document.querySelector('.captured-image'),
+        paused: track.paused,
+        data: null
+    };
+
+    capture.context = capture.canvas.getContext('2d');
+
+    function resetCapture() {
+        capture.image.src = '';
+        capture.url.value = 'loading...';
+        capture.url.size = capture.url.value.length;
+    }
+
+    capture.exit.addEventListener('click', () => {
+            capture.overlay.classList.remove('show');
+            resetCapture();
+
+            if(!capture.paused) {
+                track.play();
+            }
+        });
 
     function captureImage() {
-        const dataURI = canvas.toDataURL('image/png');
+        capture.paused = track.paused;
+        track.pause();
+
+        resetCapture();
+
+        capture.canvas.width = canvas.width;
+        capture.canvas.height = canvas.height;
+
+        capture.context.fillStyle = getComputedStyle(canvas)
+            .backgroundColor;
+
+        capture.context.fillRect(0, 0, canvas.width, canvas.height);
+        capture.context.drawImage(canvas, 0, 0);
+
+        const dataURI = capture.data = capture.canvas.toDataURL('image/png');
+
+        capture.image.src = dataURI;
+        capture.overlay.classList.add('show');
+
         const dataAPIURI = dataURI.replace(/^data:image\/\w+;base64,/, '');
 
         xhr({
-                url: 'https://data-uri-to-img-url.herokuapp.com/images.json',
+                url: 'https://api.imgur.com/3/image',
                 method: 'POST',
                 body: {
-                    image: {
-                        data_uri: dataAPIURI
-                    }
+                    image: dataAPIURI,
+                    type: 'base64'
                 },
                 headers: {
-                    'Access-Control-Allow-Origin': '*'
+                    Authorization: 'Client-ID 290f4e8d36da965'
                 },
-                withCredentials: false,
                 json: true
             },
             (e, response, body) => {
-                console.log(e);
-                console.log(response);
-                console.log(body);
-
                 if(e) {
                     console.error(e, response);
                 }
-                else if(body.status !== 200) {
+                else if(!body.success || body.status !== 200) {
                     console.error(e, response, body.status);
                 }
-                else {
-                    console.log(body.url);
+                else if(capture.data === dataURI) {
+                    capture.image.src = capture.url.value = body.data.link;
+                    capture.url.size = capture.url.value.length;
                 }
             });
     }

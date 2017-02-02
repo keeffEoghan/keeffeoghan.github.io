@@ -18,6 +18,69 @@ canvas {
     }
 }
 
+.material-icons {
+    vertical-align: middle;
+}
+
+.button {
+    display: inline-block;
+    padding: 0.5em 1.75em;
+    margin: 0.5em 0.1em;
+    color: #000;
+    background: #efefef;
+    border: none;
+    cursor: pointer;
+    font-weight: 600;
+    border-radius: 2px;
+    box-shadow: 0 0 0 4px rgba(#121212, 0.9);
+    vertical-align: middle;
+
+    &:hover,
+    &:focus {
+        color: #121212;
+        background-color: #fff;
+    }
+
+    &:active {
+        color: #414141;
+    }
+}
+
+a {
+    color: #efefef;
+
+    &:visited {
+        color: #efefef;
+    }
+
+    &:hover,
+    &:focus {
+        color: #fff;
+    }
+
+    &:active {
+        color: #414141;
+    }
+}
+
+input {
+    display: inline-block;
+    color: #efefef;
+    background: transparent;
+    padding: 0.3em;
+    border: 1px solid #efefef;
+    border-radius: 2px;
+    vertical-align: middle;
+    text-shadow: 0 0 3px #000,
+        0 0 3px #000;
+    box-shadow: 0 0 4px #000;
+
+    &:hover,
+    &:focus {
+        color: #fff;
+    }
+}
+
 .info {
     position: absolute;
     left: 0;
@@ -42,46 +105,9 @@ canvas {
         background-color: rgba(#121212, 0.9);
     }
 
-    button {
+    .button {
         display: block;
         font-size: 1.5em;
-        padding: 0.5em 1.75em;
-        margin: 0.5em 0;
-        color: #000;
-        background: #efefef;
-        border: none;
-        cursor: pointer;
-        font-weight: 600;
-        border-radius: 1px;
-        box-shadow: 0 0 0 4px rgba(#121212, 0.9);
-
-        &:hover,
-        &:focus {
-            color: #121212;
-            background-color: #fff;
-        }
-
-        &:active {
-            color: #414141;
-        }
-    }
-
-    a {
-        color: #efefef;
-
-        &:visited {
-            color: #efefef;
-        }
-
-        &:hover,
-        &:focus {
-            color: #fff;
-        }
-
-        &:active {
-            color: #414141;
-        }
-
     }
 }
 
@@ -92,8 +118,8 @@ canvas {
 
 .npm-scb-wrap {
     opacity: 0.7;
-    text-shadow: 0 0 2px #000,
-        0 0 2px #000;
+    text-shadow: 0 0 3px #000,
+        0 0 3px #000;
         transition: opacity 300ms ease-in-out;
 
     &:hover {
@@ -144,8 +170,8 @@ canvas {
     outline: none;
     text-decoration: none;
     text-align: center;
-    text-shadow: 0 0 2px #000,
-        0 0 2px #000;
+    text-shadow: 0 0 3px #000,
+        0 0 3px #000;
     opacity: 0.7;
     transition: opacity 300ms ease-in-out;
 
@@ -194,10 +220,10 @@ canvas {
     flex-flow: row nowrap;
     align-items: stretch;
     justify-content: center;
-    padding: 1em;
+    padding: 0.7em 1em;
     color: #fff;
-    text-shadow: 0 0 2px #000,
-        0 0 2px #000;
+    text-shadow: 0 0 3px #000,
+        0 0 3px #000;
 
     &.show {
         display: flex;
@@ -245,5 +271,31 @@ canvas {
         flex: 1 1 auto;
         margin: 0 1em;
         cursor: pointer;
+    }
+}
+
+.captured-overlay {
+    position: fixed;
+    display: flex;
+    flex-flow: row nowrap;
+    justify-content: center;
+    align-items: center;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    right: 0;
+    opacity: 0;
+    pointer-events: none;
+    z-index: 10001;
+    background-color: rgba(0, 0, 0, 0.9);
+    transition: opacity 300ms ease-out;
+
+    &.show {
+        opacity: 1;
+        pointer-events: all;
+    }
+
+    .main-controls {
+        z-index: 10002;
     }
 }
