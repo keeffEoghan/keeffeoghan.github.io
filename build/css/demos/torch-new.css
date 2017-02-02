@@ -14,7 +14,15 @@ blockquote:before, blockquote:after, q:before, q:after { content: ''; content: n
 
 table { border-collapse: collapse; border-spacing: 0; }
 
-html { box-sizing: border-box; font-family: sans-serif; }
+@-ms-viewport { zoom: 1.0;
+  width: extend-to-zoom; }
+
+@viewport { zoom: 1.0;
+  width: extend-to-zoom; }
+
+html { box-sizing: border-box; font-family: sans-serif; font-size: 14px; }
+
+@media (min-width: 480px) { html { font-size: 16px; } }
 
 *, *:before, *:after { box-sizing: inherit; }
 
