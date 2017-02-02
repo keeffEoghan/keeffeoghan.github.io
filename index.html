@@ -17,19 +17,19 @@
         <canvas touch-action="none"></canvas>
 
         <div class="main-controls">
-            <button class="info-button main-control" title="Toggle info"><i class="material-icons">info_outline</i></button>
+            <button class="info-button main-control" title="Toggle info"><i class="material-icons">info</i></button>
             <button class="fullscreen-button main-control" title="Fullscreen"><i class="material-icons">aspect_ratio</i></button>
             <button class="editor-button main-control" title="Toggle editor"><i class="material-icons">tune</i></button>
             <button class="capture-button main-control" title="Capture screenshot"><i class="material-icons">camera</i></button>
-            <a class="video-button main-control" title="Play recorded video" href="#" target="_blank"><i class="material-icons">ondemand_video</i></a>
+            <a class="video-button main-control" title="Play recorded video" href="https://youtu.be/pDIfSTgkYYs" target="_blank"><i class="material-icons">ondemand_video</i></a>
             <a class="link-button main-control" title="Download/stream Emergence" href="https://maxcooper.lnk.to/emergence" target="_blank"><i class="material-icons">arrow_downward</i></a>
             <a class="link-button main-control" title="See the Emergence project" href="http://emergence.maxcooper.net/" target="_blank"><i class="material-icons">call_made</i></a>
         </div>
 
         <section class="info">
             <p>Allow access to camera and microphone for the full experience.</p>
-            <button>Begin</button>
-            <p>Best seen on a modern browser and fast computer. <a href="#" target="_blank">Watch the video</a> if you can't see the visuals here.</p>
+            <button class="button">Begin</button>
+            <p>Best seen on a modern browser and fast computer. <a href="https://youtu.be/pDIfSTgkYYs" target="_blank">Watch the video</a> if you can't see the visuals here.</p>
         </section>
 
         <div class="audio-controls">
@@ -39,6 +39,14 @@
             </div>
             <input class="progress" type="range" value="0" min="0" max="1"/>
             <span class="current time-text">-</span>&nbsp;/&nbsp;<span class="total time-text">-</span>
+        </div>
+
+        <div class="captured-overlay">
+            <img class="captured-image"/>
+            <div class="main-controls">
+                <button class="exit-overlay main-control" title="Return to visuals"><i class="material-icons">cancel</i></button>
+                <label class="main-control" title="Copy the link to share your screenshot"><i class="material-icons">share</i> <input class="captured-url" onclick="this.focus(); this.select()" readonly size="1"/></label>
+            </div>
         </div>
 
         <!-- Navigation and controls -->

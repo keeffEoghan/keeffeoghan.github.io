@@ -16,7 +16,6 @@ let readyCallbacks = {
         },
         interactive() {
             tendrilsApp(document.querySelector('canvas'));
-
             document.removeEventListener('readystatechange', updateState);
         }
     };
