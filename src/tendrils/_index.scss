@@ -9,11 +9,11 @@ canvas {
     background: #000;
     transition: background-color 200ms ease-in-out;
 
-    &.light {
+    &.epok-light {
         background: #fff;
     }
 
-    &.no-cursor {
+    &.epok-no-cursor {
         cursor: none;
     }
 }
@@ -22,7 +22,7 @@ canvas {
     vertical-align: middle;
 }
 
-.button {
+.epok-button {
     display: inline-block;
     padding: 0.5em 1.75em;
     margin: 0.5em 0.1em;
@@ -46,7 +46,7 @@ canvas {
     }
 }
 
-a {
+.epok-a {
     color: #efefef;
 
     &:visited {
@@ -63,38 +63,30 @@ a {
     }
 }
 
-input {
-    display: inline-block;
-    color: #efefef;
-    background: transparent;
-    padding: 0.3em;
-    border: 1px solid #efefef;
-    border-radius: 2px;
-    vertical-align: middle;
-    text-shadow: 0 0 3px #000,
-        0 0 3px #000;
-    box-shadow: 0 0 4px #000;
-
-    &:hover,
-    &:focus {
-        color: #fff;
-    }
-}
-
-.info {
+.epok-info {
     position: absolute;
+    display: flex;
+    flex-flow: column nowrap;
+    justify-content: flex-start;
+    align-items: flex-start;
     left: 0;
-    top: 50%;
-    transform: translateY(-50%);
+    top: 4em;
+    bottom: 4em;
     width: 60%;
     max-width: 36em;
+    overflow: auto;
     z-index: 10;
     transition: opacity 300ms ease-in-out;
 
-    &.hide {
+    &.epok-hide {
         opacity: 0;
         pointer-events: none;
     }
+}
+
+.epok-info-content {
+    flex: 0 0 auto;
+    margin: auto;
 
     p {
         display: inline-block;
@@ -105,7 +97,7 @@ input {
         background-color: rgba(#121212, 0.9);
     }
 
-    .button {
+    .epok-button {
         display: block;
         font-size: 1.5em;
     }
@@ -114,6 +106,11 @@ input {
 /* Quick fix for a broken DAT.GUI style */
 .hue-field {
     width: 13px !important;
+}
+
+.npm-scb-wrap,
+.npm-scb-now-playing {
+    right: 0;
 }
 
 .npm-scb-wrap {
@@ -126,16 +123,22 @@ input {
         opacity: 1;
     }
 
-    .track {
+    .epok-track {
         margin: 0;
     }
+}
+
+.npm-scb-now-playing {
+    width: auto;
+    font-size: 1em;
+    line-height: 1.3;
 }
 
 .npm-scb-icon {
     background-color: rgba(0, 0, 0, 0.3);
 }
 
-.show {
+.epok-show {
     .npm-scb-inner {
         top: 0;
     }
@@ -145,20 +148,15 @@ input {
     }
 }
 
-.cam-stream {
+.epok-main-controls {
     position: absolute;
-    left: 1em;
-    bottom: 1em;
-}
-
-.main-controls {
-    position: fixed;
     bottom: 0;
     left: 0;
     padding: 0.4em 1.2em;
+    z-index: 1000;
 }
 
-.main-control {
+.epok-main-control {
     display: inline-block;
     font-size: 1.3rem;
     padding: 0;
@@ -184,7 +182,7 @@ input {
     }
 }
 
-.edit-controls {
+.epok-edit-controls {
     position: fixed;
     display: flex;
     flex-flow: column nowrap;
@@ -193,10 +191,10 @@ input {
     right: 0;
     max-height: 100%;
     padding-bottom: 20px;
-    z-index: 1000;
+    z-index: 1001;
     transition: opacity 300ms ease-out;
 
-    &.hide {
+    &.epok-hide {
         opacity: 0;
         pointer-events: none;
     }
@@ -205,17 +203,17 @@ input {
         overflow-y: auto;
     }
 
-    .close-button {
+    .epok-close-button {
         position: absolute;
         bottom: 0;
     }
 }
 
-.track {
+.epok-track {
     visibility: hidden;
 }
 
-.audio-controls {
+.epok-audio-controls {
     display: none;
     flex-flow: row nowrap;
     align-items: stretch;
@@ -225,22 +223,22 @@ input {
     text-shadow: 0 0 3px #000,
         0 0 3px #000;
 
-    &.show {
+    &.epok-show {
         display: flex;
     }
 
-    .play-state {
+    .epok-play-state {
         position: relative;
     }
 
-    .play-toggle,
-    .play-indicator {
+    .epok-play-toggle,
+    .epok-play-indicator {
         width: 1.2rem;
         height: 1.2rem;
         line-height: 1.2rem;
     }
 
-    .play-indicator {
+    .epok-play-indicator {
         position: absolute;
         top: 0;
         right: 0;
@@ -253,7 +251,7 @@ input {
         }
     }
 
-    .play-toggle {
+    .epok-play-toggle {
         position: relative;
         z-index: 10;
         opacity: 0;
@@ -262,19 +260,19 @@ input {
         margin: 0;
         cursor: pointer;
 
-        &:checked + .play-indicator::after {
+        &:checked + .epok-play-indicator::after {
             content: '\2759\2759';
         }
     }
 
-    .progress {
+    .epok-progress {
         flex: 1 1 auto;
         margin: 0 1em;
         cursor: pointer;
     }
 }
 
-.captured-overlay {
+.epok-captured-overlay {
     position: fixed;
     display: flex;
     flex-flow: row nowrap;
@@ -286,16 +284,34 @@ input {
     right: 0;
     opacity: 0;
     pointer-events: none;
-    z-index: 10001;
+    z-index: 1002;
     background-color: rgba(0, 0, 0, 0.9);
     transition: opacity 300ms ease-out;
 
-    &.show {
+    &.epok-show {
         opacity: 1;
         pointer-events: all;
     }
 
-    .main-controls {
+    .epok-main-controls {
         z-index: 10002;
+    }
+}
+
+.epok-captured-url {
+    display: inline-block;
+    color: #efefef;
+    background: transparent;
+    padding: 0.3em;
+    border: 1px solid #efefef;
+    border-radius: 2px;
+    vertical-align: middle;
+    text-shadow: 0 0 3px #000,
+        0 0 3px #000;
+    box-shadow: 0 0 4px #000;
+
+    &:hover,
+    &:focus {
+        color: #fff;
     }
 }
