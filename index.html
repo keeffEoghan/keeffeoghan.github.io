@@ -8,7 +8,7 @@
         <meta name="mobile-web-app-capable" content="yes">
         <meta name="apple-mobile-web-app-capable" content="yes">
         <meta name="apple-mobile-web-app-status-bar-style" content="black">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0, minimal-ui">
+        <meta name="viewport" content="initial-scale=1.0, minimal-ui">
 
         <link rel="stylesheet" type="text/css" href="./build/css/index.css">
         <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
@@ -16,36 +16,39 @@
     <body>
         <canvas touch-action="none"></canvas>
 
-        <div class="main-controls">
-            <button class="info-button main-control" title="Toggle info"><i class="material-icons">info</i></button>
-            <button class="fullscreen-button main-control" title="Fullscreen"><i class="material-icons">aspect_ratio</i></button>
-            <button class="editor-button main-control" title="Toggle editor"><i class="material-icons">tune</i></button>
-            <button class="capture-button main-control" title="Capture screenshot"><i class="material-icons">camera</i></button>
-            <a class="video-button main-control" title="Play recorded video" href="https://youtu.be/j98Tcpkh3ak" target="_blank"><i class="material-icons">ondemand_video</i></a>
-            <a class="link-button main-control" title="Download/stream Emergence" href="https://maxcooper.lnk.to/emergence" target="_blank"><i class="material-icons">arrow_downward</i></a>
-            <a class="link-button main-control" title="See the Emergence project" href="http://emergence.maxcooper.net/" target="_blank"><i class="material-icons">call_made</i></a>
+        <div class="epok-main-controls">
+            <button class="epok-info-button epok-main-control" title="Toggle info"><i class="material-icons">info</i></button>
+            <button class="epok-fullscreen-button epok-main-control" title="Fullscreen"><i class="material-icons">aspect_ratio</i></button>
+            <button class="epok-editor-button epok-main-control" title="Toggle editor"><i class="material-icons">tune</i></button>
+            <button class="epok-capture-button epok-main-control" title="Capture screenshot"><i class="material-icons">camera</i></button>
+            <a class="epok-a epok-video-button epok-main-control" title="Play recorded video" href="https://youtu.be/j98Tcpkh3ak" target="_blank"><i class="material-icons">ondemand_video</i></a>
+            <a class="epok-a epok-link-button epok-main-control" title="Get the Emergence album" href="https://maxcooper.lnk.to/emergence" target="_blank"><i class="material-icons">arrow_downward</i></a>
+            <a class="epok-a epok-link-button epok-main-control" title="See the Emergence project" href="http://emergence.maxcooper.net/" target="_blank"><i class="material-icons">call_made</i></a>
         </div>
 
-        <section class="info">
-            <p>Allow access to camera and microphone for the full experience.</p>
-            <button class="button">Begin</button>
-            <p>Best seen on a modern browser and fast computer. <a href="https://youtu.be/j98Tcpkh3ak" target="_blank">Watch the video</a> if you can't see the visuals here.</p>
+        <section class="epok-info">
+            <div class="epok-info-content">
+                <p>Allow access to camera and microphone for the full experience.</p>
+                <button class="epok-button">Begin</button>
+                <p>Best seen on a modern browser and fast computer. <a class="epok-a" href="https://youtu.be/j98Tcpkh3ak" target="_blank">Watch the video</a> if you can't see the visuals here.</p>
+                <p>Interact, explore; controls below, track above...</p>
+            </div>
         </section>
 
-        <div class="audio-controls">
-            <div class="play-state">
-                <input class="play-toggle" type="checkbox"/>
-                <span class="play-indicator"></span>
+        <div class="epok-audio-controls">
+            <div class="epok-play-state">
+                <input class="epok-play-toggle" type="checkbox"/>
+                <span class="epok-play-indicator"></span>
             </div>
-            <input class="progress" type="range" value="0" min="0" max="1"/>
-            <span class="current time-text">-</span>&nbsp;/&nbsp;<span class="total time-text">-</span>
+            <input class="epok-progress" type="range" value="0" min="0" max="1"/>
+            <span class="epok-current time-text">-</span>&nbsp;/&nbsp;<span class="epok-total time-text">-</span>
         </div>
 
-        <div class="captured-overlay">
-            <img class="captured-image"/>
-            <div class="main-controls">
-                <button class="exit-overlay main-control" title="Return to visuals"><i class="material-icons">cancel</i></button>
-                <label class="main-control" title="Copy the link to share your screenshot"><i class="material-icons">share</i> <input class="captured-url" onclick="this.focus(); this.select()" readonly size="1"/></label>
+        <div class="epok-captured-overlay">
+            <img class="epok-captured-image"/>
+            <div class="epok-main-controls">
+                <button class="epok-exit-overlay epok-main-control" title="Return to visuals"><i class="material-icons">cancel</i></button>
+                <label class="epok-main-control" title="Copy the link to share your screenshot"><i class="material-icons">share</i> <input class="captured-url" onclick="this.focus(); this.select()" readonly size="1"/></label>
             </div>
         </div>
 

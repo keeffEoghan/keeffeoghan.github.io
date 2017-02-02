@@ -133,7 +133,7 @@ export default (canvas) => {
     };
 
     if(''+queries.cursor === 'false') {
-        canvas.classList.add('no-cursor');
+        canvas.classList.add('epok-no-cursor');
     }
 
 
@@ -167,15 +167,15 @@ export default (canvas) => {
             className: 'track'
         });
 
-    const trackControlsEl = document.querySelector('.audio-controls');
+    const trackControlsEl = document.querySelector('.epok-audio-controls');
 
     const trackControls = {
         els: {
             main: trackControlsEl,
-            toggle: trackControlsEl.querySelector('.play-toggle'),
-            progress: trackControlsEl.querySelector('.progress'),
-            current: trackControlsEl.querySelector('.current'),
-            total: trackControlsEl.querySelector('.total')
+            toggle: trackControlsEl.querySelector('.epok-play-toggle'),
+            progress: trackControlsEl.querySelector('.epok-progress'),
+            current: trackControlsEl.querySelector('.epok-current'),
+            total: trackControlsEl.querySelector('.epok-total')
         },
         times: {
             current: new Date(0),
@@ -189,7 +189,7 @@ export default (canvas) => {
 
     trackControls.els.main.parentElement.removeChild(trackControls.els.main);
     trackControls.els.main.appendChild(track);
-    trackControls.els.main.classList.add('show');
+    trackControls.els.main.classList.add('epok-show');
 
     const trackTimeChanged = () => {
         trackControls.els.progress.max = track.duration;
@@ -279,7 +279,7 @@ export default (canvas) => {
                     }
                     else {
                         setupTrack(src, el.querySelector('.npm-scb-info'));
-                        // el.classList.add('show');
+                        // el.classList.add('epok-show');
                     }
                 });
         }
@@ -766,7 +766,7 @@ export default (canvas) => {
             call: [
                 () => {
                     restart();
-                    canvas.classList.remove('light')
+                    canvas.classList.remove('epok-light')
                 }
             ],
             time: 200
@@ -787,14 +787,14 @@ export default (canvas) => {
     // Intro info
 
     const introElements = {
-        info: document.querySelector('.info'),
-        start: document.querySelector('.info > button')
+        info: document.querySelector('.epok-info'),
+        start: document.querySelector('.epok-info-content > .epok-button')
     };
 
     const toggleInfo = () =>
-        ((introElements.info.classList.contains('hide'))?
-            introElements.info.classList.remove('hide')
-        :   introElements.info.classList.add('hide'));
+        ((introElements.info.classList.contains('epok-hide'))?
+            introElements.info.classList.remove('epok-hide')
+        :   introElements.info.classList.add('epok-hide'));
 
     introElements.start.addEventListener('click', () => {
         toggleInfo();
@@ -806,7 +806,7 @@ export default (canvas) => {
         }
     });
 
-    document.querySelector('.info-button')
+    document.querySelector('.epok-info-button')
         .addEventListener('click', toggleInfo);
 
 
@@ -819,7 +819,7 @@ export default (canvas) => {
     const fullscreen = (requestFullscreen &&
         (() => canvas[requestFullscreen]()));
 
-    document.querySelector('.fullscreen-button')
+    document.querySelector('.epok-fullscreen-button')
         .addEventListener('click', fullscreen);
 
 
@@ -828,10 +828,10 @@ export default (canvas) => {
 
     const capture = {
         canvas: document.createElement('canvas'),
-        overlay: document.querySelector('.captured-overlay'),
-        exit: document.querySelector('.exit-overlay'),
-        url: document.querySelector('.captured-url'),
-        image: document.querySelector('.captured-image'),
+        overlay: document.querySelector('.epok-captured-overlay'),
+        exit: document.querySelector('.epok-exit-overlay'),
+        url: document.querySelector('.epok-captured-url'),
+        image: document.querySelector('.epok-captured-image'),
         paused: track.paused,
         data: null
     };
@@ -845,7 +845,7 @@ export default (canvas) => {
     }
 
     capture.exit.addEventListener('click', () => {
-            capture.overlay.classList.remove('show');
+            capture.overlay.classList.remove('epok-show');
             resetCapture();
 
             if(!capture.paused) {
@@ -871,7 +871,7 @@ export default (canvas) => {
         const dataURI = capture.data = capture.canvas.toDataURL('image/png');
 
         capture.image.src = dataURI;
-        capture.overlay.classList.add('show');
+        capture.overlay.classList.add('epok-show');
 
         const dataAPIURI = dataURI.replace(/^data:image\/\w+;base64,/, '');
 
@@ -901,7 +901,7 @@ export default (canvas) => {
             });
     }
 
-    document.querySelector('.capture-button')
+    document.querySelector('.epok-capture-button')
         .addEventListener('click', captureImage);
 
 
@@ -1582,7 +1582,7 @@ export default (canvas) => {
                 time: 70100,
                 call: [
                     () => {
-                        canvas.classList.add('light');
+                        canvas.classList.add('epok-light');
                         seedBreak();
                     }
                 ]
@@ -1611,7 +1611,7 @@ export default (canvas) => {
                 time: 93600,
                 call: [
                     () => {
-                        canvas.classList.remove('light');
+                        canvas.classList.remove('epok-light');
                         seedBreak();
                     }
                 ]
@@ -2484,7 +2484,7 @@ export default (canvas) => {
     };
 
     const containGUI = Object.assign(document.createElement('div'), {
-            className: 'edit-controls'
+            className: 'epok-edit-controls'
         });
 
     const preventKeyClash = (e) => e.stopPropagation();
@@ -2513,11 +2513,11 @@ export default (canvas) => {
     let guiShowing = false;
 
     function toggleShowGUI(show = !guiShowing) {
-        containGUI.classList[(show)? 'remove' : 'add']('hide');
+        containGUI.classList[(show)? 'remove' : 'add']('epok-hide');
         guiShowing = show;
     }
 
-    document.querySelector('.editor-button')
+    document.querySelector('.epok-editor-button')
         .addEventListener('click', () => toggleShowGUI());
 
 
