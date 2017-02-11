@@ -1,6 +1,6 @@
 @import '../libs/build/reset';
 
-@viewport{
+@viewport {
     zoom: 1.0;
     width: extend-to-zoom;
 }
@@ -27,10 +27,10 @@ body {
     height: 100%;
 }
 
-main {
-    min-height: 100%;
-}
-
 body {
     margin: 0;
+}
+
+main {
+    min-height: 100%;
 }
