@@ -8,13 +8,13 @@
         <meta name="mobile-web-app-capable" content="yes">
         <meta name="apple-mobile-web-app-capable" content="yes">
         <meta name="apple-mobile-web-app-status-bar-style" content="black">
-        <meta name="viewport" content="initial-scale=1.0, minimal-ui">
+        <meta name="viewport" content="width=device-width, height=device-height, initial-scale=1, minimal-ui">
 
         <link rel="stylesheet" type="text/css" href="../../build/css/demos/tendrils.css">
         <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
     </head>
     <body>
-        <canvas touch-action="none"></canvas>
+        <canvas touch-action="auto"></canvas>
 
         <div class="epok-main-controls">
             <button class="epok-info-button epok-main-control" title="Toggle info"><i class="material-icons">info</i></button>
@@ -40,7 +40,7 @@
                 <input class="epok-play-toggle" type="checkbox"/>
                 <span class="epok-play-indicator"></span>
             </div>
-            <input class="epok-progress" type="range" value="0" min="0" max="1"/>
+            <input class="epok-progress" type="range" value="0" min="0" max="1" touch-action="auto"/>
             <span class="epok-current time-text">-</span>&nbsp;/&nbsp;<span class="epok-total time-text">-</span>
         </div>
 
@@ -48,7 +48,7 @@
             <img class="epok-captured-image"/>
             <div class="epok-main-controls">
                 <button class="epok-exit-overlay epok-main-control" title="Return to visuals"><i class="material-icons">cancel</i></button>
-                <label class="epok-main-control" title="Copy the link to share your screenshot"><i class="material-icons">share</i> <input class="captured-url" onclick="this.focus(); this.select()" readonly size="1"/></label>
+                <label class="epok-main-control" title="Copy the link to share your screenshot"><i class="material-icons">share</i> <input class="epok-captured-url" onclick="this.focus(); this.select()" readonly size="1"/></label>
             </div>
         </div>
 
