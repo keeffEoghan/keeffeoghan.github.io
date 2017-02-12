@@ -14,13 +14,13 @@ blockquote:before, blockquote:after, q:before, q:after { content: ''; content: n
 
 table { border-collapse: collapse; border-spacing: 0; }
 
-@-ms-viewport { zoom: 1.0;
-  width: extend-to-zoom; }
+@-ms-viewport { zoom: 1;
+  width: device-width; }
 
-@viewport { zoom: 1.0;
-  width: extend-to-zoom; }
+@viewport { zoom: 1;
+  width: device-width; }
 
-html { box-sizing: border-box; font-family: sans-serif; font-size: 14px; }
+html { box-sizing: border-box; font-family: sans-serif; font-size: 14px; zoom: 1; }
 
 @media (min-width: 480px) { html { font-size: 16px; } }
 
