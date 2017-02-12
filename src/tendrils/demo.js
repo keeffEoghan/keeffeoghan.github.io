@@ -312,6 +312,8 @@ export default (canvas) => {
         pos[1] = mapRange(pos[1], 0, tendrils.viewRes[1], 1, -1);
 
         flowInputs.get(e.pointerId).add(timer.app.time, pos);
+
+        e.preventDefault();
     };
 
     canvas.addEventListener('pointermove', pointerFlow, false);
@@ -840,7 +842,6 @@ export default (canvas) => {
     function resetCapture() {
         capture.image.src = '';
         capture.url.value = 'loading...';
-        capture.url.size = capture.url.value.length;
     }
 
     capture.exit.addEventListener('click', () => {
@@ -895,7 +896,6 @@ export default (canvas) => {
                 }
                 else if(capture.data === dataURI) {
                     capture.image.src = capture.url.value = body.data.link;
-                    capture.url.size = capture.url.value.length;
                 }
             });
     }
