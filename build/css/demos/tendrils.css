@@ -14,13 +14,13 @@ blockquote:before, blockquote:after, q:before, q:after { content: ''; content: n
 
 table { border-collapse: collapse; border-spacing: 0; }
 
-@-ms-viewport { zoom: 1.0;
-  width: extend-to-zoom; }
+@-ms-viewport { zoom: 1;
+  width: device-width; }
 
-@viewport { zoom: 1.0;
-  width: extend-to-zoom; }
+@viewport { zoom: 1;
+  width: device-width; }
 
-html { box-sizing: border-box; font-family: sans-serif; font-size: 14px; }
+html { box-sizing: border-box; font-family: sans-serif; font-size: 14px; zoom: 1; }
 
 @media (min-width: 480px) { html { font-size: 16px; } }
 
@@ -32,7 +32,7 @@ body { margin: 0; }
 
 main { min-height: 100%; }
 
-canvas { display: block; position: fixed; top: 0; left: 0; bottom: 0; right: 0; cursor: cell; background: #000; -webkit-transition: background-color 200ms ease-in-out; transition: background-color 200ms ease-in-out; }
+canvas { display: block; position: absolute; top: 0; left: 0; bottom: 0; right: 0; cursor: cell; background: #000; -webkit-transition: background-color 200ms ease-in-out; transition: background-color 200ms ease-in-out; }
 
 canvas.epok-light { background: #fff; }
 
@@ -77,6 +77,8 @@ canvas.epok-no-cursor { cursor: none; }
 
 .npm-scb-now-playing { width: auto; font-size: 1em; line-height: 1.3; }
 
+.npm-scb-info { width: auto; }
+
 .npm-scb-icon { background-color: rgba(0, 0, 0, 0.3); }
 
 .epok-show .npm-scb-inner { top: 0; }
@@ -91,13 +93,13 @@ canvas.epok-no-cursor { cursor: none; }
 
 .epok-main-control:active { opacity: 0.6; }
 
-.epok-edit-controls { position: fixed; display: -webkit-box; display: -webkit-flex; display: -ms-flexbox; display: flex; -webkit-flex-flow: column nowrap; -ms-flex-flow: column nowrap; flex-flow: column nowrap; -webkit-box-pack: stretch; -webkit-justify-content: stretch; -ms-flex-pack: stretch; justify-content: stretch; top: 0; right: 0; max-height: 100%; padding-bottom: 20px; z-index: 1001; -webkit-transition: opacity 300ms ease-out; transition: opacity 300ms ease-out; }
+.epok-edit-controls { position: absolute; display: -webkit-box; display: -webkit-flex; display: -ms-flexbox; display: flex; -webkit-flex-flow: column nowrap; -ms-flex-flow: column nowrap; flex-flow: column nowrap; -webkit-box-pack: stretch; -webkit-justify-content: stretch; -ms-flex-pack: stretch; justify-content: stretch; top: 0; right: 0; max-height: 100%; padding-bottom: 20px; z-index: 1001; -webkit-transition: opacity 300ms ease-out; transition: opacity 300ms ease-out; }
 
 .epok-edit-controls.epok-hide { opacity: 0; pointer-events: none; }
 
 .epok-edit-controls .dg.main { overflow-y: auto; }
 
-.epok-edit-controls .epok-close-button { position: absolute; bottom: 0; }
+.epok-edit-controls .close-button { position: absolute; bottom: 0; }
 
 .epok-track { visibility: hidden; }
 
@@ -119,7 +121,7 @@ canvas.epok-no-cursor { cursor: none; }
 
 .epok-audio-controls .epok-progress { -webkit-box-flex: 1; -webkit-flex: 1 1 auto; -ms-flex: 1 1 auto; flex: 1 1 auto; margin: 0 1em; cursor: pointer; }
 
-.epok-captured-overlay { position: fixed; display: -webkit-box; display: -webkit-flex; display: -ms-flexbox; display: flex; -webkit-flex-flow: row nowrap; -ms-flex-flow: row nowrap; flex-flow: row nowrap; -webkit-box-pack: center; -webkit-justify-content: center; -ms-flex-pack: center; justify-content: center; -webkit-box-align: center; -webkit-align-items: center; -ms-flex-align: center; align-items: center; top: 0; left: 0; bottom: 0; right: 0; opacity: 0; pointer-events: none; z-index: 1002; background-color: rgba(0, 0, 0, 0.9); -webkit-transition: opacity 300ms ease-out; transition: opacity 300ms ease-out; }
+.epok-captured-overlay { position: absolute; display: -webkit-box; display: -webkit-flex; display: -ms-flexbox; display: flex; -webkit-flex-flow: row nowrap; -ms-flex-flow: row nowrap; flex-flow: row nowrap; -webkit-box-pack: center; -webkit-justify-content: center; -ms-flex-pack: center; justify-content: center; -webkit-box-align: center; -webkit-align-items: center; -ms-flex-align: center; align-items: center; top: 0; left: 0; bottom: 0; right: 0; opacity: 0; pointer-events: none; z-index: 1002; background-color: rgba(0, 0, 0, 0.9); -webkit-transition: opacity 300ms ease-out; transition: opacity 300ms ease-out; }
 
 .epok-captured-overlay.epok-show { opacity: 1; pointer-events: all; }
 
