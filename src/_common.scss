@@ -1,14 +1,15 @@
 @import '../libs/build/reset';
 
 @viewport {
-    zoom: 1.0;
-    width: extend-to-zoom;
+    zoom: 1;
+    width: device-width;
 }
 
 html {
     box-sizing: border-box;
     font-family: sans-serif;
     font-size: 14px;
+    zoom: 1;
 
     @media (min-width: 480px) {
         font-size: 16px;
