@@ -1171,8 +1171,8 @@ export default (canvas) => {
             })
             .smoothOver(35500-32200, {
                 to: {
-                    target: 0.003,
-                    lineWidth: 3
+                    target: 0.004,
+                    lineWidth: 2
                 },
                 time: 35500,
                 ease: [0, 0, 1]
@@ -1186,7 +1186,7 @@ export default (canvas) => {
             })
             .smoothTo({
                 to: {
-                    target: 0.03
+                    target: 0.1
                 },
                 time: 38500,
                 ease: [0, 0, 1]
@@ -1200,7 +1200,7 @@ export default (canvas) => {
             })
             .to({
                 to: {
-                    target: 0.01
+                    target: 0.05
                 },
                 time: 41500,
                 ease: [0, 0, 1]
@@ -1209,12 +1209,12 @@ export default (canvas) => {
                 to: {
                     target: 0
                 },
-                time: 42500,
+                time: 42000,
                 ease: [0, 1, 1]
             })
             .to({
                 to: {
-                    target: 0.02,
+                    target: 0.05,
                     lineWidth: 1
                 },
                 time: 43500,
@@ -1225,7 +1225,7 @@ export default (canvas) => {
                     target: 0.00003
                 },
                 time: 46000,
-                ease: [0, 1, 1]
+                ease: [0, 0, 1]
             });
 
         trackTracks.calls
@@ -1261,6 +1261,13 @@ export default (canvas) => {
                 },
                 time: 29000,
                 ease: [0, -0.1, 0.95, 1]
+            })
+            .smoothTo({
+                to: {
+                    colorMapAlpha: 1
+                },
+                time: 32000,
+                ease: [0, 1, 1]
             });
 
         trackTracks.tendrils2
@@ -1280,14 +1287,14 @@ export default (canvas) => {
 
         trackTracks.blend
             .to({
-                to: [0.2, 1],
+                to: [0.4, 0.7],
                 time: 24000,
                 ease: [0, 0, 1]
             })
-            .over(47000-40000, {
-                to: [0.4, 0.6],
-                time: 47000,
-                ease: [0, 0, 1]
+            .over(32000-29000, {
+                to: [0.1, 1],
+                time: 32000,
+                ease: [0, 1, 1]
             });
 
         trackTracks.baseColor
@@ -1784,7 +1791,7 @@ export default (canvas) => {
             .over(132000-126000, {
                 to: {
                     target: 0.005,
-                    lineWidth: 3
+                    lineWidth: 2
                 },
                 time: 132000,
                 ease: [0, 0, 1]
@@ -2960,7 +2967,7 @@ export default (canvas) => {
                     forceWeight: 0.015,
                     noiseWeight: 0.0023,
                     speedAlpha: 0.00005,
-                    lineWidth: 3,
+                    lineWidth: 2,
                     colorMapAlpha: 0.0001
                 });
 
