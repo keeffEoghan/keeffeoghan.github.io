@@ -1171,7 +1171,7 @@ export default (canvas) => {
             })
             .smoothOver(35500-32200, {
                 to: {
-                    target: 0.004,
+                    target: 0.005,
                     lineWidth: 2
                 },
                 time: 35500,
@@ -1186,7 +1186,7 @@ export default (canvas) => {
             })
             .smoothTo({
                 to: {
-                    target: 0.1
+                    target: 0.12
                 },
                 time: 38500,
                 ease: [0, 0, 1]
@@ -1195,12 +1195,12 @@ export default (canvas) => {
                 to: {
                     target: 0
                 },
-                time: 39500,
+                time: 39200,
                 ease: [0, 1, 1]
             })
             .to({
                 to: {
-                    target: 0.05
+                    target: 0.06
                 },
                 time: 41500,
                 ease: [0, 0, 1]
@@ -1209,15 +1209,15 @@ export default (canvas) => {
                 to: {
                     target: 0
                 },
-                time: 42000,
+                time: 42200,
                 ease: [0, 1, 1]
             })
             .to({
                 to: {
-                    target: 0.05,
+                    target: 0.06,
                     lineWidth: 1
                 },
-                time: 43500,
+                time: 44500,
                 ease: [0, 0, 1]
             })
             .to({
@@ -1301,6 +1301,10 @@ export default (canvas) => {
             .to({
                 to: [1, 1, 1, 0.25],
                 time: 24000
+            })
+            .over(32000-29000, {
+                to: [1, 1, 1, 0.1],
+                time: 32000
             });
 
         trackTracks.flowColor
