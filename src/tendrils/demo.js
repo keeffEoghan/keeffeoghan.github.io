@@ -20,6 +20,7 @@ import xhr from 'xhr';
 
 import dat from '../../libs/dat.gui/build/dat.gui';
 
+import { basePath } from '../utils/';
 import redirect from '../utils/protocol-redirect';
 
 import Timer from './timer';
@@ -129,7 +130,7 @@ export default (canvas) => {
         useMedia: (''+queries.use_media !== 'false'),
         staticImage: ((queries.static_image)?
                 decodeURIComponent(queries.static_image)
-            :   '/build/images/max-crop-gradient.png')
+            :   basePath+'/build/images/max-crop-gradient.png')
     };
 
     if(''+queries.cursor === 'false') {
