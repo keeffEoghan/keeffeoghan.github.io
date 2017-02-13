@@ -1908,10 +1908,10 @@ export default (canvas) => {
             });
 
         trackTracks.blend
-            .over(133000-129000, {
+            .over(133000-128000, {
                 to: [0, 1],
-                time: 134000,
-                ease: [0, 0.9, 1]
+                time: 133000,
+                ease: [0, 0.1, 1]
             })
             .smoothOver(142000-136000, {
                 to: [0.2, 0.9],
