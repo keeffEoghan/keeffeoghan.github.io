@@ -16,5 +16,5 @@ export const nextPow2 = (x) => Math.pow(2, Math.ceil(Math.log(x)*invLog2));
 
 // Get around github.io hosting path issues
 export const basePath = ((location.hostname.match(/.*?\.github\.io/gi))?
-        location.pathname.split('/')[0]
+        (location.pathname.split('/')[1] || '')
     :   '');
