@@ -231,6 +231,11 @@ canvas {
         display: flex;
     }
 
+    &.epok-on-window {
+        position: absolute;
+        z-index: 1002;
+    }
+
     .epok-play-state {
         position: relative;
     }
