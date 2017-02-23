@@ -107,6 +107,8 @@ canvas.epok-no-cursor { cursor: none; }
 
 .epok-audio-controls.epok-show { display: -webkit-box; display: -webkit-flex; display: -ms-flexbox; display: flex; }
 
+.epok-audio-controls.epok-on-window { position: absolute; z-index: 1002; }
+
 .epok-audio-controls .epok-play-state { position: relative; }
 
 .epok-audio-controls .epok-play-toggle, .epok-audio-controls .epok-play-indicator { width: 1.2rem; height: 1.2rem; line-height: 1.2rem; }
