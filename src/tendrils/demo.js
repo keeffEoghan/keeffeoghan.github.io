@@ -124,7 +124,9 @@ export default (canvas) => {
     const appSettings = {
         trackURL: ((queries.track)?
                 decodeURIComponent(queries.track)
-            :   'https://soundcloud.com/max-cooper/trust-feat-kathrin-deboer'),
+            :   ((''+queries.local_stream !== 'true')?
+                'https://soundcloud.com/max-cooper/trust-feat-kathrin-deboer'
+            :   rootPath+'build/audio/Trust%20feat.%20Kathrin%20deBoer%20&%20Tom%20Hodge%20-%20Max%20Cooper.mp3')),
 
         animate: (''+queries.animate !== 'false'),
         useMedia: (''+queries.use_media !== 'false'),
@@ -247,15 +249,19 @@ export default (canvas) => {
 
     // Track setup
 
-    const setupTrack = (src, el = canvas.parentElement) => {
+    const setupTrack = (src, el = canvas.parentElement, onWindow) => {
         if(track.src !== src) {
             track.src = src;
             track.currentTime = 0;
         }
 
-        if(trackControls.els.main.parentElement !== el) {
-            el.appendChild(trackControls.els.main);
+        const main = trackControls.els.main;
+
+        if(main.parentElement !== el) {
+            el.appendChild(main);
         }
+
+        main.classList[((onWindow)? 'add' : 'remove')]('epok-on-window');
 
         return track;
     };
@@ -287,10 +293,11 @@ export default (canvas) => {
         else if(trackURL.match(/^(https)?(:\/\/)?(www\.)?dropbox\.com\/s\//gi)) {
             // Handle Dropbox share links
             setupTrack(trackURL.replace(/^((https)?(:\/\/)?(www\.)?)dropbox\.com\/s\/(.*)\?dl=(0)$/gi,
-                'https://dl.dropboxusercontent.com/s/$5?dl=1&raw=1'));
+                    'https://dl.dropboxusercontent.com/s/$5?dl=1&raw=1'),
+                canvas.parentElement, true);
         }
         else {
-            setupTrack(trackURL);
+            setupTrack(trackURL, canvas.parentElement, true);
         }
     };
 
