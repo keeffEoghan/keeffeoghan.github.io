@@ -800,13 +800,21 @@ export default (canvas) => {
         start: document.querySelector('.epok-info-content > .epok-button')
     };
 
-    const toggleInfo = () =>
-        ((introElements.info.classList.contains('epok-hide'))?
-            introElements.info.classList.remove('epok-hide')
-        :   introElements.info.classList.add('epok-hide'));
+    function toggleInfo(toggle) {
+        const show = ((typeof toggle !== 'undefined')?
+                toggle
+            :   introElements.info.classList.contains('epok-hide'));
+
+        if(show) {
+            introElements.info.classList.remove('epok-hide');
+        }
+        else {
+            introElements.info.classList.add('epok-hide');
+        }
+    }
 
     introElements.start.addEventListener('click', () => {
-        toggleInfo();
+        toggleInfo(false);
 
         track.autoplay = true;
 
@@ -816,7 +824,7 @@ export default (canvas) => {
     });
 
     document.querySelector('.epok-info-button')
-        .addEventListener('click', toggleInfo);
+        .addEventListener('click', () => toggleInfo());
 
 
     // Fullscreen
@@ -847,19 +855,16 @@ export default (canvas) => {
 
     capture.context = capture.canvas.getContext('2d');
 
-    function resetCapture() {
-        capture.image.src = '';
-        capture.url.value = 'loading...';
-    }
+    const resetCapture = () => (capture.image.src = capture.url.value = '');
 
     capture.exit.addEventListener('click', () => {
-            capture.overlay.classList.remove('epok-show');
-            resetCapture();
+        capture.overlay.classList.remove('epok-show');
+        resetCapture();
 
-            if(!capture.paused) {
-                track.play();
-            }
-        });
+        if(!capture.paused) {
+            track.play();
+        }
+    });
 
     function captureImage() {
         capture.paused = track.paused;
@@ -1043,9 +1048,9 @@ export default (canvas) => {
             })
             .smoothTo({
                 to: {
-                    noiseScale: 80,
-                    varyNoiseScale: 2,
-                    noiseSpeed: 0
+                    noiseScale: 60,
+                    varyNoiseScale: 8,
+                    noiseSpeed: 0.0003
                 },
                 time: 18000,
                 ease: [0, 0, 1.1, 1]
@@ -1156,7 +1161,7 @@ export default (canvas) => {
         trackTracks.tendrils2
             .smoothTo({
                 to: {
-                    noiseScale: 40,
+                    noiseScale: 30,
                     varyNoiseScale: 0
                 },
                 time: 24000,
@@ -1173,21 +1178,21 @@ export default (canvas) => {
             })
             .smoothOver(29000-26000, {
                 to: {
-                    target: 0.00036
+                    target: 0.00034
                 },
                 time: 29000,
                 ease: [0, 0, 1]
             })
             .smoothOver(33000-32000, {
                 to: {
-                    target: 0.0015
+                    target: 0.0016
                 },
                 time: 33000,
                 ease: [0, 0, 1]
             })
             .smoothOver(800, {
                 to: {
-                    target: 0.012,
+                    target: 0.013,
                     lineWidth: 2
                 },
                 time: 36000,
@@ -1202,7 +1207,7 @@ export default (canvas) => {
             })
             .smoothTo({
                 to: {
-                    target: 0.1
+                    target: 0.08
                 },
                 time: 38500,
                 ease: [0, 0, 1]
@@ -1211,12 +1216,12 @@ export default (canvas) => {
                 to: {
                     target: 0
                 },
-                time: 39200,
+                time: 39000,
                 ease: [0, 1, 1]
             })
             .to({
                 to: {
-                    target: 0.1
+                    target: 0.04
                 },
                 time: 41000,
                 ease: [0, 0, 1]
@@ -1281,7 +1286,6 @@ export default (canvas) => {
         trackTracks.tendrils2
             .smoothOver(29000-27000, {
                 to: {
-                    varyNoiseScale: 1,
                     noiseSpeed: 0.0002
                 },
                 time: 29000,
@@ -1331,16 +1335,10 @@ export default (canvas) => {
         // Scale up again for the next drop, and free things up
 
         trackTracks.tendrils
-            .over(45000-39000, {
-                to: {
-                    flowWeight: 1
-                },
-                ease: [0, 1, 1],
-                time: 45000
-            })
             .over(400, {
                 to: {
                     flowWeight: 0.75,
+                    varyFlow: 0.4,
                     colorMapAlpha: 0.1
                 },
                 ease: [0, 0, 1],
@@ -1350,27 +1348,35 @@ export default (canvas) => {
         trackTracks.tendrils2
             .smoothOver(38500-35500, {
                 to: {
-                    noiseSpeed: 0.0002
+                    noiseSpeed: 0.0002,
+                    noiseScale: 20
                 },
                 time: 38500,
                 ease: [0, 0, 1]
             })
-            .smoothTo({
+            .to({
                 to: {
                     noiseWeight: 0.0013,
-                    noiseScale: 25,
-                    varyNoiseScale: 0
+                    noiseScale: 10
                 },
-                time: 40500,
+                time: 40000,
                 ease: [0, 0, 1]
             })
-            .smoothOver(49000-44000, {
+            .to({
                 to: {
-                    noiseWeight: 0.002,
-                    noiseScale: 18,
-                    varyNoiseScale: 0.3
+                    noiseWeight: 0.0018,
+                    noiseScale: 6
                 },
-                time: 49000,
+                time: 42000,
+                ease: [0, 0, 1]
+            })
+            .to({
+                to: {
+                    noiseScale: 18,
+                    varyNoiseScale: 0.3,
+                    noiseSpeed: 0.0002
+                },
+                time: 47000,
                 ease: [0, 0, 1]
             });
 
@@ -3037,7 +3043,7 @@ export default (canvas) => {
                     fadeColor: [0, 0, 0]
                 });
 
-            spawnImage();
+            spawnImage(null);
         }
     };
 
@@ -3260,7 +3266,7 @@ export default (canvas) => {
 
             '<shift>': keyframeCaller(() => restart()),
             '/': keyframeCaller(() => spawnSamples()),
-            '.': keyframeCaller(() => spawnImage()),
+            '.': keyframeCaller(() => spawnImage(null)),
             ',': keyframeCaller(() => spawnForm())
         };
 

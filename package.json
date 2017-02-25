@@ -46,6 +46,7 @@
     "glsl-random": "0.0.5",
     "glslify": "^5.1.0",
     "glslify-import": "^3.0.0",
+    "hint.css": "^2.4.1",
     "lerp": "^1.0.3",
     "lodash": "^4.13.1",
     "lookat-camera": "^1.0.0",
