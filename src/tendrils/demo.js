@@ -800,10 +800,18 @@ export default (canvas) => {
         start: document.querySelector('.epok-info-content > .epok-button')
     };
 
-    const toggleInfo = () =>
-        ((introElements.info.classList.contains('epok-hide'))?
-            introElements.info.classList.remove('epok-hide')
-        :   introElements.info.classList.add('epok-hide'));
+    function toggleInfo(toggle) {
+        const show = ((typeof toggle !== 'undefined')?
+                toggle
+            :   introElements.info.classList.contains('epok-hide'));
+
+        if(show) {
+            introElements.info.classList.remove('epok-hide');
+        }
+        else {
+            introElements.info.classList.add('epok-hide');
+        }
+    }
 
     introElements.start.addEventListener('click', () => {
         toggleInfo();
@@ -847,19 +855,16 @@ export default (canvas) => {
 
     capture.context = capture.canvas.getContext('2d');
 
-    function resetCapture() {
-        capture.image.src = '';
-        capture.url.value = 'loading...';
-    }
+    const resetCapture = () => (capture.image.src = capture.url.value = '');
 
     capture.exit.addEventListener('click', () => {
-            capture.overlay.classList.remove('epok-show');
-            resetCapture();
+        capture.overlay.classList.remove('epok-show');
+        resetCapture();
 
-            if(!capture.paused) {
-                track.play();
-            }
-        });
+        if(!capture.paused) {
+            track.play();
+        }
+    });
 
     function captureImage() {
         capture.paused = track.paused;
