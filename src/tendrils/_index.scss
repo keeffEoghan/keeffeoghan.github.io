@@ -50,6 +50,8 @@ canvas {
 
 .epok-a {
     color: #efefef;
+    text-decoration: underline;
+    cursor: pointer;
 
     &:visited {
         color: #efefef;
@@ -186,6 +188,14 @@ canvas {
     &:active {
         opacity: 0.6;
     }
+}
+
+.epok-quality-stepper {
+    margin: 0.5em 0.2em;
+}
+
+.epok-quality-level.epok-hide {
+    display: none;
 }
 
 .epok-edit-controls {

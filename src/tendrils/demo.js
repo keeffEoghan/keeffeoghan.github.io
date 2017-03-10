@@ -797,7 +797,8 @@ export default (canvas) => {
 
     const introElements = {
         info: document.querySelector('.epok-info'),
-        start: document.querySelector('.epok-info-content > .epok-button')
+        start: document.querySelector('.epok-info-content > .epok-button'),
+        // quality: document.querySelector('.epok-info-content > .epok-button')
     };
 
     function toggleInfo(toggle) {
@@ -825,6 +826,49 @@ export default (canvas) => {
 
     document.querySelector('.epok-info-button')
         .addEventListener('click', () => toggleInfo());
+
+
+    // Quality settings
+
+    const quality = {
+        options: [
+            {
+                rootNum: defaultState.rootNum,
+                damping: defaultState.damping
+            },
+            {
+                rootNum: defaultState.rootNum*2,
+                damping: defaultState.damping-0.002
+            }
+        ],
+        level: 0,
+        levels: document.querySelectorAll('.epok-quality-level')
+    };
+
+    function changeQuality(level) {
+        const to = ((typeof level !== 'undefined')?
+                level
+            :   (quality.level+1)%quality.options.length);
+
+        const settings = quality.options[to];
+
+        tendrils.setup(settings.rootNum);
+        Object.assign(state, settings);
+        restart();
+
+        quality.levels[quality.level].classList.add('epok-hide');
+        quality.levels[to].classList.remove('epok-hide');
+
+        quality.level = to;
+    }
+
+    changeQuality(quality.level);
+
+    document.querySelector('.epok-quality-stepper').addEventListener('click',
+        () => changeQuality());
+
+    document.querySelector('.epok-quality-prompter').addEventListener('click',
+        () => changeQuality());
 
 
     // Fullscreen
@@ -866,7 +910,7 @@ export default (canvas) => {
         }
     });
 
-    function captureImage() {
+    function takeScreenshot() {
         capture.paused = track.paused;
         track.pause();
 
@@ -914,7 +958,7 @@ export default (canvas) => {
     }
 
     document.querySelector('.epok-capture-button')
-        .addEventListener('click', captureImage);
+        .addEventListener('click', takeScreenshot);
 
 
     // The main loop
@@ -1698,7 +1742,7 @@ export default (canvas) => {
                     varyNoise: 0.1,
                     noiseScale: 26,
                     varyNoiseScale: 0,
-                    noiseSpeed: 0.00025
+                    noiseSpeed: 0.00033
                 },
                 time: 93800
             })
@@ -1707,10 +1751,10 @@ export default (canvas) => {
                     noiseWeight: 0.003,
                     noiseScale: 1.8,
                     varyNoiseScale: 0.5,
-                    noiseSpeed: 0.0002
+                    noiseSpeed: 0.00027
                 },
                 time: 109000,
-                ease: [0, 0.8, 1]
+                ease: [0, 0.7, 1]
             });
 
         trackTracks.audio
@@ -2011,7 +2055,7 @@ export default (canvas) => {
                 to: {
                     colorMapAlpha: 0.6
                 },
-                time: 60000,
+                time: 160000,
                 ease: [0, 0.4, 1]
             })
             .smoothTo({
@@ -2599,9 +2643,13 @@ export default (canvas) => {
 
     const rootControls = {};
 
+    rootControls.changeQuality = () => changeQuality();
+
     if(fullscreen) {
         rootControls.fullscreen = fullscreen;
     }
+
+    rootControls.takeScreenshot = takeScreenshot;
 
 
     // State, animation, import/export
