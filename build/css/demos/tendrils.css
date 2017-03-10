@@ -329,7 +329,7 @@ canvas.epok-no-cursor { cursor: none; }
 
 .epok-button:active { color: #414141; }
 
-.epok-a { color: #efefef; }
+.epok-a { color: #efefef; text-decoration: underline; cursor: pointer; }
 
 .epok-a:visited { color: #efefef; }
 
@@ -375,6 +375,10 @@ canvas.epok-no-cursor { cursor: none; }
 .epok-main-control:hover { opacity: 1; }
 
 .epok-main-control:active { opacity: 0.6; }
+
+.epok-quality-stepper { margin: 0.5em 0.2em; }
+
+.epok-quality-level.epok-hide { display: none; }
 
 .epok-edit-controls { position: absolute; display: -webkit-box; display: -webkit-flex; display: -ms-flexbox; display: flex; -webkit-flex-flow: column nowrap; -ms-flex-flow: column nowrap; flex-flow: column nowrap; -webkit-box-pack: stretch; -webkit-justify-content: stretch; -ms-flex-pack: stretch; justify-content: stretch; top: 0; right: 0; max-height: 100%; padding-bottom: 20px; z-index: 1001; -webkit-transition: opacity 300ms ease-out; transition: opacity 300ms ease-out; }
 
