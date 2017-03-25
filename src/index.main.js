@@ -11,14 +11,15 @@ const readyStates = ['loading', 'interactive', 'complete'];
 
 // Load in stages.
 let readyCallbacks = {
-        loading() {
-            document.addEventListener('readystatechange', updateState);
-        },
-        interactive() {
-            tendrilsApp(document.querySelector('canvas'));
-            document.removeEventListener('readystatechange', updateState);
-        }
-    };
+    loading() {
+        document.addEventListener('readystatechange', updateState);
+    },
+    interactive() {
+        tendrilsApp(document.querySelector('canvas'));
+        document.removeEventListener('readystatechange', updateState);
+    }
+};
+
 let last = 0;
 
 function updateState() {

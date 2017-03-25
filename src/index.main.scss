@@ -1,2 +1,28 @@
 @import './common';
 @import './tendrils/index';
+
+.epok-logo {
+    position: absolute;
+    width: 60%;
+    max-width: 900px;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+}
+
+.epok-main-controls {
+    right: 0;
+    left: auto;
+}
+
+.epok-edit-controls {
+    $gap: 100px;
+    $height: 20px;
+
+    padding-bottom: $gap + $height;
+
+    .close-button {
+        height: $height;
+        bottom: $gap;
+    }
+}
