@@ -16,29 +16,45 @@
     <body>
         <canvas touch-action="none"></canvas>
 
+        <section class="epok-info">
+            <div class="epok-info-content">
+                <p>Watch, listen, interact, explore.</p>
+                <p>Allow camera access for the full experience. Controls below, track above.</p>
+                <button class="epok-button">Begin</button>
+                <p>
+                    <a class="epok-a epok-quality-prompter">Change visuals quality</a>
+                    (best on a modern browser and fast computer).
+                </p>
+                <p>
+                    <a class="epok-a" href="https://youtu.be/j98Tcpkh3ak" target="_blank">Watch the video</a>
+                    (if you can't see the live visuals here).
+                </p>
+            </div>
+        </section>
+
         <div class="epok-main-controls">
-            <button class="epok-info-button epok-main-control epok-tooltip hint--top-right" aria-label="Toggle info">
+            <button class="epok-info-button epok-main-control epok-tooltip hint--top-right" aria-label="Toggle the intro info">
                 <i class="material-icons">info</i>
             </button>
 
             <button class="epok-quality-stepper epok-main-control">
-                <i class="epok-quality-level material-icons epok-tooltip hint--top-right" aria-label="Visuals quality: default">hdr_weak</i><!-- remove_circle_outline -->
+                <i class="epok-quality-level material-icons epok-tooltip hint--top-right" aria-label="Visuals quality: normal">hdr_weak</i><!-- remove_circle_outline -->
                 <i class="epok-quality-level epok-hide material-icons epok-tooltip hint--top-right" aria-label="Visuals quality: high">hdr_strong</i><!-- add_circle_outline -->
             </button>
 
-            <button class="epok-fullscreen-button epok-main-control epok-tooltip hint--top-right" aria-label="Fullscreen">
+            <button class="epok-fullscreen-button epok-main-control epok-tooltip hint--top-right" aria-label="Toggle fullscreen">
                 <i class="material-icons">aspect_ratio</i>
             </button>
 
-            <button class="epok-editor-button epok-main-control epok-tooltip hint--top-right" aria-label="Toggle editor">
+            <button class="epok-editor-button epok-main-control epok-tooltip hint--top-right" aria-label="Toggle the edit panel">
                 <i class="material-icons">tune</i>
             </button>
 
-            <button class="epok-capture-button epok-main-control epok-tooltip hint--top-right" aria-label="Capture screenshot">
+            <button class="epok-capture-button epok-main-control epok-tooltip hint--top-right" aria-label="Capture and share a screenshot">
                 <i class="material-icons">camera</i>
             </button>
 
-            <a class="epok-a epok-video-button epok-main-control epok-tooltip hint--top-right" aria-label="Play recorded video" href="https://youtu.be/LFqM5n74w9Y" target="_blank">
+            <a class="epok-a epok-video-button epok-main-control epok-tooltip hint--top-right" aria-label="See the video" href="https://youtu.be/LFqM5n74w9Y" target="_blank">
                 <i class="material-icons">ondemand_video</i>
             </a>
 
@@ -47,25 +63,9 @@
             </a>
 
             <a class="epok-a epok-link-button epok-main-control epok-tooltip hint--top-right" aria-label="See the Emergence project" href="http://emergence.maxcooper.net/" target="_blank">
-                <i class="material-icons">call_made</i>
+                <i class="material-icons">arrow_forward</i>
             </a>
         </div>
-
-        <section class="epok-info">
-            <div class="epok-info-content">
-                <p>Interact and explore. Controls are below; the track is above.</p>
-                <p>Allow access to camera and microphone for the full experience.</p>
-                <button class="epok-button">Begin</button>
-                <p>
-                    <a class="epok-a epok-quality-prompter">Change the quality</a>
-                    - for best visuals, on a modern browser and fast computer.
-                </p>
-                <p>
-                    <a class="epok-a" href="https://youtu.be/j98Tcpkh3ak" target="_blank">Watch the video</a>
-                    - if you can't see the visuals here.
-                </p>
-            </div>
-        </section>
 
         <div class="epok-audio-controls">
             <div class="epok-play-state">
