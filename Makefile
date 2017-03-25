@@ -1,3 +1,6 @@
+# @todo Get rid of this build system in favour of the simpler NPM scripts setup.
+# @todo Separate each project/demo into its own repo and package.
+
 APP_NAME = tendrils
 ARGS = 
 

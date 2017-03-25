@@ -1,3 +1,19 @@
+/**
+ * A demo of the tendrils visuals, an interactive music video for Max Cooper's
+ * Trust.
+ *
+ * Disclaimer:
+ * Several things done here (animation engine, audio analysis and response,
+ * mouse/touch interaction, and some of the non-core shader stuff) are basically
+ * learning exercises and experiments for me:
+ *     - There are better approaches and libraries out there.
+ *     - These were an interesting way for me to learn what might go into building
+ *       these things.
+ *     - There are some not very well researched, or combinations of
+ *       odd/different approaches in here.
+ * ...so, wouldn't take any of them as good ideas straight away.
+ */
+
 /* global Map */
 
 import 'pepjs';
@@ -16,8 +32,8 @@ import toSource from 'to-source';
 import shader from 'gl-shader';
 import prefixes from 'prefixes';
 import xhr from 'xhr';
-// import dat from 'dat-gui';
 
+// import dat from 'dat-gui';
 import dat from '../../libs/dat.gui/build/dat.gui';
 
 import { rootPath } from '../utils/';
@@ -53,7 +69,6 @@ import { curry } from '../fp/partial';
 import reduce from '../fp/reduce';
 import map from '../fp/map';
 import each from '../fp/each';
-import filter from '../fp/filter';
 
 toSource.defaultFnFormatter = (depth, f) => f.name;
 
@@ -70,12 +85,6 @@ export default (canvas) => {
     // Main init
 
     const gl = glContext(canvas, glSettings, render);
-
-    // Print out some GL parameters we depend on, for remote debugging
-    console.log('Maximum texture units',
-        '| vertex:', gl.getParameter(gl.MAX_VERTEX_TEXTURE_IMAGE_UNITS),
-        '| fragment:', gl.getParameter(gl.MAX_TEXTURE_IMAGE_UNITS),
-        '| combined:', gl.getParameter(gl.MAX_COMBINED_TEXTURE_IMAGE_UNITS));
 
     const timer = {
         app: defaultSettings.timer,
@@ -124,7 +133,7 @@ export default (canvas) => {
     const appSettings = {
         trackURL: ((queries.track)?
                 decodeURIComponent(queries.track)
-            :   ((''+queries.local_stream !== 'true')?
+            : ((''+queries.local_stream !== 'true')?
                 'https://soundcloud.com/max-cooper/trust-feat-kathrin-deboer'
             :   rootPath+'build/audio/Trust%20feat.%20Kathrin%20deBoer%20&%20Tom%20Hodge%20-%20Max%20Cooper.mp3')),
 
@@ -163,22 +172,25 @@ export default (canvas) => {
     };
 
 
-    // Track and analyser init
+    // Track
 
     const track = Object.assign(new Audio(), {
             crossOrigin: 'anonymous',
             className: 'track'
         });
 
-    const trackControlsEl = document.querySelector('.epok-audio-controls');
 
-    const trackControls = {
+    // Track control setup
+
+    const trackControls = document.querySelector('.epok-audio-controls');
+
+    const trackControl = (trackControls && {
         els: {
-            main: trackControlsEl,
-            toggle: trackControlsEl.querySelector('.epok-play-toggle'),
-            progress: trackControlsEl.querySelector('.epok-progress'),
-            current: trackControlsEl.querySelector('.epok-current'),
-            total: trackControlsEl.querySelector('.epok-total')
+            main: trackControls,
+            toggle: trackControls.querySelector('.epok-play-toggle'),
+            progress: trackControls.querySelector('.epok-progress'),
+            current: trackControls.querySelector('.epok-current'),
+            total: trackControls.querySelector('.epok-total')
         },
         times: {
             current: new Date(0),
@@ -187,48 +199,64 @@ export default (canvas) => {
         timeFormat: {
             second: 'numeric'
         },
-        seeking: false
-    };
+        seeking: false,
 
-    trackControls.els.main.parentElement.removeChild(trackControls.els.main);
-    trackControls.els.main.appendChild(track);
-    trackControls.els.main.classList.add('epok-show');
+        trackTimeChanged() {
+            trackControl.els.progress.max = track.duration;
 
-    const trackTimeChanged = () => {
-        trackControls.els.progress.max = track.duration;
+            const total = track.duration*1000;
 
-        const total = track.duration*1000;
+            trackControl.times.total.setTime(total);
 
-        trackControls.times.total.setTime(total);
+            trackControl.timeFormat.minute = ((total >= 60*1000)?
+                'numeric' : undefined);
 
-        trackControls.timeFormat.minute = ((total >= 60*1000)?
-            'numeric' : undefined);
+            trackControl.timeFormat.hour = ((total >= 60*60*1000)?
+                'numeric' : undefined);
 
-        trackControls.timeFormat.hour = ((total >= 60*60*1000)?
-            'numeric' : undefined);
+            trackControl.els.current.innerText = 0;
 
-        trackControls.els.current.innerText = 0;
+            trackControl.els.total.innerText = trackControl.times.total
+                .toLocaleTimeString('en-gb', trackControl.timeFormat);
+        },
+        tick(time, paused) {
+            trackControl.times.current.setTime(time);
 
-        trackControls.els.total.innerText = trackControls.times.total
-            .toLocaleTimeString('en-gb', trackControls.timeFormat);
-    };
+            trackControl.els.current.innerText = trackControl.times.current
+                .toLocaleTimeString('en-gb', trackControl.timeFormat);
 
-    track.addEventListener('durationchange', trackTimeChanged);
+            if(!trackControl.seeking) {
+                trackControl.els.progress.value = time*0.001;
+            }
 
-    trackControls.els.toggle.addEventListener('change',
-        () => ((trackControls.els.toggle.checked)?
-            track.play() : track.pause()));
+            trackControl.els.toggle.checked = !paused;
+        }
+    });
 
-    trackControls.els.progress.addEventListener('pointerdown',
-        () => trackControls.seeking = true);
+    if(trackControl) {
+        trackControl.els.main.parentElement.removeChild(trackControl.els.main);
+        trackControl.els.main.appendChild(track);
+        trackControl.els.main.classList.add('epok-show');
 
-    trackControls.els.progress.addEventListener('change',
-        () => {
-            if(trackControls.seeking) {
-                track.currentTime = trackControls.els.progress.value;
-                trackControls.seeking = false;
+        track.addEventListener('durationchange', trackControl.trackTimeChanged);
+
+        trackControl.els.toggle.addEventListener('change',
+            () => ((trackControl.els.toggle.checked)?
+                track.play() : track.pause()));
+
+        trackControl.els.progress.addEventListener('pointerdown',
+            () => trackControl.seeking = true);
+
+        trackControl.els.progress.addEventListener('change', () => {
+            if(trackControl.seeking) {
+                track.currentTime = trackControl.els.progress.value;
+                trackControl.seeking = false;
             }
         });
+    }
+
+
+    // Analyser setup
 
     const audioState = { ...audioDefaults };
 
@@ -255,19 +283,21 @@ export default (canvas) => {
             track.currentTime = 0;
         }
 
-        const main = trackControls.els.main;
+        if(trackControl) {
+            const main = trackControl.els.main;
 
-        if(main.parentElement !== el) {
-            el.appendChild(main);
+            if(main.parentElement !== el) {
+                el.appendChild(main);
+            }
+
+            main.classList[((onWindow)? 'add' : 'remove')]('epok-on-window');
         }
-
-        main.classList[((onWindow)? 'add' : 'remove')]('epok-on-window');
 
         return track;
     };
 
     const setupTrackURL = (trackURL = appSettings.trackURL) => {
-        const old = document.querySelector('.npm-scb-white');
+        const old = document.querySelector('.epok-soundcloud');
 
         if(old) {
             old.parentElement.removeChild(old);
@@ -286,7 +316,7 @@ export default (canvas) => {
                     }
                     else {
                         setupTrack(src, el.querySelector('.npm-scb-info'));
-                        // el.classList.add('epok-show');
+                        el.classList.add('epok-soundcloud');
                     }
                 });
         }
@@ -795,37 +825,39 @@ export default (canvas) => {
 
     // Intro info
 
-    const introElements = {
-        info: document.querySelector('.epok-info'),
-        start: document.querySelector('.epok-info-content > .epok-button'),
-        // quality: document.querySelector('.epok-info-content > .epok-button')
-    };
+    const introInfo = document.querySelector('.epok-info');
 
-    function toggleInfo(toggle) {
-        const show = ((typeof toggle !== 'undefined')?
-                toggle
-            :   introElements.info.classList.contains('epok-hide'));
+    const intro = (introInfo && {
+        info: introInfo,
+        starter: introInfo.querySelector('.epok-info-content > .epok-button'),
+        toggler: document.querySelector('.epok-info-button'),
 
-        if(show) {
-            introElements.info.classList.remove('epok-hide');
-        }
-        else {
-            introElements.info.classList.add('epok-hide');
-        }
-    }
+        toggle(toggle) {
+            const show = ((typeof toggle !== 'undefined')?
+                    toggle
+                :   intro.info.classList.contains('epok-hide'));
 
-    introElements.start.addEventListener('click', () => {
-        toggleInfo(false);
+            if(show) {
+                intro.info.classList.remove('epok-hide');
+            }
+            else {
+                intro.info.classList.add('epok-hide');
+            }
+        },
+        start() {
+            intro.toggle(false);
+            track.autoplay = true;
 
-        track.autoplay = true;
-
-        if(track.duration) {
-            track.play();
+            (track.duration && track.play());
         }
     });
 
-    document.querySelector('.epok-info-button')
-        .addEventListener('click', () => toggleInfo());
+    if(intro) {
+        intro.starter.addEventListener('click', intro.start);
+
+        (intro.toggler &&
+            intro.toggler.addEventListener('click', () => intro.toggle()));
+    }
 
 
     // Quality settings
@@ -841,34 +873,37 @@ export default (canvas) => {
                 damping: defaultState.damping-0.002
             }
         ],
-        level: 0,
-        levels: document.querySelectorAll('.epok-quality-level')
+        level: parseInt((queries.quality || 0), 10),
+        levels: document.querySelectorAll('.epok-quality-level'),
+        steppers: document.querySelectorAll(`.epok-quality-stepper,
+            .epok-quality-prompter`),
+
+        change(level) {
+            const to = ((typeof level !== 'undefined')?
+                    level
+                :   (quality.level+1)%quality.options.length);
+
+            const settings = quality.options[to];
+
+            tendrils.setup(settings.rootNum);
+            Object.assign(state, settings);
+            restart();
+
+            const last = quality.levels[quality.level];
+            (last && last.classList.add('epok-hide'));
+
+            const next = quality.levels[to];
+            (next && next.classList.remove('epok-hide'));
+
+            quality.level = to;
+        },
+        step: () => quality.change()
     };
 
-    function changeQuality(level) {
-        const to = ((typeof level !== 'undefined')?
-                level
-            :   (quality.level+1)%quality.options.length);
+    quality.change(quality.level);
 
-        const settings = quality.options[to];
-
-        tendrils.setup(settings.rootNum);
-        Object.assign(state, settings);
-        restart();
-
-        quality.levels[quality.level].classList.add('epok-hide');
-        quality.levels[to].classList.remove('epok-hide');
-
-        quality.level = to;
-    }
-
-    changeQuality(quality.level);
-
-    document.querySelector('.epok-quality-stepper').addEventListener('click',
-        () => changeQuality());
-
-    document.querySelector('.epok-quality-prompter').addEventListener('click',
-        () => changeQuality());
+    quality.steppers.forEach((stepper) =>
+        stepper.addEventListener('click', quality.step));
 
 
     // Fullscreen
@@ -877,88 +912,96 @@ export default (canvas) => {
     // Invocation`
     // const requestFullscreen = prefixes('requestFullscreen', canvas);
     const requestFullscreen = prefixes('requestFullscreen', canvas).name;
-    const fullscreen = (requestFullscreen &&
-        (() => canvas[requestFullscreen]()));
 
-    document.querySelector('.epok-fullscreen-button')
-        .addEventListener('click', fullscreen);
+    const fullscreen = (requestFullscreen && {
+        request: () => canvas[requestFullscreen](),
+        toggle: document.querySelector('.epok-fullscreen-button')
+    });
+
+    (fullscreen.toggle &&
+        fullscreen.toggle.addEventListener('click', fullscreen.request));
 
 
     // Screen capture - save data URI to host, show resulting link
     // @see http://stackoverflow.com/questions/17805456/upload-a-canvas-image-to-imgur-api-v3-with-javascript
 
-    const capture = {
+    const captureOverlay = document.querySelector('.epok-captured-overlay');
+
+    const capture = (captureOverlay && {
         canvas: document.createElement('canvas'),
-        overlay: document.querySelector('.epok-captured-overlay'),
-        exit: document.querySelector('.epok-exit-overlay'),
-        url: document.querySelector('.epok-captured-url'),
-        image: document.querySelector('.epok-captured-image'),
+        overlay: captureOverlay,
+        exit: captureOverlay.querySelector('.epok-exit-overlay'),
+        url: captureOverlay.querySelector('.epok-captured-url'),
+        image: captureOverlay.querySelector('.epok-captured-image'),
+        toggle: document.querySelector('.epok-capture-button'),
         paused: track.paused,
-        data: null
-    };
+        data: null,
 
-    capture.context = capture.canvas.getContext('2d');
+        reset: () => (capture.image.src = capture.url.value = ''),
 
-    const resetCapture = () => (capture.image.src = capture.url.value = '');
+        screenshot() {
+            capture.paused = track.paused;
+            track.pause();
 
-    capture.exit.addEventListener('click', () => {
-        capture.overlay.classList.remove('epok-show');
-        resetCapture();
+            capture.reset();
 
-        if(!capture.paused) {
-            track.play();
+            capture.canvas.width = canvas.width;
+            capture.canvas.height = canvas.height;
+
+            capture.context.fillStyle = getComputedStyle(canvas)
+                .backgroundColor;
+
+            capture.context.fillRect(0, 0, canvas.width, canvas.height);
+            capture.context.drawImage(canvas, 0, 0);
+
+            const dataURI = capture.canvas.toDataURL('image/png');
+
+            capture.data = capture.image.src = dataURI;
+            capture.overlay.classList.add('epok-show');
+
+            const dataAPIURI = dataURI.replace(/^data:image\/\w+;base64,/, '');
+
+            xhr({
+                    url: 'https://api.imgur.com/3/image',
+                    method: 'POST',
+                    body: {
+                        image: dataAPIURI,
+                        type: 'base64'
+                    },
+                    headers: {
+                        Authorization: 'Client-ID 290f4e8d36da965'
+                    },
+                    json: true
+                },
+                (e, response, body) => {
+                    if(e) {
+                        console.error(e, response);
+                    }
+                    else if(!body.success || body.status !== 200) {
+                        console.error(e, response, body.status);
+                    }
+                    else if(capture.data === dataURI) {
+                        capture.image.src = capture.url.value = body.data.link;
+                    }
+                });
         }
     });
 
-    function takeScreenshot() {
-        capture.paused = track.paused;
-        track.pause();
+    if(capture) {
+        capture.context = capture.canvas.getContext('2d');
 
-        resetCapture();
+        capture.exit.addEventListener('click', () => {
+            capture.overlay.classList.remove('epok-show');
+            capture.reset();
 
-        capture.canvas.width = canvas.width;
-        capture.canvas.height = canvas.height;
+            if(!capture.paused) {
+                track.play();
+            }
+        });
 
-        capture.context.fillStyle = getComputedStyle(canvas)
-            .backgroundColor;
-
-        capture.context.fillRect(0, 0, canvas.width, canvas.height);
-        capture.context.drawImage(canvas, 0, 0);
-
-        const dataURI = capture.data = capture.canvas.toDataURL('image/png');
-
-        capture.image.src = dataURI;
-        capture.overlay.classList.add('epok-show');
-
-        const dataAPIURI = dataURI.replace(/^data:image\/\w+;base64,/, '');
-
-        xhr({
-                url: 'https://api.imgur.com/3/image',
-                method: 'POST',
-                body: {
-                    image: dataAPIURI,
-                    type: 'base64'
-                },
-                headers: {
-                    Authorization: 'Client-ID 290f4e8d36da965'
-                },
-                json: true
-            },
-            (e, response, body) => {
-                if(e) {
-                    console.error(e, response);
-                }
-                else if(!body.success || body.status !== 200) {
-                    console.error(e, response, body.status);
-                }
-                else if(capture.data === dataURI) {
-                    capture.image.src = capture.url.value = body.data.link;
-                }
-            });
+        (capture.toggle &&
+            capture.toggle.addEventListener('click', capture.screenshot));
     }
-
-    document.querySelector('.epok-capture-button')
-        .addEventListener('click', takeScreenshot);
 
 
     // The main loop
@@ -967,26 +1010,16 @@ export default (canvas) => {
 
         player.app.play(timer.app.time);
 
-        if(track && track.currentTime >= 0 && !track.paused) {
+        if(track && track.currentTime >= 0) {
             timer.track.tick(track.currentTime*1000);
 
             if(appSettings.animate) {
                 player.track.play(timer.track.time);
             }
 
-            trackControls.times.current.setTime(timer.track.time);
-
-            trackControls.els.current.innerText = trackControls.times.current
-                .toLocaleTimeString('en-gb', trackControls.timeFormat);
-
-            if(!trackControls.seeking) {
-                trackControls.els.progress.value = track.currentTime;
+            if(trackControl) {
+                trackControl.tick(timer.track.time, track.paused);
             }
-
-            trackControls.els.toggle.checked = true;
-        }
-        else {
-            trackControls.els.toggle.checked = false;
         }
 
         /**
@@ -1447,12 +1480,7 @@ export default (canvas) => {
             });
 
         trackTracks.baseColor
-            .over(46000-42000, {
-                to: [1, 1, 1, 0.2],
-                time: 46000,
-                ease: [0, 0, 1]
-            })
-            .to({
+            .over(500, {
                 to: [0, 0, 0, 0.8],
                 time: 46500
             });
@@ -2598,7 +2626,9 @@ export default (canvas) => {
     window.spawnTargets = spawnTargets;
 
     const gui = {
-        main: new dat.GUI({ autoPlace: false })
+        main: new dat.GUI({ autoPlace: false }),
+        showing: (''+queries.edit === 'true'),
+        toggle: document.querySelector('.epok-editor-button')
     };
 
     const containGUI = Object.assign(document.createElement('div'), {
@@ -2628,28 +2658,26 @@ export default (canvas) => {
         }
     }
 
-    let guiShowing = false;
-
-    function toggleShowGUI(show = !guiShowing) {
+    function toggleShowGUI(show = !gui.showing) {
         containGUI.classList[(show)? 'remove' : 'add']('epok-hide');
-        guiShowing = show;
+        gui.showing = show;
     }
 
-    document.querySelector('.epok-editor-button')
-        .addEventListener('click', () => toggleShowGUI());
+    (gui.toggle &&
+        gui.toggle.addEventListener('click', () => toggleShowGUI()));
 
 
     // Root level
 
     const rootControls = {};
 
-    rootControls.changeQuality = () => changeQuality();
+    rootControls.changeQuality = quality.step;
 
     if(fullscreen) {
-        rootControls.fullscreen = fullscreen;
+        rootControls.fullscreen = fullscreen.request;
     }
 
-    rootControls.takeScreenshot = takeScreenshot;
+    rootControls.screenshot = capture.screenshot;
 
 
     // State, animation, import/export
@@ -3148,8 +3176,7 @@ export default (canvas) => {
     // Hide by default till the animation's over
 
     toggleOpenGUI(true);
-
-    toggleShowGUI(false);
+    toggleShowGUI(gui.showing);
     setTimeout(() => gui.main.open(), 200);
 
     // Add to the DOM
@@ -3239,15 +3266,6 @@ export default (canvas) => {
             reset: stateCopy(key),
             adjust: stateEdit(key, scale)
         });
-
-        const stateExtend = (assign = {}) => {
-            const resets = filter((v, k) => k in assign, defaultState);
-
-            return {
-                    reset: () => Object.assign(state, resets),
-                    go: () => Object.assign(state, assign)
-                };
-        };
 
 
         const editing = {};
@@ -3348,7 +3366,7 @@ export default (canvas) => {
         };
 
         if(fullscreen) {
-            callMap['F'] = fullscreen;
+            callMap['F'] = fullscreen.request;
         }
 
         // @todo Throttle so multiple states can go into one keyframe.
