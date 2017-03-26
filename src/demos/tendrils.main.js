@@ -14,7 +14,11 @@ let readyCallbacks = {
             document.addEventListener('readystatechange', updateState);
         },
         interactive() {
-            tendrilsDemo(document.querySelector('canvas'));
+            const canvas = document.querySelector('canvas');
+
+            tendrilsDemo(canvas);
+            canvas.classList.add('epok-dark');
+
             document.removeEventListener('readystatechange', updateState);
         }
     };

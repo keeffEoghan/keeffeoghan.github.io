@@ -111,6 +111,8 @@ export default (canvas, keyboard = true) => {
 
     const resetSpawner = spawnReset(gl);
 
+    resetSpawner.shader.bind();
+
 
     // Some convenient shorthands
 
@@ -690,6 +692,9 @@ export default (canvas, keyboard = true) => {
         limit: 0.2
     };
 
+    blurShader.bind();
+    Object.assign(blurShader.uniforms, blurState);
+
 
     // Animation setup
 
@@ -875,28 +880,23 @@ export default (canvas, keyboard = true) => {
             }
         ],
         level: parseInt((queries.quality || 0), 10),
-        levels: document.querySelectorAll('.epok-quality-level'),
-        steppers: document.querySelectorAll(`.epok-quality-stepper,
-            .epok-quality-prompter`),
+        levels: Array.from(document.querySelectorAll('.epok-quality-level')),
+        steppers: Array.from(document.querySelectorAll(`.epok-quality-stepper,
+            .epok-quality-prompter`)),
 
-        change(level) {
-            const to = ((typeof level !== 'undefined')?
-                    level
-                :   (quality.level+1)%quality.options.length);
-
-            const settings = quality.options[to];
+        change(level = (quality.level+1)%quality.options.length) {
+            const settings = quality.options[level];
 
             tendrils.setup(settings.rootNum);
             Object.assign(state, settings);
             restart();
 
-            const last = quality.levels[quality.level];
-            (last && last.classList.add('epok-hide'));
+            quality.levels.forEach((last) => last.classList.add('epok-hide'));
 
-            const next = quality.levels[to];
+            const next = quality.levels[level];
             (next && next.classList.remove('epok-hide'));
 
-            quality.level = to;
+            quality.level = level;
         },
         step: () => quality.change()
     };
@@ -2874,8 +2874,9 @@ export default (canvas, keyboard = true) => {
     gui.blur = gui.main.addFolder('blur');
 
     for(let s in blurDefaults) {
-        if(!(typeof blurState[s]).match(/^(object|array|undefined|null)$/gi)) {
-            gui.blur.add(blurState, s);
+        if(!(typeof blurShader.uniforms[s])
+                .match(/^(object|array|undefined|null)$/gi)) {
+            gui.blur.add(blurShader.uniforms, s);
         }
     }
 
