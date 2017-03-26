@@ -24,6 +24,7 @@
     ]
   },
   "dependencies": {
+    "animate-svg": "^1.0.1",
     "babel-polyfill": "^6.16.0",
     "bezier": "^0.1.0",
     "clamp": "^1.0.1",
