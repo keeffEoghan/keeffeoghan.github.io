@@ -5,7 +5,9 @@
 
 import 'babel-polyfill';
 
-import app from './';
+import setup from './';
+
+let app;
 
 const readyStates = ['loading', 'interactive', 'complete'];
 
@@ -15,7 +17,10 @@ let readyCallbacks = {
         document.addEventListener('readystatechange', updateState);
     },
     interactive() {
-        app();
+        app = setup();
+    },
+    complete() {
+        app.go();
         document.removeEventListener('readystatechange', updateState);
     }
 };
