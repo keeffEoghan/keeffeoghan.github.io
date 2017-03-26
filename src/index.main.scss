@@ -1,13 +1,65 @@
 @import './common';
 @import './tendrils/index';
 
+main {
+    position: relative;
+}
+
+.epok-folio__intro,
 .epok-logo {
     position: absolute;
-    width: 60%;
-    max-width: 900px;
+    z-index: 10;
+}
+
+.epok-folio__intro {
+    left: 0;
+    top: 10em;
+    max-width: 30em;
+}
+
+.epok-folio__intro-item {
+    padding: 0.75em 1.75em;
+    color: #000;
+    background-color: rgba(255, 255, 255, 0.8);
+    transition: opacity 300ms ease-in-out;
+
+    &.epok-hide {
+        opacity: 0;
+        pointer-events: none;
+    }
+}
+
+.epok-logo {
+    top: 50vh;
     left: 50%;
-    top: 50%;
     transform: translate(-50%, -50%);
+    width: 90%;
+    max-width: 900px;
+    pointer-events: none;
+
+    @media (min-width: (30em / 0.6)) {
+        width: 40%;
+    }
+}
+
+.epok-logo__build {
+}
+
+.epok-logo__draw {
+    stroke: #fff;
+    stroke-width: 4;
+}
+
+.epok-logo__background {
+    display: none;
+}
+
+.epok-folio__demo {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 100vh;
 }
 
 .epok-main-controls {
@@ -25,4 +77,12 @@
         height: $height;
         bottom: $gap;
     }
+}
+
+.epok-phonetic {
+    opacity: 0.6;
+}
+
+em {
+    font-style: italic;
 }
