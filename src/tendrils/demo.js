@@ -72,7 +72,7 @@ import each from '../fp/each';
 
 toSource.defaultFnFormatter = (depth, f) => f.name;
 
-export default (canvas) => {
+export default (canvas, keyboard = true) => {
     if(redirect()) {
         return;
     }
@@ -95,9 +95,9 @@ export default (canvas) => {
     // Tendrils init
 
     const tendrils = new Tendrils(gl, {
-            timer: timer.app,
-            numBuffers: 1
-        });
+        timer: timer.app,
+        numBuffers: 1
+    });
 
     /**
      * Stateful but convenient way to set which buffer we spawn into.
@@ -118,17 +118,18 @@ export default (canvas) => {
         resetSpawner.spawn(tendrils, buffer);
 
     const reset = () => tendrils.reset();
+
     const restart = () => {
         tendrils.clear();
         respawn();
         respawn(tendrils.targets);
     };
+
     const clear = () => tendrils.clear();
     const clearView = () => tendrils.clearView();
     const clearFlow = () => tendrils.clearFlow();
 
     const state = tendrils.state;
-
 
     const appSettings = {
         trackURL: ((queries.track)?
@@ -175,9 +176,9 @@ export default (canvas) => {
     // Track
 
     const track = Object.assign(new Audio(), {
-            crossOrigin: 'anonymous',
-            className: 'track'
-        });
+        crossOrigin: 'anonymous',
+        className: 'track'
+    });
 
 
     // Track control setup
@@ -393,9 +394,9 @@ export default (canvas) => {
     // Spawn on fastest particles.
 
     const simplePixelSpawner = new spawnPixels.PixelSpawner(gl, {
-            shader: [spawnPixels.defaults().shader[0], dataSampleFrag],
-            buffer: null
-        });
+        shader: [spawnPixels.defaults().shader[0], dataSampleFrag],
+        buffer: null
+    });
 
     function spawnFastest(buffer = spawnTargets.spawnFastest) {
         simplePixelSpawner.buffer = tendrils.particles.buffers[0];
@@ -407,9 +408,9 @@ export default (canvas) => {
     // Respawn from geometry (platonic forms)
 
     const geometrySpawner = new GeometrySpawner(gl, {
-            speed: 0.005,
-            bias: 100/0.005
-        });
+        speed: 0.005,
+        bias: 100/0.005
+    });
 
     const spawnForm = (buffer = spawnTargets.spawnForm) =>
         geometrySpawner.shuffle().spawn(tendrils, undefined, buffer);
@@ -456,8 +457,7 @@ export default (canvas) => {
             raster = video;
         }
 
-        imageSpawner.buffer.shape =
-            tendrils.colorMap.shape = shape;
+        imageSpawner.buffer.shape = tendrils.colorMap.shape = shape;
 
         imageSpawner.setPixels(raster);
         imageSpawner.spawn(tendrils, undefined, buffer);
@@ -483,11 +483,11 @@ export default (canvas) => {
                     mediaStream = stream;
 
                     const v = Object.assign(document.createElement('video'), {
-                            src: self.URL.createObjectURL(stream),
-                            controls: true,
-                            muted: true,
-                            autoplay: true
-                        });
+                        src: self.URL.createObjectURL(stream),
+                        controls: true,
+                        muted: true,
+                        autoplay: true
+                    });
 
                     v.addEventListener('canplay', () => {
                         video = v;
@@ -519,9 +519,9 @@ export default (canvas) => {
             trackAnalyser.analyser.frequencyBinCount);
 
     const blend = new Blend(gl, {
-            views: [audioTexture.texture, imageSpawner.buffer],
-            alphas: [0.3, 0.8]
-        });
+        views: [audioTexture.texture, imageSpawner.buffer],
+        alphas: [0.3, 0.8]
+    });
 
 
     // Audio `react` and `test` function pairs - for `AudioTrigger.fire`
@@ -703,7 +703,7 @@ export default (canvas) => {
         spawn: resetSpawner.uniforms,
         audio: audioState,
         blend: blend.alphas,
-        blur: blurState,
+        blur: blurShader.uniforms,
         // Just for calls
         // @todo Fix the animation lib properly, not just by convention
         calls: {}
@@ -805,7 +805,8 @@ export default (canvas) => {
             call: [
                 () => {
                     restart();
-                    canvas.classList.remove('epok-light')
+                    canvas.classList.remove('epok-light');
+                    canvas.classList.add('epok-dark');
                 }
             ],
             time: 200
@@ -1044,11 +1045,10 @@ export default (canvas) => {
             blurShader.bind();
 
             Object.assign(blurShader.uniforms, {
-                    view: tendrils.buffers[0].color[0].bind(0),
-                    resolution: tendrils.viewRes,
-                    time: tendrils.timer.time
-                },
-                blurState);
+                view: tendrils.buffers[0].color[0].bind(0),
+                resolution: tendrils.viewRes,
+                time: tendrils.timer.time
+            });
 
             screen.render();
 
@@ -1694,6 +1694,7 @@ export default (canvas) => {
                 time: 70100,
                 call: [
                     () => {
+                        canvas.classList.remove('epok-dark');
                         canvas.classList.add('epok-light');
                         seedBreak();
                     }
@@ -1724,6 +1725,7 @@ export default (canvas) => {
                 call: [
                     () => {
                         canvas.classList.remove('epok-light');
+                        canvas.classList.add('epok-dark');
                         seedBreak();
                     }
                 ]
@@ -2621,10 +2623,6 @@ export default (canvas) => {
 
     // Control panel
 
-    window.state = state;
-    window.audioState = audioState;
-    window.spawnTargets = spawnTargets;
-
     const gui = {
         main: new dat.GUI({ autoPlace: false }),
         showing: (''+queries.edit === 'true'),
@@ -2913,240 +2911,240 @@ export default (canvas) => {
     const presetters = {
         'Flow'() {
             Object.assign(state, {
-                    flowWidth: 5,
-                    colorMapAlpha: 0
-                });
+                flowWidth: 5,
+                colorMapAlpha: 0
+            });
 
             Object.assign(resetSpawner.uniforms, {
-                    radius: 0.25,
-                    speed: 0.01
-                });
+                radius: 0.25,
+                speed: 0.01
+            });
 
             Object.assign(colorProxy, {
-                    baseAlpha: 0,
-                    baseColor: [0, 0, 0],
-                    flowAlpha: 1,
-                    flowColor: [255, 255, 255],
-                    fadeAlpha: Math.max(state.flowDecay, 0.05)
-                });
+                baseAlpha: 0,
+                baseColor: [0, 0, 0],
+                flowAlpha: 1,
+                flowColor: [255, 255, 255],
+                fadeAlpha: Math.max(state.flowDecay, 0.05)
+            });
         },
         'Wings'() {
             Object.assign(state, {
-                    flowDecay: 0,
-                    colorMapAlpha: 0
-                });
+                flowDecay: 0,
+                colorMapAlpha: 0
+            });
 
             Object.assign(resetSpawner.uniforms, {
-                    radius: 0.05,
-                    speed: 0.05,
-                });
+                radius: 0.05,
+                speed: 0.05
+            });
 
             Object.assign(colorProxy, {
-                    flowAlpha: 0.01,
-                    baseAlpha: 0.8,
-                    fadeAlpha: 0
-                });
-
-            Object.assign(colorProxy);
+                flowAlpha: 0.01,
+                baseAlpha: 0.8,
+                fadeAlpha: 0
+            });
 
             restart();
         },
         'Fluid'() {
             Object.assign(state, {
-                    autoClearView: true
-                });
+                autoClearView: true
+            });
 
             Object.assign(colorProxy, {
-                    fadeAlpha: 0
-                });
+                fadeAlpha: 0
+            });
+
+            clear();
         },
         'Flow only'() {
             Object.assign(state, {
-                    flowDecay: 0.001,
-                    forceWeight: 0.014,
-                    noiseWeight: 0,
-                    speedAlpha: 0
-                });
+                flowDecay: 0.001,
+                forceWeight: 0.014,
+                noiseWeight: 0,
+                speedAlpha: 0
+            });
 
             Object.assign(resetSpawner.uniforms, {
-                    radius: 0.4,
-                    speed: 0.15
-                });
+                radius: 0.4,
+                speed: 0.15
+            });
 
             Object.assign(colorProxy, {
-                    baseAlpha: 0.8,
-                    baseColor: [100, 200, 255],
-                    fadeAlpha: 0.1
-                });
+                baseAlpha: 0.8,
+                baseColor: [100, 200, 255],
+                fadeAlpha: 0.1
+            });
         },
         'Noise only'() {
             Object.assign(state, {
-                    flowWeight: 0,
-                    noiseWeight: 0.003,
-                    noiseSpeed: 0.0005,
-                    noiseScale: 1.5,
-                    varyNoiseScale: 10,
-                    varyNoiseSpeed: 0.05,
-                    speedAlpha: 0,
-                    colorMapAlpha: 0.8
-                });
+                flowWeight: 0,
+                noiseWeight: 0.003,
+                noiseSpeed: 0.0005,
+                noiseScale: 1.5,
+                varyNoiseScale: 10,
+                varyNoiseSpeed: 0.05,
+                speedAlpha: 0,
+                colorMapAlpha: 0.8
+            });
 
             Object.assign(colorProxy, {
-                    baseAlpha: 0.4,
-                    baseColor: [255, 150, 0],
-                    fadeAlpha: 0.05,
-                    flowAlpha: 0
-                });
+                baseAlpha: 0.4,
+                baseColor: [255, 150, 0],
+                fadeAlpha: 0.05,
+                flowAlpha: 0
+            });
 
             Object.assign(blendProxy, {
-                    audio: 0.9,
-                    video: 0
-                });
+                audio: 0.9,
+                video: 0
+            });
         },
         'Sea'() {
             Object.assign(state, {
-                    flowWidth: 5,
-                    forceWeight: 0.013,
-                    noiseWeight: 0.002,
-                    flowDecay: 0.01,
-                    speedAlpha: 0,
-                    colorMapAlpha: 0.4
-                });
+                flowWidth: 5,
+                forceWeight: 0.013,
+                noiseWeight: 0.002,
+                flowDecay: 0.01,
+                speedAlpha: 0,
+                colorMapAlpha: 0.4
+            });
 
             Object.assign(resetSpawner.uniforms, {
-                    radius: 1.5,
-                    speed: 0
-                });
+                radius: 1.5,
+                speed: 0
+            });
 
             Object.assign(colorProxy, {
-                    baseAlpha: 0.8,
-                    baseColor: [55, 155, 255],
-                    fadeAlpha: 0.3,
-                    fadeColor: [0, 58, 90]
-                });
+                baseAlpha: 0.8,
+                baseColor: [55, 155, 255],
+                fadeAlpha: 0.3,
+                fadeColor: [0, 58, 90]
+            });
         },
         'Ghostly'() {
             Object.assign(state, {
-                    flowDecay: 0,
-                    colorMapAlpha: 0.005
-                });
+                flowDecay: 0,
+                colorMapAlpha: 0.005
+            });
 
             Object.assign(colorProxy, {
-                    baseAlpha: 0.25,
-                    baseColor: [255, 255, 255],
-                    flowAlpha: 0.03,
-                    fadeAlpha: 0.03,
-                    fadeColor: [0, 0, 0]
-                });
+                baseAlpha: 0.25,
+                baseColor: [255, 255, 255],
+                flowAlpha: 0.03,
+                fadeAlpha: 0.03,
+                fadeColor: [0, 0, 0]
+            });
         },
         'Petri'() {
             Object.assign(state, {
-                    forceWeight: 0.015,
-                    noiseWeight: 0.001,
-                    flowDecay: 0.001,
-                    noiseScale: 200,
-                    noiseSpeed: 0.0001
-                });
+                forceWeight: 0.015,
+                noiseWeight: 0.001,
+                flowDecay: 0.001,
+                noiseScale: 200,
+                noiseSpeed: 0.0001
+            });
 
             Object.assign(colorProxy, {
-                    baseAlpha: 0.4,
-                    baseColor:[255, 203, 37],
-                    flowAlpha: 0.05,
-                    fadeAlpha: 0.03
-                });
+                baseAlpha: 0.4,
+                baseColor:[255, 203, 37],
+                flowAlpha: 0.05,
+                fadeAlpha: 0.03
+            });
 
             Object.assign(resetSpawner.uniforms, {
-                    radius: 1/Math.max(...tendrils.viewSize),
-                    speed: 0
-                });
+                radius: 1/Math.max(...tendrils.viewSize),
+                speed: 0
+            });
         },
         'Turbulence'() {
             Object.assign(state, {
-                    noiseSpeed: 0.00005,
-                    noiseScale: 10,
-                    forceWeight: 0.014,
-                    noiseWeight: 0.003,
-                    speedAlpha: 0.000002,
-                    colorMapAlpha: 0.3
-                });
+                noiseSpeed: 0.00005,
+                noiseScale: 10,
+                forceWeight: 0.014,
+                noiseWeight: 0.003,
+                speedAlpha: 0.000002,
+                colorMapAlpha: 0.3
+            });
 
             Object.assign(colorProxy, {
-                    baseAlpha: 0.3,
-                    baseColor: [100, 0, 0],
-                    flowAlpha: 0.5,
-                    flowColor: [255, 10, 10],
-                    fadeAlpha: 0.01,
-                    fadeColor: [0, 0, 0]
-                });
+                baseAlpha: 0.3,
+                baseColor: [100, 0, 0],
+                flowAlpha: 0.5,
+                flowColor: [255, 10, 10],
+                fadeAlpha: 0.01,
+                fadeColor: [0, 0, 0]
+            });
         },
         'Rorschach'() {
             Object.assign(state, {
-                    noiseScale: 40,
-                    varyNoiseScale: 0.1,
-                    noiseSpeed: 0.00001,
-                    varyNoiseSpeed: 0.01,
-                    forceWeight: 0.014,
-                    noiseWeight: 0.0021,
-                    speedAlpha: 0.000002,
-                    colorMapAlpha: 0.2
-                });
+                noiseScale: 40,
+                varyNoiseScale: 0.1,
+                noiseSpeed: 0.00001,
+                varyNoiseSpeed: 0.01,
+                forceWeight: 0.014,
+                noiseWeight: 0.0021,
+                speedAlpha: 0.000002,
+                colorMapAlpha: 0.2
+            });
 
             Object.assign(flowPixelState, {
                 scale: 'mirror xy'
             });
 
             Object.assign(colorProxy, {
-                    baseAlpha: 0.9,
-                    baseColor: [0, 0, 0],
-                    flowAlpha: 0.1,
-                    fadeAlpha: 0.05,
-                    fadeColor: [255, 255, 255]
-                });
+                baseAlpha: 0.9,
+                baseColor: [0, 0, 0],
+                flowAlpha: 0.1,
+                fadeAlpha: 0.05,
+                fadeColor: [255, 255, 255]
+            });
         },
         'Roots'() {
             Object.assign(state, {
-                    flowDecay: 0,
-                    noiseSpeed: 0,
-                    noiseScale: 18,
-                    forceWeight: 0.015,
-                    noiseWeight: 0.0023,
-                    speedAlpha: 0.00005,
-                    lineWidth: 2,
-                    colorMapAlpha: 0.0001
-                });
+                flowDecay: 0,
+                noiseSpeed: 0,
+                noiseScale: 18,
+                forceWeight: 0.015,
+                noiseWeight: 0.0023,
+                speedAlpha: 0.00005,
+                lineWidth: 2,
+                colorMapAlpha: 0.0001
+            });
 
             Object.assign(colorProxy, {
-                    baseAlpha: 0.2,
-                    baseColor: [50, 255, 50],
-                    flowAlpha: 0.05,
-                    fadeAlpha: 0
-                });
+                baseAlpha: 0.2,
+                baseColor: [50, 255, 50],
+                flowAlpha: 0.05,
+                fadeAlpha: 0
+            });
         },
         'Funhouse'() {
             Object.assign(state, {
-                    forceWeight: 0.0165,
-                    varyForce: 0.3,
-                    flowWeight: 0.5,
-                    varyFlow: 1,
-                    noiseWeight: 0.0015,
-                    varyNoise: 1,
-                    noiseScale: 40,
-                    varyNoiseScale: -4,
-                    noiseSpeed: 0.0001,
-                    varyNoiseSpeed: -3,
-                    flowDecay: 0.001,
-                    flowWidth: 8,
-                    speedAlpha: 0.00002,
-                    colorMapAlpha: 1
-                });
+                forceWeight: 0.0165,
+                varyForce: 0.3,
+                flowWeight: 0.5,
+                varyFlow: 1,
+                noiseWeight: 0.0015,
+                varyNoise: 1,
+                noiseScale: 40,
+                varyNoiseScale: -4,
+                noiseSpeed: 0.0001,
+                varyNoiseSpeed: -3,
+                flowDecay: 0.001,
+                flowWidth: 8,
+                speedAlpha: 0.00002,
+                colorMapAlpha: 1
+            });
 
             Object.assign(colorProxy, {
-                    baseAlpha: 0.2,
-                    baseColor: [0, 0, 0],
-                    flowAlpha: 0.05,
-                    fadeAlpha: 0.05,
-                    fadeColor: [0, 0, 0]
-                });
+                baseAlpha: 0.2,
+                baseColor: [0, 0, 0],
+                flowAlpha: 0.05,
+                fadeAlpha: 0.05,
+                fadeColor: [0, 0, 0]
+            });
 
             spawnImage(null);
         }
@@ -3207,7 +3205,7 @@ export default (canvas) => {
      * @todo Increment/decrement state values by various amounts.
      * @todo Use the above to play the visuals and set keyframes in real time?
      */
-    (() => {
+    function keyMash() {
         // Quick track control
 
         const togglePlay = (play = track.paused) =>
@@ -3370,6 +3368,7 @@ export default (canvas) => {
         }
 
         // @todo Throttle so multiple states can go into one keyframe.
+        // @todo Toggle this on or off any time - from GUI flag etc.
         document.body.addEventListener('keydown', (e) => {
                 // Control is a special case to assign the current state to
                 // a key.
@@ -3422,5 +3421,25 @@ export default (canvas) => {
                 }
             },
             false);
-    })();
+    }
+
+    if(keyboard && ''+queries.keys !== 'false') {
+        keyMash();
+    }
+
+    // Need some stuff exposed.
+    // @todo Come up with a better interface than this.
+    const out = {
+        tendrils,
+        tracks,
+        reset,
+        restart,
+        defaultState,
+        audioDefaults
+    };
+
+    // Debug
+    window.tendrils = out;
+
+    return out;
 };

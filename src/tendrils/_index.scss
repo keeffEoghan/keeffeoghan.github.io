@@ -8,8 +8,11 @@ canvas {
     bottom: 0;
     right: 0;
     cursor: cell;
-    background: #000;
     transition: background-color 200ms ease-in-out;
+
+    &.epok-dark {
+        background: #000;
+    }
 
     &.epok-light {
         background: #fff;
