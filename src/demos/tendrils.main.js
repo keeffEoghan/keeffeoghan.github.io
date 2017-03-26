@@ -3,7 +3,7 @@
  * @main Index
  */
 
-import tendrilsApp from '../tendrils/demo';
+import tendrilsDemo from '../tendrils/demo';
 
 
 const readyStates = ['loading', 'interactive', 'complete'];
@@ -14,8 +14,7 @@ let readyCallbacks = {
             document.addEventListener('readystatechange', updateState);
         },
         interactive() {
-            tendrilsApp(document.querySelector('canvas'));
-
+            tendrilsDemo(document.querySelector('canvas'));
             document.removeEventListener('readystatechange', updateState);
         }
     };
