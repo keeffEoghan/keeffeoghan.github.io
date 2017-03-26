@@ -324,7 +324,7 @@ export class Tendrils {
         }
 
         if(this.state.autoClearView) {
-            this.gl.clear(this.gl.COLOR_BUFFER_BIT);
+            this.clearView();
         }
 
         if(this.state.autoFade) {
