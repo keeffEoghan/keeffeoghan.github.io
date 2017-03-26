@@ -42,7 +42,12 @@ main {
     }
 }
 
-.epok-logo__build {
+.epok-logo__build-part {
+    opacity: 0;
+
+    &.epok-show {
+        opacity: 1;
+    }
 }
 
 .epok-logo__draw {
