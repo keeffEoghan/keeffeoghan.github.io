@@ -64,7 +64,7 @@ export default () => {
                 demo.toggleMedia(true);
                 Object.assign(demo.tracks.fadeColor, [0, 0, 0, 0.0025]);
             },
-            4000);
+            5000);
     };
 
     // Sequence
