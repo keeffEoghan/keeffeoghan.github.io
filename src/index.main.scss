@@ -1,7 +1,11 @@
 @import './common';
 @import './tendrils/index';
 
-$epok-folio__detail--bg: #222;
+$epok-folio--bg: #222;
+
+body {
+    background-color: $epok-folio--bg;
+}
 
 header {
     height: 100%;
@@ -12,7 +16,7 @@ header {
         bottom: 0;
         left: 0;
         right: 0;
-        border-top: 1px dashed $epok-folio__detail--bg;
+        border-top: 1px dashed $epok-folio--bg;
     }
 }
 
@@ -22,8 +26,12 @@ header {
     z-index: 10;
 }
 
-.epok-folio__intro {
+.epok-folio__intro
+.epok-folio__detail {
     padding: 0.75em 0;
+}
+
+.epok-folio__intro {
     margin-top: 13%;
     bottom: 0;
     left: 0;
@@ -39,12 +47,16 @@ header {
     pointer-events: none;
 }
 
-.epok-folio__tag {
-    float: left;
-    clear: both;
+.epok-folio__tag,
+.epok-folio__project {
+    line-height: 1.75em;
     padding: 0.75em 1.75em;
     margin: 0.5em 0;
-    line-height: 1.75em;
+    clear: both;
+}
+
+.epok-folio__tag {
+    float: left;
     color: #000;
     background-color: rgba(255, 255, 255, 0.85);
     transition: opacity 300ms ease-in-out;
@@ -109,7 +121,6 @@ header {
 
 .epok-folio__glyph {
     opacity: 0.6;
-    padding: 0 0.5em;
 }
 
 em {
@@ -144,9 +155,7 @@ em {
 
 .epok-folio__detail {
     position: relative;
-    padding: 0.75em 0;
     color: #fff;
-    background-color: $epok-folio__detail--bg;
     z-index: 10;
 }
 
@@ -156,5 +165,5 @@ em {
 }
 
 .epok-folio__project {
-    margin: 2em 0;
+    margin: 1em 0;
 }
