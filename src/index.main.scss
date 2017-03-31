@@ -1,8 +1,19 @@
 @import './common';
 @import './tendrils/index';
 
-main {
-    position: relative;
+$epok-folio__detail--bg: #222;
+
+header {
+    height: 100%;
+
+    &::after {
+        content: '';
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        border-top: 1px dashed $epok-folio__detail--bg;
+    }
 }
 
 .epok-folio__intro,
@@ -12,15 +23,30 @@ main {
 }
 
 .epok-folio__intro {
+    padding: 0.75em 0;
+    margin-top: 13%;
+    bottom: 0;
     left: 0;
-    top: 10em;
     max-width: 30em;
 }
 
-.epok-folio__intro-item {
+.epok-logo {
+    top: 50vh;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 50%;
+    max-width: 800px;
+    pointer-events: none;
+}
+
+.epok-folio__tag {
+    float: left;
+    clear: both;
     padding: 0.75em 1.75em;
+    margin: 0.5em 0;
+    line-height: 1.75em;
     color: #000;
-    background-color: rgba(255, 255, 255, 0.8);
+    background-color: rgba(255, 255, 255, 0.85);
     transition: opacity 300ms ease-in-out;
 
     &.epok-hide {
@@ -29,17 +55,13 @@ main {
     }
 }
 
-.epok-logo {
-    top: 50vh;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    width: 90%;
-    max-width: 900px;
-    pointer-events: none;
+.epok-folio__name {
+    display: inline-block;
+    font-size: 1em;
+}
 
-    @media (min-width: (30em / 0.6)) {
-        width: 40%;
-    }
+.epok-logo__build {
+    stroke: #7f7f7f;
 }
 
 .epok-logo__build-part {
@@ -65,6 +87,7 @@ main {
     left: 0;
     right: 0;
     height: 100vh;
+    background-color: #fff;
 }
 
 .epok-main-controls {
@@ -84,10 +107,54 @@ main {
     }
 }
 
-.epok-phonetic {
+.epok-folio__glyph {
     opacity: 0.6;
+    padding: 0 0.5em;
 }
 
 em {
     font-style: italic;
+}
+
+.epok-folio__link {
+    color: inherit;
+    text-decoration: underline;
+    cursor: pointer;
+
+    &:visited,
+    &:hover,
+    &:focus,
+    &:active {
+        color: inherit;
+    }
+
+    &:visited {
+        opacity: 1;
+    }
+
+    &:hover,
+    &:focus {
+        opacity: 0.75;
+    }
+
+    &:active {
+        opacity: 0.5;
+    }
+}
+
+.epok-folio__detail {
+    position: relative;
+    padding: 0.75em 0;
+    color: #fff;
+    background-color: $epok-folio__detail--bg;
+    z-index: 10;
+}
+
+.epok-folio__projects {
+    clear: both;
+    overflow: hidden;
+}
+
+.epok-folio__project {
+    margin: 2em 0;
 }
