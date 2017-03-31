@@ -422,17 +422,23 @@ canvas.epok-no-cursor { cursor: none; }
 
 .epok-captured-url:hover, .epok-captured-url:focus { color: #fff; }
 
+body { background-color: #222; }
+
 header { height: 100%; }
 
 header::after { content: ''; position: absolute; bottom: 0; left: 0; right: 0; border-top: 1px dashed #222; }
 
 .epok-folio__intro, .epok-logo { position: absolute; z-index: 10; }
 
-.epok-folio__intro { padding: 0.75em 0; margin-top: 13%; bottom: 0; left: 0; max-width: 30em; }
+.epok-folio__intro .epok-folio__detail { padding: 0.75em 0; }
+
+.epok-folio__intro { margin-top: 13%; bottom: 0; left: 0; max-width: 30em; }
 
 .epok-logo { top: 50vh; left: 50%; -webkit-transform: translate(-50%, -50%); transform: translate(-50%, -50%); width: 50%; max-width: 800px; pointer-events: none; }
 
-.epok-folio__tag { float: left; clear: both; padding: 0.75em 1.75em; margin: 0.5em 0; line-height: 1.75em; color: #000; background-color: rgba(255, 255, 255, 0.85); -webkit-transition: opacity 300ms ease-in-out; transition: opacity 300ms ease-in-out; }
+.epok-folio__tag, .epok-folio__project { line-height: 1.75em; padding: 0.75em 1.75em; margin: 0.5em 0; clear: both; }
+
+.epok-folio__tag { float: left; color: #000; background-color: rgba(255, 255, 255, 0.85); -webkit-transition: opacity 300ms ease-in-out; transition: opacity 300ms ease-in-out; }
 
 .epok-folio__tag.epok-hide { opacity: 0; pointer-events: none; }
 
@@ -456,7 +462,7 @@ header::after { content: ''; position: absolute; bottom: 0; left: 0; right: 0; b
 
 .epok-edit-controls .close-button { height: 20px; bottom: 100px; }
 
-.epok-folio__glyph { opacity: 0.6; padding: 0 0.5em; }
+.epok-folio__glyph { opacity: 0.6; }
 
 em { font-style: italic; }
 
@@ -470,10 +476,10 @@ em { font-style: italic; }
 
 .epok-folio__link:active { opacity: 0.5; }
 
-.epok-folio__detail { position: relative; padding: 0.75em 0; color: #fff; background-color: #222; z-index: 10; }
+.epok-folio__detail { position: relative; color: #fff; z-index: 10; }
 
 .epok-folio__projects { clear: both; overflow: hidden; }
 
-.epok-folio__project { margin: 2em 0; }
+.epok-folio__project { margin: 1em 0; }
 
 /*# sourceMappingURL=index.css.map */
