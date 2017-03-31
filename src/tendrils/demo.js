@@ -72,12 +72,14 @@ import each from '../fp/each';
 
 toSource.defaultFnFormatter = (depth, f) => f.name;
 
-export default (canvas, keyboard = true) => {
+export default (canvas, options) => {
     if(redirect()) {
         return;
     }
 
-    const queries = querystring.parse(location.search.slice(1));
+    const settings = Object.assign(querystring.parse(location.search.slice(1)),
+        options);
+
     const defaultSettings = defaults();
     const defaultState = defaultSettings.state;
 
@@ -134,20 +136,22 @@ export default (canvas, keyboard = true) => {
     const state = tendrils.state;
 
     const appSettings = {
-        trackURL: ((queries.track)?
-                decodeURIComponent(queries.track)
-            : ((''+queries.local_stream !== 'true')?
+        trackURL: ((''+settings.track === 'false')?
+                ''
+            : ((settings.track)?
+                decodeURIComponent(settings.track)
+            : ((''+settings.local_stream !== 'true')?
                 'https://soundcloud.com/max-cooper/trust-feat-kathrin-deboer'
-            :   rootPath+'build/audio/Trust%20feat.%20Kathrin%20deBoer%20&%20Tom%20Hodge%20-%20Max%20Cooper.mp3')),
+            :   rootPath+'build/audio/Trust%20feat.%20Kathrin%20deBoer%20&%20Tom%20Hodge%20-%20Max%20Cooper.mp3'))),
 
-        animate: (''+queries.animate !== 'false'),
-        useMedia: (''+queries.use_media !== 'false'),
-        staticImage: ((queries.static_image)?
-                decodeURIComponent(queries.static_image)
+        animate: (''+settings.animate !== 'false'),
+        useMedia: (''+settings.use_media !== 'false'),
+        staticImage: ((settings.static_image)?
+                decodeURIComponent(settings.static_image)
             :   rootPath+'build/images/max-crop-gradient.png')
     };
 
-    if(''+queries.cursor === 'false') {
+    if(''+settings.cursor === 'false') {
         canvas.classList.add('epok-no-cursor');
     }
 
@@ -155,9 +159,9 @@ export default (canvas, keyboard = true) => {
     // Audio init
 
     const audioDefaults = {
-        audible: (''+queries.mute !== 'true'),
+        audible: (''+settings.mute !== 'true'),
 
-        track: parseFloat((queries.track_in || 1), 10),
+        track: parseFloat((settings.track_in || 1), 10),
         trackFlowAt: 1.15,
         trackFastAt: 0.12,
         trackFormAt: 0.06,
@@ -165,10 +169,10 @@ export default (canvas, keyboard = true) => {
         trackCamAt: 0.008,
         trackSpawnAt: 0.18,
 
-        mic: parseFloat((queries.mic_in || 1), 10),
-        micFlowAt: 0.5,
-        micFastAt: 0.6,
-        micFormAt: 0.4,
+        mic: parseFloat((settings.mic_in || 1), 10),
+        micFlowAt: 1,
+        micFastAt: 0.8,
+        micFormAt: 0.5,
         micSampleAt: 0.74,
         micCamAt: 0.06,
         micSpawnAt: 0.09
@@ -306,31 +310,33 @@ export default (canvas, keyboard = true) => {
             old.parentElement.removeChild(old);
         }
 
-        if(trackURL.match(/^(https?)?(\:\/\/)?(www\.)?soundcloud\.com\//gi)) {
-            // Special setup for SoundCloud links
-            soundCloud({
-                    client_id: '75aca2e2b815f9f5d4e92916c7b80846',
-                    song: trackURL,
-                    dark: false
-                },
-                (e, src, data, el) => {
-                    if(e) {
-                        console.warn('Error loading track', e);
-                    }
-                    else {
-                        setupTrack(src, el.querySelector('.npm-scb-info'));
-                        el.classList.add('epok-soundcloud');
-                    }
-                });
-        }
-        else if(trackURL.match(/^(https)?(:\/\/)?(www\.)?dropbox\.com\/s\//gi)) {
-            // Handle Dropbox share links
-            setupTrack(trackURL.replace(/^((https)?(:\/\/)?(www\.)?)dropbox\.com\/s\/(.*)\?dl=(0)$/gi,
-                    'https://dl.dropboxusercontent.com/s/$5?dl=1&raw=1'),
-                canvas.parentElement, true);
-        }
-        else {
-            setupTrack(trackURL, canvas.parentElement, true);
+        if(trackURL) {
+            if(trackURL.match(/^(https?)?(\:\/\/)?(www\.)?soundcloud\.com\//gi)) {
+                // Special setup for SoundCloud links
+                soundCloud({
+                        client_id: '75aca2e2b815f9f5d4e92916c7b80846',
+                        song: trackURL,
+                        dark: false
+                    },
+                    (e, src, data, el) => {
+                        if(e) {
+                            console.warn('Error loading track', e);
+                        }
+                        else {
+                            setupTrack(src, el.querySelector('.npm-scb-info'));
+                            el.classList.add('epok-soundcloud');
+                        }
+                    });
+            }
+            else if(trackURL.match(/^(https)?(:\/\/)?(www\.)?dropbox\.com\/s\//gi)) {
+                // Handle Dropbox share links
+                setupTrack(trackURL.replace(/^((https)?(:\/\/)?(www\.)?)dropbox\.com\/s\/(.*)\?dl=(0)$/gi,
+                        'https://dl.dropboxusercontent.com/s/$5?dl=1&raw=1'),
+                    canvas.parentElement, true);
+            }
+            else {
+                setupTrack(trackURL, canvas.parentElement, true);
+            }
         }
     };
 
@@ -473,6 +479,8 @@ export default (canvas, keyboard = true) => {
 
 
     function getMedia() {
+        appSettings.useMedia = true;
+
         getUserMedia({
                 video: true,
                 audio: true
@@ -507,8 +515,13 @@ export default (canvas, keyboard = true) => {
             });
     }
 
-    const stopMedia = (stream = mediaStream) =>
+    function stopMedia(stream = mediaStream) {
+        appSettings.useMedia = false;
         (stream && each((track) => track.stop(), stream.getTracks()));
+    }
+
+    const toggleMedia = (toggle = appSettings.useMedia) =>
+        ((toggle)? getMedia : stopMedia)();
 
     if(appSettings.useMedia) {
         getMedia();
@@ -879,7 +892,7 @@ export default (canvas, keyboard = true) => {
                 damping: defaultState.damping-0.002
             }
         ],
-        level: parseInt((queries.quality || 0), 10),
+        level: parseInt((settings.quality || 0), 10),
         levels: Array.from(document.querySelectorAll('.epok-quality-level')),
         steppers: Array.from(document.querySelectorAll(`.epok-quality-stepper,
             .epok-quality-prompter`)),
@@ -2625,7 +2638,7 @@ export default (canvas, keyboard = true) => {
 
     const gui = {
         main: new dat.GUI({ autoPlace: false }),
-        showing: (''+queries.edit === 'true'),
+        showing: (''+settings.edit === 'true'),
         toggle: document.querySelector('.epok-editor-button')
     };
 
@@ -2689,7 +2702,7 @@ export default (canvas, keyboard = true) => {
             ease: [0, 0.95, 1]
         });
 
-    const showExport = ((''+queries.prompt_show !== 'false')?
+    const showExport = ((''+settings.prompt_show !== 'false')?
             (...rest) => self.prompt(...rest)
         :   (...rest) => console.log(...rest));
 
@@ -2697,7 +2710,7 @@ export default (canvas, keyboard = true) => {
             showLink: () => showExport('Link:',
                 location.href.replace((location.search || /$/gi),
                     '?'+querystring.encode({
-                        ...queries,
+                        ...settings,
                         track: encodeURIComponent(appSettings.trackURL),
                         mute: !audioState.audible,
                         track_in: audioState.track,
@@ -2717,8 +2730,7 @@ export default (canvas, keyboard = true) => {
 
     gui.main.add(appSettings, 'animate');
 
-    gui.main.add(appSettings, 'useMedia').onFinishChange(() =>
-            ((appSettings.useMedia)? getMedia : stopMedia)());
+    gui.main.add(appSettings, 'useMedia').onFinishChange(() => toggleMedia());
 
     gui.main.add(appSettings, 'staticImage').onFinishChange(() =>
             image.src = appSettings.staticImage);
@@ -3424,7 +3436,7 @@ export default (canvas, keyboard = true) => {
             false);
     }
 
-    if(keyboard && ''+queries.keys !== 'false') {
+    if(''+settings.keyboard !== 'false') {
         keyMash();
     }
 
@@ -3436,7 +3448,8 @@ export default (canvas, keyboard = true) => {
         reset,
         restart,
         defaultState,
-        audioDefaults
+        audioDefaults,
+        toggleMedia
     };
 
     // Debug
