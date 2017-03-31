@@ -14,7 +14,7 @@
         <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
     </head>
     <body>
-        <main>
+        <header>
             <!-- <img class="epok-logo" title="epok" src="./build/images/epok.svg"/> -->
             <svg class="epok-logo" title="epok" viewBox="0 0 652 250" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
                 <!-- Generator: Sketch 42 (36781) - http://www.bohemiancoding.com/sketch -->
@@ -52,7 +52,7 @@
                             <path d="M27.0480052,12.2371511 L86.3851219,115.821443 C104.007854,105.369323 115.821443,86.153546 115.821443,64.1785573 C115.821443,31.0414723 88.9585277,4.17855731 55.8214427,4.17855731 C22.6843577,4.17855731 -4.17855731,31.0414723 -4.17855731,64.1785573" class="epok-logo__draw-4" transform="translate(55.821443, 60.000000) rotate(-90.000000) translate(-55.821443, -60.000000) "></path>
                         </g>
                     </g>
-                    <g class="epok-logo__build" opacity="0.495584239" transform="translate(10.000000, 4.000000)" stroke="#7F7F97">
+                    <g class="epok-logo__build" opacity="0.495584239" transform="translate(10.000000, 4.000000)" stroke="#7F7F7F">
                         <circle class="epok-logo__build-0 epok-logo__build-part" cx="345" cy="120" r="120"></circle>
                         <circle class="epok-logo__build-1 epok-logo__build-part" cx="405" cy="120" r="60"></circle>
                         <path d="M0.483916012,179.666667 L630,179.666667" class="epok-logo__build-2 epok-logo__build-part" stroke-linecap="square"></path>
@@ -71,36 +71,49 @@
                 </g>
             </svg>
 
-            <article class="epok-folio__intro">
-                <p class="epok-folio__intro-item">Eoghan O'Keeffe <em class="epok-phonetic">[oʊən oʊkif]</em></p>
-            </article>
+            <section class="epok-folio__intro">
+                <div class="epok-folio__tag">
+                    <h1 class="epok-folio__name">Eoghan O'Keeffe</h1>
+                    <em class="epok-folio__glyph">[oʊən oʊkif]</em>
+                </div>
+                <h2 class="epok-folio__tag">
+                    Code
+                    <i class="epok-folio__glyph">&ctdot;</i>
+                    creative
+                    <i class="epok-folio__glyph">&ctdot;</i>
+                    background in fine art
+                </h2>
+                <p class="epok-folio__tag">
+                    Currently: developer at <a class="epok-folio__link" href="http://rehabstudio.com/" target="_blank">+rehabstudio</a>
+                </p>
+            </section>
 
             <section class="epok-folio__demo">
-                <canvas touch-action="none"></canvas>
+                <canvas class="epok-light" touch-action="none"></canvas>
 
                 <div class="epok-main-controls">
                     <button class="epok-quality-stepper epok-main-control">
-                        <i class="epok-quality-level material-icons epok-tooltip hint--top-right" aria-label="Visuals quality: normal">hdr_weak</i><!-- remove_circle_outline -->
-                        <i class="epok-quality-level epok-hide material-icons epok-tooltip hint--top-right" aria-label="Visuals quality: high">hdr_strong</i><!-- add_circle_outline -->
+                        <i class="epok-quality-level material-icons epok-tooltip hint--top-left" aria-label="Visuals quality: normal">hdr_weak</i>
+                        <i class="epok-quality-level epok-hide material-icons epok-tooltip hint--top-left" aria-label="Visuals quality: high">hdr_strong</i>
                     </button>
 
-                    <button class="epok-fullscreen-button epok-main-control epok-tooltip hint--top-right" aria-label="Fullscreen">
+                    <button class="epok-fullscreen-button epok-main-control epok-tooltip hint--top-left" aria-label="Fullscreen">
                         <i class="material-icons">aspect_ratio</i>
                     </button>
 
-                    <button class="epok-editor-button epok-main-control epok-tooltip hint--top-right" aria-label="Toggle the edit panel">
+                    <button class="epok-editor-button epok-main-control epok-tooltip hint--top-left" aria-label="Toggle the edit panel">
                         <i class="material-icons">tune</i>
                     </button>
 
-                    <button class="epok-capture-button epok-main-control epok-tooltip hint--top-right" aria-label="Capture and share a screenshot">
+                    <button class="epok-capture-button epok-main-control epok-tooltip hint--top-left" aria-label="Capture and share a screenshot">
                         <i class="material-icons">camera</i>
                     </button>
 
-                    <a class="epok-a epok-video-button epok-main-control epok-tooltip hint--top-right" aria-label="See the video" href="https://youtu.be/LFqM5n74w9Y" target="_blank">
+                    <a class="epok-a epok-video-button epok-main-control epok-tooltip hint--top-left" aria-label="See the video" href="https://youtu.be/LFqM5n74w9Y" target="_blank">
                         <i class="material-icons">ondemand_video</i>
                     </a>
 
-                    <a class="epok-a epok-link-button epok-main-control epok-tooltip hint--top-right" aria-label="See the Emergence project" href="http://emergence.maxcooper.net/" target="_blank">
+                    <a class="epok-a epok-link-button epok-main-control epok-tooltip hint--top-left" aria-label="See the Emergence project" href="http://emergence.maxcooper.net/" target="_blank">
                         <i class="material-icons">arrow_forward</i>
                     </a>
                 </div>
@@ -117,26 +130,55 @@
                 <div class="epok-captured-overlay">
                     <img class="epok-captured-image"/>
                     <div class="epok-main-controls">
-                        <button class="epok-exit-overlay epok-main-control epok-tooltip hint--top-right" aria-label="Return to visuals">
+                        <button class="epok-exit-overlay epok-main-control epok-tooltip hint--top-left" aria-label="Return to visuals">
                             <i class="material-icons">cancel</i>
                         </button>
 
-                        <label class="epok-main-control epok-tooltip hint--top-right" aria-label="Copy the link to share your screenshot">
+                        <label class="epok-main-control epok-tooltip hint--top-left" aria-label="Copy the link to share your screenshot">
                             <i class="material-icons">share</i>
                             <input class="epok-captured-url"
                                 onclick="this.focus(); this.select()" readonly
-                                placeholder="Share link loading..."
+                                placeholder="Loading share link..."
                                 />
                         </label>
                     </div>
                 </div>
             </section>
-        </main>
+        </header>
 
-        <!-- Navigation and controls -->
-            <!-- Demos -->
-            <!-- CV and about -->
-            <!-- Portfolio showcase -->
+        <article class="epok-folio__detail">
+            <h3 class="epok-folio__tag">
+                Projects
+                <i class="epok-folio__glyph">&ctdot;</i>
+                <a class="epok-folio__link" href="http://stackoverflow.com/story/keeffeoghan" target="_blank">CV</a>
+            </h3>
+            <ul class="epok-folio__projects">
+                <li class="epok-folio__project">
+                    <h4>
+                        <a class="epok-folio__link" href="https://keeffeoghan.github.io/portfolio/demos/tendrils/" target="_blank">Tendrils</a>
+                    Interactive music video for Max Cooper's Emergence.
+                    </h4>
+                </li>
+                <li class="epok-folio__project">
+                    <h4>
+                        <a class="epok-folio__link" href="http://www.torchsongs.co.uk/" target="_blank">CALM Torch Songs</a>
+                    Audio-reactive visuals for each song in the campaign.
+                    </h4>
+                </li>
+                <li class="epok-folio__project">
+                    <h4>
+                        <a class="epok-folio__link" href="http://rehabstudio.com/work/owning-the-ice/" target="_blank">Google Chromecast - Own The Ice</a>
+                    </h4>
+                    Multiplayer game for a whole hockey stadium, played on the jumbotron.
+                </li>
+                <li class="epok-folio__project">
+                    <h4>
+                        <a class="epok-folio__link" href="https://store.google.com/category/customizable_live_case" target="_blank">Google Live Cases</a>
+                    </h4>
+                    Custom phone accessory design creator.
+                </li>
+            </ul>
+        </article>
 
         <script type="text/javascript" src="./build/js/index.js"></script>
     </body>
