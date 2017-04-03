@@ -43,7 +43,7 @@
             <path d="M0.483916012,59.6666667 L630,59.6666667" id="build-4" stroke-linecap="square"></path>
             <path d="M629.69159,60.5 L422.5,181.033609" id="build-5" stroke-linecap="square" transform="translate(526.095795, 120.766805) scale(-1, 1) translate(-526.095795, -120.766805) "></path>
             <path d="M525.5,180.5 L525.5,60" id="build-6" stroke-linecap="square"></path>
-            <path d="M448.5,60.5 L136.499941,240.500034" id="build-7" stroke-linecap="square"></path>
+            <path d="M448.5,60.5 L164.5,223.5" id="build-7" stroke-linecap="square"></path>
             <circle id="build-8" cx="225" cy="120" r="60"></circle>
             <path d="M164.5,223.5 L164.5,120" id="build-9" stroke-linecap="square"></path>
             <path d="M165.009178,120.316776 L61.5,180.033609" id="build-10" stroke-linecap="square" transform="translate(113.254589, 150.175193) scale(-1, -1) translate(-113.254589, -150.175193) "></path>
