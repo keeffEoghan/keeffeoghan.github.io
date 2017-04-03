@@ -18,6 +18,23 @@ header {
         right: 0;
         border-top: 1px dashed $epok-folio--bg;
     }
+
+    &.epok-folio--intro-run {
+        .epok-main-controls,
+        .epok-folio__tag {
+            opacity: 0;
+        }
+    }
+
+    .epok-folio__tag {
+        &:nth-child(2) {
+            transition-delay: 200ms;
+        }
+
+        &:nth-child(3) {
+            transition-delay: 400ms;
+        }
+    }
 }
 
 .epok-folio__intro,
@@ -26,29 +43,19 @@ header {
     z-index: 10;
 }
 
-.epok-folio__intro
+.epok-folio__intro,
 .epok-folio__detail {
     padding: 0.75em 0;
 }
 
 .epok-folio__intro {
-    margin-top: 13%;
     bottom: 0;
     left: 0;
     max-width: 30em;
 }
 
-.epok-logo {
-    top: 50vh;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    width: 50%;
-    max-width: 800px;
-    pointer-events: none;
-}
-
 .epok-folio__tag,
-.epok-folio__project {
+.epok-folio__content {
     line-height: 1.75em;
     padding: 0.75em 1.75em;
     margin: 0.5em 0;
@@ -70,6 +77,16 @@ header {
 .epok-folio__name {
     display: inline-block;
     font-size: 1em;
+}
+
+.epok-logo {
+    top: 50vh;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 50%;
+    width: 40vmax;
+    max-width: 800px;
+    pointer-events: none;
 }
 
 .epok-logo__build {
@@ -157,6 +174,7 @@ em {
     position: relative;
     color: #fff;
     z-index: 10;
+    border-top: 1px dashed #fff;
 }
 
 .epok-folio__projects {
