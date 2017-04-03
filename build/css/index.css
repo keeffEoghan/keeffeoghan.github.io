@@ -428,21 +428,27 @@ header { height: 100%; }
 
 header::after { content: ''; position: absolute; bottom: 0; left: 0; right: 0; border-top: 1px dashed #222; }
 
+header.epok-folio--intro-run .epok-main-controls, header.epok-folio--intro-run .epok-folio__tag { opacity: 0; }
+
+header .epok-folio__tag:nth-child(2) { -webkit-transition-delay: 200ms; transition-delay: 200ms; }
+
+header .epok-folio__tag:nth-child(3) { -webkit-transition-delay: 400ms; transition-delay: 400ms; }
+
 .epok-folio__intro, .epok-logo { position: absolute; z-index: 10; }
 
-.epok-folio__intro .epok-folio__detail { padding: 0.75em 0; }
+.epok-folio__intro, .epok-folio__detail { padding: 0.75em 0; }
 
-.epok-folio__intro { margin-top: 13%; bottom: 0; left: 0; max-width: 30em; }
+.epok-folio__intro { bottom: 0; left: 0; max-width: 30em; }
 
-.epok-logo { top: 50vh; left: 50%; -webkit-transform: translate(-50%, -50%); transform: translate(-50%, -50%); width: 50%; max-width: 800px; pointer-events: none; }
-
-.epok-folio__tag, .epok-folio__project { line-height: 1.75em; padding: 0.75em 1.75em; margin: 0.5em 0; clear: both; }
+.epok-folio__tag, .epok-folio__content { line-height: 1.75em; padding: 0.75em 1.75em; margin: 0.5em 0; clear: both; }
 
 .epok-folio__tag { float: left; color: #000; background-color: rgba(255, 255, 255, 0.85); -webkit-transition: opacity 300ms ease-in-out; transition: opacity 300ms ease-in-out; }
 
 .epok-folio__tag.epok-hide { opacity: 0; pointer-events: none; }
 
 .epok-folio__name { display: inline-block; font-size: 1em; }
+
+.epok-logo { top: 50vh; left: 50%; -webkit-transform: translate(-50%, -50%); transform: translate(-50%, -50%); width: 50%; width: 40vmax; max-width: 800px; pointer-events: none; }
 
 .epok-logo__build { stroke: #7f7f7f; }
 
@@ -476,7 +482,7 @@ em { font-style: italic; }
 
 .epok-folio__link:active { opacity: 0.5; }
 
-.epok-folio__detail { position: relative; color: #fff; z-index: 10; }
+.epok-folio__detail { position: relative; color: #fff; z-index: 10; border-top: 1px dashed #fff; }
 
 .epok-folio__projects { clear: both; overflow: hidden; }
 
