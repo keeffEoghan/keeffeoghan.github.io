@@ -3443,10 +3443,9 @@ export default (canvas, options) => {
     // Need some stuff exposed.
     // @todo Come up with a better interface than this.
     const out = {
+        ...controllers,
         tendrils,
         tracks,
-        reset,
-        restart,
         defaultState,
         audioDefaults,
         toggleMedia

@@ -38,14 +38,16 @@ export default () => {
 
     Object.assign(demo.tendrils.state, demo.defaultState, {
         flowDecay: 0.001,
-        colorMapAlpha: 0.33,
+        varyForce: 0.1,
+        varyNoiseSpeed: 0,
+        colorMapAlpha: 0.4,
         baseColor: Object.assign(demo.tracks.baseColor, [0, 0, 0, 0.85]),
         flowColor: Object.assign(demo.tracks.flowColor, [1, 1, 1, 0.06]),
         fadeColor: Object.assign(demo.tracks.fadeColor, [0, 0, 0, 0])
     });
 
     Object.assign(demo.tracks.spawn, {
-        radius: 0.55,
+        radius: 0.475,
         speed: 0
     });
 
@@ -57,7 +59,16 @@ export default () => {
     demo.reset();
 
     stages[1] = () => {
-        setTimeout(demo.restart, 100);
+        setTimeout(() => {
+                demo.restart();
+
+                document.addEventListener('click', () => demo.spawnFastest());
+                document.addEventListener('dblclick', () => demo.spawnImage());
+
+                document.querySelector('header')
+                    .classList.remove('epok-folio--intro-run');
+            },
+            100);
 
         setTimeout(() => {
                 Object.assign(demo.tracks.audio, demo.audioDefaults);
