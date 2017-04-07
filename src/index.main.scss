@@ -27,12 +27,13 @@ header {
     }
 
     .epok-folio__tag {
-        &:nth-child(2) {
-            transition-delay: 200ms;
-        }
+        $wait: 300ms;
+        $stagger: 250ms;
 
-        &:nth-child(3) {
-            transition-delay: 400ms;
+        @for $i from 1 through 3 {
+            &:nth-child(#{ $i }) {
+                transition-delay: $wait + ($stagger * $i);
+            }
         }
     }
 }
@@ -66,7 +67,7 @@ header {
     float: left;
     color: #000;
     background-color: rgba(255, 255, 255, 0.85);
-    transition: opacity 300ms ease-in-out;
+    transition: opacity 500ms ease-in-out;
 
     &.epok-hide {
         opacity: 0;
