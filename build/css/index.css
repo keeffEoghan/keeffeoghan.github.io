@@ -32,10 +32,10 @@ body { margin: 0; }
 
 main { min-height: 100%; }
 
-/*! Hint.css - v2.4.1 - 2016-11-08 http://kushagragour.in/lab/hint/ Copyright (c) 2016 Kushagra Gour */
+/*! Hint.css - v2.5.0 - 2017-04-23 http://kushagragour.in/lab/hint/ Copyright (c) 2017 Kushagra Gour */
 /*-------------------------------------*	HINT.css - A CSS tooltip library
 \*-------------------------------------*/
-/** HINT.css is a tooltip library made in pure CSS. Source: https://github.com/chinchang/hint.css Demo: http://kushagragour.in/lab/hint/ Release under The MIT License */
+/** HINT.css is a tooltip library made in pure CSS. Source: https://github.com/chinchang/hint.css Demo: http://kushagragour.in/lab/hint/ */
 /** source: hint-core.scss Defines the basic styling for the tooltip. Each tooltip is made of 2 parts: 1) body (:after) 2) arrow (:before) Classes added: 1) hint */
 [class*="hint--"] { position: relative; display: inline-block; /** tooltip arrow */ /** tooltip body */ }
 
@@ -339,7 +339,7 @@ canvas.epok-no-cursor { cursor: none; }
 
 .epok-a:active { color: #414141; }
 
-.epok-info { position: absolute; display: -webkit-box; display: -webkit-flex; display: -ms-flexbox; display: flex; -webkit-flex-flow: column nowrap; -ms-flex-flow: column nowrap; flex-flow: column nowrap; -webkit-box-pack: start; -webkit-justify-content: flex-start; -ms-flex-pack: start; justify-content: flex-start; -webkit-box-align: start; -webkit-align-items: flex-start; -ms-flex-align: start; align-items: flex-start; left: 0; top: 4em; bottom: 4em; width: 60%; max-width: 36em; overflow: auto; z-index: 10; -webkit-transition: opacity 300ms ease-in-out; transition: opacity 300ms ease-in-out; }
+.epok-info { position: absolute; display: -webkit-box; display: -webkit-flex; display: -ms-flexbox; display: flex; -webkit-box-orient: vertical; -webkit-box-direction: normal; -webkit-flex-flow: column nowrap; -ms-flex-flow: column nowrap; flex-flow: column nowrap; -webkit-box-pack: start; -webkit-justify-content: flex-start; -ms-flex-pack: start; justify-content: flex-start; -webkit-box-align: start; -webkit-align-items: flex-start; -ms-flex-align: start; align-items: flex-start; left: 0; top: 4em; bottom: 4em; width: 60%; max-width: 36em; overflow: auto; z-index: 10; -webkit-transition: opacity 300ms ease-in-out; transition: opacity 300ms ease-in-out; }
 
 .epok-info.epok-hide { opacity: 0; pointer-events: none; }
 
@@ -382,7 +382,7 @@ canvas.epok-no-cursor { cursor: none; }
 
 .epok-quality-level.epok-hide { display: none; }
 
-.epok-edit-controls { position: absolute; display: -webkit-box; display: -webkit-flex; display: -ms-flexbox; display: flex; -webkit-flex-flow: column nowrap; -ms-flex-flow: column nowrap; flex-flow: column nowrap; -webkit-box-pack: stretch; -webkit-justify-content: stretch; -ms-flex-pack: stretch; justify-content: stretch; top: 0; right: 0; max-height: 100%; padding-bottom: 20px; z-index: 1000; -webkit-transition: opacity 300ms ease-out; transition: opacity 300ms ease-out; }
+.epok-edit-controls { position: absolute; display: -webkit-box; display: -webkit-flex; display: -ms-flexbox; display: flex; -webkit-box-orient: vertical; -webkit-box-direction: normal; -webkit-flex-flow: column nowrap; -ms-flex-flow: column nowrap; flex-flow: column nowrap; -webkit-box-pack: stretch; -webkit-justify-content: stretch; -ms-flex-pack: stretch; justify-content: stretch; top: 0; right: 0; max-height: 100%; padding-bottom: 20px; z-index: 1000; -webkit-transition: opacity 300ms ease-out; transition: opacity 300ms ease-out; }
 
 .epok-edit-controls.epok-hide { opacity: 0; pointer-events: none; }
 
@@ -392,7 +392,7 @@ canvas.epok-no-cursor { cursor: none; }
 
 .epok-track { visibility: hidden; }
 
-.epok-audio-controls { display: none; -webkit-flex-flow: row nowrap; -ms-flex-flow: row nowrap; flex-flow: row nowrap; -webkit-box-align: stretch; -webkit-align-items: stretch; -ms-flex-align: stretch; align-items: stretch; -webkit-box-pack: center; -webkit-justify-content: center; -ms-flex-pack: center; justify-content: center; padding: 0.7em 1em; color: #fff; text-shadow: 0 0 3px #000, 0 0 3px #000; }
+.epok-audio-controls { display: none; -webkit-box-orient: horizontal; -webkit-box-direction: normal; -webkit-flex-flow: row nowrap; -ms-flex-flow: row nowrap; flex-flow: row nowrap; -webkit-box-align: stretch; -webkit-align-items: stretch; -ms-flex-align: stretch; align-items: stretch; -webkit-box-pack: center; -webkit-justify-content: center; -ms-flex-pack: center; justify-content: center; padding: 0.7em 1em; color: #fff; text-shadow: 0 0 3px #000, 0 0 3px #000; }
 
 .epok-audio-controls.epok-show { display: -webkit-box; display: -webkit-flex; display: -ms-flexbox; display: flex; }
 
@@ -412,7 +412,7 @@ canvas.epok-no-cursor { cursor: none; }
 
 .epok-audio-controls .epok-progress { -webkit-box-flex: 1; -webkit-flex: 1 1 auto; -ms-flex: 1 1 auto; flex: 1 1 auto; margin: 0 1em; cursor: pointer; }
 
-.epok-captured-overlay { position: absolute; display: -webkit-box; display: -webkit-flex; display: -ms-flexbox; display: flex; -webkit-flex-flow: row nowrap; -ms-flex-flow: row nowrap; flex-flow: row nowrap; -webkit-box-pack: center; -webkit-justify-content: center; -ms-flex-pack: center; justify-content: center; -webkit-box-align: center; -webkit-align-items: center; -ms-flex-align: center; align-items: center; top: 0; left: 0; bottom: 0; right: 0; opacity: 0; pointer-events: none; z-index: 1002; background-color: rgba(0, 0, 0, 0.9); -webkit-transition: opacity 300ms ease-out; transition: opacity 300ms ease-out; }
+.epok-captured-overlay { position: absolute; display: -webkit-box; display: -webkit-flex; display: -ms-flexbox; display: flex; -webkit-box-orient: horizontal; -webkit-box-direction: normal; -webkit-flex-flow: row nowrap; -ms-flex-flow: row nowrap; flex-flow: row nowrap; -webkit-box-pack: center; -webkit-justify-content: center; -ms-flex-pack: center; justify-content: center; -webkit-box-align: center; -webkit-align-items: center; -ms-flex-align: center; align-items: center; top: 0; left: 0; bottom: 0; right: 0; opacity: 0; pointer-events: none; z-index: 1002; background-color: rgba(0, 0, 0, 0.9); -webkit-transition: opacity 300ms ease-out; transition: opacity 300ms ease-out; }
 
 .epok-captured-overlay.epok-show { opacity: 1; pointer-events: all; }
 
@@ -428,11 +428,7 @@ header { height: 100%; }
 
 header::after { content: ''; position: absolute; bottom: 0; left: 0; right: 0; border-top: 1px dashed #222; }
 
-header.epok-folio--intro-run .epok-main-controls, header.epok-folio--intro-run .epok-folio__tag { opacity: 0; }
-
-header .epok-folio__tag:nth-child(2) { -webkit-transition-delay: 200ms; transition-delay: 200ms; }
-
-header .epok-folio__tag:nth-child(3) { -webkit-transition-delay: 400ms; transition-delay: 400ms; }
+header.epok-folio--intro-run .epok-main-controls { opacity: 0; }
 
 .epok-folio__intro, .epok-logo { position: absolute; z-index: 10; }
 
@@ -442,7 +438,7 @@ header .epok-folio__tag:nth-child(3) { -webkit-transition-delay: 400ms; transiti
 
 .epok-folio__tag, .epok-folio__content { line-height: 1.75em; padding: 0.75em 1.75em; margin: 0.5em 0; clear: both; }
 
-.epok-folio__tag { float: left; color: #000; background-color: rgba(255, 255, 255, 0.85); -webkit-transition: opacity 300ms ease-in-out; transition: opacity 300ms ease-in-out; }
+.epok-folio__tag { float: left; color: #000; background-color: rgba(255, 255, 255, 0.85); -webkit-transition: opacity 500ms ease-in-out; transition: opacity 500ms ease-in-out; }
 
 .epok-folio__tag.epok-hide { opacity: 0; pointer-events: none; }
 
