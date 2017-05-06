@@ -20,20 +20,8 @@ header {
     }
 
     &.epok-folio--intro-run {
-        .epok-main-controls,
-        .epok-folio__tag {
+        .epok-main-controls {
             opacity: 0;
-        }
-    }
-
-    .epok-folio__tag {
-        $wait: 300ms;
-        $stagger: 250ms;
-
-        @for $i from 1 through 3 {
-            &:nth-child(#{ $i }) {
-                transition-delay: $wait + ($stagger * $i);
-            }
         }
     }
 }
