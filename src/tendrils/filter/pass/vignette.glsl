@@ -1,18 +1,13 @@
-// @todo Tweak shape of vignette falloff.
+/**
+ * @requires {vec2} mid The center of the vignette
+ * @requires {float} limit The radius of the vignette
+ * @requires {(float|vec2|vec3|vec4)} curve Bezier curve points, shaping falloff
+ */
 
-#pragma glslify: length2 = require(../../utils/length-2)
-
-const vec2 midUV = vec2(0.5);
-const float limit = 0.5*0.5;
+#pragma glslify: vignette = require(../vignette)
 
 vec4 pass(vec2 uv, vec4 pixel) {
-    return vec4(pixel*max(0.0, limit-length2(uv-midUV)));
+    return pixel*vignette(uv, mid, limit, curve);
 }
-
-// const float limit = 0.5;
-
-// vec4 pass(vec2 uv, vec4 pixel) {
-//     return vec4(pixel*max(0.0, limit-length(uv-midUV)));
-// }
 
 #pragma glslify: export(pass)

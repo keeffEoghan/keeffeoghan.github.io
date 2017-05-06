@@ -1,7 +1,176 @@
 @import './common';
+@import './tendrils/index';
+
+$epok-folio--bg: #222;
 
 body {
-    background: #042B2D;
+    background-color: $epok-folio--bg;
 }
 
-@import './tendrils/index';
+header {
+    height: 100%;
+
+    &::after {
+        content: '';
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        border-top: 1px dashed $epok-folio--bg;
+    }
+
+    &.epok-folio--intro-run {
+        .epok-main-controls {
+            opacity: 0;
+        }
+    }
+}
+
+.epok-folio__intro,
+.epok-logo {
+    position: absolute;
+    z-index: 10;
+}
+
+.epok-folio__intro,
+.epok-folio__detail {
+    padding: 0.75em 0;
+}
+
+.epok-folio__intro {
+    bottom: 0;
+    left: 0;
+    max-width: 30em;
+}
+
+.epok-folio__tag,
+.epok-folio__content {
+    line-height: 1.75em;
+    padding: 0.75em 1.75em;
+    margin: 0.5em 0;
+    clear: both;
+}
+
+.epok-folio__tag {
+    float: left;
+    color: #000;
+    background-color: rgba(255, 255, 255, 0.85);
+    transition: opacity 500ms ease-in-out;
+
+    &.epok-hide {
+        opacity: 0;
+        pointer-events: none;
+    }
+}
+
+.epok-folio__name {
+    display: inline-block;
+    font-size: 1em;
+}
+
+.epok-logo {
+    top: 50vh;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 50%;
+    width: 40vmax;
+    max-width: 800px;
+    pointer-events: none;
+}
+
+.epok-logo__build {
+    stroke: #7f7f7f;
+}
+
+.epok-logo__build-part {
+    opacity: 0;
+
+    &.epok-show {
+        opacity: 1;
+    }
+}
+
+.epok-logo__draw {
+    stroke: #fff;
+    stroke-width: 4;
+}
+
+.epok-logo__background {
+    display: none;
+}
+
+.epok-folio__demo {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 100vh;
+    background-color: #fff;
+}
+
+.epok-main-controls {
+    right: 0;
+    left: auto;
+}
+
+.epok-edit-controls {
+    $gap: 100px;
+    $height: 20px;
+
+    padding-bottom: $gap + $height;
+
+    .close-button {
+        height: $height;
+        bottom: $gap;
+    }
+}
+
+.epok-folio__glyph {
+    opacity: 0.6;
+}
+
+em {
+    font-style: italic;
+}
+
+.epok-folio__link {
+    color: inherit;
+    text-decoration: underline;
+    cursor: pointer;
+
+    &:visited,
+    &:hover,
+    &:focus,
+    &:active {
+        color: inherit;
+    }
+
+    &:visited {
+        opacity: 1;
+    }
+
+    &:hover,
+    &:focus {
+        opacity: 0.75;
+    }
+
+    &:active {
+        opacity: 0.5;
+    }
+}
+
+.epok-folio__detail {
+    position: relative;
+    color: #fff;
+    z-index: 10;
+    border-top: 1px dashed #fff;
+}
+
+.epok-folio__projects {
+    clear: both;
+    overflow: hidden;
+}
+
+.epok-folio__project {
+    margin: 1em 0;
+}

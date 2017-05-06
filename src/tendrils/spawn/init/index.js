@@ -9,10 +9,7 @@ export const defaults = () => ({
 });
 
 export const spawner = (gl, options) => {
-    const params = {
-        ...defaults(),
-        ...options
-    };
+    const params = Object.assign(defaults(), options);
 
     return {
         gl,
@@ -22,8 +19,8 @@ export const spawner = (gl, options) => {
                 shader(gl, ...params.shader)
             :   params.shader),
 
-        respawn(tendrils) {
-            tendrils.respawnShader(this.shader, this.uniforms);
+        spawn(tendrils, ...rest) {
+            tendrils.spawnShader(this.shader, this.uniforms, ...rest);
         }
     };
 };

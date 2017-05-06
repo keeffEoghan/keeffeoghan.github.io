@@ -1,11 +1,13 @@
 'use strict';
 
 /**
- *  Moves HTML assets (maintaining folder structure) to
- *  the global `destPath` directory.
+ * Moves HTML assets (maintaining folder structure) to
+ * the global `destPath` directory.
  *
- *  Example Usage:
- *  gulp html
+ * @todo Get some templating in here.
+ *
+ * Example Usage:
+ * gulp html
  */
 
 var gulp = require('gulp');

@@ -7,39 +7,53 @@
 
 /* global Float32Array */
 
-import texture from 'gl-texture2d';
+import makeTexture from 'gl-texture2d';
 import ndarray from 'ndarray';
+import isNumber from 'lodash/isNumber';
 
-import { map } from '../../fp';
+import { mapList } from '../../fp/map';
 import { waveformMap, frequencyMap } from './utils';
 
+const assignMap = (v) => v;
+
 export class AudioTexture {
-    constructor(gl, size) {
-        this.array = ndarray(new Float32Array(size), [size, 1]);
-        this.texture = texture(gl, this.array, { float: true });
+    constructor(gl, array, texture) {
         this.gl = gl;
+
+        this.array = ((array && array.length)?
+                ndarray(array, [array.length, 1])
+            : ((isNumber(array))?
+                ndarray(new Float32Array(array), [array, 1])
+            :   array));
+
+        this.texture = (texture ||
+            makeTexture(gl, this.array, { float: true }));
     }
 
-    bind(unit) {
-        let bound = this.texture.bind(unit);
+    apply(array = this.array) {
+        this.texture.setPixels(array);
 
-        this.texture.setPixels(this.array);
-
-        return bound;
+        return this;
     }
 
     /**
      * Transform `web-audio-analyser` data values into a WebGL data texture range.
      */
 
-    waveform(data = this.array.data) {
-        map(waveformMap, data, this.array.data);
+    assign(data = this.array.data) {
+        mapList(assignMap, data, this.array.data);
 
         return this;
     }
 
-    frequency(data = this.array.data) {
-        map(frequencyMap, data, this.array.data);
+    waveform(data = this.array.data) {
+        mapList(waveformMap, data, this.array.data);
+
+        return this;
+    }
+
+    frequencies(data = this.array.data) {
+        mapList(frequencyMap, data, this.array.data);
 
         return this;
     }

@@ -18,12 +18,12 @@
 import geom from 'gl-geometry';
 import shader from 'gl-shader';
 import FBO from 'gl-fbo';
-import triangle from 'gl-big-triangle';
 import ndarray from 'ndarray';
 import isFunction from 'lodash/isFunction';
 
 import { step } from '../utils';
 
+import Screen from './screen';
 import logicVert from './screen/index.vert';
 
 
@@ -49,7 +49,7 @@ export class Particles {
 
         this.gl = gl;
 
-        this.triangle = triangle(this.gl);
+        this.screen = new Screen(this.gl);
 
         // The dimensions of the state data FBOs. Can be 1:1 with the number of
         // particle vertices, or
@@ -116,32 +116,43 @@ export class Particles {
             buffer.color[0].setPixels(pixels, offset));
     }
 
-    step(update) {
-        step(this.buffers);
+    /**
+     * @todo Find a way to use free texture bind units without having to
+     *       manually remember them
+     */
+    step(update, buffer) {
+        if(buffer) {
+            buffer.bind();
+        }
+        else {
+            step(this.buffers);
+            this.buffers[0].bind();
+        }
 
-        this.buffers[0].bind();
         this.gl.viewport(0, 0, this.shape[0], this.shape[1]);
 
         this.logic.bind();
 
         Particles.applyUpdate(Object.assign(this.logic.uniforms, {
                 dataRes: this.shape,
+                geomRes: this.geomShape,
                 particles: this.buffers[1].color[0].bind(0)
             }),
             update);
 
-        this.triangle.bind();
-        this.triangle.draw();
-        this.triangle.unbind();
-
+        this.screen.render();
         this.gl.bindFramebuffer(this.gl.FRAMEBUFFER, null);
     }
 
     draw(update, mode = this.gl.POINTS) {
         this.geom.bind(this.render);
-        this.render.uniforms.particles = this.buffers[0].color[0].bind(0);
 
-        Particles.applyUpdate(this.render.uniforms, update);
+        Particles.applyUpdate(Object.assign(this.render.uniforms, {
+                dataRes: this.shape,
+                geomRes: this.geomShape,
+                particles: this.buffers[0].color[0].bind(0)
+            }),
+            update);
 
         this.geom.draw(mode);
     }

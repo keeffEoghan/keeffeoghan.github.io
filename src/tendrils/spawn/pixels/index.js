@@ -1,6 +1,6 @@
 /**
  * Stupid little class for conveniently wrapping up things to be passed to the
- * Tendrils `respawnShader` function.
+ * Tendrils `spawnShader` function.
  */
 
 import FBO from 'gl-fbo';
@@ -17,17 +17,17 @@ export const defaults = () => ({
     shader: [vert, frag],
     // buffer: [[1, 1]]
     buffer: [[1, 1], { float: true }],
-    spawnSize: [1, 1]
+    spawnSize: [1, 1],
+    jitterRad: 2,
+    speed: 1,
+    bias: 1
 });
 
-export class SpawnPixels {
+export class PixelSpawner {
     constructor(gl, options) {
         this.gl = gl;
 
-        const params = {
-                ...defaults(),
-                ...options
-            };
+        const params = Object.assign(defaults(), options);
 
         this.shader = ((Array.isArray(params.shader))?
                 shader(this.gl, ...params.shader)
@@ -37,8 +37,10 @@ export class SpawnPixels {
                 FBO(this.gl, ...params.buffer)
             :   params.buffer);
 
-        this.jitterRad = 4;
+        this.speed = params.speed;
+        this.bias = params.bias;
 
+        this.jitterRad = params.jitterRad;
         this.jitter = vec2.create();
 
         this.spawnSize = params.spawnSize;
@@ -50,13 +52,14 @@ export class SpawnPixels {
                 spawnData: this.buffer.color[0].bind(1),
                 spawnSize: this.spawnSize,
                 spawnMatrix: this.spawnMatrix,
+                speed: this.speed,
                 jitter: aspect(this.jitter, uniforms.viewRes, this.jitterRad),
-                bias: 1
+                bias: this.bias
             });
     }
 
-    respawn(tendrils, update = this.update.bind(this)) {
-        return tendrils.respawnShader(this.shader, update);
+    spawn(tendrils, update = this.update.bind(this), ...rest) {
+        return tendrils.spawnShader(this.shader, update, ...rest);
     }
 
     setPixels(pixels) {
@@ -64,4 +67,4 @@ export class SpawnPixels {
     }
 }
 
-export default SpawnPixels;
+export default PixelSpawner;

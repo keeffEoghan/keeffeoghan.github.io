@@ -1,5 +1,8 @@
 /**
  * Draw forms into a tendrils flow FBO.
+ *
+ * @todo Improve the smoothness of this - currently very uneven and jagged,
+ *       especially over short gaps.
  */
 
 import Line, { defaults } from '../geom/line';
@@ -16,7 +19,7 @@ export class FlowLine {
                 uniforms: {
                     ...defaults().uniforms,
                     speed: 3,
-                    maxSpeed: 0.01,
+                    speedLimit: 0.01,
                     rad: 0.1,
                     crestShape: 0.6
                 },
@@ -34,17 +37,14 @@ export class FlowLine {
          * @type {Array}
          */
         this.times = (options.times || []);
-
-        // Drawn properties, derived from the above on `update`.
-        this.drawnTimes = null;
     }
 
-    update(each = this.setAttributes.bind(this)) {
+    update(setAttributes = this.setAttributes) {
         // @todo Unsure if this makes sense - reconsider closed loop times.
-        this.drawnTimes = ((this.line.closed && this.line.path.length)?
-            this.times.concat(this.times[0]) : this.times);
+        const drawnTimes = ((this.line.closed && this.line.path.length)?
+                this.times.concat(this.times[0]) : this.times);
 
-        this.line.update(each);
+        this.line.update((...rest) => setAttributes(drawnTimes, ...rest));
 
         return this;
     }
@@ -55,7 +55,7 @@ export class FlowLine {
         return this;
     }
 
-    setAttributes(values, index, attributes, line) {
+    setAttributes(times, values, index, attributes, line) {
         line.setAttributes(values, index, attributes, line);
 
         const prev = ((line.closed)?
@@ -65,10 +65,39 @@ export class FlowLine {
         attributes.previous.data.set(line.path[prev],
             index.data*attributes.previous.size);
 
-        const time = this.drawnTimes[index.path];
+        const time = times[index.path];
 
         attributes.time.data[index.data] = time;
-        attributes.dt.data[index.data] = time-this.drawnTimes[prev];
+        attributes.dt.data[index.data] = time-times[prev];
+    }
+
+    add(time, point) {
+        this.times.push(time);
+        this.line.path.push(point);
+
+        return this;
+    }
+
+    insert(time, point) {
+        const index = this.findIndex(time);
+
+        this.times.splice(index, 0, time);
+        this.line.path.splice(index, 0, point);
+
+        return this;
+    }
+
+    at(index, out = {}) {
+        out.time = this.times[index];
+        out.point = this.line.path[index];
+
+        return out;
+    }
+
+    findIndex(time) {
+        const next = this.times.findIndex((other) => other > time);
+
+        return ((next < 0)? this.times.length : next);
     }
 
     /**
@@ -78,7 +107,7 @@ export class FlowLine {
      * @param  {Number} ago The amount of time ago (in ms) before which to trim.
      * @param  {Number} now The current time.
      */
-    trimOld(ago, now = Date.now()) {
+    trim(ago, now = Date.now()) {
         const times = this.times;
         const path = this.line.path;
 
@@ -89,35 +118,12 @@ export class FlowLine {
             path.shift();
         }
 
-        return this;
+        return this.length;
+    }
+
+    get length() {
+        return this.times.length;
     }
 }
 
 export default FlowLine;
-
-// Test stuff:
-/*
-    // path: [[-0.8, 0], [0.8, 0]],
-    // path: [
-    //     [-0.8, -0.8],
-    //     [0.8, -0.8],
-    //     [0.8, 0.8],
-    //     [-0.8, 0.8],
-
-    //     [-0.8, -0.4],
-
-    //     [-0.4, -0.4],
-    //     [-0.4, 0.4],
-    //     [0.4, 0.4],
-    //     [0.4, -0.4],
-    //     [-0.1, -0.4]
-    // ],
-    // path: Array(20).fill(0).map((v, i, array) => {
-    //     const a = i/array.length*Math.PI*2;
-    //     const vec = vec2.fromValues(Math.cos(a), Math.sin(a));
-
-    //     return vec2.scale(vec, vec, 0.5);
-    // }),
-    // closed: true,
-    // times: Array(20).fill(0).map((v, i) => 1000+i*500)
-*/

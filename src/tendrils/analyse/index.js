@@ -6,14 +6,15 @@
 /* global Uint8Array */
 
 import { eulerDyDt } from '../physics/euler';
-import { map, reduce } from '../../fp';
+import { mapList } from '../../fp/map';
+import { reduceList } from '../../fp/reduce';
 import { step } from '../../utils';
 
 
 // Use them to derive higher-order info (velocity, acceleration, force, jerk...)
 
 export const logRates = (last, current, dt, out = new Uint8Array(last.length)) =>
-    map((v, i) => eulerDyDt(v, current[i], dt), last, out);
+    mapList((v, i) => eulerDyDt(v, current[i], dt), last, out);
 
 /**
  * Put the rates of change of the previous (lower) order of data into the next
@@ -33,13 +34,11 @@ export function orderLogRates(orderLog, dt = 1) {
 // Interpret from that info.
 
 export const peak = (data) =>
-    reduce((max, v) => Math.max(Math.abs(v), max), data, -1);
+    reduceList((max, v) => ((Math.abs(v) > Math.abs(max))? v : max), data, 0);
 
-export const peakPos = (data) => reduce((max, v, i) => {
-        let h = Math.abs(v);
-
-        if(h > max.peak) {
-            max.peak = h;
+export const peakPos = (data) => reduceList((max, v, i) => {
+        if(Math.abs(v) > Math.abs(max.peak)) {
+            max.peak = v;
             max.pos = i;
         }
 
@@ -47,18 +46,18 @@ export const peakPos = (data) => reduce((max, v, i) => {
     },
     data,
     {
-        peak: -1,
+        peak: 0,
         pos: -1
     });
 
-export const sum = (data) => reduce((sum, v) => sum+Math.abs(v), data, 0);
+export const sum = (data) => reduceList((sum, v) => sum+Math.abs(v), data, 0);
 
-export const weightedSum = (data, fulcrum) =>
-    reduce((sum, v, i) =>
-            sum+Math.abs(v*(1-(Math.abs(i-fulcrum)/(data.length-1)))),
+export const sumWeight = (data, fulcrum = 0.5) =>
+    reduceList((sum, v, i) =>
+            sum+Math.abs(v*(1-Math.abs((i/(data.length-1))-fulcrum))),
         data, 0);
 
 export const mean = (data) => sum(data)/data.length;
 
-export const weightedMean = (data, fulcrum) =>
-    weightedSum(data, fulcrum)/data.length;
+export const meanWeight = (data, fulcrum = 0.5) =>
+    sumWeight(data, fulcrum)/data.length;

@@ -3,21 +3,28 @@
  * @main Index
  */
 
-import tendrilsApp from './tendrils/demo';
+import 'babel-polyfill';
+
+import setup from './';
+
+let app;
 
 const readyStates = ['loading', 'interactive', 'complete'];
 
 // Load in stages.
 let readyCallbacks = {
-        loading() {
-            document.addEventListener('readystatechange', updateState);
-        },
-        interactive() {
-            tendrilsApp(document.querySelector('canvas'));
+    loading() {
+        document.addEventListener('readystatechange', updateState);
+    },
+    interactive() {
+        app = setup();
+    },
+    complete() {
+        app.go();
+        document.removeEventListener('readystatechange', updateState);
+    }
+};
 
-            document.removeEventListener('readystatechange', updateState);
-        }
-    };
 let last = 0;
 
 function updateState() {

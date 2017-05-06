@@ -1,0 +1,68 @@
+{
+  "name": "dat.gui",
+  "version": "0.6.4",
+  "description": "A lightweight graphical user interface for changing variables in JavaScript.",
+  "main": "index.js",
+  "directories": {
+    "test": "tests"
+  },
+  "scripts": {
+    "dev": "webpack --progress --colors --watch --config webpack/webpack.config.js --devtool sourcemap",
+    "build": "npm run build-js && npm run build-css",
+    "build-js": "webpack --config ./webpack/webpack.config.js --devtool sourcemap && webpack --config ./webpack/webpack.config.min.js",
+    "build-css": "node-sass src/dat/gui/style.scss build/dat.gui.css"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/dataarts/dat.gui.git"
+  },
+  "author": "Data Arts Team, Google",
+  "license": "Apache-2.0",
+  "bugs": {
+    "url": "https://github.com/dataarts/dat.gui/issues"
+  },
+  "homepage": "https://github.com/dataarts/dat.gui#readme",
+  "devDependencies": {
+    "babel-core": "^6.14.0",
+    "babel-loader": "^6.2.5",
+    "babel-plugin-add-module-exports": "^0.2.1",
+    "babel-preset-es2015": "^6.14.0",
+    "babel-preset-stage-0": "^6.5.0",
+    "css-loader": "^0.25.0",
+    "eslint": "^3.5.0",
+    "eslint-config-airbnb-base": "^7.1.0",
+    "eslint-loader": "^1.5.0",
+    "eslint-plugin-import": "^1.15.0",
+    "extend": "^3.0.0",
+    "html-loader": "^0.4.4",
+    "node-sass": "^3.10.0",
+    "sass-loader": "^4.0.2",
+    "webpack": "1.14.x"
+  },
+  "dependencies": {},
+  "eslintConfig": {
+    "extends": "airbnb-base",
+    "rules": {
+      "comma-dangle": 0,
+      "func-names": 0,
+      "no-alert": 1,
+      "no-console": 1,
+      "no-use-before-define": 0,
+      "prefer-rest-params": 0,
+      "prefer-template": 0,
+      "no-mixed-operators": 0,
+      "no-undef": 0,
+      "no-underscore-dangle": 0,
+      "prefer-arrow-callback": 0,
+      "space-before-function-paren": 0,
+      "global-require": 0,
+      "object-shorthand": 0,
+      "max-len": 0,
+      "no-param-reassign": 0,
+      "consistent-return": 0,
+      "no-restricted-syntax": 1,
+      "no-bitwise": 0,
+      "no-plusplus": 0
+    }
+  }
+}
