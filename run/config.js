@@ -62,6 +62,7 @@ module.exports = {
         assets: {
             sourcePaths: [
                 './fonts/**/!(dir.txt)',
+                './images/**/!(dir.txt)',
                 './videos/**/!(dir.txt)',
                 './audio/**/!(dir.txt)'
             ]
@@ -230,6 +231,10 @@ module.exports = {
                 {
                     path: 'node_modules/reset.css/',
                     name: 'reset.css'
+                },
+                {
+                    path: 'node_modules/hint.css/',
+                    name: 'hint.css'
                 }
             ]
         }

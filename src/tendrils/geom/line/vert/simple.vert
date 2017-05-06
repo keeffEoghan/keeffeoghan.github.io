@@ -1,6 +1,4 @@
-/**
- * @requires `./head.vert`
- */
+#pragma glslify: import(./head)
 
 #pragma glslify: expand = require(../expand)
 

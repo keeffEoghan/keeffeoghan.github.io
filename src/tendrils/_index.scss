@@ -1,13 +1,343 @@
+@import '../../libs/build/hint';
+
 canvas {
     display: block;
-    position: fixed;
+    position: absolute;
     top: 0;
     left: 0;
     bottom: 0;
     right: 0;
+    cursor: cell;
+    transition: background-color 200ms ease-in-out;
+
+    &.epok-dark {
+        background: #000;
+    }
+
+    &.epok-light {
+        background: #fff;
+    }
+
+    &.epok-no-cursor {
+        cursor: none;
+    }
+}
+
+.material-icons {
+    vertical-align: middle;
+}
+
+.epok-button {
+    display: inline-block;
+    padding: 0.5em 1.75em;
+    margin: 0.5em 0.1em;
+    color: #000;
+    background: #efefef;
+    border: none;
+    cursor: pointer;
+    font-weight: 600;
+    border-radius: 2px;
+    box-shadow: 0 0 0 4px rgba(#121212, 0.9);
+    vertical-align: middle;
+
+    &:hover,
+    &:focus {
+        color: #121212;
+        background-color: #fff;
+    }
+
+    &:active {
+        color: #414141;
+    }
+}
+
+.epok-a {
+    color: #efefef;
+    text-decoration: underline;
+    cursor: pointer;
+
+    &:visited {
+        color: #efefef;
+    }
+
+    &:hover,
+    &:focus {
+        color: #fff;
+    }
+
+    &:active {
+        color: #414141;
+    }
+}
+
+.epok-info {
+    position: absolute;
+    display: flex;
+    flex-flow: column nowrap;
+    justify-content: flex-start;
+    align-items: flex-start;
+    left: 0;
+    top: 4em;
+    bottom: 4em;
+    width: 60%;
+    max-width: 36em;
+    overflow: auto;
+    z-index: 10;
+    transition: opacity 300ms ease-in-out;
+
+    &.epok-hide {
+        opacity: 0;
+        pointer-events: none;
+    }
+}
+
+.epok-info-content {
+    flex: 0 0 auto;
+    margin: auto;
+
+    .epok-info-item {
+        float: left;
+        clear: both;
+        line-height: 1.75em;
+        padding: 0.75em 1.75em;
+        margin: 0.5em 0;
+        color: #efefef;
+        background-color: rgba(#121212, 0.9);
+    }
+
+    .epok-button {
+        float: left;
+        clear: both;
+        font-size: 1.5em;
+    }
 }
 
 /* Quick fix for a broken DAT.GUI style */
 .hue-field {
     width: 13px !important;
+}
+
+.npm-scb-wrap,
+.npm-scb-now-playing {
+    right: 0;
+}
+
+.npm-scb-wrap {
+    opacity: 0.7;
+    text-shadow: 0 0 3px #000,
+        0 0 3px #000;
+        transition: opacity 300ms ease-in-out;
+
+    &:hover {
+        opacity: 1;
+    }
+
+    .epok-track {
+        margin: 0;
+    }
+}
+
+.npm-scb-now-playing {
+    width: auto;
+}
+
+.npm-scb-info {
+    width: auto;
+}
+
+.npm-scb-icon {
+    background-color: rgba(0, 0, 0, 0.3);
+}
+
+.epok-show {
+    .npm-scb-inner {
+        top: 0;
+    }
+
+    .npm-scb-now-playing {
+        opacity: 0;
+    }
+}
+
+.epok-main-controls {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    padding: 0.4em 1.2em;
+    z-index: 1001;
+}
+
+.epok-main-control {
+    display: inline-block;
+    font-size: 1.3rem;
+    padding: 0;
+    border: none;
+    margin: 0.5rem;
+    background: transparent;
+    color: #fff;
+    cursor: pointer;
+    outline: none;
+    text-decoration: none;
+    text-align: center;
+    text-shadow: 0 0 3px #000,
+        0 0 3px #000;
+    opacity: 0.7;
+    transition: opacity 300ms ease-in-out;
+
+    &:hover {
+        opacity: 1;
+    }
+
+    &:active {
+        opacity: 0.6;
+    }
+}
+
+.epok-quality-stepper {
+    margin: 0.5em 0.2em;
+}
+
+.epok-quality-level.epok-hide {
+    display: none;
+}
+
+.epok-edit-controls {
+    position: absolute;
+    display: flex;
+    flex-flow: column nowrap;
+    justify-content: stretch;
+    top: 0;
+    right: 0;
+    max-height: 100%;
+    padding-bottom: 20px;
+    z-index: 1000;
+    transition: opacity 300ms ease-out;
+
+    &.epok-hide {
+        opacity: 0;
+        pointer-events: none;
+    }
+
+    .dg.main {
+        overflow-y: auto;
+    }
+
+    .close-button {
+        position: absolute;
+        bottom: 0;
+    }
+}
+
+.epok-track {
+    visibility: hidden;
+}
+
+.epok-audio-controls {
+    display: none;
+    flex-flow: row nowrap;
+    align-items: stretch;
+    justify-content: center;
+    padding: 0.7em 1em;
+    color: #fff;
+    text-shadow: 0 0 3px #000,
+        0 0 3px #000;
+
+    &.epok-show {
+        display: flex;
+    }
+
+    &.epok-on-window {
+        position: absolute;
+        z-index: 1002;
+    }
+
+    .epok-play-state {
+        position: relative;
+    }
+
+    .epok-play-toggle,
+    .epok-play-indicator {
+        width: 1.2rem;
+        height: 1.2rem;
+        line-height: 1.2rem;
+    }
+
+    .epok-play-indicator {
+        position: absolute;
+        top: 0;
+        right: 0;
+        bottom: 0;
+        left: 0;
+        text-align: center;
+
+        &::after {
+            content: '\25BA';
+        }
+    }
+
+    .epok-play-toggle {
+        position: relative;
+        z-index: 10;
+        opacity: 0;
+        padding: 0;
+        border: none;
+        margin: 0;
+        cursor: pointer;
+
+        &:checked + .epok-play-indicator::after {
+            content: '\2759\2759';
+        }
+    }
+
+    .epok-progress {
+        flex: 1 1 auto;
+        margin: 0 1em;
+        cursor: pointer;
+    }
+}
+
+.epok-captured-overlay {
+    position: absolute;
+    display: flex;
+    flex-flow: row nowrap;
+    justify-content: center;
+    align-items: center;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    right: 0;
+    opacity: 0;
+    pointer-events: none;
+    z-index: 1002;
+    background-color: rgba(0, 0, 0, 0.9);
+    transition: opacity 300ms ease-out;
+
+    &.epok-show {
+        opacity: 1;
+        pointer-events: all;
+    }
+
+    .epok-main-controls {
+        z-index: 10002;
+    }
+}
+
+.epok-captured-url {
+    display: inline-block;
+    color: #efefef;
+    background: transparent;
+    padding: 0.3em;
+    border: 1px solid #efefef;
+    border-radius: 2px;
+    vertical-align: middle;
+    text-shadow: 0 0 1px #000,
+        0 0 1px #000,
+        0 0 2px #000,
+        0 0 3px #000;
+    box-shadow: 0 0 4px #000;
+
+    &:hover,
+    &:focus {
+        color: #fff;
+    }
 }

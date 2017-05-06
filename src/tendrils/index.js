@@ -1,14 +1,11 @@
-/* global Float32Array */
-
 import shader from 'gl-shader';
 import FBO from 'gl-fbo';
-import ndarray from 'ndarray';
 
 import Particles from './particles';
+import Timer from './timer';
 import { step/*, nextPow2*/ } from '../utils';
-import spawner from './spawn/init/cpu';
-import { maxAspect } from './utils/aspect';
-
+import initSpawner from './spawn/init/cpu';
+import { coverAspect } from './utils/aspect';
 import Screen from './screen';
 
 
@@ -20,59 +17,66 @@ import renderVert from './render/index.vert';
 import renderFrag from './render/index.frag';
 
 import flowVert from './flow/index.vert';
-import flowScreenVert from './flow/screen.vert';
 import flowFrag from './flow/index.frag';
 
 import screenVert from './screen/index.vert';
 import screenFrag from './screen/index.frag';
 
-// @todo Try drawing a semi-transparent block over the last frame?
-import copyFadeFrag from './screen/copy-fade.frag';
+import copyFrag from './screen/copy.frag';
 
 
 export const defaults = () => ({
     state: {
         rootNum: Math.pow(2, 9),
 
-        paused: false,
-        timeStep: 1000/60,
-
         autoClearView: false,
-        showFlow: true,
+        autoFade: true,
 
-        minSpeed: 0.000001,
-        maxSpeed: 0.01,
-        damping: 0.045,
+        damping: 0.043,
+        speedLimit: 0.01,
 
-        flowDecay: 0.0005,
+        forceWeight: 0.016,
+        varyForce: -0.1,
+
+        flowWeight: 1,
+        varyFlow: 0.2,
+
+        noiseWeight: 0.002,
+        varyNoise: 0.3,
+
+        flowDecay: 0.003,
         flowWidth: 5,
 
-        noiseSpeed: 0.00025,
         noiseScale: 2.125,
+        varyNoiseScale: 0.5,
 
-        forceWeight: 0.015,
-        flowWeight: 1,
-        wanderWeight: 0.001,
+        noiseSpeed: 0.00025,
+        varyNoiseSpeed: 0.1,
 
-        // @todo Make this a texture lookup instead
-        color: [1, 1, 1, 0.01],
-        // @todo Move this to another module, doesn't need to be here
-        baseColor: [0, 0, 0, 0],
-        fadeAlpha: -1,
-        speedAlpha: 0.000001,
+        target: 0,
+        varyTarget: 1,
+
         lineWidth: 1,
+        speedAlpha: 0.000001,
+        colorMapAlpha: 0.4,
 
-        respawnAmount: 0.02
+        baseColor: [1, 1, 1, 0.5],
+        flowColor: [1, 1, 1, 0.04],
+        fadeColor: [0.1333, 0.1333, 0.1333, 0]
     },
+    timer: Object.assign(new Timer(), { step: 1000/60 }),
+    numBuffers: 0,
     logicShader: null,
     renderShader: [renderVert, renderFrag],
     flowShader: [flowVert, flowFrag],
-    flowScreenShader: [flowScreenVert, flowFrag],
-    fadeShader: [screenVert, copyFadeFrag]
+    fillShader: [screenVert, screenFrag],
+    copyShader: [screenVert, copyFrag],
+    colorMap: null
 });
 
 export const glSettings = {
-    preserveDrawingBuffer: true
+    preserveDrawingBuffer: true,
+    antialias: true
 };
 
 
@@ -84,22 +88,26 @@ export class Tendrils {
         };
 
         this.gl = gl;
+
         this.state = params.state;
+
+        if(!(this.colorMap = params.colorMap)) {
+            this.colorMap = FBO(this.gl, [1, 1], { float: true });
+        }
 
         this.screen = new Screen(this.gl);
 
+        // The FBO into which the particle flow will be rendered, creating the
+        // feedback/self-influence
         this.flow = FBO(this.gl, [1, 1], { float: true });
 
-        // Multiple bufferring
-        /**
-         * @todo May need more buffers/passes later?
-         */
-        this.buffers = [
-            FBO(this.gl, [1, 1]),
-            FBO(this.gl, [1, 1])
-        ];
+        // Targets for the particles, to allow a degree of explicit control
+        this.targets = FBO(this.gl, [1, 1], { float: true });
 
-        this.baseShader = shader(this.gl, screenVert, screenFrag);
+        // Multiple bufferring
+        this.buffers = [];
+        this.setupBuffers(params.numBuffers);
+
 
         this.logicShader = null;
 
@@ -111,18 +119,19 @@ export class Tendrils {
                 shader(this.gl, ...params.flowShader)
             :   params.flowShader);
 
-        this.flowScreenShader = ((Array.isArray(params.flowScreenShader))?
-                shader(this.gl, ...params.flowScreenShader)
-            :   params.flowScreenShader);
+        this.copyShader = ((Array.isArray(params.copyShader))?
+                shader(this.gl, ...params.copyShader)
+            :   params.copyShader);
 
-        this.fadeShader = ((Array.isArray(params.fadeShader))?
-                shader(this.gl, ...params.fadeShader)
-            :   params.fadeShader);
+        this.fillShader = ((Array.isArray(params.fillShader))?
+                shader(this.gl, ...params.fillShader)
+            :   params.fillShader);
+
 
         this.uniforms = {
-                render: {},
-                update: {}
-            };
+            render: {},
+            update: {}
+        };
 
 
         this.particles = null;
@@ -132,27 +141,22 @@ export class Tendrils {
 
         this.viewSize = [0, 0];
 
-        this.time = this.start = Date.now();
+        this.timer = params.timer;
 
         this.tempData = [];
-
-        this.respawnOffset = [0, 0];
-        this.respawnShape = [0, 0];
-
-        this.spawnCache = null;
-        this.spawnCacheOffset = 0;
     }
 
     setup(...rest) {
         this.setupParticles(...rest);
-        this.setupRespawn(...rest);
-        // this.setupSpawnCache(...rest);
+        this.reset();
+
+        return this;
     }
 
     reset() {
-        this.resetParticles();
-        this.setupRespawn();
-        // this.resetSpawnCache();
+        this.spawn();
+
+        return this;
     }
 
     // @todo
@@ -160,11 +164,28 @@ export class Tendrils {
         this.particles.dispose();
 
         delete this.particles;
-        delete this.spawnCache;
+
+        return this;
     }
 
 
-    setupParticles(rootNum = this.state.rootNum) {
+    setupBuffers(numBuffers = 0) {
+        // Add any needed new buffers
+        while(this.buffers.length < numBuffers) {
+            this.buffers.push(FBO(this.gl, [1, 1]));
+        }
+
+        // Remove any unneeded old buffers
+        while(this.buffers.length > numBuffers) {
+            this.buffers.pop().dispose();
+        }
+
+        return this;
+    }
+
+    setupParticles(rootNum = this.state.rootNum, numBuffers = 2) {
+        this.state.rootNum = rootNum;
+
         const shape = [rootNum, rootNum];
 
         this.particles = new Particles(this.gl, {
@@ -181,12 +202,11 @@ export class Tendrils {
 
         this.logicShader = this.particles.logic;
 
-        this.particles.setup(this.state.numBuffers || 2);
-    }
+        this.particles.setup(numBuffers);
 
-    // Populate the particles with the given spawn function
-    resetParticles(spawn = spawner) {
-        this.particles.spawn(spawn);
+        this.targets.shape = shape;
+
+        return this;
     }
 
 
@@ -195,6 +215,8 @@ export class Tendrils {
     clear() {
         this.clearView();
         this.clearFlow();
+
+        return this;
     }
 
     clearView() {
@@ -205,41 +227,37 @@ export class Tendrils {
 
         this.gl.bindFramebuffer(this.gl.FRAMEBUFFER, null);
         this.gl.clear(this.gl.COLOR_BUFFER_BIT);
+
+        return this;
     }
 
     clearFlow() {
         this.flow.bind();
         this.gl.clear(this.gl.COLOR_BUFFER_BIT);
+
+        return this;
     }
 
     restart() {
         this.clear();
         this.reset();
+
+        return this;
     }
 
-    draw() {
-        const directDraw = this.directDraw();
-
-        this.resize(directDraw);
-
-
-        // Time
-        const dt = this.tick();
-
-
-        // Physics
-
-        if(!this.state.paused) {
+    step() {
+        if(!this.timer.paused) {
             this.particles.logic = this.logicShader;
 
             // Disabling blending here is important
             this.gl.disable(this.gl.BLEND);
 
             Object.assign(this.uniforms.update, this.state, {
-                    dt,
-                    time: this.time,
-                    start: this.start,
+                    dt: this.timer.dt,
+                    time: this.timer.time,
+                    start: this.timer.since,
                     flow: this.flow.color[0].bind(1),
+                    targets: this.targets.color[0].bind(2),
                     viewSize: this.viewSize,
                     viewRes: this.viewRes
                 });
@@ -250,15 +268,28 @@ export class Tendrils {
             this.gl.blendFunc(this.gl.SRC_ALPHA, this.gl.ONE_MINUS_SRC_ALPHA);
         }
 
+        return this;
+    }
+
+    /**
+     * @todo Find a way to use free texture bind units without having to
+     *       manually remember them
+     */
+    draw() {
+        this.viewport();
+
 
         // Flow FBO and view renders
 
         Object.assign(this.uniforms.render, this.state, {
-                time: this.time,
-                previous: this.particles.buffers[1].color[0].bind(2),
-                dataRes: this.particles.shape,
+                time: this.timer.time,
+                previous: this.particles.buffers[1].color[0].bind(1),
                 viewSize: this.viewSize,
-                viewRes: this.viewRes
+                viewRes: this.viewRes,
+
+                colorMap: ((this.colorMap.color && this.colorMap.color[0])?
+                        this.colorMap.color[0] : this.colorMap).bind(2),
+                colorMapRes: this.colorMap.shape
             });
 
         this.particles.render = this.flowShader;
@@ -268,7 +299,7 @@ export class Tendrils {
 
         this.flow.bind();
 
-        this.gl.lineWidth(this.state.flowWidth);
+        this.gl.lineWidth(Math.max(0, this.state.flowWidth));
         this.particles.draw(this.uniforms.render, this.gl.LINES);
 
         /**
@@ -282,268 +313,147 @@ export class Tendrils {
 
 
         // Render to the view.
-        
-        // Overlay fade.
-        if(this.state.baseColor[3] > 0) {
-            this.baseShader.bind();
-            this.baseShader.uniforms.color = this.state.baseColor;
-            this.gl.bindFramebuffer(this.gl.FRAMEBUFFER, null);
-            this.screen.render();
-        }
 
-        // Show flow
-        if(this.state.showFlow) {
-            // @todo Surely just render the flow texture instead?
-            this.particles.render = this.flowScreenShader;
-
-            if(this.state.lineWidth > 0) {
-                this.gl.lineWidth(this.state.lineWidth);
-            }
-
-            // Render the flow directly to the screen
-            this.gl.bindFramebuffer(this.gl.FRAMEBUFFER, null);
-            this.particles.draw(this.uniforms.render, this.gl.LINES);
-        }
-
-        // Set up the particles for rendering
-        this.particles.render = this.renderShader;
-        this.gl.lineWidth(this.state.lineWidth);
-
-        if(directDraw) {
+        if(this.buffers.length === 0) {
             // Render the particles directly to the screen
-
             this.gl.bindFramebuffer(this.gl.FRAMEBUFFER, null);
-
-            if(this.state.autoClearView) {
-                this.gl.clear(this.gl.COLOR_BUFFER_BIT);
-            }
-
-            this.particles.draw(this.uniforms.render, this.gl.LINES);
         }
         else {
-            // Multi-buffer fade etc passes
-
+            // Multi-buffer passes
             this.buffers[0].bind();
-            this.gl.clear(this.gl.COLOR_BUFFER_BIT);
-
-            // Copy and fade the last buffer into the current buffer
-
-            this.fadeShader.bind();
-
-            Object.assign(this.fadeShader.uniforms, {
-                    opacity: this.state.fadeAlpha,
-                    view: this.buffers[1].color[0].bind(1),
-                    viewRes: this.viewRes
-                });
-
-            this.screen.render();
-
-
-            // Render the particles into the current buffer
-            this.particles.draw(this.uniforms.render, this.gl.LINES);
-
-
-            // Copy and fade the current buffer to the screen
-
-            this.gl.bindFramebuffer(this.gl.FRAMEBUFFER, null);
-            this.gl.clear(this.gl.COLOR_BUFFER_BIT);
-
-            this.fadeShader.bind();
-
-            Object.assign(this.fadeShader.uniforms, {
-                    opacity: 1,
-                    view: this.buffers[0].color[0].bind(2),
-                    viewRes: this.viewRes
-                });
-
-            this.screen.render();
-
-            // Step buffers
-            step(this.buffers);
         }
+
+        if(this.state.autoClearView) {
+            this.clearView();
+        }
+
+        if(this.state.autoFade) {
+            this.drawFade();
+        }
+
+        // Draw the particles
+        this.particles.render = this.renderShader;
+        this.gl.lineWidth(Math.max(0, this.state.lineWidth));
+        this.particles.draw(this.uniforms.render, this.gl.LINES);
+
+        return this;
     }
 
-    resize(directDraw = this.directDraw()) {
+    drawFade() {
+        if(this.state.fadeColor[3] > 0) {
+            this.drawFill(this.state.fadeColor);
+        }
+
+        return this;
+    }
+
+    drawFill(color = this.state.fadeColor) {
+        this.fillShader.bind();
+        this.fillShader.uniforms.color = color;
+        this.screen.render();
+
+        return this;
+    }
+
+    // Draw a buffer's contents to the screen
+    drawBuffer(index) {
+        this.gl.bindFramebuffer(this.gl.FRAMEBUFFER, null);
+
+        if(this.state.autoClearView) {
+            this.gl.clear(this.gl.COLOR_BUFFER_BIT);
+        }
+
+        return this.copyBuffer(index).stepBuffers();
+    }
+
+    // Copy a buffer's contents into the current render target
+    copyBuffer(index = 0) {
+        if(index < this.buffers.length) {
+            this.copyShader.bind();
+
+            Object.assign(this.copyShader.uniforms, {
+                    view: this.buffers[index].color[0].bind(0),
+                    viewRes: this.viewRes
+                });
+
+            this.screen.render();
+        }
+
+        return this;
+    }
+
+    stepBuffers() {
+        if(this.buffers.length > 1) {
+            step(this.buffers);
+        }
+
+        return this;
+    }
+
+    resize() {
         this.viewRes[0] = this.gl.drawingBufferWidth;
         this.viewRes[1] = this.gl.drawingBufferHeight;
 
-        maxAspect(this.viewSize, this.viewRes);
+        // NDC dimensions in the range [-1, 1] -> [-(max radius), (max radius)]
+        coverAspect(this.viewSize, this.viewRes);
 
         // this.pow2Res.fill(nextPow2(Math.max(...this.viewRes)));
 
-        if(!directDraw) {
-            this.buffers.forEach((buffer) => buffer.shape = this.viewRes);
-        }
+        this.buffers.forEach((buffer) => buffer.shape = this.viewRes);
 
         // this.flow.shape = this.pow2Res;
         this.flow.shape = this.viewRes;
 
+        return this;
+    }
+
+    viewport() {
         /**
          * @todo Why do these 2 lines seem to be equivalent? Something to do
-         *       with how `a-big-triangle` scales its geometry over the screen?
+         *       with how `gl-big-triangle` scales its geometry over the screen?
          */
         // this.gl.viewport(0, 0, 1, 1);
         this.gl.viewport(0, 0, this.viewRes[0], this.viewRes[1]);
+
+        return this;
     }
 
-
-    // @todo More specific, or derived from properties?
-    directDraw(state = this.state) {
-        return (state.autoClearView || state.fadeAlpha < 0);
-    }
-
-
-    /**
-     * @todo Move all this respawn stuff to other modules - too many different
-     *       kinds to cater for in here.
-     */
 
     // Respawn
 
-    /**
-     * @todo Is the old approach below approach needed? Could use a `spawn`
-     *       sweep across sub-regions of the particles buffers.
-     */
+    // Populate the particles with the given spawn function
+    spawn(spawner = initSpawner) {
+        this.particles.spawn(spawner);
 
-    respawn(spawn = spawner) {
-        this.offsetRespawn(this.respawnOffset, this.respawnShape,
-            this.particles.shape);
-
-        this.particles.spawn(spawn,
-            this.particles.pixels.lo(...this.respawnOffset)
-                .hi(...this.respawnShape),
-            this.respawnOffset);
+        return this;
     }
 
-
     // Respawn on the GPU using a given shader
+    spawnShader(shader, update, ...rest) {
+        this.timer.tick();
 
-    respawnShader(spawnShader, update) {
-        this.resize(false);
+        this.particles.logic = shader;
 
-        this.particles.logic = spawnShader;
+        // @todo Allow switching between the particles data and the targets.
 
         // Disabling blending here is important
         this.gl.disable(this.gl.BLEND);
 
         this.particles.step(Particles.applyUpdate({
-                ...this.state,
-                time: this.time,
-                viewSize: this.viewSize,
-                viewRes: this.viewRes
-            },
-            update));
+                    ...this.state,
+                    time: this.timer.time,
+                    viewSize: this.viewSize,
+                    viewRes: this.viewRes
+                },
+                update),
+            ...rest);
 
         this.particles.logic = this.logicShader;
 
         this.gl.enable(this.gl.BLEND);
         this.gl.blendFunc(this.gl.SRC_ALPHA, this.gl.ONE_MINUS_SRC_ALPHA);
-    }
 
-
-    // Cached respawn chunk sweep
-
-    respawnCached(spawn = spawner) {
-        this.offsetRespawn(this.respawnOffset, this.spawnCache.shape,
-            this.particles.shape);
-
-        // Reset this part of the FBO
-        this.particles.buffers.forEach((buffer) =>
-            buffer.color[0].setPixels(this.spawnCache, this.respawnOffset));
-
-
-        // Finally, change some of the spawn data values for next time too,
-        // a line at a time
-
-        // Linear data stepping, no need for 2D
-        this.spawnCacheOffset += this.spawnCache.shape[0]*4;
-
-        // Wrap
-        if(this.spawnCacheOffset >= this.spawnCache.data.length) {
-            this.spawnCacheOffset = 0;
-        }
-
-        // Check bounds
-        this.spawnCacheOffset = Math.min(this.spawnCacheOffset,
-            this.spawnCache.data.length-(this.spawnCache.shape[0]*4));
-
-        for(let s = 0; s < this.spawnCache.shape[1]; s += 4) {
-            this.spawnCache.data.set(spawn(this.tempData),
-                this.spawnCacheOffset+s);
-        }
-    }
-
-    setupRespawn(rootNum = this.state.rootNum,
-            respawnAmount = this.state.respawnAmount) {
-        const side = Math.ceil(rootNum*respawnAmount);
-
-        this.respawnShape.fill(side);
-        this.respawnOffset.fill(0);
-    }
-
-    setupSpawnCache(dataShape = this.respawnShape) {
-        this.spawnCache = ndarray(new Float32Array(dataShape[0]*dataShape[1]*4),
-            [dataShape[0], dataShape[1], 4]);
-    }
-
-    /**
-     * Populate the respawn data with the given spawn function
-     */
-    resetSpawnCache(spawn = spawner) {
-        for(let i = 0; i < this.spawnCache.shape[0]; ++i) {
-            for(let j = 0; j < this.spawnCache.shape[1]; ++j) {
-                const spawned = spawn(this.tempData);
-
-                this.spawnCache.set(i, j, 0, spawned[0]);
-                this.spawnCache.set(i, j, 1, spawned[1]);
-                this.spawnCache.set(i, j, 2, spawned[2]);
-                this.spawnCache.set(i, j, 3, spawned[3]);
-            }
-        }
-    }
-
-    offsetRespawn(offset = this.respawnOffset, stride = this.respawnShape,
-            shape = this.particles.shape) {
-        // Step the respawn shape horizontally and vertically within the FBO
-
-        // X
-
-        offset[0] += stride[0];
-
-        // Wrap
-        if(offset[0] >= shape[0]) {
-            offset[0] = 0;
-            // Step down Y - carriage return style
-            offset[1] += stride[1];
-        }
-
-        // Clamp
-        offset[0] = Math.min(offset[0], shape[0]-stride[0]);
-
-
-        // Y
-
-        // Wrap
-        if(offset[1] >= shape[1]) {
-            offset[1] = 0;
-        }
-
-        // Clamp
-        offset[1] = Math.min(offset[1], shape[1]-stride[1]);
-
-        return offset;
-    }
-
-    getTime(time = Date.now()) {
-        return time-this.start;
-    }
-
-    tick(timeStep = this.state.timeStep) {
-        const t0 = this.time;
-
-        this.time = this.getTime();
-
-        return this.dt = (timeStep || this.time-t0);
+        return this;
     }
 }
 
