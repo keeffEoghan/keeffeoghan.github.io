@@ -472,7 +472,7 @@ export default (canvas, options) => {
     }
 
     const spawnImage = (buffer = spawnTargets.spawnImage) =>
-        spawnRaster(imageShaders.direct, 0.3, buffer);
+        spawnRaster(imageShaders.direct, 0.2, buffer);
 
     const spawnSamples = (buffer = spawnTargets.spawnSamples) =>
         spawnRaster(imageShaders.sample, 1, buffer);
@@ -889,7 +889,7 @@ export default (canvas, options) => {
             },
             {
                 rootNum: defaultState.rootNum*2,
-                damping: defaultState.damping-0.002
+                damping: defaultState.damping-0.001
             }
         ],
         level: parseInt((settings.quality || 0), 10),
