@@ -62,7 +62,6 @@ $button-height: 20px;
       /*opacity: 0;*/
       @include transition(opacity, 0.1s, linear);
       border: 0;
-      position: absolute;
 
       line-height: $button-height - 1;
       height: $button-height;
@@ -71,6 +70,12 @@ $button-height: 20px;
       cursor: pointer;
       text-align: center;
       background-color: #000;
+      &.close-top {
+        position: relative;
+      }
+      &.close-bottom {
+        position: absolute;
+      }
       &:hover {
         background-color: #111;
       }
@@ -84,25 +89,40 @@ $button-height: 20px;
 
     float: right;
     margin-right: 15px;
-    overflow-x: hidden;
+    overflow-y:visible;
 
     &.has-save > ul {
-      margin-top: $row-height;
+
+      &.close-top {
+        margin-top: 0;
+      }
+      &.close-bottom {
+        margin-top: $row-height;
+      }
+
       &.closed {
         margin-top: 0;
       }
     }
 
     .save-row {
-      position: fixed;
       top: 0;
       z-index: 1002;
+
+      &.close-top {
+        position: relative;
+      }
+      &.close-bottom {
+        position: fixed;
+      }
+
     }
 
   }
 
   li {
     @include transition(height, 0.1s, ease-out);
+    @include transition(overflow, 0.1s, linear);
   }
 
   /* Line items that don't contain folders. */
@@ -110,7 +130,6 @@ $button-height: 20px;
     cursor: auto;
     height: $row-height;
     line-height: $row-height;
-    overflow: hidden;
     padding: 0 4px 0 5px;
   }
 
@@ -140,6 +159,7 @@ $button-height: 20px;
     clear: both;
     padding-left: 3px;
     height: $row-height;
+    overflow: hidden;
   }
 
   /** Name-half (left) */
@@ -156,6 +176,7 @@ $button-height: 20px;
   .c {
     float: left;
     width: 60%;
+    position: relative;
   }
 
   /** Controller placement */
@@ -188,7 +209,7 @@ $button-height: 20px;
   }
 
   .c input[type=checkbox] {
-    margin-top: 9px;
+    margin-top: 7px;
   }
 
   .c select {
@@ -202,6 +223,11 @@ $button-height: 20px;
   .cr.boolean,
   .cr.boolean * {
     cursor: pointer;
+  }
+
+  /** allow overflow for color selector */
+  .cr.color {
+    overflow: visible;
   }
 
   .selector {
