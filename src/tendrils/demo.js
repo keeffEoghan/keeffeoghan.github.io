@@ -472,10 +472,12 @@ export default (canvas, options) => {
     }
 
     const spawnImage = (buffer = spawnTargets.spawnImage) =>
-        spawnRaster(imageShaders.direct, 1, buffer);
+        spawnRaster(imageShaders.direct, 0.4, buffer);
+        // spawnRaster(imageShaders.direct, 0.2, buffer);
 
     const spawnSamples = (buffer = spawnTargets.spawnSamples) =>
         spawnRaster(imageShaders.sample, 1, buffer);
+        // spawnRaster(imageShaders.sample, 0.4, buffer);
 
 
     function getMedia() {
