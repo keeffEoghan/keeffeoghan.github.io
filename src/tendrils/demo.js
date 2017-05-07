@@ -472,7 +472,7 @@ export default (canvas, options) => {
     }
 
     const spawnImage = (buffer = spawnTargets.spawnImage) =>
-        spawnRaster(imageShaders.direct, 0.2, buffer);
+        spawnRaster(imageShaders.direct, 1, buffer);
 
     const spawnSamples = (buffer = spawnTargets.spawnSamples) =>
         spawnRaster(imageShaders.sample, 1, buffer);
@@ -1461,8 +1461,8 @@ export default (canvas, options) => {
                     varyNoiseScale: 0.3,
                     noiseSpeed: 0.0002
                 },
-                time: 47000,
-                ease: [0, 0, 1]
+                time: 46500,
+                ease: [0, 0, 0, 1]
             });
 
         trackTracks.audio
@@ -1481,33 +1481,33 @@ export default (canvas, options) => {
         // Flip colors
 
         trackTracks.blend
-            .over(2000, {
-                to: [0.3, 0.9],
-                time: 46000,
-                ease: [0, 0, 1]
+            .over(46600-45600, {
+                to: [0.3, 0.8],
+                time: 46600,
+                ease: [0, 0, 0, 1]
             })
             .to({
                 to: [1, 0],
-                time: 46500,
-                ease: [0, 0, 1]
+                time: 46800,
+                ease: [0, 0, 0, 1]
             });
 
         trackTracks.baseColor
-            .over(500, {
+            .over(50, {
                 to: [0, 0, 0, 0.8],
-                time: 46500
+                time: 46800
             });
 
         trackTracks.flowColor
-            .over(2000, {
+            .over(46800-45200, {
                 to: [1, 1, 1, 0.035],
-                time: 46000
+                time: 46800
             });
 
         trackTracks.fadeColor
-            .over(47500-45500, {
+            .over(46800-45200, {
                 to: [1, 1, 1, 0.05],
-                time: 47500,
+                time: 46800,
                 ease: [0, 0, 1]
             });
 
@@ -1529,6 +1529,10 @@ export default (canvas, options) => {
 
         trackTracks.calls
             .to({
+                time: 46800,
+                call: [() => respawn()]
+            })
+            .to({
                 time: 49000,
                 call: [
                     () => {
@@ -1545,10 +1549,6 @@ export default (canvas, options) => {
                         out.radius = radius;
                     }
                 ]
-            })
-            .to({
-                time: 46800,
-                call: [() => respawn()]
             });
 
 
