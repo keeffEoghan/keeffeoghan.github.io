@@ -29,6 +29,7 @@ export default () => {
     // Tendrils setup
 
     const demo = tendrilsDemo(document.querySelector('canvas'), {
+        // @todo Avoid overwriting the URL settings
         animate: false,
         track: false,
         keyboard: false,
