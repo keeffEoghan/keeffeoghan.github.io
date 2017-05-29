@@ -552,7 +552,7 @@ export default (canvas, options) => {
             trackAnalyser.analyser.frequencyBinCount);
 
     const blend = new Blend(gl, {
-        views: [audioTexture.texture, imageSpawner.buffer],
+        views: [audioTexture.texture, opticalFlow.buffers[0]],
         alphas: [0.3, 0.8]
     });
 
@@ -1068,6 +1068,11 @@ export default (canvas, options) => {
 
         // Blend the color maps into tendrils one
         // @todo Only do this if necessary (skip if none or only one has alpha)
+
+        blend.views[1] = ((appSettings.useMedia && video)?
+                opticalFlow.buffers[0]
+            :   imageSpawner.buffer);
+
         blend.draw(tendrils.colorMap);
 
         // The main event
@@ -1118,18 +1123,21 @@ export default (canvas, options) => {
         // @todo Blur for optical flow? Maybe Sobel as well?
         // @see https://github.com/princemio/ofxMIOFlowGLSL/blob/master/src/ofxMioFlowGLSL.cpp
 
-        if(opticalFlowState.speed && appSettings.useMedia && video) {
+        if(appSettings.useMedia && video) {
             opticalFlow.resize(rasterShape.video);
             opticalFlow.setPixels(video);
 
-            opticalFlow.update({
-                speedLimit: state.speedLimit,
-                time: timer.app.time,
-                viewSize: tendrils.viewSize,
-                ...opticalFlowState
-            });
+            if(opticalFlowState.speed) {
+                opticalFlow.update({
+                    speedLimit: state.speedLimit,
+                    time: timer.app.time,
+                    viewSize: tendrils.viewSize,
+                    ...opticalFlowState
+                });
 
-            screen.render();
+                screen.render();
+            }
+
             opticalFlow.step();
         }
 
