@@ -64,6 +64,7 @@ import Screen from './screen';
 import Blend from './screen/blend';
 import screenVert from './screen/index.vert';
 import blurFrag from './screen/blur.frag';
+import OpticalFlow from './optical-flow';
 
 import { curry } from '../fp/partial';
 import reduce from '../fp/reduce';
@@ -472,13 +473,28 @@ export default (canvas, options) => {
     }
 
     const spawnImage = (buffer = spawnTargets.spawnImage) =>
-        spawnRaster(imageShaders.direct, 0.4, buffer);
-        // spawnRaster(imageShaders.direct, 0.2, buffer);
+        spawnRaster(imageShaders.direct, 0.3, buffer);
 
     const spawnSamples = (buffer = spawnTargets.spawnSamples) =>
         spawnRaster(imageShaders.sample, 1, buffer);
-        // spawnRaster(imageShaders.sample, 0.4, buffer);
 
+
+    // Optical flow
+
+    const opticalFlow = new OpticalFlow(gl, undefined, {
+        speed: 0.08
+    });
+
+    const opticalFlowState = {
+        speed: opticalFlow.uniforms.speed,
+        lambda: opticalFlow.uniforms.lambda,
+        offset: opticalFlow.uniforms.offset
+    };
+
+    const opticalFlowDefaults = { ...opticalFlowState };
+
+
+    // Media access
 
     function getMedia() {
         appSettings.useMedia = true;
@@ -536,7 +552,7 @@ export default (canvas, options) => {
             trackAnalyser.analyser.frequencyBinCount);
 
     const blend = new Blend(gl, {
-        views: [audioTexture.texture, imageSpawner.buffer],
+        views: [audioTexture.texture, opticalFlow.buffers[0]],
         alphas: [0.3, 0.8]
     });
 
@@ -692,9 +708,13 @@ export default (canvas, options) => {
     };
 
 
-    // Blur vignette
+    // Screen effects
 
     const screen = new Screen(gl);
+
+
+    // Blur vignette
+
     const blurShader = shader(gl, screenVert, blurFrag);
 
     const blurDefaults = {
@@ -721,9 +741,10 @@ export default (canvas, options) => {
         flowColor: tendrils.state.flowColor,
         fadeColor: tendrils.state.fadeColor,
         spawn: resetSpawner.uniforms,
+        opticalFlow: opticalFlowState,
         audio: audioState,
         blend: blend.alphas,
-        blur: blurShader.uniforms,
+        blur: blurState,
         // Just for calls
         // @todo Fix the animation lib properly, not just by convention
         calls: {}
@@ -794,6 +815,7 @@ export default (canvas, options) => {
             radius: 0.9,
             speed: 0.05
         },
+        opticalFlow: { ...opticalFlowDefaults },
         audio: {
             trackFlowAt: 0,
             trackFastAt: 0,
@@ -894,7 +916,7 @@ export default (canvas, options) => {
                 damping: defaultState.damping-0.001
             }
         ],
-        level: parseInt((settings.quality || 0), 10),
+        level: parseInt((settings.quality || 1), 10),
         levels: Array.from(document.querySelectorAll('.epok-quality-level')),
         steppers: Array.from(document.querySelectorAll(`.epok-quality-stepper,
             .epok-quality-prompter`)),
@@ -1046,6 +1068,11 @@ export default (canvas, options) => {
 
         // Blend the color maps into tendrils one
         // @todo Only do this if necessary (skip if none or only one has alpha)
+
+        blend.views[1] = ((appSettings.useMedia && video)?
+                opticalFlow.buffers[0]
+            :   imageSpawner.buffer);
+
         blend.draw(tendrils.colorMap);
 
         // The main event
@@ -1060,10 +1087,11 @@ export default (canvas, options) => {
             blurShader.bind();
 
             Object.assign(blurShader.uniforms, {
-                view: tendrils.buffers[0].color[0].bind(0),
-                resolution: tendrils.viewRes,
-                time: tendrils.timer.time
-            });
+                    view: tendrils.buffers[0].color[0].bind(1),
+                    resolution: tendrils.viewRes,
+                    time: tendrils.timer.time
+                },
+                blurState);
 
             screen.render();
 
@@ -1077,6 +1105,9 @@ export default (canvas, options) => {
 
         tendrils.flow.bind();
 
+
+        // Flow lines
+
         flowInputs.trim(1/tendrils.state.flowDecay, timer.app.time);
 
         each((flowLine) => {
@@ -1084,6 +1115,31 @@ export default (canvas, options) => {
                 flowLine.update().draw();
             },
             flowInputs.active);
+
+
+        // Optical flow
+
+        // @todo Replace the image color map with one of these textures updated each frame.
+        // @todo Blur for optical flow? Maybe Sobel as well?
+        // @see https://github.com/princemio/ofxMIOFlowGLSL/blob/master/src/ofxMioFlowGLSL.cpp
+
+        if(appSettings.useMedia && video) {
+            opticalFlow.resize(rasterShape.video);
+            opticalFlow.setPixels(video);
+
+            if(opticalFlowState.speed) {
+                opticalFlow.update({
+                    speedLimit: state.speedLimit,
+                    time: timer.app.time,
+                    viewSize: tendrils.viewSize,
+                    ...opticalFlowState
+                });
+
+                screen.render();
+            }
+
+            opticalFlow.step();
+        }
 
 
         // React to sound - from highest reaction to lowest, max one per frame
@@ -1165,6 +1221,14 @@ export default (canvas, options) => {
                 },
                 time: 10000,
                 ease: [0, 0.1, 1]
+            });
+
+        trackTracks.opticalFlow
+            .to({
+                to: {
+                    speed: 0
+                },
+                time: 300
             });
 
         trackTracks.audio
@@ -1323,7 +1387,7 @@ export default (canvas, options) => {
                 to: {
                     target: 0.00003
                 },
-                time: 42500,
+                time: 43000,
                 ease: [0, 0.7, 1]
             })
             .to({
@@ -1331,6 +1395,13 @@ export default (canvas, options) => {
                     lineWidth: 1
                 },
                 time: 46000,
+                ease: [0, 1, 1]
+            });
+
+        trackTracks.opticalFlow
+            .smoothOver(35000-27000, {
+                to: opticalFlowDefaults,
+                time: 35000,
                 ease: [0, 1, 1]
             });
 
@@ -1863,14 +1934,14 @@ export default (canvas, options) => {
             .smoothOver(141000-134000, {
                 to: {
                     flowWeight: 1,
-                    speedAlpha: 0.0005,
-                    colorMapAlpha: 0.85
+                    speedAlpha: 0.0005
                 },
                 time: 141000,
                 ease: [0, 0, 1]
             })
             .smoothTo({
                 to: {
+                    colorMapAlpha: 0.85,
                     varyForce: 0.25,
                     varyFlow: 0.4
                 },
@@ -1915,24 +1986,18 @@ export default (canvas, options) => {
         trackTracks.tendrils3
             .over(132000-126000, {
                 to: {
-                    target: 0.005,
+                    target: 0.017,
                     lineWidth: 2
                 },
                 time: 132000,
                 ease: [0, 0, 1]
             })
-            .over(138000-135000, {
+            .over(140000-136000, {
                 to: {
-                    target: 0.00003
-                },
-                time: 138000,
-                ease: [0, 0, 1]
-            })
-            .to({
-                to: {
+                    target: 0.00003,
                     lineWidth: 1
                 },
-                time: 142000,
+                time: 140000,
                 ease: [0, 0, 1]
             });
 
@@ -2086,9 +2151,9 @@ export default (canvas, options) => {
                 time: 134000,
                 ease: [0, 0, 1]
             })
-            .to(138000, {
+            .over(146000-142000, {
                 to: [1, 1, 1, 0.2],
-                time: 138000,
+                time: 146000,
                 ease: [0, 1, 1]
             });
 
@@ -2167,6 +2232,15 @@ export default (canvas, options) => {
                     micFormAt: audioDefaults.micFormAt
                 },
                 time: 174000
+            });
+
+        trackTracks.opticalFlow
+            .smoothOver(178000-174000, {
+                to: {
+                    speed: 0
+                },
+                time: 178000,
+                ease: [0, 1, 1]
             });
 
 
@@ -2342,6 +2416,15 @@ export default (canvas, options) => {
             .to({
                 to: [0.1, 0.14, 0.2, 0.05],
                 time: 187400
+            });
+
+        trackTracks.opticalFlow
+            .smoothOver(190000-188000, {
+                to: {
+                    speed: 0.08
+                },
+                time: 190000,
+                ease: [0, 1, 1]
             });
 
 
@@ -2679,6 +2762,9 @@ export default (canvas, options) => {
     (gui.toggle &&
         gui.toggle.addEventListener('click', () => toggleShowGUI()));
 
+    // Types of simple properties the GUI can handle with `.add`
+    const simpleGUIRegEx = /^(object|array|undefined|null)$/gi;
+
 
     // Root level
 
@@ -2746,7 +2832,7 @@ export default (canvas, options) => {
     gui.settings = gui.main.addFolder('settings');
 
     for(let s in state) {
-        if(!(typeof state[s]).match(/^(object|array|undefined|null)$/gi)) {
+        if(!(typeof state[s]).match(simpleGUIRegEx)) {
             const control = gui.settings.add(state, s);
 
             // Some special cases
@@ -2833,8 +2919,7 @@ export default (canvas, options) => {
     gui.spawn = gui.main.addFolder('spawn');
 
     for(let s in resetSpawner.uniforms) {
-        if(!(typeof resetSpawner.uniforms[s])
-                .match(/^(object|array|undefined|null)$/gi)) {
+        if(!(typeof resetSpawner.uniforms[s]).match(simpleGUIRegEx)) {
             gui.spawn.add(resetSpawner.uniforms, s);
         }
     }
@@ -2843,6 +2928,17 @@ export default (canvas, options) => {
         radius: 0.3,
         speed: 0.005
     };
+
+
+    // Optical flow
+
+    gui.opticalFlow = gui.main.addFolder('optical flow');
+
+    for(let s in opticalFlowState) {
+        if(!(typeof opticalFlowState[s]).match(simpleGUIRegEx)) {
+            gui.opticalFlow.add(opticalFlowState, s);
+        }
+    }
 
 
     // Reflow
@@ -2888,9 +2984,8 @@ export default (canvas, options) => {
     gui.blur = gui.main.addFolder('blur');
 
     for(let s in blurDefaults) {
-        if(!(typeof blurShader.uniforms[s])
-                .match(/^(object|array|undefined|null)$/gi)) {
-            gui.blur.add(blurShader.uniforms, s);
+        if(!(typeof blurState[s]).match(simpleGUIRegEx)) {
+            gui.blur.add(blurState, s);
         }
     }
 
