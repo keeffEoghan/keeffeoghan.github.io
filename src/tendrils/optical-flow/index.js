@@ -44,15 +44,11 @@ export class OpticalFlow {
                 ((Array.isArray(buffer))? FBO(this.gl, ...buffer) : buffer),
             params.buffers);
 
-        this.size = this.buffers[0].shape;
-
         this.uniforms = Object.assign(base.uniforms, uniforms);
     }
 
     update(uniforms) {
         this.shader.bind();
-
-        this.shader.uniforms.imageSize = this.size;
 
         Object.assign(this.shader.uniforms, {
                 view: this.buffers[0].color[0].bind(1),
@@ -71,8 +67,6 @@ export class OpticalFlow {
 
     resize(size) {
         each((buffer) => buffer.shape = size, this.buffers);
-
-        this.size = size;
     }
 }
 
