@@ -12,7 +12,6 @@ precision highp float;
 uniform sampler2D view;
 uniform sampler2D last;
 
-uniform vec2 imageSize;
 uniform vec2 viewSize;
 
 uniform float offset;
@@ -33,7 +32,7 @@ varying vec2 uv;
 const vec2 zero = vec2(0.0);
 const vec2 flipUV = vec2(-1.0);
 const vec3 falloff = vec3(0.0, 0.0, 1.0);
-
+/*
 vec4 mapColor(vec2 vec, vec2 scale) {
     vec2 x = vec2(max(vec.x, 0.0), abs(min(vec.x, 0.0)))*scale.x;
     vec2 y = vec2(max(vec.y, 0.0), abs(min(vec.y, 0.0)))*scale.y;
@@ -41,7 +40,7 @@ vec4 mapColor(vec2 vec, vec2 scale) {
     float dirY = ((y.x > y.y)? 0.9 : 1.0);
 
     return vec4(x.xy, max(y.x, y.y), dirY);
-}
+}*/
 
 #if 1
     vec4 pixel(sampler2D texture, vec2 uv) {
@@ -54,7 +53,7 @@ vec4 mapColor(vec2 vec, vec2 scale) {
 #endif
 
 void main() {
-    vec2 st = posToUV(uv*flipUV)*imageSize/viewSize;
+    vec2 st = posToUV(uv*flipUV/viewSize);
 
     vec2 offsetX = vec2(offset, 0.0);
     vec2 offsetY = vec2(0.0, offset);
@@ -71,6 +70,7 @@ void main() {
 
     // Difference
     vec4 diff = pixel(view, st)-pixel(last, st);
+
     // vec2 vec = vec2((diff*(gradX/gradMag)).x, (diff*(gradY/gradMag)).x);
 
     // gl_FragColor = mapColor(vec, scale);
