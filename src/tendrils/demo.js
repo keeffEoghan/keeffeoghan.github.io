@@ -1387,7 +1387,7 @@ export default (canvas, options) => {
                 to: {
                     target: 0.00003
                 },
-                time: 42500,
+                time: 43000,
                 ease: [0, 0.7, 1]
             })
             .to({
@@ -1934,14 +1934,14 @@ export default (canvas, options) => {
             .smoothOver(141000-134000, {
                 to: {
                     flowWeight: 1,
-                    speedAlpha: 0.0005,
-                    colorMapAlpha: 0.85
+                    speedAlpha: 0.0005
                 },
                 time: 141000,
                 ease: [0, 0, 1]
             })
             .smoothTo({
                 to: {
+                    colorMapAlpha: 0.85,
                     varyForce: 0.25,
                     varyFlow: 0.4
                 },
@@ -1986,24 +1986,18 @@ export default (canvas, options) => {
         trackTracks.tendrils3
             .over(132000-126000, {
                 to: {
-                    target: 0.005,
+                    target: 0.017,
                     lineWidth: 2
                 },
                 time: 132000,
                 ease: [0, 0, 1]
             })
-            .over(138000-135000, {
+            .over(140000-136000, {
                 to: {
-                    target: 0.00003
-                },
-                time: 138000,
-                ease: [0, 0, 1]
-            })
-            .to({
-                to: {
+                    target: 0.00003,
                     lineWidth: 1
                 },
-                time: 142000,
+                time: 140000,
                 ease: [0, 0, 1]
             });
 
@@ -2157,9 +2151,9 @@ export default (canvas, options) => {
                 time: 134000,
                 ease: [0, 0, 1]
             })
-            .to(138000, {
+            .over(146000-142000, {
                 to: [1, 1, 1, 0.2],
-                time: 138000,
+                time: 146000,
                 ease: [0, 1, 1]
             });
 
