@@ -25,8 +25,7 @@ import soundCloud from 'soundcloud-badge';
 import offset from 'mouse-event-offset';
 import throttle from 'lodash/throttle';
 import mapRange from 'range-fit';
-import mat3 from 'gl-matrix/src/gl-matrix/mat3';
-import vec2 from 'gl-matrix/src/gl-matrix/vec2';
+import { mat3, vec2 } from 'gl-matrix';
 import querystring from 'querystring';
 import toSource from 'to-source';
 import shader from 'gl-shader';
@@ -482,7 +481,8 @@ export default (canvas, options) => {
     // Optical flow
 
     const opticalFlow = new OpticalFlow(gl, undefined, {
-        speed: 0.08
+        speed: 0.08,
+        offset: 0.1
     });
 
     const opticalFlowState = {
@@ -916,7 +916,9 @@ export default (canvas, options) => {
                 damping: defaultState.damping-0.001
             }
         ],
-        level: parseInt((settings.quality || 1), 10),
+        level: parseInt((settings.quality ||
+                ((Math.max(window.innerWidth, window.innerHeight) < 800)? 0 : 1)),
+            10),
         levels: Array.from(document.querySelectorAll('.epok-quality-level')),
         steppers: Array.from(document.querySelectorAll(`.epok-quality-stepper,
             .epok-quality-prompter`)),

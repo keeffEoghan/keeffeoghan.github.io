@@ -1,6 +1,7 @@
 {
   "name": "epok-portfolio",
   "version": "0.0.0",
+  "node-version": "7.2.0",
   "browser": {},
   "authors": [
     "Eoghan O'Keeffe <keeffeoghan@gmail.com>"
@@ -45,8 +46,6 @@
     "glsl-map": "^1.0.1",
     "glsl-noise": "0.0.0",
     "glsl-random": "0.0.5",
-    "glslify": "^5.1.0",
-    "glslify-import": "^3.0.0",
     "hint.css": "^2.4.1",
     "lerp": "^1.0.3",
     "lodash": "^4.13.1",
@@ -92,6 +91,7 @@
     "raw-loader": "^0.5.1",
     "read-package-json": "^2.0.4",
     "vinyl-named": "^1.1.0",
+    "webpack": "^1.15.0",
     "webpack-stream": "^3.2.0",
     "yargs": "^4.7.1"
   }

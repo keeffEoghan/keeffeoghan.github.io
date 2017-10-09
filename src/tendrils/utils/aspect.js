@@ -1,4 +1,4 @@
-import vec2 from 'gl-matrix/src/gl-matrix/vec2';
+import { vec2 } from 'gl-matrix';
 
 
 export const aspect = (out, size, scale) =>

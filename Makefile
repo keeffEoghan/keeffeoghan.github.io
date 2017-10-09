@@ -2,7 +2,7 @@
 # @todo Separate each project/demo into its own repo and package.
 
 APP_NAME = tendrils
-ARGS = 
+ARGS =
 
 help:
 	@echo "tendrils"
@@ -32,7 +32,7 @@ setup: node_modules/.bin
 # modification date of `node_modules` when done.
 node_modules/.bin: package.json
 	npm config set progress=false;
-	npm cache clean;
+	npm cache verify;
 	npm install;
 	touch $@;
 
@@ -42,14 +42,14 @@ node_modules/.bin: package.json
 # This is still an interactive command - it still requires user input.
 deploy:
 	$(eval BRANCH = $(shell git rev-parse --abbrev-ref HEAD))
-	@echo "Switching to 'gh-pages' from '$(BRANCH)'"
-	git checkout gh-pages
+	@echo "Switching to 'master' from '$(BRANCH)'"
+	git checkout master
 	git merge $(BRANCH)
 	make dist
 	git add -f build
 	git commit
 	git push
-	@echo "Switching to '$(BRANCH)' from 'gh-pages'"
+	@echo "Switching to '$(BRANCH)' from 'master'"
 	git checkout $(BRANCH)
 
 # makefile ettiquette; mark rules without on-disk targets as PHONY

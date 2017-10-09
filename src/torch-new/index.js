@@ -8,7 +8,7 @@ import querystring from 'querystring';
 import offset from 'mouse-event-offset';
 import makeCamera from 'lookat-camera';
 import mapRange from 'range-fit';
-import mat4 from 'gl-matrix/src/gl-matrix/mat4';
+import { mat4 } from 'gl-matrix';
 import dat from 'dat-gui';
 
 import Timer from '../tendrils/timer';
