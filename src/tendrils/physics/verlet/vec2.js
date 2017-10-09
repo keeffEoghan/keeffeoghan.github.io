@@ -1,6 +1,6 @@
 // @see `./index.js`
 
-import vec2 from 'gl-matrix/src/gl-matrix/vec2';
+import { vec2 } from 'gl-matrix';
 
 export const verlet = (out, acc, pos0, pos1, dt0, dt1) =>
     vec2.add(out,

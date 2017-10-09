@@ -5,8 +5,7 @@
 
 import FBO from 'gl-fbo';
 import shader from 'gl-shader';
-import mat3 from 'gl-matrix/src/gl-matrix/mat3';
-import vec2 from 'gl-matrix/src/gl-matrix/vec2';
+import { mat3, vec2 } from 'gl-matrix';
 
 import aspect from '../../utils/aspect';
 

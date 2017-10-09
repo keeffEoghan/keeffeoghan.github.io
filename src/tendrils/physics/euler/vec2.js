@@ -1,6 +1,6 @@
 // @see `./index.js`
 
-import vec2 from 'gl-matrix/src/gl-matrix/vec2';
+import { vec2 } from 'gl-matrix';
 
 export const euler = (out, vel, pos, dt) =>
     vec2.add(out, pos, vec2.scale(out, vel, dt));
