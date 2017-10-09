@@ -2,7 +2,7 @@
 # @todo Separate each project/demo into its own repo and package.
 
 APP_NAME = tendrils
-ARGS = 
+ARGS =
 
 help:
 	@echo "tendrils"
@@ -32,7 +32,7 @@ setup: node_modules/.bin
 # modification date of `node_modules` when done.
 node_modules/.bin: package.json
 	npm config set progress=false;
-	npm cache clean;
+	npm cache verify;
 	npm install;
 	touch $@;
 

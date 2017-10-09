@@ -7,7 +7,7 @@
 
 import geometry from 'gl-geometry';
 import shader from 'gl-shader';
-import vec2 from 'gl-matrix/src/gl-matrix/vec2';
+import { vec2 } from 'gl-matrix';
 
 import * as spawnPixels from '../pixels';
 
