@@ -315,7 +315,7 @@ main { min-height: 100%; }
 
 .hint--bounce:before, .hint--bounce:after { -webkit-transition: opacity 0.3s ease, visibility 0.3s ease, -webkit-transform 0.3s cubic-bezier(0.71, 1.7, 0.77, 1.24); transition: opacity 0.3s ease, visibility 0.3s ease, -webkit-transform 0.3s cubic-bezier(0.71, 1.7, 0.77, 1.24); transition: opacity 0.3s ease, visibility 0.3s ease, transform 0.3s cubic-bezier(0.71, 1.7, 0.77, 1.24); transition: opacity 0.3s ease, visibility 0.3s ease, transform 0.3s cubic-bezier(0.71, 1.7, 0.77, 1.24), -webkit-transform 0.3s cubic-bezier(0.71, 1.7, 0.77, 1.24); }
 
-canvas { display: block; position: absolute; top: 0; left: 0; bottom: 0; right: 0; cursor: cell; -webkit-transition: background-color 200ms ease-in-out; transition: background-color 200ms ease-in-out; }
+canvas { display: block; position: absolute; top: 0; left: 0; bottom: 0; right: 0; cursor: crosshair; -webkit-transition: background-color 200ms ease-in-out; transition: background-color 200ms ease-in-out; }
 
 canvas.epok-dark { background: #000; }
 
