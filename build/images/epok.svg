@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="652px" height="250px" viewBox="0 0 652 250" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <!-- Generator: Sketch 42 (36781) - http://www.bohemiancoding.com/sketch -->
+    <title>Slice 1</title>
+    <desc>Created with Sketch.</desc>
+    <defs></defs>
+    <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="background" transform="translate(11.000000, 64.000000)" stroke-linecap="square" stroke="#FFFFFF" stroke-width="11" stroke-linejoin="bevel">
+            <g id="background-o" transform="translate(344.000000, 0.000000)">
+                <circle id="background-0" cx="60" cy="60" r="60"></circle>
+            </g>
+            <g id="background-k" transform="translate(524.000000, 0.000000)">
+                <path d="M-3.12638804e-13,119.5 L-3.12638804e-13,0" id="background-1"></path>
+                <path d="M103.69159,0.5 L0.182412007,60.2168332 L104.386719,120.369141" id="background-2"></path>
+            </g>
+            <g id="background-p" transform="translate(164.000000, 0.000000)">
+                <path d="M0,120 C0,120 23.8105469,119.076172 60,120 C96.1894531,120.923828 120,86.2875118 120,60 C120,26.862915 93.137085,0 60,0 C26.862915,0 6.12010442e-13,26.862915 6.12010442e-13,60 C6.12010442e-13,71.8934844 0,165.128906 0,165.128906" id="background-3"></path>
+            </g>
+            <g id="background-e">
+                <path d="M27.0480052,12.2371511 L86.3851219,115.821443 C104.007854,105.369323 115.821443,86.153546 115.821443,64.1785573 C115.821443,31.0414723 88.9585277,4.17855731 55.8214427,4.17855731 C22.6843577,4.17855731 -4.17855731,31.0414723 -4.17855731,64.1785573" id="background-4" transform="translate(55.821443, 60.000000) rotate(-90.000000) translate(-55.821443, -60.000000) "></path>
+            </g>
+        </g>
+        <g id="draw" transform="translate(11.000000, 64.000000)" stroke-linecap="square" stroke="#000000" stroke-width="10" stroke-linejoin="bevel">
+            <g id="draw-o" transform="translate(344.000000, 0.000000)">
+                <circle id="draw-0" cx="60" cy="60" r="60"></circle>
+            </g>
+            <g id="draw-k" transform="translate(524.000000, 0.000000)">
+                <path d="M-2.84217094e-13,119.5 L-2.84217094e-13,0" id="draw-1"></path>
+                <path d="M103.69159,0.5 L0.182412007,60.2168332 L104.386719,120.369141" id="draw-2"></path>
+            </g>
+            <g id="draw-p" transform="translate(164.000000, 0.000000)">
+                <path d="M0,120 C0,120 23.8105469,119.076172 60,120 C96.1894531,120.923828 120,86.2875118 120,60 C120,26.862915 93.137085,0 60,0 C26.862915,0 6.12010442e-13,26.862915 6.12010442e-13,60 C6.12010442e-13,71.8934844 0,165.128906 0,165.128906" id="draw-3"></path>
+            </g>
+            <g id="draw-e">
+                <path d="M27.0480052,12.2371511 L86.3851219,115.821443 C104.007854,105.369323 115.821443,86.153546 115.821443,64.1785573 C115.821443,31.0414723 88.9585277,4.17855731 55.8214427,4.17855731 C22.6843577,4.17855731 -4.17855731,31.0414723 -4.17855731,64.1785573" id="draw-4" transform="translate(55.821443, 60.000000) rotate(-90.000000) translate(-55.821443, -60.000000) "></path>
+            </g>
+        </g>
+        <g id="build" opacity="0.495584239" transform="translate(10.000000, 4.000000)" stroke="#7F7F97">
+            <circle id="build-0" cx="345" cy="120" r="120"></circle>
+            <circle id="build-1" cx="405" cy="120" r="60"></circle>
+            <path d="M0.483916012,179.666667 L630,179.666667" id="build-2" stroke-linecap="square"></path>
+            <path d="M629.69159,60.5 L422.5,180.033609" id="build-3" stroke-linecap="square" transform="translate(526.095795, 120.266805) scale(-1, -1) translate(-526.095795, -120.266805) "></path>
+            <path d="M0.483916012,59.6666667 L630,59.6666667" id="build-4" stroke-linecap="square"></path>
+            <path d="M629.69159,60.5 L422.5,181.033609" id="build-5" stroke-linecap="square" transform="translate(526.095795, 120.766805) scale(-1, 1) translate(-526.095795, -120.766805) "></path>
+            <path d="M525.5,180.5 L525.5,60" id="build-6" stroke-linecap="square"></path>
+            <path d="M448.5,60.5 L164.5,223.5" id="build-7" stroke-linecap="square"></path>
+            <circle id="build-8" cx="225" cy="120" r="60"></circle>
+            <path d="M164.5,223.5 L164.5,120" id="build-9" stroke-linecap="square"></path>
+            <path d="M165.009178,120.316776 L61.5,180.033609" id="build-10" stroke-linecap="square" transform="translate(113.254589, 150.175193) scale(-1, -1) translate(-113.254589, -150.175193) "></path>
+            <circle id="build-11" cx="61" cy="120" r="60"></circle>
+            <path d="M112.009178,89.3167762 L8.5,149.033609" id="build-12" stroke-linecap="square" transform="translate(60.254589, 119.175193) scale(-1, -1) translate(-60.254589, -119.175193) "></path>
+            <path d="M62.0091775,149.300678 L8.73876399,180.033609" id="build-13" stroke-linecap="square" transform="translate(35.373971, 164.667144) scale(1, -1) translate(-35.373971, -164.667144) "></path>
+        </g>
+    </g>
+</svg>
