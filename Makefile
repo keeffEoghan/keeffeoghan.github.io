@@ -36,7 +36,7 @@ node_modules/.bin: package.json
 	npm install;
 	touch $@;
 
-# Convenience: merge into `gh-pages` and push it.
+# Convenience: merge into `master` and push it.
 # Before doing this, make sure you've got a clean `git` stage, and you're not
 # running any build tasks...
 # This is still an interactive command - it still requires user input.
