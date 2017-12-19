@@ -148,7 +148,7 @@ export default (canvas, options) => {
         useMedia: (''+settings.use_media !== 'false'),
         staticImage: ((settings.static_image)?
                 decodeURIComponent(settings.static_image)
-            :   rootPath+'build/images/max-crop-gradient.png')
+            :   rootPath+'build/images/max/max-crop-gradient.png')
     };
 
     if(''+settings.cursor === 'false') {

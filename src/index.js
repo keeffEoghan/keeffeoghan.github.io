@@ -34,7 +34,8 @@ export default () => {
         track: false,
         keyboard: false,
         use_media: false,
-        static_image: rootPath+'build/images/epok.svg'
+        static_image: rootPath+'build/images/epok/arg.jpg'
+        // static_image: rootPath+'build/images/epok/eye.png'
     });
 
     Object.assign(demo.tendrils.state, demo.defaultState, {
