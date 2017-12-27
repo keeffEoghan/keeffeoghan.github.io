@@ -418,9 +418,11 @@ canvas.epok-no-cursor { cursor: none; }
 
 .epok-captured-overlay .epok-main-controls { z-index: 10002; }
 
-.epok-captured-url { display: inline-block; color: #efefef; background: transparent; padding: 0.3em; border: 1px solid #efefef; border-radius: 2px; vertical-align: middle; text-shadow: 0 0 1px #000, 0 0 1px #000, 0 0 2px #000, 0 0 3px #000; box-shadow: 0 0 4px #000; }
+.epok-captured-url { display: inline-block; color: #efefef; background: transparent; padding: 0.3em; border: 1px solid #efefef; border-radius: 2px; vertical-align: middle; text-shadow: 0 0 1px #000, 0 0 1px #000, 0 0 2px #000, 0 0 3px #000; box-shadow: 0 0 4px #000; min-width: 17em; }
 
 .epok-captured-url:hover, .epok-captured-url:focus { color: #fff; }
+
+.epok-capture-url.epok-loading, .epok-capture-url.epok-loading .epok-captured-url { cursor: progress; }
 
 body { background-color: #222; }
 
