@@ -135,6 +135,8 @@ export default (canvas, options) => {
 
     const state = tendrils.state;
 
+    const localTrackURL = rootPath+'build/audio/Trust%20feat.%20Kathrin%20deBoer%20&%20Tom%20Hodge%20-%20Max%20Cooper.mp3';
+
     const appSettings = {
         trackURL: ((''+settings.track === 'false')?
                 ''
@@ -142,7 +144,7 @@ export default (canvas, options) => {
                 decodeURIComponent(settings.track)
             : ((''+settings.local_stream !== 'true')?
                 'https://soundcloud.com/max-cooper/trust-feat-kathrin-deboer'
-            :   rootPath+'build/audio/Trust%20feat.%20Kathrin%20deBoer%20&%20Tom%20Hodge%20-%20Max%20Cooper.mp3'))),
+            :   localTrackURL))),
 
         animate: (''+settings.animate !== 'false'),
         useMedia: (''+settings.use_media !== 'false'),
@@ -320,7 +322,8 @@ export default (canvas, options) => {
                     },
                     (e, src, data, el) => {
                         if(e) {
-                            console.warn('Error loading track', e);
+                            console.warn('Error loading track, fall back to local', e);
+                            setupTrackURL(localTrackURL);
                         }
                         else {
                             setupTrack(src, el.querySelector('.npm-scb-info'));
@@ -512,6 +515,7 @@ export default (canvas, options) => {
 
                     const v = Object.assign(document.createElement('video'), {
                         src: self.URL.createObjectURL(stream),
+                        srcObject: stream,
                         controls: true,
                         muted: true,
                         autoplay: true
@@ -948,17 +952,16 @@ export default (canvas, options) => {
 
     // Fullscreen
 
-    // Needs to be called this way because calling the below is an `Illegal
-    // Invocation`
-    // const requestFullscreen = prefixes('requestFullscreen', canvas);
-    const requestFullscreen = prefixes('requestFullscreen', canvas).name;
+    // Needs to be called this way because calling the returned function directly is an
+    // `Illegal Invocation`
+    const requestFullscreen = prefixes('requestFullscreen', canvas);
 
-    const fullscreen = (requestFullscreen && {
-        request: () => canvas[requestFullscreen](),
+    const fullscreen = (requestFullscreen && requestFullscreen.name && {
+        request: () => canvas[requestFullscreen.name](),
         toggle: document.querySelector('.epok-fullscreen-button')
     });
 
-    (fullscreen.toggle &&
+    (fullscreen && fullscreen.toggle &&
         fullscreen.toggle.addEventListener('click', fullscreen.request));
 
 
@@ -971,13 +974,18 @@ export default (canvas, options) => {
         canvas: document.createElement('canvas'),
         overlay: captureOverlay,
         exit: captureOverlay.querySelector('.epok-exit-overlay'),
+        captureURL: captureOverlay.querySelector('.epok-capture-url'),
         url: captureOverlay.querySelector('.epok-captured-url'),
         image: captureOverlay.querySelector('.epok-captured-image'),
         toggle: document.querySelector('.epok-capture-button'),
         paused: track.paused,
         data: null,
 
-        reset: () => (capture.image.src = capture.url.value = ''),
+        reset: () => {
+            capture.captureURL.classList.add('epok-loading');
+
+            return capture.image.src = capture.url.value = '';
+        },
 
         screenshot() {
             capture.paused = track.paused;
@@ -1021,7 +1029,10 @@ export default (canvas, options) => {
                         console.error(e, response, body.status);
                     }
                     else if(capture.data === dataURI) {
-                        capture.image.src = capture.url.value = body.data.link;
+                        console.log('Screenshot share image',
+                            capture.image.src = capture.url.value = body.data.link);
+
+                        capture.captureURL.classList.remove('epok-loading');
                     }
                 });
         }
