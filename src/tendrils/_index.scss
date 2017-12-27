@@ -335,9 +335,17 @@ canvas {
         0 0 2px #000,
         0 0 3px #000;
     box-shadow: 0 0 4px #000;
+    min-width: 17em;
 
     &:hover,
     &:focus {
         color: #fff;
+    }
+}
+
+.epok-capture-url.epok-loading {
+    &,
+    .epok-captured-url {
+        cursor: progress;
     }
 }
