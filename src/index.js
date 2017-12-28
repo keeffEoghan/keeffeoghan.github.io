@@ -23,6 +23,7 @@ export default () => {
                 setTimeout(() => {
                         part.classList.add('epok-show');
                         animateSVG(part, 0.4, part.className.match).then(y);
+                        setTimeout(y, 1000);
                     },
                     stagger*curve(p)))));
 
