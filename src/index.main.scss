@@ -53,6 +53,8 @@ header {
 
 .epok-folio__tag {
     display: inline-block;
+    float: left;
+    clear: both;
     color: #000;
     background-color: rgba(255, 255, 255, 0.85);
     transition: opacity 500ms ease-in-out;
