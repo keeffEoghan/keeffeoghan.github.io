@@ -440,7 +440,7 @@ header.epok-folio--intro-run .epok-main-controls { opacity: 0; }
 
 .epok-folio__tag, .epok-folio__content { line-height: 1.75em; padding: 0.75em 1.75em; margin: 0.5em 0; clear: both; }
 
-.epok-folio__tag { display: inline-block; color: #000; background-color: rgba(255, 255, 255, 0.85); -webkit-transition: opacity 500ms ease-in-out; transition: opacity 500ms ease-in-out; }
+.epok-folio__tag { display: inline-block; float: left; clear: both; color: #000; background-color: rgba(255, 255, 255, 0.85); -webkit-transition: opacity 500ms ease-in-out; transition: opacity 500ms ease-in-out; }
 
 .epok-folio__tag.epok-hide { opacity: 0; pointer-events: none; }
 
