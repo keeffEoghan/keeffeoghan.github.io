@@ -39,6 +39,7 @@ canvas {
     border-radius: 2px;
     box-shadow: 0 0 0 4px rgba(#121212, 0.9);
     vertical-align: middle;
+    text-align: left;
 
     &:hover,
     &:focus {
@@ -81,7 +82,6 @@ canvas {
     bottom: 4em;
     width: 60%;
     max-width: 36em;
-    overflow: auto;
     z-index: 10;
     transition: opacity 300ms ease-in-out;
 
@@ -93,7 +93,9 @@ canvas {
 
 .epok-info-content {
     flex: 0 0 auto;
-    margin: auto;
+    margin: auto 0;
+    height: 100%;
+    overflow: auto;
 
     .epok-info-item {
         float: left;
@@ -111,6 +113,38 @@ canvas {
         font-size: 1.5em;
     }
 }
+
+.epok-info-more {
+    position: fixed;
+    z-index: 1000;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    display: flex;
+    flex-flow: column nowrap;
+    justify-content: flex-start;
+    align-items: flex-start;
+    padding: 5em;
+    background-color: #fff;
+    color: #000;
+    transition: opacity 400ms ease-in-out,
+        transform 400ms ease-out;
+
+    &.epok-hide {
+        opacity: 0;
+        pointer-events: none;
+        transform: scale(1.05);
+    }
+}
+
+.epok-info-more-content {
+    flex: 0 0 auto;
+    margin: auto 0;
+    height: 100%;
+    overflow: auto;
+}
+
 
 /* Quick fix for a broken DAT.GUI style */
 .hue-field {

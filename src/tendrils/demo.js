@@ -879,6 +879,9 @@ export default (canvas, options) => {
         starter: introInfo.querySelector('.epok-info-content > .epok-button'),
         toggler: document.querySelector('.epok-info-button'),
 
+        moreTogglers: Array.from(document.querySelectorAll('.epok-info-more-button')),
+        more: document.querySelector('.epok-info-more'),
+
         toggle(toggle) {
             const show = ((typeof toggle !== 'undefined')?
                     toggle
@@ -889,6 +892,19 @@ export default (canvas, options) => {
             }
             else {
                 intro.info.classList.add('epok-hide');
+                intro.more.classList.add('epok-hide');
+            }
+        },
+        toggleMore(toggle) {
+            const show = ((typeof toggle !== 'undefined')?
+                    toggle
+                :   intro.more.classList.contains('epok-hide'));
+
+            if(show) {
+                intro.more.classList.remove('epok-hide');
+            }
+            else {
+                intro.more.classList.add('epok-hide');
             }
         },
         start() {
@@ -904,6 +920,9 @@ export default (canvas, options) => {
 
         (intro.toggler &&
             intro.toggler.addEventListener('click', () => intro.toggle()));
+
+        intro.moreTogglers.forEach((moreToggler) =>
+            moreToggler.addEventListener('click', () => intro.toggleMore()));
     }
 
 
