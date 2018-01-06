@@ -32,6 +32,8 @@ body { margin: 0; }
 
 main { min-height: 100%; }
 
+small { font-size: 0.75em; }
+
 /*! Hint.css - v2.5.0 - 2017-04-23 http://kushagragour.in/lab/hint/ Copyright (c) 2017 Kushagra Gour */
 /*-------------------------------------*	HINT.css - A CSS tooltip library
 \*-------------------------------------*/
@@ -325,7 +327,7 @@ canvas.epok-no-cursor { cursor: none; }
 
 .material-icons { vertical-align: middle; }
 
-.epok-button { display: inline-block; padding: 0.5em 1.75em; margin: 0.5em 0.1em; color: #000; background: #efefef; border: none; cursor: pointer; font-weight: 600; border-radius: 2px; box-shadow: 0 0 0 4px rgba(18, 18, 18, 0.9); vertical-align: middle; }
+.epok-button { display: inline-block; padding: 0.5em 1.75em; margin: 0.5em 0.1em; color: #000; background: #efefef; border: none; cursor: pointer; font-weight: 600; border-radius: 2px; box-shadow: 0 0 0 4px rgba(18, 18, 18, 0.9); vertical-align: middle; text-align: left; }
 
 .epok-button:hover, .epok-button:focus { color: #121212; background-color: #fff; }
 
@@ -339,15 +341,21 @@ canvas.epok-no-cursor { cursor: none; }
 
 .epok-a:active { color: #414141; }
 
-.epok-info { position: absolute; display: -webkit-box; display: -webkit-flex; display: -ms-flexbox; display: flex; -webkit-box-orient: vertical; -webkit-box-direction: normal; -webkit-flex-flow: column nowrap; -ms-flex-flow: column nowrap; flex-flow: column nowrap; -webkit-box-pack: start; -webkit-justify-content: flex-start; -ms-flex-pack: start; justify-content: flex-start; -webkit-box-align: start; -webkit-align-items: flex-start; -ms-flex-align: start; align-items: flex-start; left: 0; top: 4em; bottom: 4em; width: 60%; max-width: 36em; overflow: auto; z-index: 10; -webkit-transition: opacity 300ms ease-in-out; transition: opacity 300ms ease-in-out; }
+.epok-info { position: absolute; display: -webkit-box; display: -webkit-flex; display: -ms-flexbox; display: flex; -webkit-box-orient: vertical; -webkit-box-direction: normal; -webkit-flex-flow: column nowrap; -ms-flex-flow: column nowrap; flex-flow: column nowrap; -webkit-box-pack: start; -webkit-justify-content: flex-start; -ms-flex-pack: start; justify-content: flex-start; -webkit-box-align: start; -webkit-align-items: flex-start; -ms-flex-align: start; align-items: flex-start; left: 0; top: 4em; bottom: 4em; width: 60%; max-width: 36em; z-index: 10; -webkit-transition: opacity 300ms ease-in-out; transition: opacity 300ms ease-in-out; }
 
 .epok-info.epok-hide { opacity: 0; pointer-events: none; }
 
-.epok-info-content { -webkit-box-flex: 0; -webkit-flex: 0 0 auto; -ms-flex: 0 0 auto; flex: 0 0 auto; margin: auto; }
+.epok-info-content { -webkit-box-flex: 0; -webkit-flex: 0 0 auto; -ms-flex: 0 0 auto; flex: 0 0 auto; margin: auto 0; height: 100%; overflow: auto; }
 
 .epok-info-content .epok-info-item { float: left; clear: both; line-height: 1.75em; padding: 0.75em 1.75em; margin: 0.5em 0; color: #efefef; background-color: rgba(18, 18, 18, 0.9); }
 
 .epok-info-content .epok-button { float: left; clear: both; font-size: 1.5em; }
+
+.epok-info-more { position: fixed; z-index: 1000; top: 0; right: 0; bottom: 0; left: 0; display: -webkit-box; display: -webkit-flex; display: -ms-flexbox; display: flex; -webkit-box-orient: vertical; -webkit-box-direction: normal; -webkit-flex-flow: column nowrap; -ms-flex-flow: column nowrap; flex-flow: column nowrap; -webkit-box-pack: start; -webkit-justify-content: flex-start; -ms-flex-pack: start; justify-content: flex-start; -webkit-box-align: start; -webkit-align-items: flex-start; -ms-flex-align: start; align-items: flex-start; padding: 5em; background-color: #fff; color: #000; -webkit-transition: opacity 400ms ease-in-out, -webkit-transform 400ms ease-out; transition: opacity 400ms ease-in-out, -webkit-transform 400ms ease-out; transition: opacity 400ms ease-in-out, transform 400ms ease-out; transition: opacity 400ms ease-in-out, transform 400ms ease-out, -webkit-transform 400ms ease-out; }
+
+.epok-info-more.epok-hide { opacity: 0; pointer-events: none; -webkit-transform: scale(1.05); transform: scale(1.05); }
+
+.epok-info-more-content { -webkit-box-flex: 0; -webkit-flex: 0 0 auto; -ms-flex: 0 0 auto; flex: 0 0 auto; margin: auto 0; height: 100%; overflow: auto; }
 
 /* Quick fix for a broken DAT.GUI style */
 .hue-field { width: 13px !important; }
