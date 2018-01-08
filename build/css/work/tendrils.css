@@ -333,34 +333,56 @@ canvas.epok-no-cursor { cursor: none; }
 
 .epok-button:active { color: #414141; }
 
-.epok-a { color: #efefef; text-decoration: underline; cursor: pointer; }
+.epok-a, .epok-cta { cursor: pointer; color: #efefef; }
 
-.epok-a:visited { color: #efefef; }
+.epok-a.epok-invert, .epok-cta.epok-invert { color: #111; }
 
-.epok-a:hover, .epok-a:focus { color: #fff; }
+.epok-a:visited, .epok-cta:visited { color: #efefef; }
 
-.epok-a:active { color: #414141; }
+.epok-a:visited.epok-invert, .epok-cta:visited.epok-invert { color: #111; }
 
-.epok-info { position: absolute; display: -webkit-box; display: -webkit-flex; display: -ms-flexbox; display: flex; -webkit-box-orient: vertical; -webkit-box-direction: normal; -webkit-flex-flow: column nowrap; -ms-flex-flow: column nowrap; flex-flow: column nowrap; -webkit-box-pack: start; -webkit-justify-content: flex-start; -ms-flex-pack: start; justify-content: flex-start; -webkit-box-align: start; -webkit-align-items: flex-start; -ms-flex-align: start; align-items: flex-start; left: 0; top: 4em; bottom: 4em; width: 60%; max-width: 36em; z-index: 10; -webkit-transition: opacity 300ms ease-in-out; transition: opacity 300ms ease-in-out; }
+.epok-a:hover, .epok-a:focus, .epok-cta:hover, .epok-cta:focus { color: #fff; }
 
-.epok-info.epok-hide { opacity: 0; pointer-events: none; }
+.epok-a:hover.epok-invert, .epok-a:focus.epok-invert, .epok-cta:hover.epok-invert, .epok-cta:focus.epok-invert { color: #000; }
 
-.epok-info-content { -webkit-box-flex: 0; -webkit-flex: 0 0 auto; -ms-flex: 0 0 auto; flex: 0 0 auto; margin: auto 0; height: 100%; overflow: auto; }
+.epok-a:active, .epok-cta:active { color: #414141; }
+
+.epok-a { text-decoration: underline; }
+
+.epok-cta { background-color: transparent; border: none; }
+
+.epok-info, .epok-info-more { display: -webkit-box; display: -webkit-flex; display: -ms-flexbox; display: flex; -webkit-box-orient: vertical; -webkit-box-direction: normal; -webkit-flex-flow: column nowrap; -ms-flex-flow: column nowrap; flex-flow: column nowrap; -webkit-box-pack: start; -webkit-justify-content: flex-start; -ms-flex-pack: start; justify-content: flex-start; -webkit-box-align: start; -webkit-align-items: flex-start; -ms-flex-align: start; align-items: flex-start; }
+
+.epok-info.epok-hide, .epok-info-more.epok-hide { opacity: 0; pointer-events: none; }
+
+.epok-info { position: absolute; left: 0; top: 4em; bottom: 4em; width: 60%; max-width: 36em; z-index: 10; -webkit-transition: opacity 300ms ease-in-out; transition: opacity 300ms ease-in-out; }
+
+.epok-info-content, .epok-info-more-content { -webkit-box-flex: 0; -webkit-flex: 0 1 auto; -ms-flex: 0 1 auto; flex: 0 1 auto; margin: auto 0; max-height: 100%; overflow: auto; }
 
 .epok-info-content .epok-info-item { float: left; clear: both; line-height: 1.75em; padding: 0.75em 1.75em; margin: 0.5em 0; color: #efefef; background-color: rgba(18, 18, 18, 0.9); }
 
 .epok-info-content .epok-button { float: left; clear: both; font-size: 1.5em; }
 
-.epok-info-more { position: fixed; z-index: 1000; top: 0; right: 0; bottom: 0; left: 0; display: -webkit-box; display: -webkit-flex; display: -ms-flexbox; display: flex; -webkit-box-orient: vertical; -webkit-box-direction: normal; -webkit-flex-flow: column nowrap; -ms-flex-flow: column nowrap; flex-flow: column nowrap; -webkit-box-pack: start; -webkit-justify-content: flex-start; -ms-flex-pack: start; justify-content: flex-start; -webkit-box-align: start; -webkit-align-items: flex-start; -ms-flex-align: start; align-items: flex-start; padding: 5em; background-color: #fff; color: #000; -webkit-transition: opacity 400ms ease-in-out, -webkit-transform 400ms ease-out; transition: opacity 400ms ease-in-out, -webkit-transform 400ms ease-out; transition: opacity 400ms ease-in-out, transform 400ms ease-out; transition: opacity 400ms ease-in-out, transform 400ms ease-out, -webkit-transform 400ms ease-out; }
+.epok-info-more { position: fixed; z-index: 1002; top: 0; right: 0; bottom: 0; left: 0; padding: 5em; line-height: 1.85; background-color: #fff; color: #000; -webkit-transition: opacity 400ms ease-in-out, -webkit-transform 400ms ease-out; transition: opacity 400ms ease-in-out, -webkit-transform 400ms ease-out; transition: opacity 400ms ease-in-out, transform 400ms ease-out; transition: opacity 400ms ease-in-out, transform 400ms ease-out, -webkit-transform 400ms ease-out; }
 
-.epok-info-more.epok-hide { opacity: 0; pointer-events: none; -webkit-transform: scale(1.05); transform: scale(1.05); }
+.epok-info-more.epok-hide { -webkit-transform: scale(1.05); transform: scale(1.05); }
 
-.epok-info-more-content { -webkit-box-flex: 0; -webkit-flex: 0 0 auto; -ms-flex: 0 0 auto; flex: 0 0 auto; margin: auto 0; height: 100%; overflow: auto; }
+.epok-info-more .epok-info-more-button { position: absolute; top: 5em; right: 5em; }
+
+.epok-info-more h2 { font-size: 1.1em; font-weight: bolder; margin: 2em 0 1em; }
+
+.epok-info-more p, .epok-info-more aside { margin-bottom: 1em; }
+
+.epok-info-more aside { font-weight: lighter; font-style: italic; opacity: 0.75; }
+
+.epok-info-more-content { margin: auto; max-width: 36em; }
 
 /* Quick fix for a broken DAT.GUI style */
 .hue-field { width: 13px !important; }
 
 .npm-scb-wrap, .npm-scb-now-playing { right: 0; }
+
+.npm-scb-inner { -webkit-transition: width 500ms cubic-bezier(1, 0, 0, 1), top 500ms ease-out, background-color 300ms ease-out 100ms, box-shadow 200ms ease-out 200ms; transition: width 500ms cubic-bezier(1, 0, 0, 1), top 500ms ease-out, background-color 300ms ease-out 100ms, box-shadow 200ms ease-out 200ms; }
 
 .npm-scb-wrap { opacity: 0.7; text-shadow: 0 0 3px #000, 0 0 3px #000; -webkit-transition: opacity 300ms ease-in-out; transition: opacity 300ms ease-in-out; }
 
@@ -374,9 +396,9 @@ canvas.epok-no-cursor { cursor: none; }
 
 .npm-scb-icon { background-color: rgba(0, 0, 0, 0.3); }
 
-.epok-show .npm-scb-inner { top: 0; }
+.epok-soundcloud.epok-show .npm-scb-inner, .npm-scb-wrap:hover .npm-scb-inner { top: 0; background-color: rgba(255, 255, 255, 0.85); box-shadow: 0 0 5px rgba(0, 0, 0, 0.3); }
 
-.epok-show .npm-scb-now-playing { opacity: 0; }
+.epok-soundcloud.epok-show .npm-scb-now-playing, .npm-scb-wrap:hover .npm-scb-now-playing { opacity: 0; }
 
 .epok-main-controls { position: absolute; bottom: 0; left: 0; padding: 0.4em 1.2em; z-index: 1001; }
 
@@ -420,7 +442,7 @@ canvas.epok-no-cursor { cursor: none; }
 
 .epok-audio-controls .epok-progress { -webkit-box-flex: 1; -webkit-flex: 1 1 auto; -ms-flex: 1 1 auto; flex: 1 1 auto; margin: 0 1em; cursor: pointer; }
 
-.epok-captured-overlay { position: absolute; display: -webkit-box; display: -webkit-flex; display: -ms-flexbox; display: flex; -webkit-box-orient: horizontal; -webkit-box-direction: normal; -webkit-flex-flow: row nowrap; -ms-flex-flow: row nowrap; flex-flow: row nowrap; -webkit-box-pack: center; -webkit-justify-content: center; -ms-flex-pack: center; justify-content: center; -webkit-box-align: center; -webkit-align-items: center; -ms-flex-align: center; align-items: center; top: 0; left: 0; bottom: 0; right: 0; opacity: 0; pointer-events: none; z-index: 1002; background-color: rgba(0, 0, 0, 0.9); -webkit-transition: opacity 300ms ease-out; transition: opacity 300ms ease-out; }
+.epok-captured-overlay { position: absolute; display: -webkit-box; display: -webkit-flex; display: -ms-flexbox; display: flex; -webkit-box-orient: horizontal; -webkit-box-direction: normal; -webkit-flex-flow: row nowrap; -ms-flex-flow: row nowrap; flex-flow: row nowrap; -webkit-box-pack: center; -webkit-justify-content: center; -ms-flex-pack: center; justify-content: center; -webkit-box-align: center; -webkit-align-items: center; -ms-flex-align: center; align-items: center; top: 0; left: 0; bottom: 0; right: 0; opacity: 0; pointer-events: none; z-index: 1002; overflow: hidden; background-color: rgba(0, 0, 0, 0.9); -webkit-transition: opacity 300ms ease-out; transition: opacity 300ms ease-out; }
 
 .epok-captured-overlay.epok-show { opacity: 1; pointer-events: all; }
 
