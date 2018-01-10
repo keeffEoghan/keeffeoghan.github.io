@@ -371,9 +371,17 @@ canvas.epok-no-cursor { cursor: none; }
 
 .epok-info-more h2 { font-size: 1.1em; font-weight: bolder; margin: 2em 0 1em; }
 
+.epok-info-more h3 { font-size: 1.05em; font-weight: bold; margin: 1em 0 1em; }
+
 .epok-info-more p, .epok-info-more aside { margin-bottom: 1em; }
 
 .epok-info-more aside { font-weight: lighter; font-style: italic; opacity: 0.75; }
+
+.epok-info-more ul { line-height: 1.6; list-style-type: circle; margin: 0 0 1em 2em; }
+
+.epok-info-more li { padding: 0.1em 0; }
+
+.epok-info-more code { display: inline-block; padding: 0 0.4em; background-color: #333; color: #fff; border-radius: 2px; font-style: normal; font-family: monospace; }
 
 .epok-info-more-content { margin: auto; max-width: 36em; }
 
