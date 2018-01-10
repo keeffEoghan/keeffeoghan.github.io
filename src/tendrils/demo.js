@@ -3498,11 +3498,11 @@ export default (canvas, options) => {
             '\\': keyframeCaller(() => reset()),
             "'": keyframeCaller(() => spawnFlow()),
             ';': keyframeCaller(() => spawnFastest()),
+            ',': keyframeCaller(() => spawnForm()),
 
             '<shift>': keyframeCaller(() => restart()),
             '/': keyframeCaller(() => spawnSamples()),
-            '.': keyframeCaller(() => spawnImage(null)),
-            ',': keyframeCaller(() => spawnForm())
+            '.': keyframeCaller(() => spawnImage(null))
         };
 
         if(fullscreen) {

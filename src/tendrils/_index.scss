@@ -172,6 +172,12 @@ canvas {
         margin: 2em 0 1em;
     }
 
+    h3 {
+        font-size: 1.05em;
+        font-weight: bold;
+        margin: 1em 0 1em;
+    }
+
     p,
     aside {
         margin-bottom: 1em;
@@ -181,6 +187,26 @@ canvas {
         font-weight: lighter;
         font-style: italic;
         opacity: 0.75;
+    }
+
+    ul {
+        line-height: 1.6;
+        list-style-type: circle;
+        margin: 0 0 1em 2em;
+    }
+
+    li {
+        padding: 0.1em 0;
+    }
+
+    code {
+        display: inline-block;
+        padding: 0 0.4em;
+        background-color: #333;
+        color: #fff;
+        border-radius: 2px;
+        font-style: normal;
+        font-family: monospace;
     }
 }
 
