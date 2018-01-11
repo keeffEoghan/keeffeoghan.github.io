@@ -363,11 +363,11 @@ canvas.epok-no-cursor { cursor: none; }
 
 .epok-info-content .epok-button { float: left; clear: both; font-size: 1.5em; }
 
-.epok-info-more { position: fixed; z-index: 1002; top: 0; right: 0; bottom: 0; left: 0; padding: 5em; line-height: 1.85; background-color: #fff; color: #000; -webkit-transition: opacity 400ms ease-in-out, -webkit-transform 400ms ease-out; transition: opacity 400ms ease-in-out, -webkit-transform 400ms ease-out; transition: opacity 400ms ease-in-out, transform 400ms ease-out; transition: opacity 400ms ease-in-out, transform 400ms ease-out, -webkit-transform 400ms ease-out; }
+.epok-info-more { position: fixed; z-index: 1002; top: 0; right: 0; bottom: 0; left: 0; padding: 3em; line-height: 1.85; background-color: #fff; color: #000; -webkit-transition: opacity 400ms ease-in-out, -webkit-transform 400ms ease-out; transition: opacity 400ms ease-in-out, -webkit-transform 400ms ease-out; transition: opacity 400ms ease-in-out, transform 400ms ease-out; transition: opacity 400ms ease-in-out, transform 400ms ease-out, -webkit-transform 400ms ease-out; }
 
 .epok-info-more.epok-hide { -webkit-transform: scale(1.05); transform: scale(1.05); }
 
-.epok-info-more .epok-info-more-button { position: absolute; top: 5em; right: 5em; }
+.epok-info-more .epok-info-more-button { padding: 0; margin-left: auto; }
 
 .epok-info-more h2 { font-size: 1.1em; font-weight: bolder; margin: 2em 0 1em; }
 
@@ -383,7 +383,7 @@ canvas.epok-no-cursor { cursor: none; }
 
 .epok-info-more code { display: inline-block; padding: 0 0.4em; background-color: #333; color: #fff; border-radius: 2px; font-style: normal; font-family: monospace; }
 
-.epok-info-more-content { margin: auto; max-width: 36em; }
+.epok-info-more-content { padding: 2em; margin: auto; max-width: 36em; }
 
 /* Quick fix for a broken DAT.GUI style */
 .hue-field { width: 13px !important; }
