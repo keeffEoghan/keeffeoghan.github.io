@@ -2808,7 +2808,9 @@ export default (canvas, options) => {
         rootControls.fullscreen = fullscreen.request;
     }
 
-    rootControls.screenshot = capture.screenshot;
+    if(capture) {
+        rootControls.screenshot = capture.screenshot;
+    }
 
 
     // State, animation, import/export
@@ -2838,8 +2840,8 @@ export default (canvas, options) => {
                         use_media: appSettings.useMedia,
                         animate: appSettings.animate
                     }))),
-            showState: () => showExport('Current state:',
-                timer.track.time, toSource(tracks)),
+            showState: () => showExport(`Current state (@${timer.track.time}):`,
+                toSource(player.track.tracks)),
             showSequence: () => showExport('Animation sequence:',
                 toSource(player.track.frames({}))),
 
