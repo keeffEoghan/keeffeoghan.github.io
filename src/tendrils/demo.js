@@ -188,6 +188,13 @@ export default (canvas, options) => {
         className: 'track'
     });
 
+    const audioContext = new (self.AudioContext || self.webkitAudioContext)();
+
+    // Deal with Chrome's need for user interaction before playing audio...
+    // @see https://developers.google.com/web/updates/2017/09/autoplay-policy-changes#webaudio
+    document.addEventListener('click', () =>
+        (audioContext.state === 'suspended') && audioContext.resume());
+
 
     // Track control setup
 
@@ -272,7 +279,7 @@ export default (canvas, options) => {
     // @todo Stereo: true
     // @todo Delay node to compensate for wait in analysing values?
 
-    const trackAnalyser = analyser(track, { audible: audioState.audible });
+    const trackAnalyser = analyser(track, audioContext, { audible: audioState.audible });
 
     trackAnalyser.analyser.fftSize = Math.pow(2, 8);
 
@@ -514,8 +521,11 @@ export default (canvas, options) => {
                     mediaStream = stream;
 
                     const v = Object.assign(document.createElement('video'), {
+                        // For legacy browsers - ignore any deprecation notice.
                         src: self.URL.createObjectURL(stream),
+                        // For newer browsers.
                         srcObject: stream,
+
                         controls: true,
                         muted: true,
                         autoplay: true
@@ -527,7 +537,7 @@ export default (canvas, options) => {
                     });
 
                     micAnalyser = (micAnalyser ||
-                        analyser(stream, { audible: false }));
+                        analyser(stream, audioContext, { audible: false }));
 
                     micAnalyser.analyser.fftSize = Math.pow(2, 7);
 
