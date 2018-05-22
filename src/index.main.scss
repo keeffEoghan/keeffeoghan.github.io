@@ -19,7 +19,7 @@ header {
         position: absolute;
         top: 0;
         bottom: 0;
-        width: 30px;
+        width: 2.5em;
         z-index: 10;
     }
 
@@ -123,22 +123,19 @@ header {
 }
 
 .epok-main-controls {
-    left: 30px;
+    left: 2.5em;
     top: 0;
     bottom: auto;
+    padding: 1.5em 0;
 }
 
 .epok-edit-controls {
-    right: 30px;
-
-    $gap: 100px;
-    $height: 20px;
-
-    padding-bottom: $gap + $height;
+    right: 2.5em;
+    max-height: 90%;
+    z-index: 1002;
 
     .close-button {
-        height: $height;
-        bottom: $gap;
+        bottom: 0;
     }
 }
 
