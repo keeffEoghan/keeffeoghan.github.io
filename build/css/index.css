@@ -464,9 +464,13 @@ canvas.epok-no-cursor { cursor: none; }
 
 body { background-color: #222; }
 
-header { height: 100%; }
+header { position: relative; height: 99%; background-color: #fff; }
 
-header::after { content: ''; position: absolute; bottom: 0; left: 0; right: 0; border-top: 1px dashed #222; }
+header::before, header::after { content: ''; position: absolute; top: 0; bottom: 0; width: 30px; z-index: 10; }
+
+header::before { left: 0; }
+
+header::after { right: 0; }
 
 header.epok-folio--intro-run .epok-main-controls { opacity: 0; }
 
@@ -476,9 +480,9 @@ header.epok-folio--intro-run .epok-main-controls { opacity: 0; }
 
 .epok-folio__intro { bottom: 0; left: 0; max-width: 30em; }
 
-.epok-folio__tag, .epok-folio__content { line-height: 1.75em; padding: 0.75em 1.75em; margin: 0.5em 0; clear: both; }
+.epok-folio__tag, .epok-folio__content { line-height: 1.75em; padding: 0.75em 2.5em; margin: 0.5em 0; clear: both; }
 
-.epok-folio__tag { display: inline-block; float: left; clear: both; color: #000; background-color: rgba(255, 255, 255, 0.85); -webkit-transition: opacity 500ms ease-in-out; transition: opacity 500ms ease-in-out; }
+.epok-folio__tag { display: inline-block; float: left; clear: both; color: #000; background-color: rgba(255, 255, 255, 0.8); -webkit-transition: opacity 500ms ease-in-out; transition: opacity 500ms ease-in-out; }
 
 .epok-folio__tag.epok-hide { opacity: 0; pointer-events: none; }
 
@@ -496,11 +500,11 @@ header.epok-folio--intro-run .epok-main-controls { opacity: 0; }
 
 .epok-logo__background { display: none; }
 
-.epok-folio__demo { position: absolute; top: 0; left: 0; right: 0; height: 100vh; background-color: #fff; }
+.epok-folio__demo { position: absolute; top: 0; left: 0; right: 0; height: 100%; overflow: hidden; }
 
-.epok-main-controls { right: 0; left: auto; }
+.epok-main-controls { left: 30px; top: 0; bottom: auto; }
 
-.epok-edit-controls { padding-bottom: 120px; }
+.epok-edit-controls { right: 30px; padding-bottom: 120px; }
 
 .epok-edit-controls .close-button { height: 20px; bottom: 100px; }
 
