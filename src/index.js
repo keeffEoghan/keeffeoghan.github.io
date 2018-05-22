@@ -1,5 +1,3 @@
-/* global Promise */
-
 import tendrilsDemo from './tendrils/demo';
 import animateSVG from 'animate-svg';
 

@@ -8,15 +8,27 @@ body {
 }
 
 header {
-    height: 100%;
+    position: relative;
+    height: 99%;
+    background-color: #fff;
 
+    // To ensure the edges of the demo area are scrollable (demo might cancel events).
+    &::before,
     &::after {
         content: '';
         position: absolute;
+        top: 0;
         bottom: 0;
+        width: 30px;
+        z-index: 10;
+    }
+
+    &::before {
         left: 0;
+    }
+
+    &::after {
         right: 0;
-        border-top: 1px dashed $epok-folio--bg;
     }
 
     &.epok-folio--intro-run {
@@ -46,7 +58,7 @@ header {
 .epok-folio__tag,
 .epok-folio__content {
     line-height: 1.75em;
-    padding: 0.75em 1.75em;
+    padding: 0.75em 2.5em;
     margin: 0.5em 0;
     clear: both;
 }
@@ -56,7 +68,7 @@ header {
     float: left;
     clear: both;
     color: #000;
-    background-color: rgba(255, 255, 255, 0.85);
+    background-color: rgba(255, 255, 255, 0.8);
     transition: opacity 500ms ease-in-out;
 
     &.epok-hide {
@@ -106,16 +118,19 @@ header {
     top: 0;
     left: 0;
     right: 0;
-    height: 100vh;
-    background-color: #fff;
+    height: 100%;
+    overflow: hidden;
 }
 
 .epok-main-controls {
-    right: 0;
-    left: auto;
+    left: 30px;
+    top: 0;
+    bottom: auto;
 }
 
 .epok-edit-controls {
+    right: 30px;
+
     $gap: 100px;
     $height: 20px;
 
