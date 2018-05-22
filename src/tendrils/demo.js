@@ -193,7 +193,7 @@ export default (canvas, options) => {
     // Deal with Chrome's need for user interaction before playing audio...
     // @see https://developers.google.com/web/updates/2017/09/autoplay-policy-changes#webaudio
     document.addEventListener('click', () =>
-        (audioContext.state === 'suspended') && audioContext.resume());
+        (audioContext.state === 'suspended' && audioContext.resume()));
 
 
     // Track control setup
