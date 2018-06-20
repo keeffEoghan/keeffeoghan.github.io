@@ -451,7 +451,22 @@ export default (canvas, options) => {
         video: [0, 0]
     };
 
-    let video = null;
+    const video = Object.assign(document.createElement('video'), {
+        controls: true,
+        muted: true,
+        // Autoplay causes the video to pause while offscreen in some browsers.
+        autoplay: false,
+        crossorigin: 'anonymous'
+    });
+
+    video.addEventListener('canplay', () => {
+        rasterShape.video = [video.videoWidth, video.videoHeight]
+        video.play();
+    });
+
+    const useVideo = () => (appSettings.useMedia && video.readyState > 1 && !video.paused &&
+            Math.min(...rasterShape.video) > 0);
+
     let mediaStream = null;
 
 
@@ -470,7 +485,7 @@ export default (canvas, options) => {
         let shape = rasterShape.image;
         let raster = image;
 
-        if(appSettings.useMedia && video) {
+        if(useVideo()) {
             shape = rasterShape.video;
             raster = video;
         }
@@ -520,21 +535,17 @@ export default (canvas, options) => {
                 else {
                     mediaStream = stream;
 
-                    const v = Object.assign(document.createElement('video'), {
-                        // For legacy browsers - ignore any deprecation notice.
-                        src: self.URL.createObjectURL(stream),
-                        // For newer browsers.
-                        srcObject: stream,
+                    // For legacy browsers - ignore any deprecation notice.
+                    try {
+                        video.src = self.URL.createObjectURL(stream);
+                    }
+                    catch(e) {
+                        console.log('Using deprecated `mediaElement.src = URL.createObjectURL` '+
+                            'for legacy browsers.');
+                    }
 
-                        controls: true,
-                        muted: true,
-                        autoplay: true
-                    });
-
-                    v.addEventListener('canplay', () => {
-                        video = v;
-                        rasterShape.video = [v.videoWidth, v.videoHeight];
-                    });
+                    // For newer browsers.
+                    video.srcObject = stream;
 
                     micAnalyser = (micAnalyser ||
                         analyser(stream, audioContext, { audible: false }));
@@ -1111,10 +1122,9 @@ export default (canvas, options) => {
         // Blend the color maps into tendrils one
         // @todo Only do this if necessary (skip if none or only one has alpha)
 
-        blend.views[1] = ((appSettings.useMedia && video)?
-                opticalFlow.buffers[0]
-            :   imageSpawner.buffer);
+        const usingVideo = useVideo();
 
+        blend.views[1] = ((usingVideo)? opticalFlow.buffers[0] : imageSpawner.buffer);
         blend.draw(tendrils.colorMap);
 
         // The main event
@@ -1165,7 +1175,7 @@ export default (canvas, options) => {
         // @todo Blur for optical flow? Maybe Sobel as well?
         // @see https://github.com/princemio/ofxMIOFlowGLSL/blob/master/src/ofxMioFlowGLSL.cpp
 
-        if(appSettings.useMedia && video) {
+        if(usingVideo) {
             opticalFlow.resize(rasterShape.video);
             opticalFlow.setPixels(video);
 
