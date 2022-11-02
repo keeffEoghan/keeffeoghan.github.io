@@ -75,7 +75,7 @@
     "exports-loader": "^0.6.3",
     "glslify": "^5.1.0",
     "glslify-import": "^3.0.0",
-    "gulp": "^3.9.1",
+    "gulp": "^4.0.2",
     "gulp-autoprefixer": "^3.1.0",
     "gulp-plumber": "^1.1.0",
     "gulp-rename": "^1.2.2",
