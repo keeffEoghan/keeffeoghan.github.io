@@ -478,7 +478,7 @@ header.epok-folio--intro-run .epok-main-controls { opacity: 0; }
 
 .epok-folio__intro, .epok-folio__detail { padding: 0.75em 0; }
 
-.epok-folio__intro { bottom: 0; left: 0; max-width: 30em; }
+.epok-folio__intro { bottom: 0; left: 0; }
 
 .epok-folio__tag, .epok-folio__content { line-height: 1.75em; padding: 0.75em 2.5em; margin: 0.5em 0; clear: both; }
 
