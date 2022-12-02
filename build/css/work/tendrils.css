@@ -34,9 +34,8 @@ main { min-height: 100%; }
 
 small { font-size: 0.75em; }
 
-/*! Hint.css - v2.5.0 - 2017-04-23 http://kushagragour.in/lab/hint/ Copyright (c) 2017 Kushagra Gour */
-/*-------------------------------------*	HINT.css - A CSS tooltip library
-\*-------------------------------------*/
+/*! Hint.css - v2.7.0 - 2021-10-01 https://kushagra.dev/lab/hint/ Copyright (c) 2021 Kushagra Gour */
+/*-------------------------------------*\ HINT.css - A CSS tooltip library \*-------------------------------------*/
 /** HINT.css is a tooltip library made in pure CSS. Source: https://github.com/chinchang/hint.css Demo: http://kushagragour.in/lab/hint/ */
 /** source: hint-core.scss Defines the basic styling for the tooltip. Each tooltip is made of 2 parts: 1) body (:after) 2) arrow (:before) Classes added: 1) hint */
 [class*="hint--"] { position: relative; display: inline-block; /** tooltip arrow */ /** tooltip body */ }
@@ -316,6 +315,10 @@ small { font-size: 0.75em; }
 .hint--no-animate:before, .hint--no-animate:after { -webkit-transition-duration: 0ms; transition-duration: 0ms; }
 
 .hint--bounce:before, .hint--bounce:after { -webkit-transition: opacity 0.3s ease, visibility 0.3s ease, -webkit-transform 0.3s cubic-bezier(0.71, 1.7, 0.77, 1.24); transition: opacity 0.3s ease, visibility 0.3s ease, -webkit-transform 0.3s cubic-bezier(0.71, 1.7, 0.77, 1.24); transition: opacity 0.3s ease, visibility 0.3s ease, transform 0.3s cubic-bezier(0.71, 1.7, 0.77, 1.24); transition: opacity 0.3s ease, visibility 0.3s ease, transform 0.3s cubic-bezier(0.71, 1.7, 0.77, 1.24), -webkit-transform 0.3s cubic-bezier(0.71, 1.7, 0.77, 1.24); }
+
+.hint--no-shadow:before, .hint--no-shadow:after { text-shadow: initial; box-shadow: initial; }
+
+.hint--no-arrow:before { display: none; }
 
 canvas { display: block; position: absolute; top: 0; left: 0; bottom: 0; right: 0; cursor: crosshair; -webkit-transition: background-color 200ms ease-in-out; transition: background-color 200ms ease-in-out; }
 

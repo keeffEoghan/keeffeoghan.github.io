@@ -1,189 +1,153 @@
 @import './common';
 @import './tendrils/index';
 
-$epok-folio--bg: #222;
-
 body {
-    background-color: $epok-folio--bg;
-}
+  background-color: #fff;
 
-header {
-    position: relative;
-    height: 99%;
-    background-color: #fff;
-
-    // To ensure the edges of the demo area are scrollable (demo might cancel events).
-    &::before,
-    &::after {
-        content: '';
-        position: absolute;
-        top: 0;
-        bottom: 0;
-        width: 2.5em;
-        z-index: 10;
+  &.epok-folio--intro-run {
+    .epok-main-controls {
+      opacity: 0;
     }
-
-    &::before {
-        left: 0;
-    }
-
-    &::after {
-        right: 0;
-    }
-
-    &.epok-folio--intro-run {
-        .epok-main-controls {
-            opacity: 0;
-        }
-    }
+  }
 }
 
 .epok-folio__intro,
 .epok-logo {
-    position: absolute;
-    z-index: 10;
-}
-
-.epok-folio__intro,
-.epok-folio__detail {
-    padding: 0.75em 0;
+  position: absolute;
+  z-index: 10;
 }
 
 .epok-folio__intro {
-    bottom: 0;
-    left: 0;
+  padding: 0.75em 0;
+}
+
+.epok-folio__intro {
+  bottom: 0;
+  left: 0;
+  max-width: 90%;
 }
 
 .epok-folio__tag,
 .epok-folio__content {
-    line-height: 1.75em;
-    padding: 0.75em 2.5em;
-    margin: 0.5em 0;
-    clear: both;
+  line-height: 1.75em;
+  padding: 0.65em 2em;
+  border: solid transparent;
+  border-width: 0.1em 0.5em;
+  margin: 0.5em 0;
+  clear: both;
 }
 
 .epok-folio__tag {
-    display: inline-block;
-    float: left;
-    clear: both;
-    color: #000;
-    background-color: rgba(255, 255, 255, 0.8);
-    transition: opacity 500ms ease-in-out;
+  display: inline-block;
+  float: left;
+  clear: both;
+  color: #000;
+  background-color: rgba(255, 255, 255, 0.8);
+  transition: opacity 500ms ease-in-out;
 
-    &.epok-hide {
-        opacity: 0;
-        pointer-events: none;
-    }
+  &.epok-hide {
+    opacity: 0;
+    pointer-events: none;
+  }
 }
 
 .epok-folio__name {
-    display: inline-block;
-    font-size: 1em;
+  font-size: 1em;
+}
+
+.epok-folio__more {
+  white-space: nowrap;
+  max-width: 100%;
+  overflow: auto;
 }
 
 .epok-logo {
-    top: 50vh;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    width: 50%;
-    width: 40vmax;
-    max-width: 800px;
-    pointer-events: none;
+  top: 50vh;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 50%;
+  width: 40vmax;
+  max-width: 800px;
+  pointer-events: none;
 }
 
 .epok-logo__build {
-    stroke: #7f7f7f;
+  stroke: #7f7f7f;
 }
 
 .epok-logo__build-part {
-    opacity: 0;
+  opacity: 0;
 
-    &.epok-show {
-        opacity: 1;
-    }
+  &.epok-show {
+    opacity: 1;
+  }
 }
 
 .epok-logo__draw {
-    stroke: #fff;
-    stroke-width: 4;
+  stroke: #fff;
+  stroke-width: 4;
 }
 
 .epok-logo__background {
-    display: none;
+  display: none;
 }
 
 .epok-folio__demo {
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    height: 100%;
-    overflow: hidden;
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 100%;
+  overflow: hidden;
 }
 
 .epok-main-controls {
-    left: 2.5em;
-    top: 0;
-    bottom: auto;
-    padding: 1.5em 0;
+  left: 2.5em;
+  top: 0;
+  bottom: auto;
+  padding: 1.5em 0;
 }
 
 .epok-edit-controls {
-    right: 2.5em;
-    max-height: 90%;
-    z-index: 1002;
+  right: 2.5em;
+  max-height: 90%;
+  z-index: 1002;
 
-    .close-button {
-        bottom: 0;
-    }
+  .close-button {
+    bottom: 0;
+  }
 }
 
 .epok-folio__glyph {
-    opacity: 0.6;
+  opacity: 0.6;
 }
 
 em {
-    font-style: italic;
+  font-style: italic;
 }
 
 .epok-folio__link {
+  color: inherit;
+  text-decoration: underline;
+  cursor: pointer;
+
+  &:visited,
+  &:hover,
+  &:focus,
+  &:active {
     color: inherit;
-    text-decoration: underline;
-    cursor: pointer;
+  }
 
-    &:visited,
-    &:hover,
-    &:focus,
-    &:active {
-        color: inherit;
-    }
+  &:visited {
+    opacity: 1;
+  }
 
-    &:visited {
-        opacity: 1;
-    }
+  &:hover,
+  &:focus {
+    opacity: 0.75;
+  }
 
-    &:hover,
-    &:focus {
-        opacity: 0.75;
-    }
-
-    &:active {
-        opacity: 0.5;
-    }
-}
-
-.epok-folio__detail {
-    position: relative;
-    color: #fff;
-    z-index: 10;
-    border-top: 1px dashed #fff;
-}
-
-.epok-folio__projects {
-    clear: both;
-    overflow: hidden;
-}
-
-.epok-folio__project {
-    margin: 1em 0;
+  &:active {
+    opacity: 0.5;
+  }
 }

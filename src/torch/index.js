@@ -100,7 +100,8 @@ export default (canvas) => {
         fallback: (decodeURIComponent(queries.fallback || '')),
 
         track: (decodeURIComponent(queries.track || '') ||
-            prompt('Enter a track URL:')),
+            prompt('Enter a track URL:',
+                '../../build/audio/Trust feat. Kathrin deBoer & Tom Hodge - Max Cooper.mp3')),
 
         audioOrders: ((queries.audioOrders)?
             parseInt(queries.audioOrders, 10) : 3),
@@ -451,7 +452,13 @@ export default (canvas) => {
             fallbackInfo.className = deClass(fallbackInfo.className, 'hide');
         }
 
-        audio.play();
+        // Deal with Chrome's need for user interaction before playing audio...
+        // @see https://developers.google.com/web/updates/2017/09/autoplay-policy-changes#webaudio
+        audio.play()
+            .catch(() =>
+                document.addEventListener('click', () =>
+                    (audio.paused && audio.play())));
+
         canvas.className = deClass(canvas.className, 'hide');
     }
 
@@ -556,7 +563,14 @@ export default (canvas) => {
 
     // Audio analysis
 
-    const audioAnalyser = analyser(audio);
+    const audioContext = new (self.AudioContext || self.webkitAudioContext)();
+
+    // Deal with Chrome's need for user interaction before playing audio...
+    // @see https://developers.google.com/web/updates/2017/09/autoplay-policy-changes#webaudio
+    document.addEventListener('click', () =>
+        (audioContext.state === 'suspended' && audioContext.resume()));
+
+    const audioAnalyser = analyser(audio, audioContext);
 
     audioAnalyser.analyser.fftSize = 2**11;
 

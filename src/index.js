@@ -65,7 +65,7 @@ export default () => {
                 document.addEventListener('click', () => demo.spawnFastest());
                 document.addEventListener('dblclick', () => demo.spawnImage());
 
-                document.querySelector('header')
+                document.querySelector('body')
                     .classList.remove('epok-folio--intro-run');
             },
             100);

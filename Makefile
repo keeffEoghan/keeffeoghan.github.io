@@ -22,7 +22,8 @@ assets build custom-deps html images jscs lint scripts server styles test watch:
 
 # A full minified build
 dist:
-	make build ARGS=--is-production
+	make build
+#	make build ARGS=--is-production
 
 # Just install node_modules, also callable as `make node_modules`
 setup: node_modules/.bin
@@ -32,9 +33,11 @@ setup: node_modules/.bin
 # modification date of `node_modules` when done.
 node_modules/.bin: package.json
 	npm config set progress=false;
-	npm cache verify;
 	npm install;
 	touch $@;
+#	npm cache verify;
+#	npm install;
+#	touch $@;
 
 # Convenience: merge into `master` and push it.
 # Before doing this, make sure you've got a clean `git` stage, and you're not

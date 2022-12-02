@@ -14,20 +14,7 @@ let readyCallbacks = {
             document.addEventListener('readystatechange', updateState);
         },
         interactive() {
-            // Lazy workaround for Audio and AudioContext interaction requirements.
-            function f() {
-                removeEventListener('mousemove', f);
-                removeEventListener('mousedown', f);
-                removeEventListener('resize', f);
-                removeEventListener('scroll', f);
-                app(document.querySelector('canvas'), null, true);
-            }
-
-            addEventListener('mousemove', f);
-            addEventListener('mousedown', f);
-            addEventListener('resize', f);
-            addEventListener('scroll', f);
-
+            app(document.querySelector('canvas'), null, true);
             document.removeEventListener('readystatechange', updateState);
         }
     };
