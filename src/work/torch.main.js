@@ -19,12 +19,14 @@ let readyCallbacks = {
                 removeEventListener('mousemove', f);
                 removeEventListener('mousedown', f);
                 removeEventListener('resize', f);
+                removeEventListener('scroll', f);
                 app(document.querySelector('canvas'), null, true);
             }
 
             addEventListener('mousemove', f);
             addEventListener('mousedown', f);
             addEventListener('resize', f);
+            addEventListener('scroll', f);
 
             document.removeEventListener('readystatechange', updateState);
         }
