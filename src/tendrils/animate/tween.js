@@ -17,7 +17,7 @@ const tweenable = (k, values, defaults) => {
  */
 export const tweenValue = (a, b, t, ease) =>
         ((a === b || !isNumber(a))? b
-        :   lerp(a, b, ((ease)? bezier(ease, t) : t)));
+        : lerp(a, b, ((ease)? bezier(ease, t) : t)));
 
 /**
  * A wrapper for the above that maps number properties from 2 objects into
@@ -30,10 +30,10 @@ export const tweenProps = (a, b, t, ease, out = {}) => ((b)?
 
                 return ((isNumber(va) && isNumber(vb))?
                         tweenValue(va, vb, t, ease)
-                    :   ((t < 1)? va : vb));
+                    : ((t < 1)? va : vb));
             },
             b, out)
-    :   out);
+    : out);
 
 /**
  * Generic wrapper of the above, handling the cases for both numbers and objects
@@ -45,7 +45,7 @@ export const tweenProps = (a, b, t, ease, out = {}) => ((b)?
 export const tween = (a, b, ...rest) =>
     ((rest.length)?
         ((isNumber(b))? tweenValue : tweenProps)(a, b, ...rest)
-    :   tween(a.a, a.b, a.t, a.ease, b));
+    : tween(a.a, a.b, a.t, a.ease, b));
 
 
 export default tween;

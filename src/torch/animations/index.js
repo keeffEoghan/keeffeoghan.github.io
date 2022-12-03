@@ -12,16 +12,16 @@ import retroKid from './retro-kid';
 import sattelites from './sattelites';
 
 export default {
-    vaccines,
-    yearsAndYears,
-    blaenavon,
-    frankTurner,
-    tomTheLion,
-    tallChildren,
-    lewisFieldhouse,
-    twinAtlantic,
-    lowerThanAtlantis,
-    francisLung,
-    retroKid,
-    sattelites
+  vaccines,
+  yearsAndYears,
+  blaenavon,
+  frankTurner,
+  tomTheLion,
+  tallChildren,
+  lewisFieldhouse,
+  twinAtlantic,
+  lowerThanAtlantis,
+  francisLung,
+  retroKid,
+  sattelites
 };

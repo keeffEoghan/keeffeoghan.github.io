@@ -7268,25 +7268,25 @@
 	'use strict';
 	
 	Object.defineProperty(exports, "__esModule", {
-	    value: true
+	  value: true
 	});
 	exports.step = step;
 	function step(array) {
-	    var next = Array.prototype.pop.call(array);
+	  var next = Array.prototype.pop.call(array);
 	
-	    Array.prototype.unshift.call(array, next);
+	  Array.prototype.unshift.call(array, next);
 	
-	    return next;
+	  return next;
 	}
 	
 	var wrapIndex = exports.wrapIndex = function wrapIndex(index, array) {
-	    return array[(array.length + Math.round(index)) % array.length];
+	  return array[(array.length + Math.round(index)) % array.length];
 	};
 	
 	var invLog2 = 1 / Math.log(2);
 	
 	var nextPow2 = exports.nextPow2 = function nextPow2(x) {
-	    return Math.pow(2, Math.ceil(Math.log(x) * invLog2));
+	  return Math.pow(2, Math.ceil(Math.log(x) * invLog2));
 	};
 	
 	// Handle paths on different hosts
@@ -12920,7 +12920,7 @@
 	'use strict';
 	
 	Object.defineProperty(exports, "__esModule", {
-	    value: true
+	  value: true
 	});
 	exports.Screen = undefined;
 	
@@ -12943,24 +12943,24 @@
 	// optimisation options).
 	
 	var Screen = exports.Screen = function (_Triangle) {
-	    _inherits(Screen, _Triangle);
+	  _inherits(Screen, _Triangle);
 	
-	    function Screen() {
-	        _classCallCheck(this, Screen);
+	  function Screen() {
+	    _classCallCheck(this, Screen);
 	
-	        return _possibleConstructorReturn(this, (Screen.__proto__ || Object.getPrototypeOf(Screen)).apply(this, arguments));
+	    return _possibleConstructorReturn(this, (Screen.__proto__ || Object.getPrototypeOf(Screen)).apply(this, arguments));
+	  }
+	
+	  _createClass(Screen, [{
+	    key: 'render',
+	    value: function render() {
+	      _get(Screen.prototype.__proto__ || Object.getPrototypeOf(Screen.prototype), 'bind', this).call(this);
+	      _get(Screen.prototype.__proto__ || Object.getPrototypeOf(Screen.prototype), 'draw', this).call(this);
+	      _get(Screen.prototype.__proto__ || Object.getPrototypeOf(Screen.prototype), 'unbind', this).call(this);
 	    }
+	  }]);
 	
-	    _createClass(Screen, [{
-	        key: 'render',
-	        value: function render() {
-	            _get(Screen.prototype.__proto__ || Object.getPrototypeOf(Screen.prototype), 'bind', this).call(this);
-	            _get(Screen.prototype.__proto__ || Object.getPrototypeOf(Screen.prototype), 'draw', this).call(this);
-	            _get(Screen.prototype.__proto__ || Object.getPrototypeOf(Screen.prototype), 'unbind', this).call(this);
-	        }
-	    }]);
-	
-	    return Screen;
+	  return Screen;
 	}(_glBigTriangle2.default);
 	
 	exports.default = Screen;
@@ -13007,7 +13007,7 @@
 /* 462 */
 /***/ (function(module, exports) {
 
-	module.exports = "precision highp float;\n#define GLSLIFY 1\n\nattribute vec2 position;\nvarying vec2 uv;\n\nvoid main() {\n    uv = position.xy;\n\n    gl_Position = vec4(position, 1.0, 1.0);\n}\n"
+	module.exports = "precision highp float;\n#define GLSLIFY 1\n\nattribute vec2 position;\nvarying vec2 uv;\n\nvoid main() {\n  uv = position.xy;\n\n  gl_Position = vec4(position, 1.0, 1.0);\n}\n"
 
 /***/ }),
 /* 463 */,
@@ -13018,22 +13018,22 @@
 	'use strict';
 	
 	Object.defineProperty(exports, "__esModule", {
-	    value: true
+	  value: true
 	});
 	exports.coverAspect = exports.containAspect = exports.aspect = undefined;
 	
 	var _glMatrix = __webpack_require__(386);
 	
 	var aspect = exports.aspect = function aspect(out, size, scale) {
-	    return _glMatrix.vec2.scale(out, _glMatrix.vec2.inverse(out, size), scale);
+	  return _glMatrix.vec2.scale(out, _glMatrix.vec2.inverse(out, size), scale);
 	};
 	
 	var containAspect = exports.containAspect = function containAspect(out, size) {
-	    return aspect(out, size, Math.min(size[0], size[1]));
+	  return aspect(out, size, Math.min(size[0], size[1]));
 	};
 	
 	var coverAspect = exports.coverAspect = function coverAspect(out, size) {
-	    return aspect(out, size, Math.max(size[0], size[1]));
+	  return aspect(out, size, Math.max(size[0], size[1]));
 	};
 	
 	exports.default = aspect;
@@ -13065,7 +13065,7 @@
 	'use strict';
 	
 	Object.defineProperty(exports, "__esModule", {
-	    value: true
+	  value: true
 	});
 	exports.AudioTrigger = exports.defaultTest = undefined;
 	
@@ -13095,89 +13095,89 @@
 	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 	
 	var defaultTest = exports.defaultTest = function defaultTest(trigger) {
-	    return (0, _analyse.peak)(trigger.dataOrder(-1)) > trigger.limit;
+	  return (0, _analyse.peak)(trigger.dataOrder(-1)) > trigger.limit;
 	};
 	
 	var AudioTrigger = exports.AudioTrigger = function () {
-	    function AudioTrigger(analyser, orders) {
-	        var limit = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : 200;
+	  function AudioTrigger(analyser, orders) {
+	    var limit = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : 200;
 	
-	        var _this = this;
+	    var _this = this;
 	
-	        var test = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : null;
-	        var react = arguments.length > 4 && arguments[4] !== undefined ? arguments[4] : null;
+	    var test = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : null;
+	    var react = arguments.length > 4 && arguments[4] !== undefined ? arguments[4] : null;
 	
-	        _classCallCheck(this, AudioTrigger);
+	    _classCallCheck(this, AudioTrigger);
 	
-	        this.analyser = analyser;
+	    this.analyser = analyser;
 	
-	        this.orderLog = (0, _dataLog.makeOrderLog)(orders, function (size) {
-	            return (0, _dataLog.makeLog)(size, function () {
-	                return (0, _data2.default)(_this.analyser, size === orders ? Uint8Array : Float32Array);
-	            });
-	        });
+	    this.orderLog = (0, _dataLog.makeOrderLog)(orders, function (size) {
+	      return (0, _dataLog.makeLog)(size, function () {
+	        return (0, _data2.default)(_this.analyser, size === orders ? Uint8Array : Float32Array);
+	      });
+	    });
 	
-	        // Not really needed
-	        this.limit = limit;
-	        this.test = test;
-	        this.react = react;
+	    // Not really needed
+	    this.limit = limit;
+	    this.test = test;
+	    this.react = react;
+	  }
+	
+	  // Update the sample logs from the analyser.
+	
+	
+	  _createClass(AudioTrigger, [{
+	    key: 'sample',
+	    value: function sample() {
+	      var dt = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 1;
+	      var method = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 'frequencies';
+	
+	      this.analyser[method]((0, _utils.step)(this.orderLog[0]));
+	      (0, _analyse.orderLogRates)(this.orderLog, dt);
+	
+	      return this;
 	    }
 	
-	    // Update the sample logs from the analyser.
+	    // The most recent sample at the nth-order log. Negative `nth` indexes in
+	    // reverse (highest-lowest).
 	
+	  }, {
+	    key: 'dataOrder',
+	    value: function dataOrder(nth) {
+	      return (0, _utils.wrapIndex)(nth, this.orderLog)[0];
+	    }
 	
-	    _createClass(AudioTrigger, [{
-	        key: 'sample',
-	        value: function sample() {
-	            var dt = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 1;
-	            var method = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 'frequencies';
+	    // Not relly needed - more a demo than anything.
+	    // Test if the latest sample breaks the limit to trigger a response.
 	
-	            this.analyser[method]((0, _utils.step)(this.orderLog[0]));
-	            (0, _analyse.orderLogRates)(this.orderLog, dt);
+	  }, {
+	    key: 'fire',
+	    value: function fire() {
+	      var react = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : this.react;
+	      var test = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : this.test || defaultTest;
 	
-	            return this;
-	        }
+	      var triggered = !!test(this);
 	
-	        // The most recent sample at the nth-order log. Negative `nth` indexes in
-	        // reverse (highest-lowest).
+	      if (triggered) {
+	        react(this);
+	      }
 	
-	    }, {
-	        key: 'dataOrder',
-	        value: function dataOrder(nth) {
-	            return (0, _utils.wrapIndex)(nth, this.orderLog)[0];
-	        }
+	      return triggered;
+	    }
+	  }, {
+	    key: 'clear',
+	    value: function clear() {
+	      (0, _each2.default)(function (log) {
+	        return (0, _each2.default)(function (data) {
+	          return (0, _each2.default)(function (v, i) {
+	            return data[i] = 0;
+	          }, data);
+	        }, log);
+	      }, this.orderLog);
+	    }
+	  }]);
 	
-	        // Not relly needed - more a demo than anything.
-	        // Test if the latest sample breaks the limit to trigger a response.
-	
-	    }, {
-	        key: 'fire',
-	        value: function fire() {
-	            var react = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : this.react;
-	            var test = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : this.test || defaultTest;
-	
-	            var triggered = !!test(this);
-	
-	            if (triggered) {
-	                react(this);
-	            }
-	
-	            return triggered;
-	        }
-	    }, {
-	        key: 'clear',
-	        value: function clear() {
-	            (0, _each2.default)(function (log) {
-	                return (0, _each2.default)(function (data) {
-	                    return (0, _each2.default)(function (v, i) {
-	                        return data[i] = 0;
-	                    }, data);
-	                }, log);
-	            }, this.orderLog);
-	        }
-	    }]);
-	
-	    return AudioTrigger;
+	  return AudioTrigger;
 	}();
 	
 	exports.default = AudioTrigger;
@@ -13295,7 +13295,7 @@
 	 *
 	 * @param {Number} size The size of the data log.
 	 * @param {Function} dataMaker Creates new data storage instances, given an
-	 *                             index.
+	 *               index.
 	 * @return {Array} An array of data bins.
 	 */
 	var makeLog = exports.makeLog = function makeLog(size) {
@@ -13310,16 +13310,16 @@
 	 * as in integration, differentiation) of base data.
 	 *
 	 * (3) => [
-	 *     [*, *, *],
-	 *     [*, *],
-	 *     [*]
+	 *   [*, *, *],
+	 *   [*, *],
+	 *   [*]
 	 * ]
 	 *
 	 * @param {Number} order The order of the slope log - the total number of logs
-	 *                       will be a factorial of this value (`order!`),
-	 *                       descending in length at each level from `order` to 1.
+	 *             will be a factorial of this value (`order!`),
+	 *             descending in length at each level from `order` to 1.
 	 * @param {Function} logMaker Creates new data storage log instances, given a
-	 *                            size.
+	 *              size.
 	 * @return {Array} A 2D array, of logs of logs of data.
 	 */
 	var makeOrderLog = exports.makeOrderLog = function makeOrderLog(order) {
@@ -13558,7 +13558,7 @@
 	'use strict';
 	
 	Object.defineProperty(exports, "__esModule", {
-	    value: true
+	  value: true
 	});
 	exports.meanWeight = exports.mean = exports.sumWeight = exports.sum = exports.peakPos = exports.peak = exports.logRates = undefined;
 	exports.orderLogRates = orderLogRates;
@@ -13581,10 +13581,10 @@
 	/* global Uint8Array */
 	
 	var logRates = exports.logRates = function logRates(last, current, dt) {
-	    var out = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : new Uint8Array(last.length);
-	    return (0, _map.mapList)(function (v, i) {
-	        return (0, _euler.eulerDyDt)(v, current[i], dt);
-	    }, last, out);
+	  var out = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : new Uint8Array(last.length);
+	  return (0, _map.mapList)(function (v, i) {
+	    return (0, _euler.eulerDyDt)(v, current[i], dt);
+	  }, last, out);
 	};
 	
 	/**
@@ -13594,57 +13594,57 @@
 	 * @see `makeOrderLog` in `../data-log/`.
 	 */
 	function orderLogRates(orderLog) {
-	    var dt = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 1;
+	  var dt = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 1;
 	
-	    for (var o = 1, oL = orderLog.length; o < oL; ++o) {
-	        logRates(orderLog[o - 1][1], orderLog[o - 1][0], dt, (0, _utils.step)(orderLog[o]));
-	    }
+	  for (var o = 1, oL = orderLog.length; o < oL; ++o) {
+	    logRates(orderLog[o - 1][1], orderLog[o - 1][0], dt, (0, _utils.step)(orderLog[o]));
+	  }
 	
-	    return orderLog;
+	  return orderLog;
 	}
 	
 	// Interpret from that info.
 	
 	var peak = exports.peak = function peak(data) {
-	    return (0, _reduce.reduceList)(function (max, v) {
-	        return Math.abs(v) > Math.abs(max) ? v : max;
-	    }, data, 0);
+	  return (0, _reduce.reduceList)(function (max, v) {
+	    return Math.abs(v) > Math.abs(max) ? v : max;
+	  }, data, 0);
 	};
 	
 	var peakPos = exports.peakPos = function peakPos(data) {
-	    return (0, _reduce.reduceList)(function (max, v, i) {
-	        if (Math.abs(v) > Math.abs(max.peak)) {
-	            max.peak = v;
-	            max.pos = i;
-	        }
+	  return (0, _reduce.reduceList)(function (max, v, i) {
+	    if (Math.abs(v) > Math.abs(max.peak)) {
+	      max.peak = v;
+	      max.pos = i;
+	    }
 	
-	        return max;
-	    }, data, {
-	        peak: 0,
-	        pos: -1
-	    });
+	    return max;
+	  }, data, {
+	    peak: 0,
+	    pos: -1
+	  });
 	};
 	
 	var sum = exports.sum = function sum(data) {
-	    return (0, _reduce.reduceList)(function (sum, v) {
-	        return sum + Math.abs(v);
-	    }, data, 0);
+	  return (0, _reduce.reduceList)(function (sum, v) {
+	    return sum + Math.abs(v);
+	  }, data, 0);
 	};
 	
 	var sumWeight = exports.sumWeight = function sumWeight(data) {
-	    var fulcrum = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 0.5;
-	    return (0, _reduce.reduceList)(function (sum, v, i) {
-	        return sum + Math.abs(v * (1 - Math.abs(i / (data.length - 1) - fulcrum)));
-	    }, data, 0);
+	  var fulcrum = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 0.5;
+	  return (0, _reduce.reduceList)(function (sum, v, i) {
+	    return sum + Math.abs(v * (1 - Math.abs(i / (data.length - 1) - fulcrum)));
+	  }, data, 0);
 	};
 	
 	var mean = exports.mean = function mean(data) {
-	    return sum(data) / data.length;
+	  return sum(data) / data.length;
 	};
 	
 	var meanWeight = exports.meanWeight = function meanWeight(data) {
-	    var fulcrum = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 0.5;
-	    return sumWeight(data, fulcrum) / data.length;
+	  var fulcrum = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 0.5;
+	  return sumWeight(data, fulcrum) / data.length;
 	};
 
 /***/ }),
@@ -13781,7 +13781,7 @@
 	'use strict';
 	
 	Object.defineProperty(exports, "__esModule", {
-	    value: true
+	  value: true
 	});
 	exports.AudioTexture = undefined;
 	
@@ -13815,64 +13815,64 @@
 	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 	
 	var assignMap = function assignMap(v) {
-	    return v;
+	  return v;
 	};
 	
 	var AudioTexture = exports.AudioTexture = function () {
-	    function AudioTexture(gl, array, texture) {
-	        _classCallCheck(this, AudioTexture);
+	  function AudioTexture(gl, array, texture) {
+	    _classCallCheck(this, AudioTexture);
 	
-	        this.gl = gl;
+	    this.gl = gl;
 	
-	        this.array = array && array.length ? (0, _ndarray2.default)(array, [array.length, 1]) : (0, _isNumber2.default)(array) ? (0, _ndarray2.default)(new Float32Array(array), [array, 1]) : array;
+	    this.array = array && array.length ? (0, _ndarray2.default)(array, [array.length, 1]) : (0, _isNumber2.default)(array) ? (0, _ndarray2.default)(new Float32Array(array), [array, 1]) : array;
 	
-	        this.texture = texture || (0, _glTexture2d2.default)(gl, this.array, { float: true });
+	    this.texture = texture || (0, _glTexture2d2.default)(gl, this.array, { float: true });
+	  }
+	
+	  _createClass(AudioTexture, [{
+	    key: 'apply',
+	    value: function apply() {
+	      var array = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : this.array;
+	
+	      this.texture.setPixels(array);
+	
+	      return this;
 	    }
 	
-	    _createClass(AudioTexture, [{
-	        key: 'apply',
-	        value: function apply() {
-	            var array = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : this.array;
+	    /**
+	     * Transform `web-audio-analyser` data values into a WebGL data texture range.
+	     */
 	
-	            this.texture.setPixels(array);
+	  }, {
+	    key: 'assign',
+	    value: function assign() {
+	      var data = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : this.array.data;
 	
-	            return this;
-	        }
+	      (0, _map.mapList)(assignMap, data, this.array.data);
 	
-	        /**
-	         * Transform `web-audio-analyser` data values into a WebGL data texture range.
-	         */
+	      return this;
+	    }
+	  }, {
+	    key: 'waveform',
+	    value: function waveform() {
+	      var data = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : this.array.data;
 	
-	    }, {
-	        key: 'assign',
-	        value: function assign() {
-	            var data = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : this.array.data;
+	      (0, _map.mapList)(_utils.waveformMap, data, this.array.data);
 	
-	            (0, _map.mapList)(assignMap, data, this.array.data);
+	      return this;
+	    }
+	  }, {
+	    key: 'frequencies',
+	    value: function frequencies() {
+	      var data = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : this.array.data;
 	
-	            return this;
-	        }
-	    }, {
-	        key: 'waveform',
-	        value: function waveform() {
-	            var data = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : this.array.data;
+	      (0, _map.mapList)(_utils.frequencyMap, data, this.array.data);
 	
-	            (0, _map.mapList)(_utils.waveformMap, data, this.array.data);
+	      return this;
+	    }
+	  }]);
 	
-	            return this;
-	        }
-	    }, {
-	        key: 'frequencies',
-	        value: function frequencies() {
-	            var data = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : this.array.data;
-	
-	            (0, _map.mapList)(_utils.frequencyMap, data, this.array.data);
-	
-	            return this;
-	        }
-	    }]);
-	
-	    return AudioTexture;
+	  return AudioTexture;
 	}();
 	
 	exports.default = AudioTexture;
@@ -14774,7 +14774,7 @@
 	'use strict';
 	
 	Object.defineProperty(exports, "__esModule", {
-	    value: true
+	  value: true
 	});
 	exports.filter = exports.filterList = undefined;
 	
@@ -14787,14 +14787,14 @@
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 	
 	var filterList = exports.filterList = function filterList(f, x) {
-	    var out = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : [];
-	    return (0, _reduce.reduceList)(function (acc, v, i) {
-	        if (f(v, i, x)) {
-	            acc.push(v);
-	        }
+	  var out = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : [];
+	  return (0, _reduce.reduceList)(function (acc, v, i) {
+	    if (f(v, i, x)) {
+	      acc.push(v);
+	    }
 	
-	        return acc;
-	    }, x, out);
+	    return acc;
+	  }, x, out);
 	};
 	
 	/**
@@ -14803,16 +14803,16 @@
 	 * properties.
 	 */
 	var filter = exports.filter = function filter(f, any) {
-	    var out = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : null;
-	    return (0, _reduce.reduceList)(function (acc, k, i, keys) {
-	        var v = any[k];
+	  var out = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : null;
+	  return (0, _reduce.reduceList)(function (acc, k, i, keys) {
+	    var v = any[k];
 	
-	        if (f(v, k, any, i, keys)) {
-	            (acc || (acc = {}))[k] = v;
-	        }
+	    if (f(v, k, any, i, keys)) {
+	      (acc || (acc = {}))[k] = v;
+	    }
 	
-	        return acc;
-	    }, (0, _iterable2.default)(any), out);
+	    return acc;
+	  }, (0, _iterable2.default)(any), out);
 	};
 	
 	exports.default = filter;
@@ -15005,24 +15005,24 @@
 	 */
 	
 	var readyCallbacks = {
-	    loading: function loading() {
-	        document.addEventListener('readystatechange', updateState);
-	    },
-	    interactive: function interactive() {
-	        (0, _torch2.default)(document.querySelector('canvas'), null, true);
-	        document.removeEventListener('readystatechange', updateState);
-	    }
+	  loading: function loading() {
+	    document.addEventListener('readystatechange', updateState);
+	  },
+	  interactive: function interactive() {
+	    (0, _torch2.default)(document.querySelector('canvas'), null, true);
+	    document.removeEventListener('readystatechange', updateState);
+	  }
 	};
 	var last = 0;
 	
 	function updateState() {
-	    for (var s = readyStates.indexOf(document.readyState); last <= s; ++last) {
-	        var callback = readyCallbacks[readyStates[last]];
+	  for (var s = readyStates.indexOf(document.readyState); last <= s; ++last) {
+	    var callback = readyCallbacks[readyStates[last]];
 	
-	        if (callback) {
-	            callback();
-	        }
+	    if (callback) {
+	      callback();
 	    }
+	  }
 	}
 	
 	updateState();
@@ -15034,7 +15034,7 @@
 	'use strict';
 	
 	Object.defineProperty(exports, "__esModule", {
-	    value: true
+	  value: true
 	});
 	
 	var _slicedToArray = function () { function sliceIterator(arr, i) { var _arr = []; var _n = true; var _d = false; var _e = undefined; try { for (var _i = arr[Symbol.iterator](), _s; !(_n = (_s = _i.next()).done); _n = true) { _arr.push(_s.value); if (i && _arr.length === i) break; } } catch (err) { _d = true; _e = err; } finally { try { if (!_n && _i["return"]) _i["return"](); } finally { if (_d) throw _e; } } return _arr; } return function (arr, i) { if (Array.isArray(arr)) { return arr; } else if (Symbol.iterator in Object(arr)) { return sliceIterator(arr, i); } else { throw new TypeError("Invalid attempt to destructure non-iterable instance"); } }; }();
@@ -15156,701 +15156,701 @@
 	function _toConsumableArray(arr) { if (Array.isArray(arr)) { for (var i = 0, arr2 = Array(arr.length); i < arr.length; i++) { arr2[i] = arr[i]; } return arr2; } else { return Array.from(arr); } }
 	
 	var deClass = function deClass(className) {
-	    for (var _len = arguments.length, rest = Array(_len > 1 ? _len - 1 : 0), _key = 1; _key < _len; _key++) {
-	        rest[_key - 1] = arguments[_key];
-	    }
+	  for (var _len = arguments.length, rest = Array(_len > 1 ? _len - 1 : 0), _key = 1; _key < _len; _key++) {
+	    rest[_key - 1] = arguments[_key];
+	  }
 	
-	    return (0, _reduce2.default)(function (name, remove) {
-	        return name.replace(remove, '');
-	    }, rest, className).replace(/\s\s/gi, ' ');
+	  return (0, _reduce2.default)(function (name, remove) {
+	    return name.replace(remove, '');
+	  }, rest, className).replace(/\s\s/gi, ' ');
 	};
 	
 	exports.default = function (canvas) {
-	    var queries = _querystring2.default.parse(location.search.slice(1));
+	  var queries = _querystring2.default.parse(location.search.slice(1));
 	
-	    var gl = (0, _glContext2.default)(canvas, { preserveDrawingBuffer: true }, render);
+	  var gl = (0, _glContext2.default)(canvas, { preserveDrawingBuffer: true }, render);
 	
-	    var timers = {
-	        main: Object(new _timer2.default(), { step: 1000 / 60 }),
-	        player: new _timer2.default(0)
-	    };
+	  var timers = {
+	    main: Object(new _timer2.default(), { step: 1000 / 60 }),
+	    player: new _timer2.default(0)
+	  };
 	
-	    var viewRes = [0, 0];
-	    var viewSize = [0, 0];
+	  var viewRes = [0, 0];
+	  var viewSize = [0, 0];
 	
-	    var buffers = {
-	        light: (0, _glFbo2.default)(gl, [1, 1]),
-	        // @todo
-	        // flash: FBO(gl, [1, 1]),
-	        fade: [(0, _glFbo2.default)(gl, [1, 1]), (0, _glFbo2.default)(gl, [1, 1])]
-	    };
+	  var buffers = {
+	    light: (0, _glFbo2.default)(gl, [1, 1]),
+	    // @todo
+	    // flash: FBO(gl, [1, 1]),
+	    fade: [(0, _glFbo2.default)(gl, [1, 1]), (0, _glFbo2.default)(gl, [1, 1])]
+	  };
 	
-	    var shaders = {
-	        light: (0, _glShader2.default)(gl, _index2.default, _light2.default),
-	        fade: (0, _glShader2.default)(gl, _index2.default, _fade2.default),
-	        draw: (0, _glShader2.default)(gl, _index2.default, _draw2.default)
-	    };
+	  var shaders = {
+	    light: (0, _glShader2.default)(gl, _index2.default, _light2.default),
+	    fade: (0, _glShader2.default)(gl, _index2.default, _fade2.default),
+	    draw: (0, _glShader2.default)(gl, _index2.default, _draw2.default)
+	  };
 	
-	    var screen = new _screen2.default(gl);
+	  var screen = new _screen2.default(gl);
 	
-	    // Parameters...
+	  // Parameters...
 	
-	    // Configuration, setup
-	    var config = self.config = {
-	        edit: queries.edit === 'true',
+	  // Configuration, setup
+	  var config = self.config = {
+	    edit: queries.edit === 'true',
 	
-	        showTrack: queries.showTrack === 'true',
+	    showTrack: queries.showTrack === 'true',
 	
-	        interact: parseFloat(queries.interact, 10) || 1,
+	    interact: parseFloat(queries.interact, 10) || 1,
 	
-	        showEndVideos: queries.showEndVideos === 'true' || queries.showTros === 'true', // Legacy
+	    showEndVideos: queries.showEndVideos === 'true' || queries.showTros === 'true', // Legacy
 	
-	        intro: decodeURIComponent(queries.intro || 'https://www.youtube.com/embed/7mT4vCdZY9w'),
+	    intro: decodeURIComponent(queries.intro || 'https://www.youtube.com/embed/7mT4vCdZY9w'),
 	
-	        outro: decodeURIComponent(queries.outro || 'https://www.youtube.com/embed/Xr1vohT1yG4'),
+	    outro: decodeURIComponent(queries.outro || 'https://www.youtube.com/embed/Xr1vohT1yG4'),
 	
-	        showInfo: queries.showInfo === 'true',
+	    showInfo: queries.showInfo === 'true',
 	
-	        name: decodeURIComponent(queries.name || ''),
-	        songName: decodeURIComponent(queries.songName || ''),
-	        byName: decodeURIComponent(queries.byName || ''),
+	    name: decodeURIComponent(queries.name || ''),
+	    songName: decodeURIComponent(queries.songName || ''),
+	    byName: decodeURIComponent(queries.byName || ''),
 	
-	        fallback: decodeURIComponent(queries.fallback || ''),
+	    fallback: decodeURIComponent(queries.fallback || ''),
 	
-	        track: decodeURIComponent(queries.track || '') || prompt('Enter a track URL:', '../../build/audio/Trust feat. Kathrin deBoer & Tom Hodge - Max Cooper.mp3'),
+	    track: decodeURIComponent(queries.track || '') || prompt('Enter a track URL:', '../../build/audio/Trust feat. Kathrin deBoer & Tom Hodge - Max Cooper.mp3'),
 	
-	        audioOrders: queries.audioOrders ? parseInt(queries.audioOrders, 10) : 3,
+	    audioOrders: queries.audioOrders ? parseInt(queries.audioOrders, 10) : 3,
 	
-	        animation: queries.animation || ''
-	    };
+	    animation: queries.animation || ''
+	  };
 	
-	    // Animation, running
-	    var state = self.state = {
-	        /**
-	         * @note `waveform` seems to make everything about an order of magnitude
-	         *       more sensitive than `frequencies`.
-	         */
-	        audioMode: queries.audioMode || 'frequencies',
+	  // Animation, running
+	  var state = self.state = {
+	    /**
+	     * @note `waveform` seems to make everything about an order of magnitude
+	     *     more sensitive than `frequencies`.
+	     */
+	    audioMode: queries.audioMode || 'frequencies',
 	
-	        /**
-	         * @note Each higher order seems to make everything aboutan order of
-	         *       magnitude more sensitive.
-	         */
-	        audioOrder: queries.audioOrder ? parseInt(queries.audioOrder, 10) : 1,
+	    /**
+	     * @note Each higher order seems to make everything aboutan order of
+	     *     magnitude more sensitive.
+	     */
+	    audioOrder: queries.audioOrder ? parseInt(queries.audioOrder, 10) : 1,
 	
-	        // audioScale: 1, // audioOrder = 0
-	        audioScale: 0.008, // audioOrder = 1
+	    // audioScale: 1, // audioOrder = 0
+	    audioScale: 0.008, // audioOrder = 1
 	
-	        // @todo Not actually meaningful for waveforms - check for this case
-	        meanFulcrum: queries.meanFulcrum ? parseFloat(queries.meanFulcrum, 10) : 0.4,
+	    // @todo Not actually meaningful for waveforms - check for this case
+	    meanFulcrum: queries.meanFulcrum ? parseFloat(queries.meanFulcrum, 10) : 0.4,
 	
-	        harmonies: queries.harmonies ? parseFloat(queries.harmonies, 10) : 1,
+	    harmonies: queries.harmonies ? parseFloat(queries.harmonies, 10) : 1,
 	
-	        silent: queries.silent ? parseFloat(queries.silent, 10) : 0.000001,
+	    silent: queries.silent ? parseFloat(queries.silent, 10) : 0.000001,
 	
-	        soundSmooth: queries.soundSmooth ? parseFloat(queries.soundSmooth, 10) : 0.3,
+	    soundSmooth: queries.soundSmooth ? parseFloat(queries.soundSmooth, 10) : 0.3,
 	
-	        soundWarp: queries.soundWarp ? parseFloat(queries.soundWarp, 10) : 0.006,
+	    soundWarp: queries.soundWarp ? parseFloat(queries.soundWarp, 10) : 0.006,
 	
-	        noiseWarp: queries.noiseWarp ? parseFloat(queries.noiseWarp, 10)
-	        // :   0.04),
-	        : 0,
+	    noiseWarp: queries.noiseWarp ? parseFloat(queries.noiseWarp, 10)
+	    // : 0.04),
+	    : 0,
 	
-	        noiseSpeed: queries.noiseSpeed ? parseFloat(queries.noiseSpeed, 10) : 0.0005,
+	    noiseSpeed: queries.noiseSpeed ? parseFloat(queries.noiseSpeed, 10) : 0.0005,
 	
-	        noiseScale: queries.noiseScale ? parseFloat(queries.noiseScale, 10) : 0.05,
+	    noiseScale: queries.noiseScale ? parseFloat(queries.noiseScale, 10) : 0.05,
 	
-	        spin: queries.spin ? parseFloat(queries.spin, 10) : 0.0001,
+	    spin: queries.spin ? parseFloat(queries.spin, 10) : 0.0001,
 	
-	        ringRadius: queries.ringRadius ? parseFloat(queries.ringRadius, 10) : 0.95,
+	    ringRadius: queries.ringRadius ? parseFloat(queries.ringRadius, 10) : 0.95,
 	
-	        ringThick: queries.ringThick ? parseFloat(queries.ringThick, 10) : 0.01,
+	    ringThick: queries.ringThick ? parseFloat(queries.ringThick, 10) : 0.01,
 	
-	        ringAlpha: queries.ringAlpha ? parseFloat(queries.ringAlpha, 10) : 10,
+	    ringAlpha: queries.ringAlpha ? parseFloat(queries.ringAlpha, 10) : 10,
 	
-	        otherRadius: queries.otherRadius ? parseFloat(queries.otherRadius, 10) : 100,
+	    otherRadius: queries.otherRadius ? parseFloat(queries.otherRadius, 10) : 100,
 	
-	        otherThick: queries.otherThick ? parseFloat(queries.otherThick, 10) : 0.000001,
+	    otherThick: queries.otherThick ? parseFloat(queries.otherThick, 10) : 0.000001,
 	
-	        otherEdge: queries.otherEdge ? parseFloat(queries.otherEdge, 10) : 250,
+	    otherEdge: queries.otherEdge ? parseFloat(queries.otherEdge, 10) : 250,
 	
-	        otherAlpha: queries.otherAlpha ? parseFloat(queries.otherAlpha, 10) : 0.0001,
+	    otherAlpha: queries.otherAlpha ? parseFloat(queries.otherAlpha, 10) : 0.0001,
 	
-	        triangleRadius: queries.triangleRadius ? parseFloat(queries.triangleRadius, 10) : 0.1,
+	    triangleRadius: queries.triangleRadius ? parseFloat(queries.triangleRadius, 10) : 0.1,
 	
-	        triangleFat: queries.triangleFat ? parseFloat(queries.triangleFat, 10) : 0.2,
+	    triangleFat: queries.triangleFat ? parseFloat(queries.triangleFat, 10) : 0.2,
 	
-	        triangleEdge: queries.triangleEdge ? parseFloat(queries.triangleEdge, 10) : 255,
+	    triangleEdge: queries.triangleEdge ? parseFloat(queries.triangleEdge, 10) : 255,
 	
-	        triangleAlpha: queries.triangleAlpha ? parseFloat(queries.triangleAlpha, 10) : 0.000001,
+	    triangleAlpha: queries.triangleAlpha ? parseFloat(queries.triangleAlpha, 10) : 0.000001,
 	
-	        staticScale: queries.staticScale ? parseFloat(queries.staticScale, 10) : 150,
+	    staticScale: queries.staticScale ? parseFloat(queries.staticScale, 10) : 150,
 	
-	        staticSpeed: queries.staticSpeed ? parseFloat(queries.staticSpeed, 10) : 1,
+	    staticSpeed: queries.staticSpeed ? parseFloat(queries.staticSpeed, 10) : 1,
 	
-	        staticShift: queries.staticShift ? parseFloat(queries.staticShift, 10) : 0.3,
+	    staticShift: queries.staticShift ? parseFloat(queries.staticShift, 10) : 0.3,
 	
-	        staticAlpha: queries.staticAlpha ? parseFloat(queries.staticAlpha, 10) : 0.03,
+	    staticAlpha: queries.staticAlpha ? parseFloat(queries.staticAlpha, 10) : 0.03,
 	
-	        grow: queries.grow ? parseFloat(queries.grow, 10) : 0.0005,
+	    grow: queries.grow ? parseFloat(queries.grow, 10) : 0.0005,
 	
-	        growLimit: queries.growLimit ? parseFloat(queries.growLimit, 10) : 1.6,
+	    growLimit: queries.growLimit ? parseFloat(queries.growLimit, 10) : 1.6,
 	
-	        jitter: queries.jitter ? parseFloat(queries.jitter, 10) : 0.002,
+	    jitter: queries.jitter ? parseFloat(queries.jitter, 10) : 0.002,
 	
-	        fadeAlpha: queries.fadeAlpha ? parseFloat(queries.fadeAlpha, 10)
-	        // :   0.99),
-	        : 0,
+	    fadeAlpha: queries.fadeAlpha ? parseFloat(queries.fadeAlpha, 10)
+	    // : 0.99),
+	    : 0,
 	
-	        lightColor: queries.lightColor || [].concat(_toConsumableArray(colors.white)),
+	    lightColor: queries.lightColor || [].concat(_toConsumableArray(colors.white)),
 	
-	        fadeColor: queries.fadeColor || [].concat(_toConsumableArray(colors.white)),
+	    fadeColor: queries.fadeColor || [].concat(_toConsumableArray(colors.white)),
 	
-	        bokehRadius: queries.bokehRadius ? parseFloat(queries.bokehRadius, 10) : 8,
+	    bokehRadius: queries.bokehRadius ? parseFloat(queries.bokehRadius, 10) : 8,
 	
-	        bokehAmount: queries.bokehAmount ? parseFloat(queries.bokehAmount, 10) : 60
-	    };
+	    bokehAmount: queries.bokehAmount ? parseFloat(queries.bokehAmount, 10) : 60
+	  };
 	
-	    // Editor
+	  // Editor
 	
 	
-	    var gui = new _datGui2.default.GUI();
+	  var gui = new _datGui2.default.GUI();
 	
-	    gui.domElement.parentNode.style.zIndex = 10000;
+	  gui.domElement.parentNode.style.zIndex = 10000;
 	
-	    var proxyURL = {
-	        URL: location.href,
-	        'GO!': function GO() {
-	            return location.href = proxyURL.URL;
-	        }
-	    };
-	
-	    gui.add(proxyURL, 'GO!');
-	    gui.add(proxyURL, 'URL');
-	
-	    var urlCtrl = gui.__controllers[gui.__controllers.length - 1];
-	
-	    function updateURL() {
-	        proxyURL.URL = location.href.replace(location.search, '?') + _querystring2.default.stringify(_extends({}, config, state));
-	
-	        urlCtrl.updateDisplay();
+	  var proxyURL = {
+	    URL: location.href,
+	    'GO!': function GO() {
+	      return location.href = proxyURL.URL;
 	    }
+	  };
 	
-	    var configGUI = gui.addFolder('Config: main settings');
+	  gui.add(proxyURL, 'GO!');
+	  gui.add(proxyURL, 'URL');
 	
-	    // This is an exception... need a multi-select
+	  var urlCtrl = gui.__controllers[gui.__controllers.length - 1];
 	
-	    var animation = config.animation;
+	  function updateURL() {
+	    proxyURL.URL = location.href.replace(location.search, '?') + _querystring2.default.stringify(_extends({}, config, state));
 	
-	    delete config.animation;
+	    urlCtrl.updateDisplay();
+	  }
 	
-	    (0, _each2.default)(function (value, name) {
-	        return configGUI[(typeof value === 'undefined' ? 'undefined' : _typeof(value)) === 'object' ? 'addColor' : 'add'](config, name).onFinishChange(updateURL);
-	    }, config);
+	  var configGUI = gui.addFolder('Config: main settings');
 	
-	    config.animation = animation;
+	  // This is an exception... need a multi-select
 	
-	    configGUI.add(config, 'animation', [''].concat(_toConsumableArray(Object.keys(_animations2.default)))).onFinishChange(updateURL);
+	  var animation = config.animation;
 	
-	    configGUI.open();
+	  delete config.animation;
 	
-	    var stateGUI = gui.addFolder('State: animated settings');
+	  (0, _each2.default)(function (value, name) {
+	    return configGUI[(typeof value === 'undefined' ? 'undefined' : _typeof(value)) === 'object' ? 'addColor' : 'add'](config, name).onFinishChange(updateURL);
+	  }, config);
 	
-	    (0, _each2.default)(function (value, name) {
-	        return stateGUI[(typeof value === 'undefined' ? 'undefined' : _typeof(value)) === 'object' ? 'addColor' : 'add'](state, name).onFinishChange(updateURL);
-	    }, state);
+	  config.animation = animation;
 	
-	    stateGUI.close();
+	  configGUI.add(config, 'animation', [''].concat(_toConsumableArray(Object.keys(_animations2.default)))).onFinishChange(updateURL);
 	
-	    if (!config.edit) {
-	        _datGui2.default.GUI.toggleHide();
-	    }
+	  configGUI.open();
 	
-	    setTimeout(function () {
-	        return gui.domElement.style.display = 'block';
-	    }, 0);
+	  var stateGUI = gui.addFolder('State: animated settings');
 	
-	    var pointer = [0, 0];
-	    var cameraView = _glMatrix.mat4.create();
-	    var cameraProjection = _glMatrix.mat4.create();
-	    var camera = (0, _lookatCamera2.default)();
+	  (0, _each2.default)(function (value, name) {
+	    return stateGUI[(typeof value === 'undefined' ? 'undefined' : _typeof(value)) === 'object' ? 'addColor' : 'add'](state, name).onFinishChange(updateURL);
+	  }, state);
 	
-	    var bump = 0;
+	  stateGUI.close();
 	
-	    var ytPlayerVars = {
-	        modestbranding: 1,
-	        showinfo: 0,
-	        controls: 0,
-	        autoplay: 1,
-	        playsinline: 1,
-	        enablejsapi: 1,
-	        rel: 0,
-	        disablekb: 1,
-	        width: 1280,
-	        height: 720,
-	        origin: self.location.href.match(/.*?\/\/.*?(?=\/)/gi)[0]
-	    };
+	  if (!config.edit) {
+	    _datGui2.default.GUI.toggleHide();
+	  }
 	
-	    var ytPlayerParams = function ytPlayerParams(vars) {
-	        return (0, _reduce2.default)(function (out, v, k) {
-	            return out + (out ? '&' : '?') + k + '=' + v;
-	        }, vars, '');
-	    };
+	  setTimeout(function () {
+	    return gui.domElement.style.display = 'block';
+	  }, 0);
 	
-	    // Info
+	  var pointer = [0, 0];
+	  var cameraView = _glMatrix.mat4.create();
+	  var cameraProjection = _glMatrix.mat4.create();
+	  var camera = (0, _lookatCamera2.default)();
 	
+	  var bump = 0;
+	
+	  var ytPlayerVars = {
+	    modestbranding: 1,
+	    showinfo: 0,
+	    controls: 0,
+	    autoplay: 1,
+	    playsinline: 1,
+	    enablejsapi: 1,
+	    rel: 0,
+	    disablekb: 1,
+	    width: 1280,
+	    height: 720,
+	    origin: self.location.href.match(/.*?\/\/.*?(?=\/)/gi)[0]
+	  };
+	
+	  var ytPlayerParams = function ytPlayerParams(vars) {
+	    return (0, _reduce2.default)(function (out, v, k) {
+	      return out + (out ? '&' : '?') + k + '=' + v;
+	    }, vars, '');
+	  };
+	
+	  // Info
+	
+	  if (config.showInfo) {
+	    var introInfo = document.querySelector('.intro-info');
+	
+	    introInfo.querySelector('.name').innerText = config.name || '';
+	    introInfo.querySelector('.song-name').innerText = config.songName || '';
+	    introInfo.querySelector('.by-name').innerText = config.byName || '';
+	
+	    introInfo.className = deClass(introInfo.className, 'hide');
+	  }
+	
+	  // Fallback
+	
+	  if (config.fallback) {
+	    var fallbackInfo = document.querySelector('.fallback-info');
+	    var href = config.fallback + ytPlayerParams(ytPlayerVars);
+	
+	    fallbackInfo.querySelector('.name').innerText = config.name ? ' ' + config.name : '';
+	
+	    fallbackInfo.querySelector('.fallback').href = href;
+	  }
+	
+	  // Track
+	
+	  var audio = Object.assign(new Audio(), {
+	    crossOrigin: 'anonymous',
+	    controls: true,
+	    autoplay: false,
+	    muted: 'muted' in queries,
+	    className: 'track',
+	    src: config.track.match(/^(https)?(:\/\/)?(www\.)?dropbox\.com\/s\//gi) ? config.track.replace(/^((https)?(:\/\/)?(www\.)?)dropbox\.com\/s\/(.*)\?dl=(0)$/gi, 'https://dl.dropboxusercontent.com/s/$5?dl=1&raw=1') : config.track
+	  });
+	
+	  document.body.appendChild(audio);
+	
+	  // Progress
+	
+	  if (config.showTrack) {
+	    document.documentElement.className += ' show-track';
+	  }
+	
+	  var progress = document.getElementsByClassName('progress')[0];
+	
+	  // Intro and outro
+	
+	  var videos = void 0;
+	
+	  var visuals = document.querySelector('.visuals');
+	
+	  function startInfo() {
 	    if (config.showInfo) {
-	        var introInfo = document.querySelector('.intro-info');
+	      visuals.className = deClass(visuals.className, 'hide');
 	
-	        introInfo.querySelector('.name').innerText = config.name || '';
-	        introInfo.querySelector('.song-name').innerText = config.songName || '';
-	        introInfo.querySelector('.by-name').innerText = config.byName || '';
+	      var _introInfo = document.querySelector('.intro-info');
 	
-	        introInfo.className = deClass(introInfo.className, 'hide');
+	      (0, _each2.default)(function (_ref) {
+	        var _ref2 = _slicedToArray(_ref, 2),
+	            el = _ref2[0],
+	            t = _ref2[1];
+	
+	        return setTimeout(function () {
+	          return el.className = deClass(el.className, 'hide');
+	        }, t);
+	      }, [[_introInfo.querySelector('.torch-song'), 0], [_introInfo.querySelector('.name'), 1000], [_introInfo.querySelector('.song-name'), 3000], [_introInfo.querySelector('.by-name'), 4000]]);
+	
+	      setTimeout(function () {
+	        return _introInfo.className += ' hide';
+	      }, 15000);
 	    }
+	  }
 	
-	    // Fallback
+	  function startSequence() {
+	    if (videos) {
+	      videos.intro.el.className += ' hide';
+	    }
 	
 	    if (config.fallback) {
-	        var fallbackInfo = document.querySelector('.fallback-info');
-	        var href = config.fallback + ytPlayerParams(ytPlayerVars);
+	      var _fallbackInfo = document.querySelector('.fallback-info');
 	
-	        fallbackInfo.querySelector('.name').innerText = config.name ? ' ' + config.name : '';
-	
-	        fallbackInfo.querySelector('.fallback').href = href;
+	      _fallbackInfo.className = deClass(_fallbackInfo.className, 'hide');
 	    }
-	
-	    // Track
-	
-	    var audio = Object.assign(new Audio(), {
-	        crossOrigin: 'anonymous',
-	        controls: true,
-	        autoplay: false,
-	        muted: 'muted' in queries,
-	        className: 'track',
-	        src: config.track.match(/^(https)?(:\/\/)?(www\.)?dropbox\.com\/s\//gi) ? config.track.replace(/^((https)?(:\/\/)?(www\.)?)dropbox\.com\/s\/(.*)\?dl=(0)$/gi, 'https://dl.dropboxusercontent.com/s/$5?dl=1&raw=1') : config.track
-	    });
-	
-	    document.body.appendChild(audio);
-	
-	    // Progress
-	
-	    if (config.showTrack) {
-	        document.documentElement.className += ' show-track';
-	    }
-	
-	    var progress = document.getElementsByClassName('progress')[0];
-	
-	    // Intro and outro
-	
-	    var videos = void 0;
-	
-	    var visuals = document.querySelector('.visuals');
-	
-	    function startInfo() {
-	        if (config.showInfo) {
-	            visuals.className = deClass(visuals.className, 'hide');
-	
-	            var _introInfo = document.querySelector('.intro-info');
-	
-	            (0, _each2.default)(function (_ref) {
-	                var _ref2 = _slicedToArray(_ref, 2),
-	                    el = _ref2[0],
-	                    t = _ref2[1];
-	
-	                return setTimeout(function () {
-	                    return el.className = deClass(el.className, 'hide');
-	                }, t);
-	            }, [[_introInfo.querySelector('.torch-song'), 0], [_introInfo.querySelector('.name'), 1000], [_introInfo.querySelector('.song-name'), 3000], [_introInfo.querySelector('.by-name'), 4000]]);
-	
-	            setTimeout(function () {
-	                return _introInfo.className += ' hide';
-	            }, 15000);
-	        }
-	    }
-	
-	    function startSequence() {
-	        if (videos) {
-	            videos.intro.el.className += ' hide';
-	        }
-	
-	        if (config.fallback) {
-	            var _fallbackInfo = document.querySelector('.fallback-info');
-	
-	            _fallbackInfo.className = deClass(_fallbackInfo.className, 'hide');
-	        }
-	
-	        // Deal with Chrome's need for user interaction before playing audio...
-	        // @see https://developers.google.com/web/updates/2017/09/autoplay-policy-changes#webaudio
-	        audio.play().catch(function () {
-	            return document.addEventListener('click', function () {
-	                return audio.paused && audio.play();
-	            });
-	        });
-	
-	        canvas.className = deClass(canvas.className, 'hide');
-	    }
-	
-	    function endSequence() {
-	        if (videos) {
-	            videos.outro.player.playVideo();
-	            videos.outro.el.className = deClass(videos.outro.el.className, 'hide');
-	        }
-	
-	        canvas.className += ' hide';
-	    }
-	
-	    if (config.showEndVideos) {
-	        var ytIframeVars = {
-	            width: ytPlayerVars.width,
-	            height: ytPlayerVars.height,
-	            frameborder: 0,
-	            allowfullscreen: true,
-	            className: 'video fade',
-	            src: ytPlayerParams(ytPlayerVars)
-	        };
-	
-	        videos = {
-	            intro: {
-	                iframeOptions: _extends({}, ytIframeVars, {
-	                    src: config.intro + ytIframeVars.src,
-	                    className: 'intro ' + ytIframeVars.className
-	                }),
-	                playerOptions: {
-	                    ytPlayerVars: ytPlayerVars,
-	                    events: {
-	                        onReady: function onReady() {
-	                            setTimeout(startSequence, 15000);
-	                        },
-	                        onStateChange: function onStateChange(e) {
-	                            if (e.data === self.YT.PlayerState.PLAYING) {
-	                                startInfo();
-	                            } else if (e.data === self.YT.PlayerState.ENDED) {
-	                                // startSequence();
-	                                videos.intro.el.className += ' hide';
-	                            }
-	                        }
-	                    }
-	                }
-	            },
-	            outro: {
-	                iframeOptions: _extends({}, ytIframeVars, {
-	                    src: config.outro + ytIframeVars.src,
-	                    className: 'outro hide ' + ytIframeVars.className
-	                }),
-	                playerOptions: {
-	                    ytPlayerVars: ytPlayerVars,
-	                    events: {
-	                        onStateChange: function onStateChange(e) {
-	                            if (!videos.outro.buffering && e.data === self.YT.PlayerState.PLAYING) {
-	                                videos.outro.buffering = true;
-	                                videos.outro.player.pauseVideo();
-	                            }
-	                            if (e.data === self.YT.PlayerState.ENDED) {
-	                                videos.outro.el.className += ' hide';
-	                            }
-	                        }
-	                    }
-	                }
-	            }
-	        };
-	
-	        (0, _each2.default)(function (config) {
-	            config.el = Object.assign(document.createElement('iframe'), config.iframeOptions);
-	
-	            document.body.appendChild(config.el);
-	        }, videos);
-	
-	        // Load the IFrame Player API code asynchronously.
-	
-	        var youTubeAPITag = document.createElement('script');
-	
-	        youTubeAPITag.src = 'https://www.youtube.com/player_api';
-	
-	        var firstScriptTag = document.getElementsByTagName('script')[0];
-	
-	        firstScriptTag.parentNode.insertBefore(youTubeAPITag, firstScriptTag);
-	
-	        // self.onYouTubePlayerAPIReady = () => {
-	        self.onYouTubeIframeAPIReady = function () {
-	            (0, _each2.default)(function (video) {
-	                return video.player = new self.YT.Player(video.el, video.playerOptions);
-	            }, videos);
-	        };
-	    } else {
-	        startSequence();
-	    }
-	
-	    // Audio analysis
-	
-	    var audioContext = new (self.AudioContext || self.webkitAudioContext)();
 	
 	    // Deal with Chrome's need for user interaction before playing audio...
 	    // @see https://developers.google.com/web/updates/2017/09/autoplay-policy-changes#webaudio
-	    document.addEventListener('click', function () {
-	        return audioContext.state === 'suspended' && audioContext.resume();
+	    audio.play().catch(function () {
+	      return document.addEventListener('click', function () {
+	        return audio.paused && audio.play();
+	      });
 	    });
 	
-	    var audioAnalyser = (0, _webAudioAnalyser2.default)(audio, audioContext);
+	    canvas.className = deClass(canvas.className, 'hide');
+	  }
 	
-	    audioAnalyser.analyser.fftSize = Math.pow(2, 11);
+	  function endSequence() {
+	    if (videos) {
+	      videos.outro.player.playVideo();
+	      videos.outro.el.className = deClass(videos.outro.el.className, 'hide');
+	    }
 	
-	    var audioTrigger = new _audio2.default(audioAnalyser, config.audioOrders);
+	    canvas.className += ' hide';
+	  }
 	
-	    var audioTexture = new _dataTexture2.default(gl, audioTrigger.dataOrder(state.audioOrder));
-	
-	    // Animation setup
-	
-	    var tracks = {
-	        main: state,
-	        lightColor: state.lightColor,
-	        fadeColor: state.fadeColor
+	  if (config.showEndVideos) {
+	    var ytIframeVars = {
+	      width: ytPlayerVars.width,
+	      height: ytPlayerVars.height,
+	      frameborder: 0,
+	      allowfullscreen: true,
+	      className: 'video fade',
+	      src: ytPlayerParams(ytPlayerVars)
 	    };
 	
-	    var tracksStart = {
-	        main: _extends({}, state),
-	        lightColor: state.lightColor.slice(0),
-	        fadeColor: state.fadeColor.slice(0)
+	    videos = {
+	      intro: {
+	        iframeOptions: _extends({}, ytIframeVars, {
+	          src: config.intro + ytIframeVars.src,
+	          className: 'intro ' + ytIframeVars.className
+	        }),
+	        playerOptions: {
+	          ytPlayerVars: ytPlayerVars,
+	          events: {
+	            onReady: function onReady() {
+	              setTimeout(startSequence, 15000);
+	            },
+	            onStateChange: function onStateChange(e) {
+	              if (e.data === self.YT.PlayerState.PLAYING) {
+	                startInfo();
+	              } else if (e.data === self.YT.PlayerState.ENDED) {
+	                // startSequence();
+	                videos.intro.el.className += ' hide';
+	              }
+	            }
+	          }
+	        }
+	      },
+	      outro: {
+	        iframeOptions: _extends({}, ytIframeVars, {
+	          src: config.outro + ytIframeVars.src,
+	          className: 'outro hide ' + ytIframeVars.className
+	        }),
+	        playerOptions: {
+	          ytPlayerVars: ytPlayerVars,
+	          events: {
+	            onStateChange: function onStateChange(e) {
+	              if (!videos.outro.buffering && e.data === self.YT.PlayerState.PLAYING) {
+	                videos.outro.buffering = true;
+	                videos.outro.player.pauseVideo();
+	              }
+	              if (e.data === self.YT.PlayerState.ENDED) {
+	                videos.outro.el.className += ' hide';
+	              }
+	            }
+	          }
+	        }
+	      }
 	    };
 	
-	    var player = new _animate2.default((0, _map2.default)(function () {
-	        return [];
-	    }, tracks, {}), tracks);
+	    (0, _each2.default)(function (config) {
+	      config.el = Object.assign(document.createElement('iframe'), config.iframeOptions);
 	
-	    // Set up the start/reset frame
-	    player.apply(function (track, key) {
-	        var start = tracksStart[key];
+	      document.body.appendChild(config.el);
+	    }, videos);
 	
-	        track.to({
-	            to: start,
-	            time: 200
-	        });
+	    // Load the IFrame Player API code asynchronously.
 	
-	        return { apply: start };
+	    var youTubeAPITag = document.createElement('script');
+	
+	    youTubeAPITag.src = 'https://www.youtube.com/player_api';
+	
+	    var firstScriptTag = document.getElementsByTagName('script')[0];
+	
+	    firstScriptTag.parentNode.insertBefore(youTubeAPITag, firstScriptTag);
+	
+	    // self.onYouTubePlayerAPIReady = () => {
+	    self.onYouTubeIframeAPIReady = function () {
+	      (0, _each2.default)(function (video) {
+	        return video.player = new self.YT.Player(video.el, video.playerOptions);
+	      }, videos);
+	    };
+	  } else {
+	    startSequence();
+	  }
+	
+	  // Audio analysis
+	
+	  var audioContext = new (self.AudioContext || self.webkitAudioContext)();
+	
+	  // Deal with Chrome's need for user interaction before playing audio...
+	  // @see https://developers.google.com/web/updates/2017/09/autoplay-policy-changes#webaudio
+	  document.addEventListener('click', function () {
+	    return audioContext.state === 'suspended' && audioContext.resume();
+	  });
+	
+	  var audioAnalyser = (0, _webAudioAnalyser2.default)(audio, audioContext);
+	
+	  audioAnalyser.analyser.fftSize = Math.pow(2, 11);
+	
+	  var audioTrigger = new _audio2.default(audioAnalyser, config.audioOrders);
+	
+	  var audioTexture = new _dataTexture2.default(gl, audioTrigger.dataOrder(state.audioOrder));
+	
+	  // Animation setup
+	
+	  var tracks = {
+	    main: state,
+	    lightColor: state.lightColor,
+	    fadeColor: state.fadeColor
+	  };
+	
+	  var tracksStart = {
+	    main: _extends({}, state),
+	    lightColor: state.lightColor.slice(0),
+	    fadeColor: state.fadeColor.slice(0)
+	  };
+	
+	  var player = new _animate2.default((0, _map2.default)(function () {
+	    return [];
+	  }, tracks, {}), tracks);
+	
+	  // Set up the start/reset frame
+	  player.apply(function (track, key) {
+	    var start = tracksStart[key];
+	
+	    track.to({
+	      to: start,
+	      time: 200
 	    });
 	
-	    // Hand over the rest to the param-defined animation
-	    if (config.animation) {
-	        audio.addEventListener('durationchange', function () {
-	            return _animations2.default[config.animation](player, endSequence, audio);
-	        }, false);
-	    }
+	    return { apply: start };
+	  });
 	
-	    self.t = function () {
-	        var time = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : audio.currentTime;
-	        return time / audio.duration;
-	    };
-	
-	    var scrub = function scrub() {
-	        if (audio.currentTime >= 0 && !audio.paused && config.animation) {
-	            player.playFrom(audio.currentTime * 1000, 0);
-	        }
-	    };
-	
-	    // audio.addEventListener('seeked', scrub);
-	    audio.addEventListener('play', scrub);
-	
-	    // Interaction
-	    document.body.addEventListener('pointermove', function (e) {
-	        if (e.isPrimary) {
-	            (0, _mouseEventOffset2.default)(e, document.body, pointer);
-	
-	            var l = config.interact - 1;
-	
-	            pointer[0] = (0, _rangeFit2.default)(pointer[0], 0, viewRes[0], -l, l);
-	            pointer[1] = (0, _rangeFit2.default)(pointer[1], 0, viewRes[1], l, -l);
-	        }
+	  // Hand over the rest to the param-defined animation
+	  if (config.animation) {
+	    audio.addEventListener('durationchange', function () {
+	      return _animations2.default[config.animation](player, endSequence, audio);
 	    }, false);
+	  }
 	
-	    document.body.addEventListener('pointerdown', function (e) {
-	        return bump = config.interact * 0.1;
-	    }, false);
+	  self.t = function () {
+	    var time = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : audio.currentTime;
+	    return time / audio.duration;
+	  };
 	
-	    // The main loop
-	    function render() {
-	        var dt = timers.main.tick().dt;
+	  var scrub = function scrub() {
+	    if (audio.currentTime >= 0 && !audio.paused && config.animation) {
+	      player.playFrom(audio.currentTime * 1000, 0);
+	    }
+	  };
 	
-	        // Animate
+	  // audio.addEventListener('seeked', scrub);
+	  audio.addEventListener('play', scrub);
 	
-	        if (audio.currentTime >= 0 && !audio.paused && config.animation) {
-	            timers.player.tick(audio.currentTime * 1000);
-	            player.play(timers.player.time);
-	        }
+	  // Interaction
+	  document.body.addEventListener('pointermove', function (e) {
+	    if (e.isPrimary) {
+	      (0, _mouseEventOffset2.default)(e, document.body, pointer);
 	
-	        // For guaging time accurately by looking at the video recording
-	        progress.style.width = audio.currentTime / audio.duration * 100 + '%';
+	      var l = config.interact - 1;
 	
-	        // Sample audio
+	      pointer[0] = (0, _rangeFit2.default)(pointer[0], 0, viewRes[0], -l, l);
+	      pointer[1] = (0, _rangeFit2.default)(pointer[1], 0, viewRes[1], l, -l);
+	    }
+	  }, false);
 	
-	        audioTrigger.sample(dt, state.audioMode);
-	        // @todo Hack, remove
-	        audioTexture.array.data = audioTrigger.dataOrder(state.audioOrder);
-	        audioTexture.apply();
+	  document.body.addEventListener('pointerdown', function (e) {
+	    return bump = config.interact * 0.1;
+	  }, false);
 	
-	        var audioPeak = (0, _analyse.peakPos)(audioTexture.array.data);
+	  // The main loop
+	  function render() {
+	    var dt = timers.main.tick().dt;
 	
-	        // Render
+	    // Animate
 	
-	        gl.viewport(0, 0, viewRes[0], viewRes[1]);
-	        screen.bind();
-	
-	        // Light pass
-	        /**
-	         * @todo May need to do this twice, each having their own alpha inputs:
-	         *           - For the current light, which gets after-imaged
-	         *           - For a separate flash layer, which doesn't
-	         */
-	
-	        buffers.light.bind();
-	        shaders.light.bind();
-	
-	        Object.assign(shaders.light.uniforms, {
-	            time: timers.main.time,
-	            dt: timers.main.dt,
-	
-	            viewSize: viewSize,
-	            viewRes: viewRes,
-	
-	            audio: audioTexture.texture.bind(0),
-	            audioScale: state.audioScale,
-	
-	            peak: audioPeak.peak,
-	            peakPos: audioPeak.pos / audioTexture.array.data.length,
-	            mean: (0, _analyse.meanWeight)(audioTexture.array.data, state.meanFulcrum),
-	
-	            frequencies: audioAnalyser.analyser.frequencyBinCount,
-	            harmonies: state.harmonies,
-	            silent: state.silent,
-	            soundSmooth: state.soundSmooth,
-	            soundWarp: state.soundWarp,
-	
-	            noiseWarp: state.noiseWarp,
-	            noiseSpeed: state.noiseSpeed,
-	            noiseScale: state.noiseScale,
-	
-	            spin: state.spin,
-	
-	            ringRadius: state.ringRadius,
-	            ringThick: state.ringThick,
-	            ringAlpha: state.ringAlpha,
-	
-	            otherRadius: state.otherRadius,
-	            otherThick: state.otherThick,
-	            otherEdge: state.otherEdge,
-	            otherAlpha: state.otherAlpha,
-	
-	            triangleRadius: state.triangleRadius,
-	            triangleFat: state.triangleFat,
-	            triangleEdge: state.triangleEdge,
-	            triangleAlpha: state.triangleAlpha,
-	
-	            staticScale: state.staticScale,
-	            staticSpeed: state.staticSpeed,
-	            staticShift: state.staticShift,
-	            staticAlpha: state.staticAlpha,
-	
-	            cameraView: cameraView,
-	            cameraProjection: cameraProjection,
-	
-	            bump: bump
-	        });
-	
-	        screen.draw();
-	
-	        // Fade pass
-	
-	        buffers.fade[0].bind();
-	        // gl.bindFramebuffer(gl.FRAMEBUFFER, null);
-	        shaders.fade.bind();
-	
-	        Object.assign(shaders.fade.uniforms, {
-	            time: timers.main.time,
-	            dt: timers.main.dt,
-	
-	            viewSize: viewSize,
-	            viewRes: viewRes,
-	
-	            next: buffers.light.color[0].bind(0),
-	            past: buffers.fade[1].color[0].bind(1),
-	            // @todo Bring audio stuff here as well?
-	
-	            grow: state.grow,
-	            growLimit: state.growLimit,
-	
-	            // @todo Spin this too?
-	            // spinPast: state.spinPast,
-	
-	            jitter: state.jitter,
-	
-	            fadeAlpha: state.fadeAlpha,
-	
-	            cameraView: cameraView,
-	            cameraProjection: cameraProjection
-	        });
-	
-	        screen.draw();
-	
-	        // Draw pass
-	
-	        gl.bindFramebuffer(gl.FRAMEBUFFER, null);
-	        shaders.draw.bind();
-	
-	        Object.assign(shaders.draw.uniforms, {
-	            viewRes: viewRes,
-	
-	            light: buffers.light.color[0].bind(0),
-	            fade: buffers.fade[0].color[0].bind(1),
-	
-	            lightColor: state.lightColor,
-	            fadeColor: state.fadeColor,
-	
-	            bokehRadius: state.bokehRadius,
-	            bokehAmount: state.bokehAmount
-	        });
-	
-	        screen.draw();
-	
-	        // Step the fade
-	        (0, _utils.step)(buffers.fade);
-	
-	        // Finish up
-	        screen.unbind();
-	
-	        var damping = 0.99;
-	
-	        camera.position[0] = pointer[0] *= damping;
-	        camera.position[1] = pointer[1] *= damping;
-	
-	        bump *= damping;
-	
-	        camera.view(cameraView);
+	    if (audio.currentTime >= 0 && !audio.paused && config.animation) {
+	      timers.player.tick(audio.currentTime * 1000);
+	      player.play(timers.player.time);
 	    }
 	
-	    function resize() {
-	        canvas.width = self.innerWidth;
-	        canvas.height = self.innerHeight;
+	    // For guaging time accurately by looking at the video recording
+	    progress.style.width = audio.currentTime / audio.duration * 100 + '%';
 	
-	        viewRes[0] = gl.drawingBufferWidth;
-	        viewRes[1] = gl.drawingBufferHeight;
+	    // Sample audio
 	
-	        (0, _aspect.containAspect)(viewSize, viewRes);
+	    audioTrigger.sample(dt, state.audioMode);
+	    // @todo Hack, remove
+	    audioTexture.array.data = audioTrigger.dataOrder(state.audioOrder);
+	    audioTexture.apply();
 	
-	        buffers.light.shape = viewRes;
-	        buffers.fade[0].shape = buffers.fade[1].shape = viewRes;
+	    var audioPeak = (0, _analyse.peakPos)(audioTexture.array.data);
 	
-	        var aspect = viewRes[0] / viewRes[1];
-	        var fov = Math.PI / 2.5;
-	        var near = 0;
-	        var far = 1;
+	    // Render
 	
-	        _glMatrix.mat4.perspective(cameraProjection, fov, aspect, near, far);
-	    }
+	    gl.viewport(0, 0, viewRes[0], viewRes[1]);
+	    screen.bind();
 	
-	    // Go
+	    // Light pass
+	    /**
+	     * @todo May need to do this twice, each having their own alpha inputs:
+	     *       - For the current light, which gets after-imaged
+	     *       - For a separate flash layer, which doesn't
+	     */
 	
-	    self.addEventListener('resize', (0, _throttle2.default)(resize, 200), false);
+	    buffers.light.bind();
+	    shaders.light.bind();
 	
-	    resize();
+	    Object.assign(shaders.light.uniforms, {
+	      time: timers.main.time,
+	      dt: timers.main.dt,
+	
+	      viewSize: viewSize,
+	      viewRes: viewRes,
+	
+	      audio: audioTexture.texture.bind(0),
+	      audioScale: state.audioScale,
+	
+	      peak: audioPeak.peak,
+	      peakPos: audioPeak.pos / audioTexture.array.data.length,
+	      mean: (0, _analyse.meanWeight)(audioTexture.array.data, state.meanFulcrum),
+	
+	      frequencies: audioAnalyser.analyser.frequencyBinCount,
+	      harmonies: state.harmonies,
+	      silent: state.silent,
+	      soundSmooth: state.soundSmooth,
+	      soundWarp: state.soundWarp,
+	
+	      noiseWarp: state.noiseWarp,
+	      noiseSpeed: state.noiseSpeed,
+	      noiseScale: state.noiseScale,
+	
+	      spin: state.spin,
+	
+	      ringRadius: state.ringRadius,
+	      ringThick: state.ringThick,
+	      ringAlpha: state.ringAlpha,
+	
+	      otherRadius: state.otherRadius,
+	      otherThick: state.otherThick,
+	      otherEdge: state.otherEdge,
+	      otherAlpha: state.otherAlpha,
+	
+	      triangleRadius: state.triangleRadius,
+	      triangleFat: state.triangleFat,
+	      triangleEdge: state.triangleEdge,
+	      triangleAlpha: state.triangleAlpha,
+	
+	      staticScale: state.staticScale,
+	      staticSpeed: state.staticSpeed,
+	      staticShift: state.staticShift,
+	      staticAlpha: state.staticAlpha,
+	
+	      cameraView: cameraView,
+	      cameraProjection: cameraProjection,
+	
+	      bump: bump
+	    });
+	
+	    screen.draw();
+	
+	    // Fade pass
+	
+	    buffers.fade[0].bind();
+	    // gl.bindFramebuffer(gl.FRAMEBUFFER, null);
+	    shaders.fade.bind();
+	
+	    Object.assign(shaders.fade.uniforms, {
+	      time: timers.main.time,
+	      dt: timers.main.dt,
+	
+	      viewSize: viewSize,
+	      viewRes: viewRes,
+	
+	      next: buffers.light.color[0].bind(0),
+	      past: buffers.fade[1].color[0].bind(1),
+	      // @todo Bring audio stuff here as well?
+	
+	      grow: state.grow,
+	      growLimit: state.growLimit,
+	
+	      // @todo Spin this too?
+	      // spinPast: state.spinPast,
+	
+	      jitter: state.jitter,
+	
+	      fadeAlpha: state.fadeAlpha,
+	
+	      cameraView: cameraView,
+	      cameraProjection: cameraProjection
+	    });
+	
+	    screen.draw();
+	
+	    // Draw pass
+	
+	    gl.bindFramebuffer(gl.FRAMEBUFFER, null);
+	    shaders.draw.bind();
+	
+	    Object.assign(shaders.draw.uniforms, {
+	      viewRes: viewRes,
+	
+	      light: buffers.light.color[0].bind(0),
+	      fade: buffers.fade[0].color[0].bind(1),
+	
+	      lightColor: state.lightColor,
+	      fadeColor: state.fadeColor,
+	
+	      bokehRadius: state.bokehRadius,
+	      bokehAmount: state.bokehAmount
+	    });
+	
+	    screen.draw();
+	
+	    // Step the fade
+	    (0, _utils.step)(buffers.fade);
+	
+	    // Finish up
+	    screen.unbind();
+	
+	    var damping = 0.99;
+	
+	    camera.position[0] = pointer[0] *= damping;
+	    camera.position[1] = pointer[1] *= damping;
+	
+	    bump *= damping;
+	
+	    camera.view(cameraView);
+	  }
+	
+	  function resize() {
+	    canvas.width = self.innerWidth;
+	    canvas.height = self.innerHeight;
+	
+	    viewRes[0] = gl.drawingBufferWidth;
+	    viewRes[1] = gl.drawingBufferHeight;
+	
+	    (0, _aspect.containAspect)(viewSize, viewRes);
+	
+	    buffers.light.shape = viewRes;
+	    buffers.fade[0].shape = buffers.fade[1].shape = viewRes;
+	
+	    var aspect = viewRes[0] / viewRes[1];
+	    var fov = Math.PI / 2.5;
+	    var near = 0;
+	    var far = 1;
+	
+	    _glMatrix.mat4.perspective(cameraProjection, fov, aspect, near, far);
+	  }
+	
+	  // Go
+	
+	  self.addEventListener('resize', (0, _throttle2.default)(resize, 200), false);
+	
+	  resize();
 	};
 
 /***/ }),
@@ -20444,19 +20444,19 @@
 /* 544 */
 /***/ (function(module, exports) {
 
-	module.exports = "precision highp float;\n#define GLSLIFY 1\n\nuniform float time;\n// @todo Use dt against audio rates?\nuniform float dt;\n\nuniform vec2 viewSize;\nuniform vec2 viewRes;\n\nuniform sampler2D audio;\n\nuniform float audioScale;\n\nuniform float peak;\nuniform float peakPos;\nuniform float mean;\n\nuniform float frequencies;\nuniform float harmonies;\nuniform float silent;\nuniform float soundSmooth;\nuniform float soundWarp;\n\nuniform float noiseWarp;\nuniform float noiseSpeed;\nuniform float noiseScale;\n\nuniform float spin;\n\nuniform float ringRadius;\nuniform float ringThick;\nuniform float ringAlpha;\n\nuniform float otherRadius;\nuniform float otherThick;\nuniform float otherEdge;\nuniform float otherAlpha;\n\nuniform float triangleRadius;\nuniform float triangleFat;\nuniform float triangleEdge;\nuniform float triangleAlpha;\n\nuniform float staticScale;\nuniform float staticSpeed;\nuniform float staticShift;\nuniform float staticAlpha;\n\nuniform float bump;\n\nuniform mat4 cameraView;\nuniform mat4 cameraProjection;\n\n// @todo Noise in form as well?\n//\n// Description : Array and textureless GLSL 2D/3D/4D simplex\n//               noise functions.\n//      Author : Ian McEwan, Ashima Arts.\n//  Maintainer : ijm\n//     Lastmod : 20110822 (ijm)\n//     License : Copyright (C) 2011 Ashima Arts. All rights reserved.\n//               Distributed under the MIT License. See LICENSE file.\n//               https://github.com/ashima/webgl-noise\n//\n\nvec3 mod289(vec3 x) {\n  return x - floor(x * (1.0 / 289.0)) * 289.0;\n}\n\nvec4 mod289(vec4 x) {\n  return x - floor(x * (1.0 / 289.0)) * 289.0;\n}\n\nvec4 permute(vec4 x) {\n     return mod289(((x*34.0)+1.0)*x);\n}\n\nvec4 taylorInvSqrt(vec4 r)\n{\n  return 1.79284291400159 - 0.85373472095314 * r;\n}\n\nfloat snoise(vec3 v)\n  {\n  const vec2  C = vec2(1.0/6.0, 1.0/3.0) ;\n  const vec4  D = vec4(0.0, 0.5, 1.0, 2.0);\n\n// First corner\n  vec3 i  = floor(v + dot(v, C.yyy) );\n  vec3 x0 =   v - i + dot(i, C.xxx) ;\n\n// Other corners\n  vec3 g = step(x0.yzx, x0.xyz);\n  vec3 l = 1.0 - g;\n  vec3 i1 = min( g.xyz, l.zxy );\n  vec3 i2 = max( g.xyz, l.zxy );\n\n  //   x0 = x0 - 0.0 + 0.0 * C.xxx;\n  //   x1 = x0 - i1  + 1.0 * C.xxx;\n  //   x2 = x0 - i2  + 2.0 * C.xxx;\n  //   x3 = x0 - 1.0 + 3.0 * C.xxx;\n  vec3 x1 = x0 - i1 + C.xxx;\n  vec3 x2 = x0 - i2 + C.yyy; // 2.0*C.x = 1/3 = C.y\n  vec3 x3 = x0 - D.yyy;      // -1.0+3.0*C.x = -0.5 = -D.y\n\n// Permutations\n  i = mod289(i);\n  vec4 p = permute( permute( permute(\n             i.z + vec4(0.0, i1.z, i2.z, 1.0 ))\n           + i.y + vec4(0.0, i1.y, i2.y, 1.0 ))\n           + i.x + vec4(0.0, i1.x, i2.x, 1.0 ));\n\n// Gradients: 7x7 points over a square, mapped onto an octahedron.\n// The ring size 17*17 = 289 is close to a multiple of 49 (49*6 = 294)\n  float n_ = 0.142857142857; // 1.0/7.0\n  vec3  ns = n_ * D.wyz - D.xzx;\n\n  vec4 j = p - 49.0 * floor(p * ns.z * ns.z);  //  mod(p,7*7)\n\n  vec4 x_ = floor(j * ns.z);\n  vec4 y_ = floor(j - 7.0 * x_ );    // mod(j,N)\n\n  vec4 x = x_ *ns.x + ns.yyyy;\n  vec4 y = y_ *ns.x + ns.yyyy;\n  vec4 h = 1.0 - abs(x) - abs(y);\n\n  vec4 b0 = vec4( x.xy, y.xy );\n  vec4 b1 = vec4( x.zw, y.zw );\n\n  //vec4 s0 = vec4(lessThan(b0,0.0))*2.0 - 1.0;\n  //vec4 s1 = vec4(lessThan(b1,0.0))*2.0 - 1.0;\n  vec4 s0 = floor(b0)*2.0 + 1.0;\n  vec4 s1 = floor(b1)*2.0 + 1.0;\n  vec4 sh = -step(h, vec4(0.0));\n\n  vec4 a0 = b0.xzyw + s0.xzyw*sh.xxyy ;\n  vec4 a1 = b1.xzyw + s1.xzyw*sh.zzww ;\n\n  vec3 p0 = vec3(a0.xy,h.x);\n  vec3 p1 = vec3(a0.zw,h.y);\n  vec3 p2 = vec3(a1.xy,h.z);\n  vec3 p3 = vec3(a1.zw,h.w);\n\n//Normalise gradients\n  vec4 norm = taylorInvSqrt(vec4(dot(p0,p0), dot(p1,p1), dot(p2, p2), dot(p3,p3)));\n  p0 *= norm.x;\n  p1 *= norm.y;\n  p2 *= norm.z;\n  p3 *= norm.w;\n\n// Mix final noise value\n  vec4 m = max(0.6 - vec4(dot(x0,x0), dot(x1,x1), dot(x2,x2), dot(x3,x3)), 0.0);\n  m = m * m;\n  return 42.0 * dot( m*m, vec4( dot(p0,x0), dot(p1,x1),\n                                dot(p2,x2), dot(p3,x3) ) );\n  }\n\nconst vec4 k = vec4(1.0, 2.0/3.0, 1.0/3.0, 3.0);\n\nvec3 hsv2rgb(vec3 c) {\n    vec3 p = abs(fract(c.xxx+k.xyz)*6.0-k.www);\n    return c.z*mix(k.xxx, clamp(p-k.xxx, 0.0, 1.0), c.y);\n}\n\nfloat map_1(float value, float inMin, float inMax, float outMin, float outMax) {\n  return outMin + (outMax - outMin) * (value - inMin) / (inMax - inMin);\n}\n\nvec2 map_1(vec2 value, vec2 inMin, vec2 inMax, vec2 outMin, vec2 outMax) {\n  return outMin + (outMax - outMin) * (value - inMin) / (inMax - inMin);\n}\n\nvec3 map_1(vec3 value, vec3 inMin, vec3 inMax, vec3 outMin, vec3 outMax) {\n  return outMin + (outMax - outMin) * (value - inMin) / (inMax - inMin);\n}\n\nvec4 map_1(vec4 value, vec4 inMin, vec4 inMax, vec4 outMin, vec4 outMax) {\n  return outMin + (outMax - outMin) * (value - inMin) / (inMax - inMin);\n}\n\nconst vec4 uvRange = vec4(0.0, 0.0, 1.0, 1.0);\n\nconst vec4 posRange = vec4(-1.0, -1.0, 1.0, 1.0);\n\nvec2 uvToPos(vec2 uv) {\n    return map_1(uv, uvRange.xy, uvRange.zw, posRange.xy, posRange.zw);\n}\n\nconst float pi = 3.14159265358979323846;\n\nconst float tau = 6.28318530717958647692;\n\nfloat map_0(vec2 pos) {\n    // return (atan(pos.y, pos.x)+pi)/tau;\n    return atan(pos.y, pos.x)/pi;\n}\n\nvec4 sound_0(sampler2D audio, float at) {\n    return texture2D(audio, vec2(mod(at, 1.0), 0.0));\n}\n\nvec4 sound_0(sampler2D audio, vec2 pos, float harmonies) {\n    return sound_0(audio, map_0(pos)/harmonies);\n}\n\nfloat sdf_1(vec2 pos, vec2 center, float radius) {\n    return length(pos-center)-radius;\n}\n\nfloat sdf_1(vec3 pos, vec3 center, float radius) {\n    return length(pos-center)-radius;\n}\n\n// @todo Use 2D SDF instead of 3D with a fake z\n\nfloat dot2(in vec3 v) {\n    return dot(v, v);\n}\n\nfloat sdf_0(vec3 pos, vec3 a, vec3 b, vec3 c) {\n    vec3 ba = b-a;\n    vec3 pa = pos-a;\n    vec3 cb = c-b;\n    vec3 pb = pos-b;\n    vec3 ac = a-c;\n    vec3 pc = pos-c;\n\n    vec3 nor = cross(ba, ac);\n\n    return sqrt(\n        (sign(dot(cross(ba, nor), pa))+\n        sign(dot(cross(cb, nor), pb))+\n        sign(dot(cross(ac, nor), pc)) < 2.0)?\n            min(min(dot2(ba*clamp(dot(ba, pa)/dot2(ba), 0.0, 1.0)-pa), \n                    dot2(cb*clamp(dot(cb, pb)/dot2(cb), 0.0, 1.0)-pb)),\n                dot2(ac*clamp(dot(ac, pc)/dot2(ac), 0.0, 1.0)-pc))\n        :   dot(nor, pa)*dot(nor, pa)/dot2(nor));\n}\n\nconst vec3 mid = vec3(0.0);\n\nfloat attenuate(float sdf) {\n    // @see Attenuation: http://gamedev.stackexchange.com/questions/56897/glsl-light-attenuation-color-and-intensity-formula\n    // return clamp(1.0/sdf/sdf, 0.0, 1.0);\n    return max(0.0, 1.0/sdf/sdf);\n}\n\nvoid main() {\n    vec2 uv = gl_FragCoord.xy/viewRes;\n\n    vec4 projected = (cameraProjection*cameraView*vec4(uvToPos(uv), 1.0, 1.0));\n    vec2 pos = projected.xy/viewSize/viewSize;\n\n    float dist = length(pos);\n    float angle = abs(mod(map_0(pos)+(spin*time), 1.0)/harmonies);\n\n    float frequencyOffset = 1.0/frequencies;\n\n    float soundKernel = sound_0(audio, angle).x+\n        (sound_0(audio, angle-frequencyOffset).x*soundSmooth)+\n        (sound_0(audio, angle+frequencyOffset).x*soundSmooth);\n\n    float sound = soundWarp*max(abs(soundKernel/(1.0+(2.0*soundSmooth))), silent);\n\n    float noiseTime = time*noiseSpeed;\n\n    // The light ring\n\n    float warp = (mean*sound/audioScale)+\n        (snoise(vec3(pos*(1.0+noiseScale*(1.0+(0.5*soundWarp*mean/audioScale))),\n                noiseTime))*\n            noiseWarp*(1.0+(0.5*soundWarp*peak/audioScale)));\n\n    float ringSDF = clamp(abs(dist-ringRadius-warp+bump)-ringThick, 0.0, 1.0)/sound;\n\n    // Other circle\n\n    vec2 otherPos = vec2(snoise(vec3(peakPos, peak+noiseTime, mean)),\n            snoise(vec3(peakPos+0.972, peak+noiseTime+0.234, mean+0.3785)));\n\n    float otherRad = otherRadius*length(otherPos)*peakPos;\n\n    float otherSDF = clamp(abs(sdf_1(pos, otherPos, otherRad))-\n                abs((otherThick+bump)*mean*audioScale),\n            0.0, 1.0)/\n        step(otherEdge, abs(peak/audioScale));\n\n    // Triangle\n\n    vec3 tri1 = vec3(snoise(vec3(peak+dt+0.879, peakPos-noiseTime+0.822,\n                peak-peakPos+0.545)),\n            snoise(vec3(peak+0.882, peakPos+noiseTime+0.354,\n                peak+peakPos+0.455)),\n            0.0);\n\n    vec3 tri2 = vec3(snoise(vec3(peak+dt+10.227, peakPos+noiseTime+10.822,\n                peak+peakPos+10.092)),\n            snoise(vec3(peak-dt+10.192, peakPos-noiseTime+10.277,\n                peak-peakPos+10.304)),\n            0.0);\n\n    float triRad = mean*triangleRadius;\n\n    float triangleSDF = sdf_0(vec3(pos, 0.0), mid, tri1*triRad,\n            mix(tri1, tri2*triRad, (triangleFat+bump)*(1.0-peakPos)))/\n        step(triangleEdge, abs(peak));\n\n    // \"TV static\" background\n    float background = snoise(vec3(uv*staticScale,\n            (mean*(staticShift+bump)/audioScale)+(time*staticSpeed)));\n\n    // Accumulate\n    gl_FragColor = vec4((attenuate(ringSDF)*ringAlpha)+\n            (attenuate(otherSDF)*otherAlpha)+\n            (attenuate(triangleSDF)*triangleAlpha)+\n            max(0.0, background*staticAlpha));\n}\n"
+	module.exports = "precision highp float;\n#define GLSLIFY 1\n\nuniform float time;\n// @todo Use dt against audio rates?\nuniform float dt;\n\nuniform vec2 viewSize;\nuniform vec2 viewRes;\n\nuniform sampler2D audio;\n\nuniform float audioScale;\n\nuniform float peak;\nuniform float peakPos;\nuniform float mean;\n\nuniform float frequencies;\nuniform float harmonies;\nuniform float silent;\nuniform float soundSmooth;\nuniform float soundWarp;\n\nuniform float noiseWarp;\nuniform float noiseSpeed;\nuniform float noiseScale;\n\nuniform float spin;\n\nuniform float ringRadius;\nuniform float ringThick;\nuniform float ringAlpha;\n\nuniform float otherRadius;\nuniform float otherThick;\nuniform float otherEdge;\nuniform float otherAlpha;\n\nuniform float triangleRadius;\nuniform float triangleFat;\nuniform float triangleEdge;\nuniform float triangleAlpha;\n\nuniform float staticScale;\nuniform float staticSpeed;\nuniform float staticShift;\nuniform float staticAlpha;\n\nuniform float bump;\n\nuniform mat4 cameraView;\nuniform mat4 cameraProjection;\n\n// @todo Noise in form as well?\n//\n// Description : Array and textureless GLSL 2D/3D/4D simplex\n//               noise functions.\n//      Author : Ian McEwan, Ashima Arts.\n//  Maintainer : ijm\n//     Lastmod : 20110822 (ijm)\n//     License : Copyright (C) 2011 Ashima Arts. All rights reserved.\n//               Distributed under the MIT License. See LICENSE file.\n//               https://github.com/ashima/webgl-noise\n//\n\nvec3 mod289(vec3 x) {\n  return x - floor(x * (1.0 / 289.0)) * 289.0;\n}\n\nvec4 mod289(vec4 x) {\n  return x - floor(x * (1.0 / 289.0)) * 289.0;\n}\n\nvec4 permute(vec4 x) {\n     return mod289(((x*34.0)+1.0)*x);\n}\n\nvec4 taylorInvSqrt(vec4 r)\n{\n  return 1.79284291400159 - 0.85373472095314 * r;\n}\n\nfloat snoise(vec3 v)\n  {\n  const vec2  C = vec2(1.0/6.0, 1.0/3.0) ;\n  const vec4  D = vec4(0.0, 0.5, 1.0, 2.0);\n\n// First corner\n  vec3 i  = floor(v + dot(v, C.yyy) );\n  vec3 x0 =   v - i + dot(i, C.xxx) ;\n\n// Other corners\n  vec3 g = step(x0.yzx, x0.xyz);\n  vec3 l = 1.0 - g;\n  vec3 i1 = min( g.xyz, l.zxy );\n  vec3 i2 = max( g.xyz, l.zxy );\n\n  //   x0 = x0 - 0.0 + 0.0 * C.xxx;\n  //   x1 = x0 - i1  + 1.0 * C.xxx;\n  //   x2 = x0 - i2  + 2.0 * C.xxx;\n  //   x3 = x0 - 1.0 + 3.0 * C.xxx;\n  vec3 x1 = x0 - i1 + C.xxx;\n  vec3 x2 = x0 - i2 + C.yyy; // 2.0*C.x = 1/3 = C.y\n  vec3 x3 = x0 - D.yyy;      // -1.0+3.0*C.x = -0.5 = -D.y\n\n// Permutations\n  i = mod289(i);\n  vec4 p = permute( permute( permute(\n             i.z + vec4(0.0, i1.z, i2.z, 1.0 ))\n           + i.y + vec4(0.0, i1.y, i2.y, 1.0 ))\n           + i.x + vec4(0.0, i1.x, i2.x, 1.0 ));\n\n// Gradients: 7x7 points over a square, mapped onto an octahedron.\n// The ring size 17*17 = 289 is close to a multiple of 49 (49*6 = 294)\n  float n_ = 0.142857142857; // 1.0/7.0\n  vec3  ns = n_ * D.wyz - D.xzx;\n\n  vec4 j = p - 49.0 * floor(p * ns.z * ns.z);  //  mod(p,7*7)\n\n  vec4 x_ = floor(j * ns.z);\n  vec4 y_ = floor(j - 7.0 * x_ );    // mod(j,N)\n\n  vec4 x = x_ *ns.x + ns.yyyy;\n  vec4 y = y_ *ns.x + ns.yyyy;\n  vec4 h = 1.0 - abs(x) - abs(y);\n\n  vec4 b0 = vec4( x.xy, y.xy );\n  vec4 b1 = vec4( x.zw, y.zw );\n\n  //vec4 s0 = vec4(lessThan(b0,0.0))*2.0 - 1.0;\n  //vec4 s1 = vec4(lessThan(b1,0.0))*2.0 - 1.0;\n  vec4 s0 = floor(b0)*2.0 + 1.0;\n  vec4 s1 = floor(b1)*2.0 + 1.0;\n  vec4 sh = -step(h, vec4(0.0));\n\n  vec4 a0 = b0.xzyw + s0.xzyw*sh.xxyy ;\n  vec4 a1 = b1.xzyw + s1.xzyw*sh.zzww ;\n\n  vec3 p0 = vec3(a0.xy,h.x);\n  vec3 p1 = vec3(a0.zw,h.y);\n  vec3 p2 = vec3(a1.xy,h.z);\n  vec3 p3 = vec3(a1.zw,h.w);\n\n//Normalise gradients\n  vec4 norm = taylorInvSqrt(vec4(dot(p0,p0), dot(p1,p1), dot(p2, p2), dot(p3,p3)));\n  p0 *= norm.x;\n  p1 *= norm.y;\n  p2 *= norm.z;\n  p3 *= norm.w;\n\n// Mix final noise value\n  vec4 m = max(0.6 - vec4(dot(x0,x0), dot(x1,x1), dot(x2,x2), dot(x3,x3)), 0.0);\n  m = m * m;\n  return 42.0 * dot( m*m, vec4( dot(p0,x0), dot(p1,x1),\n                                dot(p2,x2), dot(p3,x3) ) );\n  }\n\nconst vec4 k = vec4(1.0, 2.0/3.0, 1.0/3.0, 3.0);\n\nvec3 hsv2rgb(vec3 c) {\n  vec3 p = abs(fract(c.xxx+k.xyz)*6.0-k.www);\n  return c.z*mix(k.xxx, clamp(p-k.xxx, 0.0, 1.0), c.y);\n}\n\nfloat map_1(float value, float inMin, float inMax, float outMin, float outMax) {\n  return outMin + (outMax - outMin) * (value - inMin) / (inMax - inMin);\n}\n\nvec2 map_1(vec2 value, vec2 inMin, vec2 inMax, vec2 outMin, vec2 outMax) {\n  return outMin + (outMax - outMin) * (value - inMin) / (inMax - inMin);\n}\n\nvec3 map_1(vec3 value, vec3 inMin, vec3 inMax, vec3 outMin, vec3 outMax) {\n  return outMin + (outMax - outMin) * (value - inMin) / (inMax - inMin);\n}\n\nvec4 map_1(vec4 value, vec4 inMin, vec4 inMax, vec4 outMin, vec4 outMax) {\n  return outMin + (outMax - outMin) * (value - inMin) / (inMax - inMin);\n}\n\nconst vec4 uvRange = vec4(0.0, 0.0, 1.0, 1.0);\n\nconst vec4 posRange = vec4(-1.0, -1.0, 1.0, 1.0);\n\nvec2 uvToPos(vec2 uv) {\n  return map_1(uv, uvRange.xy, uvRange.zw, posRange.xy, posRange.zw);\n}\n\nconst float pi = 3.14159265358979323846;\n\nconst float tau = 6.28318530717958647692;\n\nfloat map_0(vec2 pos) {\n  // return (atan(pos.y, pos.x)+pi)/tau;\n  return atan(pos.y, pos.x)/pi;\n}\n\nvec4 sound_0(sampler2D audio, float at) {\n  return texture2D(audio, vec2(mod(at, 1.0), 0.0));\n}\n\nvec4 sound_0(sampler2D audio, vec2 pos, float harmonies) {\n  return sound_0(audio, map_0(pos)/harmonies);\n}\n\nfloat sdf_1(vec2 pos, vec2 center, float radius) {\n  return length(pos-center)-radius;\n}\n\nfloat sdf_1(vec3 pos, vec3 center, float radius) {\n  return length(pos-center)-radius;\n}\n\n// @todo Use 2D SDF instead of 3D with a fake z\n\nfloat dot2(in vec3 v) {\n  return dot(v, v);\n}\n\nfloat sdf_0(vec3 pos, vec3 a, vec3 b, vec3 c) {\n  vec3 ba = b-a;\n  vec3 pa = pos-a;\n  vec3 cb = c-b;\n  vec3 pb = pos-b;\n  vec3 ac = a-c;\n  vec3 pc = pos-c;\n\n  vec3 nor = cross(ba, ac);\n\n  return sqrt(\n    (sign(dot(cross(ba, nor), pa))+\n    sign(dot(cross(cb, nor), pb))+\n    sign(dot(cross(ac, nor), pc)) < 2.0)?\n      min(min(dot2(ba*clamp(dot(ba, pa)/dot2(ba), 0.0, 1.0)-pa),\n          dot2(cb*clamp(dot(cb, pb)/dot2(cb), 0.0, 1.0)-pb)),\n        dot2(ac*clamp(dot(ac, pc)/dot2(ac), 0.0, 1.0)-pc))\n    : dot(nor, pa)*dot(nor, pa)/dot2(nor));\n}\n\nconst vec3 mid = vec3(0.0);\n\nfloat attenuate(float sdf) {\n  // @see Attenuation: http://gamedev.stackexchange.com/questions/56897/glsl-light-attenuation-color-and-intensity-formula\n  // return clamp(1.0/sdf/sdf, 0.0, 1.0);\n  return max(0.0, 1.0/sdf/sdf);\n}\n\nvoid main() {\n  vec2 uv = gl_FragCoord.xy/viewRes;\n\n  vec4 projected = (cameraProjection*cameraView*vec4(uvToPos(uv), 1.0, 1.0));\n  vec2 pos = projected.xy/viewSize/viewSize;\n\n  float dist = length(pos);\n  float angle = abs(mod(map_0(pos)+(spin*time), 1.0)/harmonies);\n\n  float frequencyOffset = 1.0/frequencies;\n\n  float soundKernel = sound_0(audio, angle).x+\n    (sound_0(audio, angle-frequencyOffset).x*soundSmooth)+\n    (sound_0(audio, angle+frequencyOffset).x*soundSmooth);\n\n  float sound = soundWarp*max(abs(soundKernel/(1.0+(2.0*soundSmooth))), silent);\n\n  float noiseTime = time*noiseSpeed;\n\n  // The light ring\n\n  float warp = (mean*sound/audioScale)+\n    (snoise(vec3(pos*(1.0+noiseScale*(1.0+(0.5*soundWarp*mean/audioScale))),\n        noiseTime))*\n      noiseWarp*(1.0+(0.5*soundWarp*peak/audioScale)));\n\n  float ringSDF = clamp(abs(dist-ringRadius-warp+bump)-ringThick, 0.0, 1.0)/sound;\n\n  // Other circle\n\n  vec2 otherPos = vec2(snoise(vec3(peakPos, peak+noiseTime, mean)),\n      snoise(vec3(peakPos+0.972, peak+noiseTime+0.234, mean+0.3785)));\n\n  float otherRad = otherRadius*length(otherPos)*peakPos;\n\n  float otherSDF = clamp(abs(sdf_1(pos, otherPos, otherRad))-\n        abs((otherThick+bump)*mean*audioScale),\n      0.0, 1.0)/\n    step(otherEdge, abs(peak/audioScale));\n\n  // Triangle\n\n  vec3 tri1 = vec3(snoise(vec3(peak+dt+0.879, peakPos-noiseTime+0.822,\n        peak-peakPos+0.545)),\n      snoise(vec3(peak+0.882, peakPos+noiseTime+0.354,\n        peak+peakPos+0.455)),\n      0.0);\n\n  vec3 tri2 = vec3(snoise(vec3(peak+dt+10.227, peakPos+noiseTime+10.822,\n        peak+peakPos+10.092)),\n      snoise(vec3(peak-dt+10.192, peakPos-noiseTime+10.277,\n        peak-peakPos+10.304)),\n      0.0);\n\n  float triRad = mean*triangleRadius;\n\n  float triangleSDF = sdf_0(vec3(pos, 0.0), mid, tri1*triRad,\n      mix(tri1, tri2*triRad, (triangleFat+bump)*(1.0-peakPos)))/\n    step(triangleEdge, abs(peak));\n\n  // \"TV static\" background\n  float background = snoise(vec3(uv*staticScale,\n      (mean*(staticShift+bump)/audioScale)+(time*staticSpeed)));\n\n  // Accumulate\n  gl_FragColor = vec4((attenuate(ringSDF)*ringAlpha)+\n      (attenuate(otherSDF)*otherAlpha)+\n      (attenuate(triangleSDF)*triangleAlpha)+\n      max(0.0, background*staticAlpha));\n}\n"
 
 /***/ }),
 /* 545 */
 /***/ (function(module, exports) {
 
-	module.exports = "precision highp float;\n#define GLSLIFY 1\n\nuniform float time;\nuniform float dt;\n\nuniform vec2 viewSize;\nuniform vec2 viewRes;\n\nuniform sampler2D next;\nuniform sampler2D past;\n\nuniform float grow;\nuniform float growLimit;\n\n// @todo Spin this as well?\n// uniform float spinPast;\n\nuniform float jitter;\n\nuniform float fadeAlpha;\n\nvec4 color(vec2 uv) {\n    return ((texture2D(past, uv)*fadeAlpha)+texture2D(next, uv));\n}\n\nvec3 sampler(vec2 uv) {\n    return color(uv).rgb;\n}\n\n// @todo Noise in form as well?\nhighp float random(vec2 co)\n{\n    highp float a = 12.9898;\n    highp float b = 78.233;\n    highp float c = 43758.5453;\n    highp float dt= dot(co.xy ,vec2(a,b));\n    highp float sn= mod(dt,3.14);\n    return fract(sin(sn) * c);\n}\n\n#ifndef TAU\n  #define TAU 6.28318530718\n#endif\n\n//Use last part of hash function to generate new random radius and angle\nvec2 mult(inout vec2 r) {\n  r = fract(r * vec2(12.9898,78.233));\n  return sqrt(r.x + .001) * vec2(sin(r.y * TAU), cos(r.y * TAU));\n}\n\nvec3 blur(vec2 uv, float radius, float aspect, float offset) {\n  vec2 circle = vec2(radius);\n  circle.x *= aspect;\n  vec2 rnd = vec2(random(vec2(uv + offset)));\n\n  vec3 acc = vec3(0.0);\n  for (int i = 0; i < 3; i++) {\n    acc += sampler(uv + circle * mult(rnd)).xyz;\n  }\n  return acc / float(3);\n}\n\nvec3 blur(vec2 uv, float radius, float aspect) {\n  return blur(uv, radius, aspect, 0.0);\n}\n\nvec3 blur(vec2 uv, float radius) {\n  return blur(uv, radius, 1.0);\n}\n\nfloat map(float value, float inMin, float inMax, float outMin, float outMax) {\n  return outMin + (outMax - outMin) * (value - inMin) / (inMax - inMin);\n}\n\nvec2 map(vec2 value, vec2 inMin, vec2 inMax, vec2 outMin, vec2 outMax) {\n  return outMin + (outMax - outMin) * (value - inMin) / (inMax - inMin);\n}\n\nvec3 map(vec3 value, vec3 inMin, vec3 inMax, vec3 outMin, vec3 outMax) {\n  return outMin + (outMax - outMin) * (value - inMin) / (inMax - inMin);\n}\n\nvec4 map(vec4 value, vec4 inMin, vec4 inMax, vec4 outMin, vec4 outMax) {\n  return outMin + (outMax - outMin) * (value - inMin) / (inMax - inMin);\n}\n\nconst vec4 uvRange = vec4(0.0, 0.0, 1.0, 1.0);\n\nconst vec4 posRange = vec4(-1.0, -1.0, 1.0, 1.0);\n\nvec2 uvToPos(vec2 uv) {\n    return map(uv, uvRange.xy, uvRange.zw, posRange.xy, posRange.zw);\n}\n\n/**\n * Adapted from `bezier`.\n */\n\nfloat bezier(vec2 cp, float t) {\n    return cp.x+(cp.y-cp.x)*t;\n}\n\nfloat bezier(vec3 cp, float t) {\n    float ut = 1.0-t;\n\n    return (cp.x*ut+cp.y*t)*ut+(cp.y*ut+cp.z*t)*t;\n}\n\nfloat bezier(vec4 cp, float t) {\n    float ut = 1.0-t;\n    float a1 = cp.y*ut+cp.z*t;\n\n    return ((cp.x*ut+cp.y*t)*ut+a1*t)*ut+(a1*ut+(cp.z*ut+cp.w*t)*t)*t;\n}\n\nconst vec2 mid = vec2(0.5);\nconst vec3 curve = vec3(0.0, 1.0, 1.0);\n\nvoid main() {\n    vec2 uv = gl_FragCoord.xy/viewRes;\n    vec2 pos = uvToPos(uv)/viewSize;\n\n    float dist = length(pos);\n\n    // Sample and grow\n    \n    float growRate = clamp(bezier(curve, dist/growLimit), 0.0, 1.0);\n    vec2 st = uv+((mid-uv)*grow*dt*(1.0-growRate));\n\n    vec4 fade = color(st);\n\n    fade.rgb = blur(st, jitter*growRate, viewRes.x/viewRes.y,\n        mod(time, 20.0));\n\n    gl_FragColor = vec4(clamp(fade, 0.0, 1.0));\n}\n"
+	module.exports = "precision highp float;\n#define GLSLIFY 1\n\nuniform float time;\nuniform float dt;\n\nuniform vec2 viewSize;\nuniform vec2 viewRes;\n\nuniform sampler2D next;\nuniform sampler2D past;\n\nuniform float grow;\nuniform float growLimit;\n\n// @todo Spin this as well?\n// uniform float spinPast;\n\nuniform float jitter;\n\nuniform float fadeAlpha;\n\nvec4 color(vec2 uv) {\n  return ((texture2D(past, uv)*fadeAlpha)+texture2D(next, uv));\n}\n\nvec3 sampler(vec2 uv) {\n  return color(uv).rgb;\n}\n\n// @todo Noise in form as well?\nhighp float random(vec2 co)\n{\n    highp float a = 12.9898;\n    highp float b = 78.233;\n    highp float c = 43758.5453;\n    highp float dt= dot(co.xy ,vec2(a,b));\n    highp float sn= mod(dt,3.14);\n    return fract(sin(sn) * c);\n}\n\n#ifndef TAU\n  #define TAU 6.28318530718\n#endif\n\n//Use last part of hash function to generate new random radius and angle\nvec2 mult(inout vec2 r) {\n  r = fract(r * vec2(12.9898,78.233));\n  return sqrt(r.x + .001) * vec2(sin(r.y * TAU), cos(r.y * TAU));\n}\n\nvec3 blur(vec2 uv, float radius, float aspect, float offset) {\n  vec2 circle = vec2(radius);\n  circle.x *= aspect;\n  vec2 rnd = vec2(random(vec2(uv + offset)));\n\n  vec3 acc = vec3(0.0);\n  for (int i = 0; i < 3; i++) {\n    acc += sampler(uv + circle * mult(rnd)).xyz;\n  }\n  return acc / float(3);\n}\n\nvec3 blur(vec2 uv, float radius, float aspect) {\n  return blur(uv, radius, aspect, 0.0);\n}\n\nvec3 blur(vec2 uv, float radius) {\n  return blur(uv, radius, 1.0);\n}\n\nfloat map(float value, float inMin, float inMax, float outMin, float outMax) {\n  return outMin + (outMax - outMin) * (value - inMin) / (inMax - inMin);\n}\n\nvec2 map(vec2 value, vec2 inMin, vec2 inMax, vec2 outMin, vec2 outMax) {\n  return outMin + (outMax - outMin) * (value - inMin) / (inMax - inMin);\n}\n\nvec3 map(vec3 value, vec3 inMin, vec3 inMax, vec3 outMin, vec3 outMax) {\n  return outMin + (outMax - outMin) * (value - inMin) / (inMax - inMin);\n}\n\nvec4 map(vec4 value, vec4 inMin, vec4 inMax, vec4 outMin, vec4 outMax) {\n  return outMin + (outMax - outMin) * (value - inMin) / (inMax - inMin);\n}\n\nconst vec4 uvRange = vec4(0.0, 0.0, 1.0, 1.0);\n\nconst vec4 posRange = vec4(-1.0, -1.0, 1.0, 1.0);\n\nvec2 uvToPos(vec2 uv) {\n  return map(uv, uvRange.xy, uvRange.zw, posRange.xy, posRange.zw);\n}\n\n/**\n * Adapted from `bezier`.\n */\n\nfloat bezier(vec2 cp, float t) {\n  return cp.x+(cp.y-cp.x)*t;\n}\n\nfloat bezier(vec3 cp, float t) {\n  float ut = 1.0-t;\n\n  return (cp.x*ut+cp.y*t)*ut+(cp.y*ut+cp.z*t)*t;\n}\n\nfloat bezier(vec4 cp, float t) {\n  float ut = 1.0-t;\n  float a1 = cp.y*ut+cp.z*t;\n\n  return ((cp.x*ut+cp.y*t)*ut+a1*t)*ut+(a1*ut+(cp.z*ut+cp.w*t)*t)*t;\n}\n\nconst vec2 mid = vec2(0.5);\nconst vec3 curve = vec3(0.0, 1.0, 1.0);\n\nvoid main() {\n  vec2 uv = gl_FragCoord.xy/viewRes;\n  vec2 pos = uvToPos(uv)/viewSize;\n\n  float dist = length(pos);\n\n  // Sample and grow\n\n  float growRate = clamp(bezier(curve, dist/growLimit), 0.0, 1.0);\n  vec2 st = uv+((mid-uv)*grow*dt*(1.0-growRate));\n\n  vec4 fade = color(st);\n\n  fade.rgb = blur(st, jitter*growRate, viewRes.x/viewRes.y,\n    mod(time, 20.0));\n\n  gl_FragColor = vec4(clamp(fade, 0.0, 1.0));\n}\n"
 
 /***/ }),
 /* 546 */
 /***/ (function(module, exports) {
 
-	module.exports = "precision highp float;\n#define GLSLIFY 1\n\nuniform vec2 viewRes;\n\nuniform sampler2D light;\nuniform sampler2D fade;\n\nuniform vec4 lightColor;\nuniform vec4 fadeColor;\n\nuniform float bokehRadius;\nuniform float bokehAmount;\n\nvec4 color(vec2 uv) {\n    return (texture2D(light, uv)*lightColor)+\n        (texture2D(fade, uv)*fadeColor);\n}\n\n/**\n * Adapted from https://www.shadertoy.com/view/4d2Xzw\n * Bokeh disc.\n * by David Hoskins.\n * License Creative Commons Attribution-NonCommercial-ShareAlike 3.0 Unported License.\n *\n * @requires {const int} iterations The number of iterations to run.\n * @requires {function} sample A function taking a `vec2` uv and returning a\n *                             `vec3` (for example, sampling a texture).\n */\n\n// The Golden Angle is (3.0-sqrt(5.0))*PI radians, which doesn't precompiled for\n// some reason. The compiler is a dunce I tells-ya!!\nconst float goldenAngle = 2.39996323;\n\nconst mat2 rot = mat2(cos(goldenAngle), sin(goldenAngle),\n        -sin(goldenAngle), cos(goldenAngle));\n\n// Doesn't use mipmaps\nvec3 bokeh(vec2 texel, vec2 uv, float radius, float amount) {vec3 acc = vec3(0.0);\n    vec3 div = vec3(0.0);\n    float r = 1.0;\n    vec2 angle = vec2(0.0, radius);\n\n    amount += radius*500.0;\n\n    for(int j = 0; j < 20; j++) {\n        r += 1.0/r;\n        angle = rot*angle;\n\n        // (r-1.0) here is the equivalent to sqrt(0, 1, 2, 3...)\n        vec3 col = color(uv+(texel*(r-1.0)*angle)).xyz;\n\n        // ...contrast it for better highlights - leave this out elsewhere.\n        col = col*col*1.5;\n\n        vec3 blur = (pow(col, vec3(9.0))*amount)+0.4;\n\n        acc += col*blur;\n        div += blur;\n    }\n\n    return acc/div;\n}\n\n/**\n * Adapted from `bezier`.\n */\n\nfloat bezier(vec2 cp, float t) {\n    return cp.x+(cp.y-cp.x)*t;\n}\n\nfloat bezier(vec3 cp, float t) {\n    float ut = 1.0-t;\n\n    return (cp.x*ut+cp.y*t)*ut+(cp.y*ut+cp.z*t)*t;\n}\n\nfloat bezier(vec4 cp, float t) {\n    float ut = 1.0-t;\n    float a1 = cp.y*ut+cp.z*t;\n\n    return ((cp.x*ut+cp.y*t)*ut+a1*t)*ut+(a1*ut+(cp.z*ut+cp.w*t)*t)*t;\n}\n\n// @todo Remove the `1.0-` here?\nfloat amount_0(vec2 point, vec2 mid, float limit) {\n    return min(1.0-(length(point-mid)/limit), 1.0);\n}\n\nfloat vignette(vec2 point, vec2 mid, float limit) {\n    return max(0.0, amount_0(point, mid, limit));\n}\n\nfloat vignette(vec2 point, vec2 mid, float limit, float curve) {\n    return max(0.0, curve*amount_0(point, mid, limit));\n}\n\nfloat vignette(vec2 point, vec2 mid, float limit, vec2 curve) {\n    return max(0.0, bezier(curve, amount_0(point, mid, limit)));\n}\n\nfloat vignette(vec2 point, vec2 mid, float limit, vec3 curve) {\n    return max(0.0, bezier(curve, amount_0(point, mid, limit)));\n}\n\nfloat vignette(vec2 point, vec2 mid, float limit, vec4 curve) {\n    return max(0.0, bezier(curve, amount_0(point, mid, limit)));\n}\n\nconst vec4 falloff = vec4(0.0, 1.0, 1.0, 1.0);\nconst vec2 mid = vec2(0.5);\nconst float limit = 0.6;\n\nconst vec4 black = vec4(vec3(0.0), 1.0);\n\nvoid main() {\n    vec2 uv = gl_FragCoord.xy/viewRes;\n\n    vec2 texel = 1.0/viewRes;\n    float edge = 1.0-vignette(uv, mid, limit, falloff);\n\n    gl_FragColor = black+\n        vec4(bokeh(texel, uv, bokehRadius*edge, bokehAmount*edge), color(uv).a);\n}\n"
+	module.exports = "precision highp float;\n#define GLSLIFY 1\n\nuniform vec2 viewRes;\n\nuniform sampler2D light;\nuniform sampler2D fade;\n\nuniform vec4 lightColor;\nuniform vec4 fadeColor;\n\nuniform float bokehRadius;\nuniform float bokehAmount;\n\nvec4 color(vec2 uv) {\n  return (texture2D(light, uv)*lightColor)+\n    (texture2D(fade, uv)*fadeColor);\n}\n\n/**\n * Adapted from https://www.shadertoy.com/view/4d2Xzw\n * Bokeh disc.\n * by David Hoskins.\n * License Creative Commons Attribution-NonCommercial-ShareAlike 3.0 Unported License.\n *\n * @requires {const int} iterations The number of iterations to run.\n * @requires {function} sample A function taking a `vec2` uv and returning a\n *         `vec3` (for example, sampling a texture).\n */\n\n// The Golden Angle is (3.0-sqrt(5.0))*PI radians, which doesn't precompiled for\n// some reason. The compiler is a dunce I tells-ya!!\nconst float goldenAngle = 2.39996323;\n\nconst mat2 rot = mat2(cos(goldenAngle), sin(goldenAngle),\n  -sin(goldenAngle), cos(goldenAngle));\n\n// Doesn't use mipmaps\nvec3 bokeh(vec2 texel, vec2 uv, float radius, float amount) {vec3 acc = vec3(0.0);\n  vec3 div = vec3(0.0);\n  float r = 1.0;\n  vec2 angle = vec2(0.0, radius);\n\n  amount += radius*500.0;\n\n  for(int j = 0; j < 20; j++) {\n  r += 1.0/r;\n  angle = rot*angle;\n\n  // (r-1.0) here is the equivalent to sqrt(0, 1, 2, 3...)\n  vec3 col = color(uv+(texel*(r-1.0)*angle)).xyz;\n\n  // ...contrast it for better highlights - leave this out elsewhere.\n  col = col*col*1.5;\n\n  vec3 blur = (pow(col, vec3(9.0))*amount)+0.4;\n\n  acc += col*blur;\n  div += blur;\n  }\n\n  return acc/div;\n}\n\n/**\n * Adapted from `bezier`.\n */\n\nfloat bezier(vec2 cp, float t) {\n  return cp.x+(cp.y-cp.x)*t;\n}\n\nfloat bezier(vec3 cp, float t) {\n  float ut = 1.0-t;\n\n  return (cp.x*ut+cp.y*t)*ut+(cp.y*ut+cp.z*t)*t;\n}\n\nfloat bezier(vec4 cp, float t) {\n  float ut = 1.0-t;\n  float a1 = cp.y*ut+cp.z*t;\n\n  return ((cp.x*ut+cp.y*t)*ut+a1*t)*ut+(a1*ut+(cp.z*ut+cp.w*t)*t)*t;\n}\n\n// @todo Remove the `1.0-` here?\nfloat amount_0(vec2 point, vec2 mid, float limit) {\n  return min(1.0-(length(point-mid)/limit), 1.0);\n}\n\nfloat vignette(vec2 point, vec2 mid, float limit) {\n  return max(0.0, amount_0(point, mid, limit));\n}\n\nfloat vignette(vec2 point, vec2 mid, float limit, float curve) {\n  return max(0.0, curve*amount_0(point, mid, limit));\n}\n\nfloat vignette(vec2 point, vec2 mid, float limit, vec2 curve) {\n  return max(0.0, bezier(curve, amount_0(point, mid, limit)));\n}\n\nfloat vignette(vec2 point, vec2 mid, float limit, vec3 curve) {\n  return max(0.0, bezier(curve, amount_0(point, mid, limit)));\n}\n\nfloat vignette(vec2 point, vec2 mid, float limit, vec4 curve) {\n  return max(0.0, bezier(curve, amount_0(point, mid, limit)));\n}\n\nconst vec4 falloff = vec4(0.0, 1.0, 1.0, 1.0);\nconst vec2 mid = vec2(0.5);\nconst float limit = 0.6;\n\nconst vec4 black = vec4(vec3(0.0), 1.0);\n\nvoid main() {\n  vec2 uv = gl_FragCoord.xy/viewRes;\n\n  vec2 texel = 1.0/viewRes;\n  float edge = 1.0-vignette(uv, mid, limit, falloff);\n\n  gl_FragColor = black+\n    vec4(bokeh(texel, uv, bokehRadius*edge, bokehAmount*edge), color(uv).a);\n}\n"
 
 /***/ }),
 /* 547 */
@@ -20493,7 +20493,7 @@
 	'use strict';
 	
 	Object.defineProperty(exports, "__esModule", {
-	    value: true
+	  value: true
 	});
 	
 	var _vaccines = __webpack_require__(549);
@@ -20547,18 +20547,18 @@
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 	
 	exports.default = {
-	    vaccines: _vaccines2.default,
-	    yearsAndYears: _yearsAndYears2.default,
-	    blaenavon: _blaenavon2.default,
-	    frankTurner: _frankTurner2.default,
-	    tomTheLion: _tomTheLion2.default,
-	    tallChildren: _tallChildren2.default,
-	    lewisFieldhouse: _lewisFieldhouse2.default,
-	    twinAtlantic: _twinAtlantic2.default,
-	    lowerThanAtlantis: _lowerThanAtlantis2.default,
-	    francisLung: _francisLung2.default,
-	    retroKid: _retroKid2.default,
-	    sattelites: _sattelites2.default
+	  vaccines: _vaccines2.default,
+	  yearsAndYears: _yearsAndYears2.default,
+	  blaenavon: _blaenavon2.default,
+	  frankTurner: _frankTurner2.default,
+	  tomTheLion: _tomTheLion2.default,
+	  tallChildren: _tallChildren2.default,
+	  lewisFieldhouse: _lewisFieldhouse2.default,
+	  twinAtlantic: _twinAtlantic2.default,
+	  lowerThanAtlantis: _lowerThanAtlantis2.default,
+	  francisLung: _francisLung2.default,
+	  retroKid: _retroKid2.default,
+	  sattelites: _sattelites2.default
 	};
 
 /***/ }),
@@ -20568,7 +20568,7 @@
 	'use strict';
 	
 	Object.defineProperty(exports, "__esModule", {
-	    value: true
+	  value: true
 	});
 	
 	var _colors = __webpack_require__(547);
@@ -20578,157 +20578,157 @@
 	function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
 	
 	exports.default = function (player, end, audio) {
-	    var t = audio.duration * 1000;
+	  var t = audio.duration * 1000;
 	
-	    player.tracks.main.to({
-	        to: {
-	            staticAlpha: 0,
-	            fadeAlpha: 0,
-	            noiseSpeed: 0.002
-	        },
-	        time: 1000
-	    }).smoothTo({
-	        to: {
-	            ringRadius: 0.2,
-	            noiseWarp: 0.1,
-	            soundWarp: 0.01,
-	            otherEdge: 150,
-	            otherRadius: 1
-	        },
-	        time: 0.06050420168067227 * t,
-	        ease: [0, 0, 1]
-	    }).smoothTo({
-	        to: {
-	            silent: 0
-	        },
-	        time: 0.1092436974789916 * t,
-	        ease: [0, 0.95, 1]
-	    }).smoothTo({
-	        to: {
-	            ringRadius: 0.5,
-	            otherEdge: 250,
-	            staticAlpha: 0.02,
-	            fadeAlpha: 0.96,
-	            grow: 0.005
-	        },
-	        time: 0.12605042016806722 * t,
-	        ease: [0, 0.95, 1]
-	    }).smoothTo({
-	        to: {
-	            ringRadius: 0.7,
-	            otherEdge: 254,
-	            staticAlpha: 0.03,
-	            fadeAlpha: 0.99
-	        },
-	        time: 0.20588235294117646 * t,
-	        ease: [0, 0, 1]
-	    }).smoothTo({
-	        to: {
-	            otherRadius: 0.1,
-	            otherThick: 100,
-	            ringAlpha: 100
-	        },
-	        time: 0.2605042016806723 * t,
-	        ease: [0, 0, 1]
-	    }).smoothOver(0.04201680672268908 * t, {
-	        to: {
-	            ringRadius: 0.95
-	        },
-	        time: 0.3697478991596639 * t,
-	        ease: [0, 0, 1]
-	    }).smoothOver(0.04201680672268908 * t, {
-	        to: {
-	            noiseWarp: 0.55,
-	            noiseScale: 0.1
-	        },
-	        time: 0.4117647058823529 * t,
-	        ease: [0, 0, 1]
-	    }).smoothOver(0.04201680672268908 * t, {
-	        to: {
-	            otherRadius: 0.1,
-	            otherThick: 100
-	        },
-	        time: 0.46218487394957986 * t,
-	        ease: [0, 0, 1]
-	    }).smoothTo({
-	        to: {
-	            fadeAlpha: 0,
-	            otherThick: 500,
-	            otherEdge: 154
-	        },
-	        time: 0.5042016806722689 * t,
-	        ease: [0, 0, 1]
-	    }).smoothOver(100, {
-	        to: {
-	            otherThick: 0.00001,
-	            otherRadius: 0.8
-	        },
-	        time: 0.6386554621848739 * t,
-	        ease: [0, 0, 1]
-	    }).smoothOver(0.025210084033613446 * t, {
-	        to: {
-	            noiseWarp: 0.2
-	        },
-	        time: 0.6722689075630253 * t,
-	        ease: [0, 0, 1]
-	    }).smoothOver(0.025210084033613446 * t, {
-	        to: {
-	            noiseWarp: 0.35
-	        },
-	        time: 0.7226890756302521 * t,
-	        ease: [0, 0, 1]
-	    }).smoothTo({
-	        to: {
-	            fadeAlpha: 0.99
-	        },
-	        time: 0.7647058823529411 * t,
-	        ease: [0, 0, 1]
-	    }).smoothOver(0.04201680672268908 * t, {
-	        to: {
-	            ringRadius: 0,
-	            ringAlpha: 0,
-	            staticAlpha: 3
-	        },
-	        time: 0.9957983193277311 * t,
-	        ease: [0, 0, 1],
-	        call: [end]
-	    });
+	  player.tracks.main.to({
+	    to: {
+	      staticAlpha: 0,
+	      fadeAlpha: 0,
+	      noiseSpeed: 0.002
+	    },
+	    time: 1000
+	  }).smoothTo({
+	    to: {
+	      ringRadius: 0.2,
+	      noiseWarp: 0.1,
+	      soundWarp: 0.01,
+	      otherEdge: 150,
+	      otherRadius: 1
+	    },
+	    time: 0.06050420168067227 * t,
+	    ease: [0, 0, 1]
+	  }).smoothTo({
+	    to: {
+	      silent: 0
+	    },
+	    time: 0.1092436974789916 * t,
+	    ease: [0, 0.95, 1]
+	  }).smoothTo({
+	    to: {
+	      ringRadius: 0.5,
+	      otherEdge: 250,
+	      staticAlpha: 0.02,
+	      fadeAlpha: 0.96,
+	      grow: 0.005
+	    },
+	    time: 0.12605042016806722 * t,
+	    ease: [0, 0.95, 1]
+	  }).smoothTo({
+	    to: {
+	      ringRadius: 0.7,
+	      otherEdge: 254,
+	      staticAlpha: 0.03,
+	      fadeAlpha: 0.99
+	    },
+	    time: 0.20588235294117646 * t,
+	    ease: [0, 0, 1]
+	  }).smoothTo({
+	    to: {
+	      otherRadius: 0.1,
+	      otherThick: 100,
+	      ringAlpha: 100
+	    },
+	    time: 0.2605042016806723 * t,
+	    ease: [0, 0, 1]
+	  }).smoothOver(0.04201680672268908 * t, {
+	    to: {
+	      ringRadius: 0.95
+	    },
+	    time: 0.3697478991596639 * t,
+	    ease: [0, 0, 1]
+	  }).smoothOver(0.04201680672268908 * t, {
+	    to: {
+	      noiseWarp: 0.55,
+	      noiseScale: 0.1
+	    },
+	    time: 0.4117647058823529 * t,
+	    ease: [0, 0, 1]
+	  }).smoothOver(0.04201680672268908 * t, {
+	    to: {
+	      otherRadius: 0.1,
+	      otherThick: 100
+	    },
+	    time: 0.46218487394957986 * t,
+	    ease: [0, 0, 1]
+	  }).smoothTo({
+	    to: {
+	      fadeAlpha: 0,
+	      otherThick: 500,
+	      otherEdge: 154
+	    },
+	    time: 0.5042016806722689 * t,
+	    ease: [0, 0, 1]
+	  }).smoothOver(100, {
+	    to: {
+	      otherThick: 0.00001,
+	      otherRadius: 0.8
+	    },
+	    time: 0.6386554621848739 * t,
+	    ease: [0, 0, 1]
+	  }).smoothOver(0.025210084033613446 * t, {
+	    to: {
+	      noiseWarp: 0.2
+	    },
+	    time: 0.6722689075630253 * t,
+	    ease: [0, 0, 1]
+	  }).smoothOver(0.025210084033613446 * t, {
+	    to: {
+	      noiseWarp: 0.35
+	    },
+	    time: 0.7226890756302521 * t,
+	    ease: [0, 0, 1]
+	  }).smoothTo({
+	    to: {
+	      fadeAlpha: 0.99
+	    },
+	    time: 0.7647058823529411 * t,
+	    ease: [0, 0, 1]
+	  }).smoothOver(0.04201680672268908 * t, {
+	    to: {
+	      ringRadius: 0,
+	      ringAlpha: 0,
+	      staticAlpha: 3
+	    },
+	    time: 0.9957983193277311 * t,
+	    ease: [0, 0, 1],
+	    call: [end]
+	  });
 	
-	    player.tracks.lightColor.smoothOver(0.025210084033613446 * t, {
-	        to: colors.orange,
-	        time: 0.12605042016806722 * t,
-	        ease: [0, 0.95, 1]
-	    }).smoothOver(0.008403361344537815 * t, {
-	        to: colors.white,
-	        time: 0.9159663865546218 * t,
-	        ease: [0, 0, 1]
-	    });
+	  player.tracks.lightColor.smoothOver(0.025210084033613446 * t, {
+	    to: colors.orange,
+	    time: 0.12605042016806722 * t,
+	    ease: [0, 0.95, 1]
+	  }).smoothOver(0.008403361344537815 * t, {
+	    to: colors.white,
+	    time: 0.9159663865546218 * t,
+	    ease: [0, 0, 1]
+	  });
 	
-	    player.tracks.fadeColor.smoothOver(0.04201680672268908 * t, {
-	        to: colors.lightBlueC,
-	        time: 0.23529411764705882 * t,
-	        ease: [0, 0.95, 1]
-	    }).smoothOver(0.01680672268907563 * t, {
-	        to: colors.lightBlueB,
-	        time: 0.37815126050420167 * t,
-	        ease: [0, 0.95, 1]
-	    }).smoothOver(0.08403361344537816 * t, {
-	        to: colors.darkBlue,
-	        time: 0.5042016806722689 * t,
-	        ease: [0, 0, 1]
-	    }).smoothOver(100, {
-	        to: colors.white,
-	        time: 0.7647058823529411 * t,
-	        ease: [0, 0, 1]
-	    }).smoothTo({
-	        to: colors.lightBlueB,
-	        time: 0.9159663865546218 * t,
-	        ease: [0, 0, 1]
-	    }).smoothOver(0.08403361344537816 * t, {
-	        to: colors.white,
-	        time: 0.9831932773109243 * t,
-	        ease: [0, 0, 1]
-	    });
+	  player.tracks.fadeColor.smoothOver(0.04201680672268908 * t, {
+	    to: colors.lightBlueC,
+	    time: 0.23529411764705882 * t,
+	    ease: [0, 0.95, 1]
+	  }).smoothOver(0.01680672268907563 * t, {
+	    to: colors.lightBlueB,
+	    time: 0.37815126050420167 * t,
+	    ease: [0, 0.95, 1]
+	  }).smoothOver(0.08403361344537816 * t, {
+	    to: colors.darkBlue,
+	    time: 0.5042016806722689 * t,
+	    ease: [0, 0, 1]
+	  }).smoothOver(100, {
+	    to: colors.white,
+	    time: 0.7647058823529411 * t,
+	    ease: [0, 0, 1]
+	  }).smoothTo({
+	    to: colors.lightBlueB,
+	    time: 0.9159663865546218 * t,
+	    ease: [0, 0, 1]
+	  }).smoothOver(0.08403361344537816 * t, {
+	    to: colors.white,
+	    time: 0.9831932773109243 * t,
+	    ease: [0, 0, 1]
+	  });
 	};
 
 /***/ }),
@@ -20738,7 +20738,7 @@
 	'use strict';
 	
 	Object.defineProperty(exports, "__esModule", {
-	    value: true
+	  value: true
 	});
 	
 	var _colors = __webpack_require__(547);
@@ -20748,146 +20748,146 @@
 	function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
 	
 	exports.default = function (player, end, audio) {
-	    var t = audio.duration * 1000;
+	  var t = audio.duration * 1000;
 	
-	    player.tracks.main.to({
-	        to: {
-	            audioMode: 'waveform',
-	            audioScale: 0.1,
-	            audioOrder: 2,
-	            silent: 0.001,
-	            soundSmooth: 0.3,
-	            soundWarp: 0.02,
-	            meanFulcrum: 0.7,
-	            ringAlpha: 0.1,
-	            otherAlpha: 0.000001,
-	            triangleAlpha: 0,
-	            bokehRadius: 8,
-	            bokehAmount: 60
-	        },
-	        time: 500
-	    }).smoothTo({
-	        to: {
-	            otherRadius: 0.8,
-	            otherThick: -0.01,
-	            otherEdge: 5
-	        },
-	        time: 0.017064846416382253 * t,
-	        ease: [0, 0, 1]
-	    }).smoothTo({
-	        to: {
-	            noiseWarp: 0.06,
-	            noiseSpeed: 0.001,
-	            noiseScale: 0.5,
-	            grow: 0.0005,
-	            growLimit: 1.6,
-	            spin: 0.0003,
-	            ringRadius: 0,
-	            ringThick: 0.5
-	        },
-	        time: 0.051194539249146756 * t,
-	        ease: [0, 0, 1]
-	    }).smoothTo({
-	        to: {
-	            fadeAlpha: 0.99
-	        },
-	        time: 0.06484641638225255 * t,
-	        ease: [0, 0, 1]
-	    }).smoothOver(0.013651877133105802 * t, {
-	        to: {
-	            soundWarp: 0.07,
-	            noiseWarp: 0.2
-	        },
-	        time: 0.14675767918088736 * t,
-	        ease: [0, 0, 1]
-	    }).smoothOver(0.027303754266211604 * t, {
-	        to: {
-	            noiseWarp: 0.04,
-	            otherAlpha: 0.0001,
-	            otherEdge: 3.5
-	        },
-	        time: 0.32081911262798635 * t,
-	        ease: [0, 0, 1]
-	    }).smoothOver(0.013651877133105802 * t, {
-	        to: {
-	            noiseWarp: 0.08,
-	            soundWarp: 0.025,
-	            otherRadius: 0,
-	            otherThick: 10,
-	            otherEdge: 3
-	        },
-	        time: 0.40955631399317405 * t,
-	        ease: [0, 0, 1]
-	    }).smoothOver(0.034129692832764506 * t, {
-	        to: {
-	            otherRadius: 2,
-	            otherThick: 0.00000001,
-	            otherEdge: 6
-	        },
-	        time: 0.6143344709897611 * t,
-	        ease: [0, 0, 1]
-	    }).smoothOver(0.027303754266211604 * t, {
-	        to: {
-	            staticScale: 60,
-	            staticShift: 0.9
-	        },
-	        time: 0.6825938566552902 * t,
-	        ease: [0, 0, 1]
-	    }).smoothTo({
-	        to: {
-	            noiseWarp: 0.4,
-	            noiseSpeed: 0.0001,
-	            ringRadius: 0.7,
-	            ringThick: 0.15,
-	            ringAlpha: 0.00001,
-	            otherEdge: 4,
-	            otherRadius: 0.8,
-	            otherThick: 0.0000001,
-	            otherAlpha: 0.000001
-	        },
-	        time: 0.7849829351535836 * t,
-	        ease: [0, 0, 1]
-	    }).smoothTo({
-	        to: {
-	            grow: -0.0001,
-	            noiseWarp: 0.8,
-	            noiseScale: 3,
-	            ringRadius: 1,
-	            ringThick: 0.005,
-	            ringAlpha: 0.01
-	        },
-	        time: 0.8532423208191127 * t,
-	        ease: [0, 0, 1]
-	    }).smoothOver(0.025597269624573378 * t, {
-	        to: {
-	            noiseScale: 0.2,
-	            ringThick: 1.5,
-	            ringAlpha: 3
-	        },
-	        time: 0.9692832764505119 * t,
-	        ease: [0, 0, 0, 1],
-	        call: [end]
-	    });
+	  player.tracks.main.to({
+	    to: {
+	      audioMode: 'waveform',
+	      audioScale: 0.1,
+	      audioOrder: 2,
+	      silent: 0.001,
+	      soundSmooth: 0.3,
+	      soundWarp: 0.02,
+	      meanFulcrum: 0.7,
+	      ringAlpha: 0.1,
+	      otherAlpha: 0.000001,
+	      triangleAlpha: 0,
+	      bokehRadius: 8,
+	      bokehAmount: 60
+	    },
+	    time: 500
+	  }).smoothTo({
+	    to: {
+	      otherRadius: 0.8,
+	      otherThick: -0.01,
+	      otherEdge: 5
+	    },
+	    time: 0.017064846416382253 * t,
+	    ease: [0, 0, 1]
+	  }).smoothTo({
+	    to: {
+	      noiseWarp: 0.06,
+	      noiseSpeed: 0.001,
+	      noiseScale: 0.5,
+	      grow: 0.0005,
+	      growLimit: 1.6,
+	      spin: 0.0003,
+	      ringRadius: 0,
+	      ringThick: 0.5
+	    },
+	    time: 0.051194539249146756 * t,
+	    ease: [0, 0, 1]
+	  }).smoothTo({
+	    to: {
+	      fadeAlpha: 0.99
+	    },
+	    time: 0.06484641638225255 * t,
+	    ease: [0, 0, 1]
+	  }).smoothOver(0.013651877133105802 * t, {
+	    to: {
+	      soundWarp: 0.07,
+	      noiseWarp: 0.2
+	    },
+	    time: 0.14675767918088736 * t,
+	    ease: [0, 0, 1]
+	  }).smoothOver(0.027303754266211604 * t, {
+	    to: {
+	      noiseWarp: 0.04,
+	      otherAlpha: 0.0001,
+	      otherEdge: 3.5
+	    },
+	    time: 0.32081911262798635 * t,
+	    ease: [0, 0, 1]
+	  }).smoothOver(0.013651877133105802 * t, {
+	    to: {
+	      noiseWarp: 0.08,
+	      soundWarp: 0.025,
+	      otherRadius: 0,
+	      otherThick: 10,
+	      otherEdge: 3
+	    },
+	    time: 0.40955631399317405 * t,
+	    ease: [0, 0, 1]
+	  }).smoothOver(0.034129692832764506 * t, {
+	    to: {
+	      otherRadius: 2,
+	      otherThick: 0.00000001,
+	      otherEdge: 6
+	    },
+	    time: 0.6143344709897611 * t,
+	    ease: [0, 0, 1]
+	  }).smoothOver(0.027303754266211604 * t, {
+	    to: {
+	      staticScale: 60,
+	      staticShift: 0.9
+	    },
+	    time: 0.6825938566552902 * t,
+	    ease: [0, 0, 1]
+	  }).smoothTo({
+	    to: {
+	      noiseWarp: 0.4,
+	      noiseSpeed: 0.0001,
+	      ringRadius: 0.7,
+	      ringThick: 0.15,
+	      ringAlpha: 0.00001,
+	      otherEdge: 4,
+	      otherRadius: 0.8,
+	      otherThick: 0.0000001,
+	      otherAlpha: 0.000001
+	    },
+	    time: 0.7849829351535836 * t,
+	    ease: [0, 0, 1]
+	  }).smoothTo({
+	    to: {
+	      grow: -0.0001,
+	      noiseWarp: 0.8,
+	      noiseScale: 3,
+	      ringRadius: 1,
+	      ringThick: 0.005,
+	      ringAlpha: 0.01
+	    },
+	    time: 0.8532423208191127 * t,
+	    ease: [0, 0, 1]
+	  }).smoothOver(0.025597269624573378 * t, {
+	    to: {
+	      noiseScale: 0.2,
+	      ringThick: 1.5,
+	      ringAlpha: 3
+	    },
+	    time: 0.9692832764505119 * t,
+	    ease: [0, 0, 0, 1],
+	    call: [end]
+	  });
 	
-	    player.tracks.lightColor.smoothTo({
-	        to: colors.white,
-	        time: 0.017064846416382253 * t,
-	        ease: [0, 0.95, 1]
-	    });
+	  player.tracks.lightColor.smoothTo({
+	    to: colors.white,
+	    time: 0.017064846416382253 * t,
+	    ease: [0, 0.95, 1]
+	  });
 	
-	    player.tracks.fadeColor.smoothTo({
-	        to: colors.orange,
-	        time: 0.017064846416382253 * t,
-	        ease: [0, 0.95, 1]
-	    }).smoothOver(0.027303754266211604 * t, {
-	        to: colors.yellow,
-	        time: 0.32081911262798635 * t,
-	        ease: [0, 0, 1]
-	    }).smoothOver(0.10238907849829351 * t, {
-	        to: colors.white,
-	        time: 0.8532423208191127 * t,
-	        ease: [0, 0, 1]
-	    });
+	  player.tracks.fadeColor.smoothTo({
+	    to: colors.orange,
+	    time: 0.017064846416382253 * t,
+	    ease: [0, 0.95, 1]
+	  }).smoothOver(0.027303754266211604 * t, {
+	    to: colors.yellow,
+	    time: 0.32081911262798635 * t,
+	    ease: [0, 0, 1]
+	  }).smoothOver(0.10238907849829351 * t, {
+	    to: colors.white,
+	    time: 0.8532423208191127 * t,
+	    ease: [0, 0, 1]
+	  });
 	};
 
 /***/ }),
@@ -20897,7 +20897,7 @@
 	'use strict';
 	
 	Object.defineProperty(exports, "__esModule", {
-	    value: true
+	  value: true
 	});
 	
 	var _colors = __webpack_require__(547);
@@ -20907,199 +20907,199 @@
 	function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
 	
 	exports.default = function (player, end, audio) {
-	    var t = audio.duration * 1000;
+	  var t = audio.duration * 1000;
 	
-	    player.tracks.main.to({
-	        to: {
-	            audioMode: 'waveform',
-	            audioScale: 1,
-	            audioOrder: 1,
-	            silent: 0.00001,
-	            soundWarp: 0.1,
-	            soundSmooth: 0.3,
-	            meanFulcrum: 0.3,
-	            ringAlpha: 0.005,
-	            noiseSpeed: 0.0001,
-	            noiseWarp: 0.04,
-	            otherAlpha: 0,
-	            otherEdge: 10000,
-	            triangleAlpha: 0,
-	            triangleEdge: 10000,
-	            bokehRadius: 7,
-	            bokehAmount: 40
-	        },
-	        time: 500
-	    }).smoothOver(0.006734006734006734 * t, {
-	        to: {
-	            soundWarp: 1.7
-	        },
-	        time: 0.02356902356902357 * t,
-	        ease: [0, 1, 1]
-	    }).smoothTo({
-	        to: {
-	            silent: 0,
-	            spin: 0.001,
-	            ringRadius: 0.35,
-	            ringThick: 0.001,
-	            soundWarp: 8
-	        },
-	        time: 0.07407407407407407 * t,
-	        ease: [0, 0, 1]
-	    }).smoothTo({
-	        to: {
-	            noiseSpeed: 0.0001,
-	            noiseWarp: 0.03
-	        },
-	        time: 0.13468013468013468 * t,
-	        ease: [0, 0, 1]
-	    }).smoothTo({
-	        to: {
-	            ringRadius: 1.1,
-	            ringThick: 0.0001,
-	            soundWarp: 4,
-	            fadeAlpha: 0.5
-	        },
-	        time: 0.16161616161616163 * t,
-	        ease: [0, 1, 1]
-	    }).smoothTo({
-	        to: {
-	            grow: -0.0006,
-	            silent: 0.01,
-	            triangleAlpha: 0.0001,
-	            triangleEdge: 10,
-	            triangleRadius: 10
-	        },
-	        time: 0.20202020202020202 * t,
-	        ease: [0, 0, 1]
-	    }).smoothTo({
-	        to: {
-	            grow: 0.0006,
-	            silent: 1,
-	            triangleAlpha: 0.0001,
-	            triangleEdge: 10,
-	            triangleRadius: 10,
-	            triangleFat: 0.1,
-	            fadeAlpha: 0.92
-	        },
-	        time: 0.2154882154882155 * t,
-	        ease: [0, 0, 1]
-	    }).smoothOver(0.06734006734006734 * t, {
-	        to: {
-	            otherAlpha: 0.00001,
-	            otherEdge: 3,
-	            otherRadius: 0.7,
-	            otherThick: 0.00000001
-	        },
-	        time: 0.3501683501683502 * t,
-	        ease: [0, 0, 1]
-	    }).smoothOver(0.06734006734006734 * t, {
-	        to: {
-	            ringRadius: 2,
-	            otherEdge: 2,
-	            otherThick: 0.000001
-	        },
-	        time: 0.4713804713804714 * t,
-	        ease: [0, 0, 1]
-	    }).over(0.003367003367003367 * t, {
-	        to: {
-	            ringRadius: 0.1,
-	            ringThick: 0,
-	            ringAlpha: 0,
-	            soundWarp: 0
-	        },
-	        time: 0.5622895622895623 * t
-	    }).smoothTo({
-	        to: {
-	            ringRadius: 0.25,
-	            ringAlpha: 0.0005,
-	            soundWarp: 0.1
-	        },
-	        time: 0.6195286195286196 * t,
-	        ease: [0, 1, 1]
-	    }).smoothTo({
-	        to: {
-	            ringThick: 0.005,
-	            ringRadius: 0.33
-	        },
-	        time: 0.6397306397306397 * t,
-	        ease: [0, 0, 1]
-	    }).smoothTo({
-	        to: {
-	            noiseWarp: 0.1
-	        },
-	        time: 0.6734006734006734 * t,
-	        ease: [0, 0, 1]
-	    }).smoothTo({
-	        to: {
-	            noiseWarp: 0.16,
-	            otherThick: 0.0001
-	        },
-	        time: 0.7070707070707071 * t,
-	        ease: [0, 0, 1]
-	    }).smoothTo({
-	        to: {
-	            soundWarp: 0.02,
-	            noiseWarp: 0.4,
-	            noiseScale: 0.25,
-	            noiseSpeed: 0.001,
-	            otherRadius: 0.3,
-	            otherThick: 0.1,
-	            grow: -0.002
-	        },
-	        time: 0.8080808080808081 * t,
-	        ease: [0, 0, 1]
-	    }).smoothTo({
-	        to: {
-	            ringAlpha: 0.001,
-	            fadeAlpha: 0.99,
-	            otherAlpha: -0.00001,
-	            staticAlpha: 0.05,
-	            staticScale: 60,
-	            staticShift: 1
-	        },
-	        time: 0.8148148148148149 * t,
-	        ease: [0, 0, 1]
-	    }).smoothOver(0.06734006734006734 * t, {
-	        to: {
-	            ringRadius: 0.4,
-	            ringAlpha: 0.005,
-	            ringThick: 0.01,
-	            noiseWarp: 0.05,
-	            noiseSpeed: 0.0003,
-	            staticAlpha: 0.5
-	        },
-	        time: 0.9966329966329966 * t,
-	        ease: [0, 0, 1],
-	        call: [end]
-	    });
+	  player.tracks.main.to({
+	    to: {
+	      audioMode: 'waveform',
+	      audioScale: 1,
+	      audioOrder: 1,
+	      silent: 0.00001,
+	      soundWarp: 0.1,
+	      soundSmooth: 0.3,
+	      meanFulcrum: 0.3,
+	      ringAlpha: 0.005,
+	      noiseSpeed: 0.0001,
+	      noiseWarp: 0.04,
+	      otherAlpha: 0,
+	      otherEdge: 10000,
+	      triangleAlpha: 0,
+	      triangleEdge: 10000,
+	      bokehRadius: 7,
+	      bokehAmount: 40
+	    },
+	    time: 500
+	  }).smoothOver(0.006734006734006734 * t, {
+	    to: {
+	      soundWarp: 1.7
+	    },
+	    time: 0.02356902356902357 * t,
+	    ease: [0, 1, 1]
+	  }).smoothTo({
+	    to: {
+	      silent: 0,
+	      spin: 0.001,
+	      ringRadius: 0.35,
+	      ringThick: 0.001,
+	      soundWarp: 8
+	    },
+	    time: 0.07407407407407407 * t,
+	    ease: [0, 0, 1]
+	  }).smoothTo({
+	    to: {
+	      noiseSpeed: 0.0001,
+	      noiseWarp: 0.03
+	    },
+	    time: 0.13468013468013468 * t,
+	    ease: [0, 0, 1]
+	  }).smoothTo({
+	    to: {
+	      ringRadius: 1.1,
+	      ringThick: 0.0001,
+	      soundWarp: 4,
+	      fadeAlpha: 0.5
+	    },
+	    time: 0.16161616161616163 * t,
+	    ease: [0, 1, 1]
+	  }).smoothTo({
+	    to: {
+	      grow: -0.0006,
+	      silent: 0.01,
+	      triangleAlpha: 0.0001,
+	      triangleEdge: 10,
+	      triangleRadius: 10
+	    },
+	    time: 0.20202020202020202 * t,
+	    ease: [0, 0, 1]
+	  }).smoothTo({
+	    to: {
+	      grow: 0.0006,
+	      silent: 1,
+	      triangleAlpha: 0.0001,
+	      triangleEdge: 10,
+	      triangleRadius: 10,
+	      triangleFat: 0.1,
+	      fadeAlpha: 0.92
+	    },
+	    time: 0.2154882154882155 * t,
+	    ease: [0, 0, 1]
+	  }).smoothOver(0.06734006734006734 * t, {
+	    to: {
+	      otherAlpha: 0.00001,
+	      otherEdge: 3,
+	      otherRadius: 0.7,
+	      otherThick: 0.00000001
+	    },
+	    time: 0.3501683501683502 * t,
+	    ease: [0, 0, 1]
+	  }).smoothOver(0.06734006734006734 * t, {
+	    to: {
+	      ringRadius: 2,
+	      otherEdge: 2,
+	      otherThick: 0.000001
+	    },
+	    time: 0.4713804713804714 * t,
+	    ease: [0, 0, 1]
+	  }).over(0.003367003367003367 * t, {
+	    to: {
+	      ringRadius: 0.1,
+	      ringThick: 0,
+	      ringAlpha: 0,
+	      soundWarp: 0
+	    },
+	    time: 0.5622895622895623 * t
+	  }).smoothTo({
+	    to: {
+	      ringRadius: 0.25,
+	      ringAlpha: 0.0005,
+	      soundWarp: 0.1
+	    },
+	    time: 0.6195286195286196 * t,
+	    ease: [0, 1, 1]
+	  }).smoothTo({
+	    to: {
+	      ringThick: 0.005,
+	      ringRadius: 0.33
+	    },
+	    time: 0.6397306397306397 * t,
+	    ease: [0, 0, 1]
+	  }).smoothTo({
+	    to: {
+	      noiseWarp: 0.1
+	    },
+	    time: 0.6734006734006734 * t,
+	    ease: [0, 0, 1]
+	  }).smoothTo({
+	    to: {
+	      noiseWarp: 0.16,
+	      otherThick: 0.0001
+	    },
+	    time: 0.7070707070707071 * t,
+	    ease: [0, 0, 1]
+	  }).smoothTo({
+	    to: {
+	      soundWarp: 0.02,
+	      noiseWarp: 0.4,
+	      noiseScale: 0.25,
+	      noiseSpeed: 0.001,
+	      otherRadius: 0.3,
+	      otherThick: 0.1,
+	      grow: -0.002
+	    },
+	    time: 0.8080808080808081 * t,
+	    ease: [0, 0, 1]
+	  }).smoothTo({
+	    to: {
+	      ringAlpha: 0.001,
+	      fadeAlpha: 0.99,
+	      otherAlpha: -0.00001,
+	      staticAlpha: 0.05,
+	      staticScale: 60,
+	      staticShift: 1
+	    },
+	    time: 0.8148148148148149 * t,
+	    ease: [0, 0, 1]
+	  }).smoothOver(0.06734006734006734 * t, {
+	    to: {
+	      ringRadius: 0.4,
+	      ringAlpha: 0.005,
+	      ringThick: 0.01,
+	      noiseWarp: 0.05,
+	      noiseSpeed: 0.0003,
+	      staticAlpha: 0.5
+	    },
+	    time: 0.9966329966329966 * t,
+	    ease: [0, 0, 1],
+	    call: [end]
+	  });
 	
-	    player.tracks.lightColor.smoothTo({
-	        to: colors.white,
-	        time: 0.03367003367003367 * t,
-	        ease: [0, 0.95, 1]
-	    }).smoothOver(0.026936026936026935 * t, {
-	        to: colors.lightBlueA,
-	        time: 0.11447811447811448 * t,
-	        ease: [0, 0, 1]
-	    }).smoothOver(0.06734006734006734 * t, {
-	        to: colors.white,
-	        time: 0.9966329966329966 * t,
-	        ease: [0, 0, 1]
-	    });
+	  player.tracks.lightColor.smoothTo({
+	    to: colors.white,
+	    time: 0.03367003367003367 * t,
+	    ease: [0, 0.95, 1]
+	  }).smoothOver(0.026936026936026935 * t, {
+	    to: colors.lightBlueA,
+	    time: 0.11447811447811448 * t,
+	    ease: [0, 0, 1]
+	  }).smoothOver(0.06734006734006734 * t, {
+	    to: colors.white,
+	    time: 0.9966329966329966 * t,
+	    ease: [0, 0, 1]
+	  });
 	
-	    player.tracks.fadeColor.smoothTo({
-	        to: colors.lightBlueA,
-	        time: 0.03367003367003367 * t,
-	        ease: [0, 0.95, 1]
-	    }).smoothOver(0.026936026936026935 * t, {
-	        to: colors.darkBlue,
-	        time: 0.11447811447811448 * t,
-	        ease: [0, 0, 1]
-	    }).smoothOver(0.06734006734006734 * t, {
-	        to: colors.white,
-	        time: 0.9966329966329966 * t,
-	        ease: [0, 0, 1]
-	    });
+	  player.tracks.fadeColor.smoothTo({
+	    to: colors.lightBlueA,
+	    time: 0.03367003367003367 * t,
+	    ease: [0, 0.95, 1]
+	  }).smoothOver(0.026936026936026935 * t, {
+	    to: colors.darkBlue,
+	    time: 0.11447811447811448 * t,
+	    ease: [0, 0, 1]
+	  }).smoothOver(0.06734006734006734 * t, {
+	    to: colors.white,
+	    time: 0.9966329966329966 * t,
+	    ease: [0, 0, 1]
+	  });
 	};
 
 /***/ }),
@@ -21109,7 +21109,7 @@
 	'use strict';
 	
 	Object.defineProperty(exports, "__esModule", {
-	    value: true
+	  value: true
 	});
 	
 	var _colors = __webpack_require__(547);
@@ -21119,182 +21119,182 @@
 	function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
 	
 	exports.default = function (player, end, audio) {
-	    var t = audio.duration * 1000;
+	  var t = audio.duration * 1000;
 	
-	    player.tracks.main.smoothTo({
-	        to: {
-	            audioMode: 'waveform',
-	            audioScale: 1000,
-	            audioOrder: 0,
-	            silent: 0.0000001,
-	            soundWarp: 0.005,
-	            soundSmooth: 0.3,
-	            meanFulcrum: 0.6,
-	            ringRadius: 0,
-	            ringAlpha: 0.5,
-	            ringThick: 0.1,
-	            noiseSpeed: 0.0001,
-	            noiseWarp: 0,
-	            otherRadius: 3,
-	            otherThick: -0.0000001,
-	            otherAlpha: -0.00001,
-	            otherEdge: 500,
-	            triangleAlpha: 0,
-	            triangleEdge: 500,
-	            staticScale: 100,
-	            staticSpeed: 0.5,
-	            staticShift: 0.5,
-	            staticAlpha: 0.05,
-	            grow: 0,
-	            fadeAlpha: 0.9,
-	            bokehRadius: 7,
-	            bokehAmount: 40
-	        },
-	        time: 1800,
-	        ease: [0, 0, 1]
-	    }).smoothOver(0.004901960784313725 * t, {
-	        to: {
-	            noiseWarp: 0.06,
-	            grow: 1
-	        },
-	        time: 0.0784313725490196 * t,
-	        ease: [0, 0, 1]
-	    }).smoothOver(0.004901960784313725 * t, {
-	        to: {
-	            ringAlpha: 0.02,
-	            noiseWarp: 0.1,
-	            ringRadius: -0.2
-	        },
-	        time: 0.1568627450980392 * t,
-	        ease: [0, -0.3, 1.3, 1]
-	    }).smoothOver(0.004901960784313725 * t, {
-	        to: {
-	            ringAlpha: 0.25
-	        },
-	        time: 0.22549019607843138 * t,
-	        ease: [0, 0, 1]
-	    }).smoothOver(0.004901960784313725 * t, {
-	        to: {
-	            ringAlpha: 0.1,
-	            soundWarp: 0.012
-	        },
-	        time: 0.29901960784313725 * t,
-	        ease: [0, 0, 1]
-	    }).smoothOver(0.00980392156862745 * t, {
-	        to: {
-	            ringAlpha: 0.01,
-	            soundWarp: 0.01
-	        },
-	        time: 0.37745098039215685 * t,
-	        ease: [0, 0, 1]
-	    }).smoothTo({
-	        to: {
-	            triangleEdge: 200,
-	            triangleAlpha: -0.001,
-	            triangleRadius: -1,
-	            fadeAlpha: 0.93
-	        },
-	        time: 0.47549019607843135 * t,
-	        ease: [0, 0, 1]
-	    }).smoothTo({
-	        to: {
-	            ringRadius: -0.1,
-	            fadeAlpha: 0.99
-	        },
-	        time: 0.5049019607843137 * t,
-	        ease: [0, 0, 1]
-	    }).smoothTo({
-	        to: {
-	            ringRadius: -0.1,
-	            fadeAlpha: 0.99
-	        },
-	        time: 0.5147058823529411 * t,
-	        ease: [0, 0, 1]
-	    }).smoothTo({
-	        to: {
-	            ringRadius: 0,
-	            ringThick: 0.15,
-	            triangleEdge: 500,
-	            otherEdge: 0.22,
-	            staticScale: 40
-	        },
-	        time: 0.5343137254901961 * t,
-	        ease: [0, 0, 1]
-	    }).smoothTo({
-	        to: {
-	            ringRadius: 0.5,
-	            ringThick: 0.03
-	        },
-	        time: 0.5784313725490197 * t,
-	        ease: [0, 0, 1]
-	    }).smoothTo({
-	        to: {
-	            ringThick: 0.1,
-	            noiseWarp: 0.2,
-	            noiseSpeed: 0.001,
-	            fadeAlpha: 0.9
-	        },
-	        time: 0.5882352941176471 * t,
-	        ease: [0, 1, 1]
-	    }).smoothOver(0.0196078431372549 * t, {
-	        to: {
-	            ringRadius: 0,
-	            ringThick: 0.7,
-	            staticAlpha: 0.3
-	        },
-	        time: 0.6715686274509803 * t,
-	        ease: [0, 1, 1]
-	    }).smoothOver(0.0196078431372549 * t, {
-	        to: {
-	            ringThick: 0.95,
-	            triangleEdge: 210,
-	            triangleFat: 0.01,
-	            triangleRadius: -5,
-	            otherThick: -0.000001
-	        },
-	        time: 0.7401960784313726 * t,
-	        ease: [0, 1, 1]
-	    }).smoothTo({
-	        to: {
-	            ringThick: 1.8
-	        },
-	        time: 0.8823529411764706 * t,
-	        ease: [0, 1, 1]
-	    }).smoothOver(0.06372549019607843 * t, {
-	        to: {
-	            triangleRadius: -10,
-	            otherEdge: 0
-	        },
-	        time: 0.9852941176470589 * t,
-	        ease: [0, 0, 1]
-	    }).smoothTo({
-	        to: {
-	            otherEdge: 1
-	        },
-	        time: 0.9950980392156863 * t,
-	        ease: [0, 0, 1],
-	        call: [end]
-	    });
+	  player.tracks.main.smoothTo({
+	    to: {
+	      audioMode: 'waveform',
+	      audioScale: 1000,
+	      audioOrder: 0,
+	      silent: 0.0000001,
+	      soundWarp: 0.005,
+	      soundSmooth: 0.3,
+	      meanFulcrum: 0.6,
+	      ringRadius: 0,
+	      ringAlpha: 0.5,
+	      ringThick: 0.1,
+	      noiseSpeed: 0.0001,
+	      noiseWarp: 0,
+	      otherRadius: 3,
+	      otherThick: -0.0000001,
+	      otherAlpha: -0.00001,
+	      otherEdge: 500,
+	      triangleAlpha: 0,
+	      triangleEdge: 500,
+	      staticScale: 100,
+	      staticSpeed: 0.5,
+	      staticShift: 0.5,
+	      staticAlpha: 0.05,
+	      grow: 0,
+	      fadeAlpha: 0.9,
+	      bokehRadius: 7,
+	      bokehAmount: 40
+	    },
+	    time: 1800,
+	    ease: [0, 0, 1]
+	  }).smoothOver(0.004901960784313725 * t, {
+	    to: {
+	      noiseWarp: 0.06,
+	      grow: 1
+	    },
+	    time: 0.0784313725490196 * t,
+	    ease: [0, 0, 1]
+	  }).smoothOver(0.004901960784313725 * t, {
+	    to: {
+	      ringAlpha: 0.02,
+	      noiseWarp: 0.1,
+	      ringRadius: -0.2
+	    },
+	    time: 0.1568627450980392 * t,
+	    ease: [0, -0.3, 1.3, 1]
+	  }).smoothOver(0.004901960784313725 * t, {
+	    to: {
+	      ringAlpha: 0.25
+	    },
+	    time: 0.22549019607843138 * t,
+	    ease: [0, 0, 1]
+	  }).smoothOver(0.004901960784313725 * t, {
+	    to: {
+	      ringAlpha: 0.1,
+	      soundWarp: 0.012
+	    },
+	    time: 0.29901960784313725 * t,
+	    ease: [0, 0, 1]
+	  }).smoothOver(0.00980392156862745 * t, {
+	    to: {
+	      ringAlpha: 0.01,
+	      soundWarp: 0.01
+	    },
+	    time: 0.37745098039215685 * t,
+	    ease: [0, 0, 1]
+	  }).smoothTo({
+	    to: {
+	      triangleEdge: 200,
+	      triangleAlpha: -0.001,
+	      triangleRadius: -1,
+	      fadeAlpha: 0.93
+	    },
+	    time: 0.47549019607843135 * t,
+	    ease: [0, 0, 1]
+	  }).smoothTo({
+	    to: {
+	      ringRadius: -0.1,
+	      fadeAlpha: 0.99
+	    },
+	    time: 0.5049019607843137 * t,
+	    ease: [0, 0, 1]
+	  }).smoothTo({
+	    to: {
+	      ringRadius: -0.1,
+	      fadeAlpha: 0.99
+	    },
+	    time: 0.5147058823529411 * t,
+	    ease: [0, 0, 1]
+	  }).smoothTo({
+	    to: {
+	      ringRadius: 0,
+	      ringThick: 0.15,
+	      triangleEdge: 500,
+	      otherEdge: 0.22,
+	      staticScale: 40
+	    },
+	    time: 0.5343137254901961 * t,
+	    ease: [0, 0, 1]
+	  }).smoothTo({
+	    to: {
+	      ringRadius: 0.5,
+	      ringThick: 0.03
+	    },
+	    time: 0.5784313725490197 * t,
+	    ease: [0, 0, 1]
+	  }).smoothTo({
+	    to: {
+	      ringThick: 0.1,
+	      noiseWarp: 0.2,
+	      noiseSpeed: 0.001,
+	      fadeAlpha: 0.9
+	    },
+	    time: 0.5882352941176471 * t,
+	    ease: [0, 1, 1]
+	  }).smoothOver(0.0196078431372549 * t, {
+	    to: {
+	      ringRadius: 0,
+	      ringThick: 0.7,
+	      staticAlpha: 0.3
+	    },
+	    time: 0.6715686274509803 * t,
+	    ease: [0, 1, 1]
+	  }).smoothOver(0.0196078431372549 * t, {
+	    to: {
+	      ringThick: 0.95,
+	      triangleEdge: 210,
+	      triangleFat: 0.01,
+	      triangleRadius: -5,
+	      otherThick: -0.000001
+	    },
+	    time: 0.7401960784313726 * t,
+	    ease: [0, 1, 1]
+	  }).smoothTo({
+	    to: {
+	      ringThick: 1.8
+	    },
+	    time: 0.8823529411764706 * t,
+	    ease: [0, 1, 1]
+	  }).smoothOver(0.06372549019607843 * t, {
+	    to: {
+	      triangleRadius: -10,
+	      otherEdge: 0
+	    },
+	    time: 0.9852941176470589 * t,
+	    ease: [0, 0, 1]
+	  }).smoothTo({
+	    to: {
+	      otherEdge: 1
+	    },
+	    time: 0.9950980392156863 * t,
+	    ease: [0, 0, 1],
+	    call: [end]
+	  });
 	
-	    player.tracks.lightColor.smoothTo({
-	        to: colors.white,
-	        time: 1000,
-	        ease: [0, 0.95, 1]
-	    });
+	  player.tracks.lightColor.smoothTo({
+	    to: colors.white,
+	    time: 1000,
+	    ease: [0, 0.95, 1]
+	  });
 	
-	    player.tracks.fadeColor.smoothTo({
-	        to: colors.darkBlue,
-	        time: 1000,
-	        ease: [0, 0.95, 1]
-	    }).smoothOver(0.049019607843137254 * t, {
-	        to: colors.lightBlueA,
-	        time: 0.5343137254901961 * t,
-	        ease: [0, 0.95, 1]
-	    }).smoothOver(0.004901960784313725 * t, {
-	        to: colors.darkBlue,
-	        time: 0.5784313725490197 * t,
-	        ease: [0, 0.95, 1]
-	    });
+	  player.tracks.fadeColor.smoothTo({
+	    to: colors.darkBlue,
+	    time: 1000,
+	    ease: [0, 0.95, 1]
+	  }).smoothOver(0.049019607843137254 * t, {
+	    to: colors.lightBlueA,
+	    time: 0.5343137254901961 * t,
+	    ease: [0, 0.95, 1]
+	  }).smoothOver(0.004901960784313725 * t, {
+	    to: colors.darkBlue,
+	    time: 0.5784313725490197 * t,
+	    ease: [0, 0.95, 1]
+	  });
 	};
 
 /***/ }),
@@ -21304,7 +21304,7 @@
 	'use strict';
 	
 	Object.defineProperty(exports, "__esModule", {
-	    value: true
+	  value: true
 	});
 	
 	var _colors = __webpack_require__(547);
@@ -21314,129 +21314,129 @@
 	function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
 	
 	exports.default = function (player, end, audio) {
-	    var t = audio.duration * 1000;
+	  var t = audio.duration * 1000;
 	
-	    player.tracks.main.to({
-	        to: {
-	            audioMode: 'frequencies',
-	            audioScale: 1,
-	            audioOrder: 0,
-	            silent: 0.0000001,
-	            soundWarp: 0.000003,
-	            soundSmooth: 0.3,
-	            meanFulcrum: 0.3,
-	            ringAlpha: 0.5,
-	            ringThick: 0.001,
-	            noiseSpeed: 0.0001,
-	            noiseWarp: 0,
-	            otherRadius: 0,
-	            otherThick: 0,
-	            otherAlpha: 0.0002,
-	            otherEdge: 500,
-	            triangleAlpha: 0,
-	            triangleEdge: 210,
-	            staticScale: 150,
-	            staticSpeed: 0.5,
-	            staticShift: 0.8,
-	            staticAlpha: 0.05,
-	            grow: -0.003,
-	            fadeAlpha: 0.91,
-	            bokehRadius: 3,
-	            bokehAmount: 40
-	        },
-	        time: 210
-	    }).smoothTo({
-	        to: {
-	            ringRadius: 0.5
-	        },
-	        time: 0.024271844660194174 * t,
-	        ease: [0, 0, 1]
-	    }).smoothOver(0.08737864077669903 * t, {
-	        to: {
-	            soundWarp: 0.00004,
-	            staticAlpha: 0.08
-	        },
-	        time: 0.1262135922330097 * t,
-	        ease: [0, 0, 1]
-	    }).smoothTo({
-	        to: {
-	            ringThick: 0.01
-	        },
-	        time: 0.1941747572815534 * t,
-	        ease: [0, 0, 1]
-	    }).smoothTo({
-	        to: {
-	            ringRadius: 0.6,
-	            ringThick: 0.001
-	        },
-	        time: 0.3106796116504854 * t,
-	        ease: [0, 0, 1]
-	    }).smoothTo({
-	        to: {
-	            otherEdge: 250,
-	            otherRadius: 0.2,
-	            otherThick: 0.000000001
-	        },
-	        time: 0.3592233009708738 * t,
-	        ease: [0, 0, 1]
-	    }).smoothOver(0.0970873786407767 * t, {
-	        to: {
-	            otherRadius: 15,
-	            otherThick: 0.0000001
-	        },
-	        time: 0.5533980582524272 * t,
-	        ease: [0, 0, 1]
-	    }).smoothTo({
-	        to: {
-	            otherRadius: 60,
-	            ringRadius: 0.92,
-	            soundWarp: -0.00002
-	        },
-	        time: 0.6116504854368932 * t,
-	        ease: [0, 0, 1]
-	    }).smoothOver(0.038834951456310676 * t, {
-	        to: {
-	            grow: 0.003,
-	            soundWarp: -0.00005
-	        },
-	        time: 0.7766990291262136 * t,
-	        ease: [0, 0, 1]
-	    }).smoothTo({
-	        to: {
-	            otherRadius: 1
-	        },
-	        time: 0.8252427184466019 * t,
-	        ease: [0, 0, 1]
-	    }).smoothTo({
-	        to: {
-	            otherRadius: 1,
-	            soundWarp: -0.00008
-	        },
-	        time: 0.8640776699029126 * t,
-	        ease: [0, 0, 1]
-	    }).smoothOver(0.05825242718446602 * t, {
-	        to: {
-	            soundWarp: -0.001,
-	            ringAlpha: 50,
-	            silent: 1,
-	            fadeAlpha: 1
-	        },
-	        time: 0.9999 * t,
-	        ease: [0, 0, 1],
-	        call: [end]
-	    });
+	  player.tracks.main.to({
+	    to: {
+	      audioMode: 'frequencies',
+	      audioScale: 1,
+	      audioOrder: 0,
+	      silent: 0.0000001,
+	      soundWarp: 0.000003,
+	      soundSmooth: 0.3,
+	      meanFulcrum: 0.3,
+	      ringAlpha: 0.5,
+	      ringThick: 0.001,
+	      noiseSpeed: 0.0001,
+	      noiseWarp: 0,
+	      otherRadius: 0,
+	      otherThick: 0,
+	      otherAlpha: 0.0002,
+	      otherEdge: 500,
+	      triangleAlpha: 0,
+	      triangleEdge: 210,
+	      staticScale: 150,
+	      staticSpeed: 0.5,
+	      staticShift: 0.8,
+	      staticAlpha: 0.05,
+	      grow: -0.003,
+	      fadeAlpha: 0.91,
+	      bokehRadius: 3,
+	      bokehAmount: 40
+	    },
+	    time: 210
+	  }).smoothTo({
+	    to: {
+	      ringRadius: 0.5
+	    },
+	    time: 0.024271844660194174 * t,
+	    ease: [0, 0, 1]
+	  }).smoothOver(0.08737864077669903 * t, {
+	    to: {
+	      soundWarp: 0.00004,
+	      staticAlpha: 0.08
+	    },
+	    time: 0.1262135922330097 * t,
+	    ease: [0, 0, 1]
+	  }).smoothTo({
+	    to: {
+	      ringThick: 0.01
+	    },
+	    time: 0.1941747572815534 * t,
+	    ease: [0, 0, 1]
+	  }).smoothTo({
+	    to: {
+	      ringRadius: 0.6,
+	      ringThick: 0.001
+	    },
+	    time: 0.3106796116504854 * t,
+	    ease: [0, 0, 1]
+	  }).smoothTo({
+	    to: {
+	      otherEdge: 250,
+	      otherRadius: 0.2,
+	      otherThick: 0.000000001
+	    },
+	    time: 0.3592233009708738 * t,
+	    ease: [0, 0, 1]
+	  }).smoothOver(0.0970873786407767 * t, {
+	    to: {
+	      otherRadius: 15,
+	      otherThick: 0.0000001
+	    },
+	    time: 0.5533980582524272 * t,
+	    ease: [0, 0, 1]
+	  }).smoothTo({
+	    to: {
+	      otherRadius: 60,
+	      ringRadius: 0.92,
+	      soundWarp: -0.00002
+	    },
+	    time: 0.6116504854368932 * t,
+	    ease: [0, 0, 1]
+	  }).smoothOver(0.038834951456310676 * t, {
+	    to: {
+	      grow: 0.003,
+	      soundWarp: -0.00005
+	    },
+	    time: 0.7766990291262136 * t,
+	    ease: [0, 0, 1]
+	  }).smoothTo({
+	    to: {
+	      otherRadius: 1
+	    },
+	    time: 0.8252427184466019 * t,
+	    ease: [0, 0, 1]
+	  }).smoothTo({
+	    to: {
+	      otherRadius: 1,
+	      soundWarp: -0.00008
+	    },
+	    time: 0.8640776699029126 * t,
+	    ease: [0, 0, 1]
+	  }).smoothOver(0.05825242718446602 * t, {
+	    to: {
+	      soundWarp: -0.001,
+	      ringAlpha: 50,
+	      silent: 1,
+	      fadeAlpha: 1
+	    },
+	    time: 0.9999 * t,
+	    ease: [0, 0, 1],
+	    call: [end]
+	  });
 	
-	    player.tracks.lightColor.smoothTo({
-	        to: colors.white,
-	        time: 1000,
-	        ease: [0, 0.95, 1]
-	    });
+	  player.tracks.lightColor.smoothTo({
+	    to: colors.white,
+	    time: 1000,
+	    ease: [0, 0.95, 1]
+	  });
 	
-	    player.tracks.fadeColor.smoothTo({
-	        to: colors.white,
-	        time: 1000,
-	        ease: [0, 0.95, 1]
-	    });
+	  player.tracks.fadeColor.smoothTo({
+	    to: colors.white,
+	    time: 1000,
+	    ease: [0, 0.95, 1]
+	  });
 	};
 
 /***/ }),
@@ -21446,7 +21446,7 @@
 	'use strict';
 	
 	Object.defineProperty(exports, "__esModule", {
-	    value: true
+	  value: true
 	});
 	
 	var _colors = __webpack_require__(547);
@@ -21456,230 +21456,230 @@
 	function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
 	
 	exports.default = function (player, end, audio) {
-	    var t = audio.duration * 1000;
+	  var t = audio.duration * 1000;
 	
-	    player.tracks.main.to({
-	        to: {
-	            audioMode: 'frequencies',
-	            audioScale: 1,
-	            audioOrder: 0,
-	            silent: 0,
-	            soundWarp: 0.000005,
-	            soundSmooth: 0.3,
-	            meanFulcrum: 0.35,
-	            spin: -0.0001,
-	            ringRadius: 0.5,
-	            ringAlpha: 0.5,
-	            ringThick: 0.01,
-	            noiseSpeed: 0.0001,
-	            noiseWarp: 0.001,
-	            otherRadius: 0,
-	            otherThick: 0,
-	            otherAlpha: 0.0002,
-	            otherEdge: 500,
-	            triangleAlpha: 0,
-	            triangleEdge: 210,
-	            staticScale: 150,
-	            staticSpeed: 0.5,
-	            staticShift: 0.8,
-	            staticAlpha: 0.05,
-	            grow: 0.0025,
-	            fadeAlpha: 0.91,
-	            bokehRadius: 6,
-	            bokehAmount: 40
-	        },
-	        time: 210
-	    }).smoothOver(0.0311284046692607 * t, {
-	        to: {
-	            soundWarp: 0.00002,
-	            silent: 0.0000002
-	        },
-	        time: 0.07392996108949416 * t,
-	        ease: [0, 0, 1]
-	    }).smoothOver(0.01556420233463035 * t, {
-	        to: {
-	            fadeAlpha: 0.98
-	        },
-	        time: 0.09727626459143969 * t,
-	        ease: [0, 0, 1]
-	    }).smoothOver(0.011673151750972763 * t, {
-	        to: {
-	            noiseWarp: 0.2,
-	            noiseSpeed: 0.001
-	        },
-	        time: 0.1556420233463035 * t,
-	        ease: [0, 0, 1]
-	    }).smoothOver(0.023346303501945526 * t, {
-	        to: {
-	            otherEdge: 210
-	        },
-	        time: 0.23346303501945526 * t,
-	        ease: [0, 0, 1]
-	    }).smoothTo({
-	        to: {
-	            otherThick: 0.0025
-	        },
-	        time: 0.2607003891050584 * t,
-	        ease: [0, 0, 1]
-	    }).smoothOver(0.019455252918287938 * t, {
-	        to: {
-	            otherThick: 0.0008,
-	            otherEdge: 254
-	        },
-	        time: 0.2723735408560311 * t,
-	        ease: [0, 0, 1]
-	    }).smoothOver(0.038910505836575876 * t, {
-	        to: {
-	            ringRadius: 0.7,
-	            otherThick: 0.00001,
-	            otherRadius: 200
-	        },
-	        time: 0.35019455252918286 * t,
-	        ease: [0, 0, 1]
-	    }).smoothOver(0.019455252918287938 * t, {
-	        to: {
-	            staticAlpha: 0
-	        },
-	        time: 0.3852140077821012 * t,
-	        ease: [0, 0, 1]
-	    }).smoothOver(0.011673151750972763 * t, {
-	        to: {
-	            grow: 0.1
-	        },
-	        time: 0.47470817120622566 * t,
-	        ease: [0, 0, 1]
-	    }).smoothOver(0.011673151750972763 * t, {
-	        to: {
-	            grow: 0.3
-	        },
-	        time: 0.5525291828793775 * t,
-	        ease: [0, 0, 1]
-	    }).smoothOver(0.023346303501945526 * t, {
-	        to: {
-	            soundWarp: 0.000001,
-	            noiseWarp: 0.001
-	        },
-	        time: 0.6964980544747081 * t,
-	        ease: [0, 0, 1]
-	    }).smoothTo({
-	        to: {
-	            grow: 0.4,
-	            ringAlpha: 0,
-	            noiseWarp: 0.00001
-	        },
-	        time: 0.7159533073929961 * t,
-	        ease: [0, 0, 1]
-	    }).smoothOver(500, {
-	        to: {
-	            ringAlpha: 5,
-	            noiseWarp: 0.0001,
-	            spin: 0.0002
-	        },
-	        time: 0.7295719844357976 * t,
-	        ease: [0, 0, 1]
-	    }).smoothOver(0.023346303501945526 * t, {
-	        to: {
-	            ringThick: 0.1,
-	            noiseWarp: 0.0003,
-	            soundWarp: 0.00003,
-	            otherThick: 0.003,
-	            otherRadius: 0.0000001
-	        },
-	        time: 0.7821011673151751 * t,
-	        ease: [0, 0, 1]
-	    }).smoothTo({
-	        to: {
-	            noiseWarp: 0.002,
-	            spin: -0.0002
-	        },
-	        time: 0.8054474708171206 * t,
-	        ease: [0, 0, 1]
-	    }).smoothTo({
-	        to: {
-	            noiseWarp: 0.1
-	        },
-	        time: 0.8443579766536965 * t,
-	        ease: [0, 0, 1]
-	    }).smoothTo({
-	        to: {
-	            soundWarp: 0.00005,
-	            grow: 0.2,
-	            growLimit: 1.2,
-	            ringThick: 0.03,
-	            fadeAlpha: 0.93,
-	            jitter: 0
-	        },
-	        time: 0.8560311284046692 * t,
-	        ease: [0, 0, 1]
-	    }).smoothTo({
-	        to: {
-	            grow: 0.5,
-	            growLimit: 1.8
-	        },
-	        time: 0.9182879377431906 * t,
-	        ease: [0, 0, 1]
-	    }).smoothOver(0.011673151750972763 * t, {
-	        to: {
-	            grow: 1,
-	            growLimit: 3,
-	            ringThick: 2
-	        },
-	        time: 0.9999 * t,
-	        ease: [0, 0, 1],
-	        call: [end]
-	    });
+	  player.tracks.main.to({
+	    to: {
+	      audioMode: 'frequencies',
+	      audioScale: 1,
+	      audioOrder: 0,
+	      silent: 0,
+	      soundWarp: 0.000005,
+	      soundSmooth: 0.3,
+	      meanFulcrum: 0.35,
+	      spin: -0.0001,
+	      ringRadius: 0.5,
+	      ringAlpha: 0.5,
+	      ringThick: 0.01,
+	      noiseSpeed: 0.0001,
+	      noiseWarp: 0.001,
+	      otherRadius: 0,
+	      otherThick: 0,
+	      otherAlpha: 0.0002,
+	      otherEdge: 500,
+	      triangleAlpha: 0,
+	      triangleEdge: 210,
+	      staticScale: 150,
+	      staticSpeed: 0.5,
+	      staticShift: 0.8,
+	      staticAlpha: 0.05,
+	      grow: 0.0025,
+	      fadeAlpha: 0.91,
+	      bokehRadius: 6,
+	      bokehAmount: 40
+	    },
+	    time: 210
+	  }).smoothOver(0.0311284046692607 * t, {
+	    to: {
+	      soundWarp: 0.00002,
+	      silent: 0.0000002
+	    },
+	    time: 0.07392996108949416 * t,
+	    ease: [0, 0, 1]
+	  }).smoothOver(0.01556420233463035 * t, {
+	    to: {
+	      fadeAlpha: 0.98
+	    },
+	    time: 0.09727626459143969 * t,
+	    ease: [0, 0, 1]
+	  }).smoothOver(0.011673151750972763 * t, {
+	    to: {
+	      noiseWarp: 0.2,
+	      noiseSpeed: 0.001
+	    },
+	    time: 0.1556420233463035 * t,
+	    ease: [0, 0, 1]
+	  }).smoothOver(0.023346303501945526 * t, {
+	    to: {
+	      otherEdge: 210
+	    },
+	    time: 0.23346303501945526 * t,
+	    ease: [0, 0, 1]
+	  }).smoothTo({
+	    to: {
+	      otherThick: 0.0025
+	    },
+	    time: 0.2607003891050584 * t,
+	    ease: [0, 0, 1]
+	  }).smoothOver(0.019455252918287938 * t, {
+	    to: {
+	      otherThick: 0.0008,
+	      otherEdge: 254
+	    },
+	    time: 0.2723735408560311 * t,
+	    ease: [0, 0, 1]
+	  }).smoothOver(0.038910505836575876 * t, {
+	    to: {
+	      ringRadius: 0.7,
+	      otherThick: 0.00001,
+	      otherRadius: 200
+	    },
+	    time: 0.35019455252918286 * t,
+	    ease: [0, 0, 1]
+	  }).smoothOver(0.019455252918287938 * t, {
+	    to: {
+	      staticAlpha: 0
+	    },
+	    time: 0.3852140077821012 * t,
+	    ease: [0, 0, 1]
+	  }).smoothOver(0.011673151750972763 * t, {
+	    to: {
+	      grow: 0.1
+	    },
+	    time: 0.47470817120622566 * t,
+	    ease: [0, 0, 1]
+	  }).smoothOver(0.011673151750972763 * t, {
+	    to: {
+	      grow: 0.3
+	    },
+	    time: 0.5525291828793775 * t,
+	    ease: [0, 0, 1]
+	  }).smoothOver(0.023346303501945526 * t, {
+	    to: {
+	      soundWarp: 0.000001,
+	      noiseWarp: 0.001
+	    },
+	    time: 0.6964980544747081 * t,
+	    ease: [0, 0, 1]
+	  }).smoothTo({
+	    to: {
+	      grow: 0.4,
+	      ringAlpha: 0,
+	      noiseWarp: 0.00001
+	    },
+	    time: 0.7159533073929961 * t,
+	    ease: [0, 0, 1]
+	  }).smoothOver(500, {
+	    to: {
+	      ringAlpha: 5,
+	      noiseWarp: 0.0001,
+	      spin: 0.0002
+	    },
+	    time: 0.7295719844357976 * t,
+	    ease: [0, 0, 1]
+	  }).smoothOver(0.023346303501945526 * t, {
+	    to: {
+	      ringThick: 0.1,
+	      noiseWarp: 0.0003,
+	      soundWarp: 0.00003,
+	      otherThick: 0.003,
+	      otherRadius: 0.0000001
+	    },
+	    time: 0.7821011673151751 * t,
+	    ease: [0, 0, 1]
+	  }).smoothTo({
+	    to: {
+	      noiseWarp: 0.002,
+	      spin: -0.0002
+	    },
+	    time: 0.8054474708171206 * t,
+	    ease: [0, 0, 1]
+	  }).smoothTo({
+	    to: {
+	      noiseWarp: 0.1
+	    },
+	    time: 0.8443579766536965 * t,
+	    ease: [0, 0, 1]
+	  }).smoothTo({
+	    to: {
+	      soundWarp: 0.00005,
+	      grow: 0.2,
+	      growLimit: 1.2,
+	      ringThick: 0.03,
+	      fadeAlpha: 0.93,
+	      jitter: 0
+	    },
+	    time: 0.8560311284046692 * t,
+	    ease: [0, 0, 1]
+	  }).smoothTo({
+	    to: {
+	      grow: 0.5,
+	      growLimit: 1.8
+	    },
+	    time: 0.9182879377431906 * t,
+	    ease: [0, 0, 1]
+	  }).smoothOver(0.011673151750972763 * t, {
+	    to: {
+	      grow: 1,
+	      growLimit: 3,
+	      ringThick: 2
+	    },
+	    time: 0.9999 * t,
+	    ease: [0, 0, 1],
+	    call: [end]
+	  });
 	
-	    player.tracks.lightColor.smoothTo({
-	        to: colors.pink,
-	        time: 0.07392996108949416 * t,
-	        ease: [0, 0.95, 1]
-	    }).smoothOver(0.011673151750972763 * t, {
-	        to: colors.lightBlueA,
-	        time: 0.2178988326848249 * t,
-	        ease: [0, 0, 1]
-	    }).smoothOver(0.011673151750972763 * t, {
-	        to: colors.yellow,
-	        time: 0.35019455252918286 * t,
-	        ease: [0, 0, 1]
-	    }).smoothOver(0.019455252918287938 * t, {
-	        to: colors.orange,
-	        time: 0.5525291828793775 * t,
-	        ease: [0, 0, 1]
-	    }).smoothOver(0.0311284046692607 * t, {
-	        to: colors.white,
-	        time: 0.9999 * t,
-	        ease: [0, 0, 1]
-	    });
+	  player.tracks.lightColor.smoothTo({
+	    to: colors.pink,
+	    time: 0.07392996108949416 * t,
+	    ease: [0, 0.95, 1]
+	  }).smoothOver(0.011673151750972763 * t, {
+	    to: colors.lightBlueA,
+	    time: 0.2178988326848249 * t,
+	    ease: [0, 0, 1]
+	  }).smoothOver(0.011673151750972763 * t, {
+	    to: colors.yellow,
+	    time: 0.35019455252918286 * t,
+	    ease: [0, 0, 1]
+	  }).smoothOver(0.019455252918287938 * t, {
+	    to: colors.orange,
+	    time: 0.5525291828793775 * t,
+	    ease: [0, 0, 1]
+	  }).smoothOver(0.0311284046692607 * t, {
+	    to: colors.white,
+	    time: 0.9999 * t,
+	    ease: [0, 0, 1]
+	  });
 	
-	    player.tracks.fadeColor.smoothTo({
-	        to: colors.orange,
-	        time: 0.07392996108949416 * t,
-	        ease: [0, 0.95, 1]
-	    }).smoothOver(0.019455252918287938 * t, {
-	        to: colors.white,
-	        time: 0.5525291828793775 * t,
-	        ease: [0, 0, 1]
-	    }).smoothOver(500, {
-	        to: colors.lightBlueC,
-	        time: 0.7295719844357976 * t,
-	        ease: [0, 0, 1]
-	    }).smoothTo({
-	        to: colors.lightBlueB,
-	        time: 0.8054474708171206 * t,
-	        ease: [0, 0, 1]
-	    }).smoothTo({
-	        to: colors.lightBlueA,
-	        time: 0.8521400778210116 * t,
-	        ease: [0, 0, 1]
-	    }).smoothTo({
-	        to: colors.orange,
-	        time: 0.8560311284046692 * t,
-	        ease: [0, 0, 1]
-	    }).smoothOver(0.0311284046692607 * t, {
-	        to: colors.white,
-	        time: 0.9999 * t,
-	        ease: [0, 0, 1]
-	    });
+	  player.tracks.fadeColor.smoothTo({
+	    to: colors.orange,
+	    time: 0.07392996108949416 * t,
+	    ease: [0, 0.95, 1]
+	  }).smoothOver(0.019455252918287938 * t, {
+	    to: colors.white,
+	    time: 0.5525291828793775 * t,
+	    ease: [0, 0, 1]
+	  }).smoothOver(500, {
+	    to: colors.lightBlueC,
+	    time: 0.7295719844357976 * t,
+	    ease: [0, 0, 1]
+	  }).smoothTo({
+	    to: colors.lightBlueB,
+	    time: 0.8054474708171206 * t,
+	    ease: [0, 0, 1]
+	  }).smoothTo({
+	    to: colors.lightBlueA,
+	    time: 0.8521400778210116 * t,
+	    ease: [0, 0, 1]
+	  }).smoothTo({
+	    to: colors.orange,
+	    time: 0.8560311284046692 * t,
+	    ease: [0, 0, 1]
+	  }).smoothOver(0.0311284046692607 * t, {
+	    to: colors.white,
+	    time: 0.9999 * t,
+	    ease: [0, 0, 1]
+	  });
 	};
 
 /***/ }),
@@ -21689,7 +21689,7 @@
 	'use strict';
 	
 	Object.defineProperty(exports, "__esModule", {
-	    value: true
+	  value: true
 	});
 	
 	var _colors = __webpack_require__(547);
@@ -21699,233 +21699,233 @@
 	function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
 	
 	exports.default = function (player, end, audio) {
-	    var t = audio.duration * 1000;
+	  var t = audio.duration * 1000;
 	
-	    player.tracks.main.to({
-	        to: {
-	            audioMode: 'waveform',
-	            audioOrder: 0,
-	            audioScale: 1,
-	            silent: 0,
-	            soundWarp: 0.000007,
-	            soundSmooth: 0.3,
-	            meanFulcrum: 0.7,
-	            spin: -0.0001,
-	            ringAlpha: 0.5,
-	            ringThick: 0.01,
-	            noiseSpeed: 0.001,
-	            noiseWarp: 0.001,
-	            otherRadius: 0,
-	            otherThick: 0,
-	            otherAlpha: 0.0002,
-	            otherEdge: 500,
-	            triangleAlpha: 0,
-	            triangleEdge: 210,
-	            staticScale: 70,
-	            staticSpeed: 0.5,
-	            staticShift: 0.8,
-	            staticAlpha: 0.05,
-	            grow: 0.0001,
-	            fadeAlpha: 0.91,
-	            bokehRadius: 4,
-	            bokehAmount: 40
-	        },
-	        time: 210
-	    }).smoothOver(0.01567398119122257 * t, {
-	        to: {
-	            ringRadius: 0.35,
-	            ringThick: 0,
-	            ringAlpha: 0.01,
-	            grow: 0.003
-	        },
-	        time: 0.02664576802507837 * t,
-	        ease: [0, 0, 1]
-	    }).smoothTo({
-	        to: {
-	            soundWarp: 0.00004,
-	            ringRadius: 0.1
-	        },
-	        time: 0.09404388714733543 * t,
-	        ease: [0, 0, 1]
-	    }).smoothTo({
-	        to: {
-	            soundWarp: 0.000055,
-	            fadeAlpha: 0.93
-	        },
-	        time: 0.12539184952978055 * t,
-	        ease: [0, 0, 1]
-	    }).smoothTo({
-	        to: {
-	            soundWarp: 0.000075,
-	            ringRadius: 0,
-	            ringThick: 0.001,
-	            fadeAlpha: 0.94
-	        },
-	        time: 0.1724137931034483 * t,
-	        ease: [0, 0, 1]
-	    }).smoothTo({
-	        to: {
-	            ringAlpha: 0.1
-	        },
-	        time: 0.1974921630094044 * t,
-	        ease: [0, 0, 1]
-	    }).smoothOver(0.03134796238244514 * t, {
-	        to: {
-	            grow: 0.01
-	        },
-	        time: 0.28213166144200624 * t,
-	        ease: [0, 0, 1]
-	    }).smoothOver(0.01567398119122257 * t, {
-	        to: {
-	            otherEdge: 0.01
-	        },
-	        time: 0.3573667711598746 * t,
-	        ease: [0, 0, 1]
-	    }).smoothTo({
-	        to: {
-	            otherRadius: 0.3
-	        },
-	        time: 0.39184952978056425 * t,
-	        ease: [0, 0, 1]
-	    }).smoothTo({
-	        to: {
-	            otherRadius: 0.3,
-	            otherThick: 0.0001,
-	            otherEdge: 200
-	        },
-	        time: 0.40752351097178685 * t,
-	        ease: [0, 0, 1]
-	    }).smoothOver(0.018808777429467086 * t, {
-	        to: {
-	            grow: 0.005,
-	            growLimit: 1.4
-	        },
-	        time: 0.45141065830721006 * t,
-	        ease: [0, 0, 1]
-	    }).smoothOver(0.018808777429467086 * t, {
-	        to: {
-	            otherThick: 0.0001
-	        },
-	        time: 0.5172413793103449 * t,
-	        ease: [0, 0, 1]
-	    }).smoothTo({
-	        to: {
-	            otherThick: -0.001,
-	            grow: -0.003,
-	            growLimit: -0.3,
-	            ringRadius: 0.6
-	        },
-	        time: 0.5360501567398119 * t,
-	        ease: [0, 0, 1]
-	    }).smoothTo({
-	        to: {
-	            otherThick: -0.01,
-	            otherRadius: 0.1
-	        },
-	        time: 0.567398119122257 * t,
-	        ease: [0, 0, 1]
-	    }).smoothTo({
-	        to: {
-	            otherAlpha: 0.00005,
-	            otherThick: 0.0001,
-	            otherRadius: 0.7
-	        },
-	        time: 0.5736677115987461 * t,
-	        ease: [0, 0, 1]
-	    }).smoothOver(0.018808777429467086 * t, {
-	        to: {
-	            otherAlpha: 0.0005
-	        },
-	        time: 0.6363636363636364 * t,
-	        ease: [0, 0, 1]
-	    }).smoothOver(0.009404388714733543 * t, {
-	        to: {
-	            otherAlpha: 0.00001,
-	            grow: 0.002,
-	            growLimit: 0,
-	            ringRadius: 0.3
-	        },
-	        time: 0.658307210031348 * t,
-	        ease: [0, 0, 1]
-	    }).smoothOver(0.07523510971786834 * t, {
-	        to: {
-	            otherRadius: 1.4,
-	            soundWarp: 0.0001
-	        },
-	        time: 0.7962382445141066 * t,
-	        ease: [0, -0.1, 1.3, 1]
-	    }).smoothTo({
-	        to: {
-	            ringRadius: 0.6,
-	            ringThick: 0.05,
-	            otherRadius: 0.01,
-	            otherThick: 0.003
-	        },
-	        time: 0.8087774294670846 * t,
-	        ease: [0, 1, 0.3, 1]
-	    }).smoothTo({
-	        to: {
-	            ringRadius: 0.4,
-	            otherThick: -0.0006
-	        },
-	        time: 0.8620689655172413 * t,
-	        ease: [0, 0, 1.6, 1]
-	    }).smoothOver(0.018808777429467086 * t, {
-	        to: {
-	            ringRadius: 0.3,
-	            noiseWarp: 0.08,
-	            grow: 0.0008
-	        },
-	        time: 0.8871473354231975 * t,
-	        ease: [0, 0, 1]
-	    }).smoothTo({
-	        to: {
-	            ringRadius: 0.6,
-	            soundWarp: 0.00006,
-	            meanFulcrum: 0.1
-	        },
-	        time: 0.9404388714733543 * t,
-	        ease: [0, 0, 1]
-	    }).smoothOver(0.03542319749216301 * t, {
-	        to: {
-	            ringRadius: 0.3,
-	            soundWarp: 0.00001
-	        },
-	        time: 0.9884012539184953 * t,
-	        ease: [0, 0.8, 0, 1]
-	    }).smoothTo({
-	        to: {
-	            ringRadius: 0,
-	            ringThick: 2
-	        },
-	        time: 0.9968652037617555 * t,
-	        ease: [0, 0.8, 0, 1],
-	        call: [end]
-	    });
+	  player.tracks.main.to({
+	    to: {
+	      audioMode: 'waveform',
+	      audioOrder: 0,
+	      audioScale: 1,
+	      silent: 0,
+	      soundWarp: 0.000007,
+	      soundSmooth: 0.3,
+	      meanFulcrum: 0.7,
+	      spin: -0.0001,
+	      ringAlpha: 0.5,
+	      ringThick: 0.01,
+	      noiseSpeed: 0.001,
+	      noiseWarp: 0.001,
+	      otherRadius: 0,
+	      otherThick: 0,
+	      otherAlpha: 0.0002,
+	      otherEdge: 500,
+	      triangleAlpha: 0,
+	      triangleEdge: 210,
+	      staticScale: 70,
+	      staticSpeed: 0.5,
+	      staticShift: 0.8,
+	      staticAlpha: 0.05,
+	      grow: 0.0001,
+	      fadeAlpha: 0.91,
+	      bokehRadius: 4,
+	      bokehAmount: 40
+	    },
+	    time: 210
+	  }).smoothOver(0.01567398119122257 * t, {
+	    to: {
+	      ringRadius: 0.35,
+	      ringThick: 0,
+	      ringAlpha: 0.01,
+	      grow: 0.003
+	    },
+	    time: 0.02664576802507837 * t,
+	    ease: [0, 0, 1]
+	  }).smoothTo({
+	    to: {
+	      soundWarp: 0.00004,
+	      ringRadius: 0.1
+	    },
+	    time: 0.09404388714733543 * t,
+	    ease: [0, 0, 1]
+	  }).smoothTo({
+	    to: {
+	      soundWarp: 0.000055,
+	      fadeAlpha: 0.93
+	    },
+	    time: 0.12539184952978055 * t,
+	    ease: [0, 0, 1]
+	  }).smoothTo({
+	    to: {
+	      soundWarp: 0.000075,
+	      ringRadius: 0,
+	      ringThick: 0.001,
+	      fadeAlpha: 0.94
+	    },
+	    time: 0.1724137931034483 * t,
+	    ease: [0, 0, 1]
+	  }).smoothTo({
+	    to: {
+	      ringAlpha: 0.1
+	    },
+	    time: 0.1974921630094044 * t,
+	    ease: [0, 0, 1]
+	  }).smoothOver(0.03134796238244514 * t, {
+	    to: {
+	      grow: 0.01
+	    },
+	    time: 0.28213166144200624 * t,
+	    ease: [0, 0, 1]
+	  }).smoothOver(0.01567398119122257 * t, {
+	    to: {
+	      otherEdge: 0.01
+	    },
+	    time: 0.3573667711598746 * t,
+	    ease: [0, 0, 1]
+	  }).smoothTo({
+	    to: {
+	      otherRadius: 0.3
+	    },
+	    time: 0.39184952978056425 * t,
+	    ease: [0, 0, 1]
+	  }).smoothTo({
+	    to: {
+	      otherRadius: 0.3,
+	      otherThick: 0.0001,
+	      otherEdge: 200
+	    },
+	    time: 0.40752351097178685 * t,
+	    ease: [0, 0, 1]
+	  }).smoothOver(0.018808777429467086 * t, {
+	    to: {
+	      grow: 0.005,
+	      growLimit: 1.4
+	    },
+	    time: 0.45141065830721006 * t,
+	    ease: [0, 0, 1]
+	  }).smoothOver(0.018808777429467086 * t, {
+	    to: {
+	      otherThick: 0.0001
+	    },
+	    time: 0.5172413793103449 * t,
+	    ease: [0, 0, 1]
+	  }).smoothTo({
+	    to: {
+	      otherThick: -0.001,
+	      grow: -0.003,
+	      growLimit: -0.3,
+	      ringRadius: 0.6
+	    },
+	    time: 0.5360501567398119 * t,
+	    ease: [0, 0, 1]
+	  }).smoothTo({
+	    to: {
+	      otherThick: -0.01,
+	      otherRadius: 0.1
+	    },
+	    time: 0.567398119122257 * t,
+	    ease: [0, 0, 1]
+	  }).smoothTo({
+	    to: {
+	      otherAlpha: 0.00005,
+	      otherThick: 0.0001,
+	      otherRadius: 0.7
+	    },
+	    time: 0.5736677115987461 * t,
+	    ease: [0, 0, 1]
+	  }).smoothOver(0.018808777429467086 * t, {
+	    to: {
+	      otherAlpha: 0.0005
+	    },
+	    time: 0.6363636363636364 * t,
+	    ease: [0, 0, 1]
+	  }).smoothOver(0.009404388714733543 * t, {
+	    to: {
+	      otherAlpha: 0.00001,
+	      grow: 0.002,
+	      growLimit: 0,
+	      ringRadius: 0.3
+	    },
+	    time: 0.658307210031348 * t,
+	    ease: [0, 0, 1]
+	  }).smoothOver(0.07523510971786834 * t, {
+	    to: {
+	      otherRadius: 1.4,
+	      soundWarp: 0.0001
+	    },
+	    time: 0.7962382445141066 * t,
+	    ease: [0, -0.1, 1.3, 1]
+	  }).smoothTo({
+	    to: {
+	      ringRadius: 0.6,
+	      ringThick: 0.05,
+	      otherRadius: 0.01,
+	      otherThick: 0.003
+	    },
+	    time: 0.8087774294670846 * t,
+	    ease: [0, 1, 0.3, 1]
+	  }).smoothTo({
+	    to: {
+	      ringRadius: 0.4,
+	      otherThick: -0.0006
+	    },
+	    time: 0.8620689655172413 * t,
+	    ease: [0, 0, 1.6, 1]
+	  }).smoothOver(0.018808777429467086 * t, {
+	    to: {
+	      ringRadius: 0.3,
+	      noiseWarp: 0.08,
+	      grow: 0.0008
+	    },
+	    time: 0.8871473354231975 * t,
+	    ease: [0, 0, 1]
+	  }).smoothTo({
+	    to: {
+	      ringRadius: 0.6,
+	      soundWarp: 0.00006,
+	      meanFulcrum: 0.1
+	    },
+	    time: 0.9404388714733543 * t,
+	    ease: [0, 0, 1]
+	  }).smoothOver(0.03542319749216301 * t, {
+	    to: {
+	      ringRadius: 0.3,
+	      soundWarp: 0.00001
+	    },
+	    time: 0.9884012539184953 * t,
+	    ease: [0, 0.8, 0, 1]
+	  }).smoothTo({
+	    to: {
+	      ringRadius: 0,
+	      ringThick: 2
+	    },
+	    time: 0.9968652037617555 * t,
+	    ease: [0, 0.8, 0, 1],
+	    call: [end]
+	  });
 	
-	    player.tracks.lightColor.smoothTo({
-	        to: colors.lightBlueC,
-	        time: 0.09090909090909091 * t,
-	        ease: [0, 0.95, 1]
-	    }).over(0.009404388714733543 * t, {
-	        to: colors.yellow,
-	        time: 0.658307210031348 * t
-	    }).over(0.025078369905956112 * t, {
-	        to: colors.white,
-	        time: 0.8181818181818182 * t
-	    });
+	  player.tracks.lightColor.smoothTo({
+	    to: colors.lightBlueC,
+	    time: 0.09090909090909091 * t,
+	    ease: [0, 0.95, 1]
+	  }).over(0.009404388714733543 * t, {
+	    to: colors.yellow,
+	    time: 0.658307210031348 * t
+	  }).over(0.025078369905956112 * t, {
+	    to: colors.white,
+	    time: 0.8181818181818182 * t
+	  });
 	
-	    player.tracks.fadeColor.smoothTo({
-	        to: colors.yellow,
-	        time: 0.09090909090909091 * t,
-	        ease: [0, 0.95, 1]
-	    }).over(0.03761755485893417 * t, {
-	        to: colors.orange,
-	        time: 0.5172413793103449 * t
-	    }).over(0.03761755485893417 * t, {
-	        to: colors.yellow,
-	        time: 0.8181818181818182 * t
-	    });
+	  player.tracks.fadeColor.smoothTo({
+	    to: colors.yellow,
+	    time: 0.09090909090909091 * t,
+	    ease: [0, 0.95, 1]
+	  }).over(0.03761755485893417 * t, {
+	    to: colors.orange,
+	    time: 0.5172413793103449 * t
+	  }).over(0.03761755485893417 * t, {
+	    to: colors.yellow,
+	    time: 0.8181818181818182 * t
+	  });
 	};
 
 /***/ }),
@@ -21935,7 +21935,7 @@
 	'use strict';
 	
 	Object.defineProperty(exports, "__esModule", {
-	    value: true
+	  value: true
 	});
 	
 	var _colors = __webpack_require__(547);
@@ -21945,203 +21945,203 @@
 	function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
 	
 	exports.default = function (player, end, audio) {
-	    var t = audio.duration * 1000;
+	  var t = audio.duration * 1000;
 	
-	    player.tracks.main.to({
-	        to: {
-	            audioMode: 'frequencies',
-	            audioScale: 1,
-	            audioOrder: 1,
-	            silent: 0.00001,
-	            soundWarp: 0.1,
-	            soundSmooth: 0.3,
-	            meanFulcrum: 0.5,
-	            ringAlpha: 0.005,
-	            noiseSpeed: 0.0005,
-	            noiseWarp: 0,
-	            otherAlpha: 0,
-	            otherRadius: 1.2,
-	            otherThick: 0.0000001,
-	            otherEdge: 2.5,
-	            triangleAlpha: 0,
-	            triangleFat: 0,
-	            triangleRadius: 100,
-	            triangleEdge: 3,
-	            bokehRadius: 7,
-	            bokehAmount: 40
-	        },
-	        time: 500
-	    }).smoothTo({
-	        to: {
-	            noiseWarp: 0.06
-	        },
-	        time: 0.025806451612903226 * t,
-	        ease: [0, 0, 1]
-	    }).smoothTo({
-	        to: {
-	            noiseWarp: 0.15
-	        },
-	        time: 0.05806451612903226 * t,
-	        ease: [0, 0.3, 1]
-	    }).smoothOver(0.016129032258064516 * t, {
-	        to: {
-	            ringRadius: 0.6,
-	            triangleAlpha: 0.0001
-	        },
-	        time: 0.11290322580645161 * t,
-	        ease: [0, 0, 1]
-	    }).smoothTo({
-	        to: {
-	            ringRadius: 0,
-	            ringAlpha: 0.015,
-	            soundWarp: 1.6,
-	            noiseWarp: 0,
-	            fadeAlpha: 0.95,
-	            grow: 0.003,
-	            spin: 0.002
-	        },
-	        time: 0.16129032258064516 * t,
-	        ease: [0, 0.8, 1]
-	    }).smoothTo({
-	        to: {
-	            otherAlpha: 0.00001
-	        },
-	        time: 0.2 * t,
-	        ease: [0, 0, 1]
-	    }).smoothOver(0.02903225806451613 * t, {
-	        to: {
-	            otherAlpha: 0.001,
-	            otherThick: 0.000007
-	        },
-	        time: 0.25806451612903225 * t,
-	        ease: [0, 0, 1]
-	    }).smoothOver(0.05161290322580645 * t, {
-	        to: {
-	            otherEdge: 1.5,
-	            triangleEdge: 1.5
-	        },
-	        time: 0.3387096774193548 * t,
-	        ease: [0, 1, 1]
-	    }).smoothTo({
-	        to: {
-	            grow: 0.02,
-	            otherThick: 0.00001
-	        },
-	        time: 0.3709677419354839 * t,
-	        ease: [0, 0.5, 0, 1]
-	    }).smoothTo({
-	        to: {
-	            grow: 0.01,
-	            ringThick: 0.07,
-	            otherThick: 1,
-	            otherRadius: 0.6
-	        },
-	        time: 0.3935483870967742 * t,
-	        ease: [0, 1, 1]
-	    }).smoothTo({
-	        to: {
-	            ringAlpha: 0.05,
-	            grow: 0.01,
-	            otherThick: 0.0001,
-	            otherRadius: 1,
-	            otherAlpha: 0.00004,
-	            otherEdge: 3,
-	            spin: 0.0008
-	        },
-	        time: 0.4483870967741935 * t,
-	        ease: [0, 1, 1]
-	    }).smoothTo({
-	        to: {
-	            ringRadius: 0.3,
-	            noiseWarp: 0.25,
-	            spin: 0.0004
-	        },
-	        time: 0.5096774193548387 * t,
-	        ease: [0, 0.3, 1]
-	    }).smoothTo({
-	        to: {
-	            ringRadius: 0.8,
-	            ringThick: 0,
-	            noiseWarp: 0.05,
-	            triangleAlpha: 0
-	        },
-	        time: 0.535483870967742 * t,
-	        ease: [0, 0, 1]
-	    }).smoothOver(0.05806451612903226 * t, {
-	        to: {
-	            ringRadius: 1,
-	            grow: -0.002,
-	            otherThick: 0.1,
-	            otherAlpha: 0.01,
-	            otherRadius: 2,
-	            fadeAlpha: 0.98
-	        },
-	        time: 0.6774193548387096 * t,
-	        ease: [0, 0, 1]
-	    }).smoothOver(0.054838709677419356 * t, {
-	        to: {
-	            ringRadius: 1.6,
-	            noiseWarp: 0.1,
-	            spin: -0.00004,
-	            otherRadius: 0.5,
-	            otherEdge: 1,
-	            triangleEdge: 1.5
-	        },
-	        time: 0.7935483870967742 * t,
-	        ease: [0, 0, 1]
-	    }).smoothTo({
-	        to: {
-	            otherRadius: 1,
-	            otherThick: 0.00001,
-	            otherAlpha: 0.00001,
-	            triangleAlpha: 0.00001,
-	            grow: -0.004
-	        },
-	        time: 0.8 * t,
-	        ease: [0, 0, 1]
-	    }).smoothOver(0.03870967741935484 * t, {
-	        to: {
-	            ringRadius: 0,
-	            triangleAlpha: 0,
-	            grow: -0.001
-	        },
-	        time: 0.9516129032258065 * t,
-	        ease: [0, 0, 1]
-	    }).smoothOver(0.024193548387096774 * t, {
-	        to: {
-	            ringAlpha: 20
-	        },
-	        time: 0.9919354838709677 * t,
-	        ease: [0, 0, 1]
-	    }).smoothTo({
-	        to: {
-	            ringThick: 5
-	        },
-	        time: 0.9951612903225806 * t,
-	        ease: [0, 0, 1],
-	        call: [end]
-	    });
+	  player.tracks.main.to({
+	    to: {
+	      audioMode: 'frequencies',
+	      audioScale: 1,
+	      audioOrder: 1,
+	      silent: 0.00001,
+	      soundWarp: 0.1,
+	      soundSmooth: 0.3,
+	      meanFulcrum: 0.5,
+	      ringAlpha: 0.005,
+	      noiseSpeed: 0.0005,
+	      noiseWarp: 0,
+	      otherAlpha: 0,
+	      otherRadius: 1.2,
+	      otherThick: 0.0000001,
+	      otherEdge: 2.5,
+	      triangleAlpha: 0,
+	      triangleFat: 0,
+	      triangleRadius: 100,
+	      triangleEdge: 3,
+	      bokehRadius: 7,
+	      bokehAmount: 40
+	    },
+	    time: 500
+	  }).smoothTo({
+	    to: {
+	      noiseWarp: 0.06
+	    },
+	    time: 0.025806451612903226 * t,
+	    ease: [0, 0, 1]
+	  }).smoothTo({
+	    to: {
+	      noiseWarp: 0.15
+	    },
+	    time: 0.05806451612903226 * t,
+	    ease: [0, 0.3, 1]
+	  }).smoothOver(0.016129032258064516 * t, {
+	    to: {
+	      ringRadius: 0.6,
+	      triangleAlpha: 0.0001
+	    },
+	    time: 0.11290322580645161 * t,
+	    ease: [0, 0, 1]
+	  }).smoothTo({
+	    to: {
+	      ringRadius: 0,
+	      ringAlpha: 0.015,
+	      soundWarp: 1.6,
+	      noiseWarp: 0,
+	      fadeAlpha: 0.95,
+	      grow: 0.003,
+	      spin: 0.002
+	    },
+	    time: 0.16129032258064516 * t,
+	    ease: [0, 0.8, 1]
+	  }).smoothTo({
+	    to: {
+	      otherAlpha: 0.00001
+	    },
+	    time: 0.2 * t,
+	    ease: [0, 0, 1]
+	  }).smoothOver(0.02903225806451613 * t, {
+	    to: {
+	      otherAlpha: 0.001,
+	      otherThick: 0.000007
+	    },
+	    time: 0.25806451612903225 * t,
+	    ease: [0, 0, 1]
+	  }).smoothOver(0.05161290322580645 * t, {
+	    to: {
+	      otherEdge: 1.5,
+	      triangleEdge: 1.5
+	    },
+	    time: 0.3387096774193548 * t,
+	    ease: [0, 1, 1]
+	  }).smoothTo({
+	    to: {
+	      grow: 0.02,
+	      otherThick: 0.00001
+	    },
+	    time: 0.3709677419354839 * t,
+	    ease: [0, 0.5, 0, 1]
+	  }).smoothTo({
+	    to: {
+	      grow: 0.01,
+	      ringThick: 0.07,
+	      otherThick: 1,
+	      otherRadius: 0.6
+	    },
+	    time: 0.3935483870967742 * t,
+	    ease: [0, 1, 1]
+	  }).smoothTo({
+	    to: {
+	      ringAlpha: 0.05,
+	      grow: 0.01,
+	      otherThick: 0.0001,
+	      otherRadius: 1,
+	      otherAlpha: 0.00004,
+	      otherEdge: 3,
+	      spin: 0.0008
+	    },
+	    time: 0.4483870967741935 * t,
+	    ease: [0, 1, 1]
+	  }).smoothTo({
+	    to: {
+	      ringRadius: 0.3,
+	      noiseWarp: 0.25,
+	      spin: 0.0004
+	    },
+	    time: 0.5096774193548387 * t,
+	    ease: [0, 0.3, 1]
+	  }).smoothTo({
+	    to: {
+	      ringRadius: 0.8,
+	      ringThick: 0,
+	      noiseWarp: 0.05,
+	      triangleAlpha: 0
+	    },
+	    time: 0.535483870967742 * t,
+	    ease: [0, 0, 1]
+	  }).smoothOver(0.05806451612903226 * t, {
+	    to: {
+	      ringRadius: 1,
+	      grow: -0.002,
+	      otherThick: 0.1,
+	      otherAlpha: 0.01,
+	      otherRadius: 2,
+	      fadeAlpha: 0.98
+	    },
+	    time: 0.6774193548387096 * t,
+	    ease: [0, 0, 1]
+	  }).smoothOver(0.054838709677419356 * t, {
+	    to: {
+	      ringRadius: 1.6,
+	      noiseWarp: 0.1,
+	      spin: -0.00004,
+	      otherRadius: 0.5,
+	      otherEdge: 1,
+	      triangleEdge: 1.5
+	    },
+	    time: 0.7935483870967742 * t,
+	    ease: [0, 0, 1]
+	  }).smoothTo({
+	    to: {
+	      otherRadius: 1,
+	      otherThick: 0.00001,
+	      otherAlpha: 0.00001,
+	      triangleAlpha: 0.00001,
+	      grow: -0.004
+	    },
+	    time: 0.8 * t,
+	    ease: [0, 0, 1]
+	  }).smoothOver(0.03870967741935484 * t, {
+	    to: {
+	      ringRadius: 0,
+	      triangleAlpha: 0,
+	      grow: -0.001
+	    },
+	    time: 0.9516129032258065 * t,
+	    ease: [0, 0, 1]
+	  }).smoothOver(0.024193548387096774 * t, {
+	    to: {
+	      ringAlpha: 20
+	    },
+	    time: 0.9919354838709677 * t,
+	    ease: [0, 0, 1]
+	  }).smoothTo({
+	    to: {
+	      ringThick: 5
+	    },
+	    time: 0.9951612903225806 * t,
+	    ease: [0, 0, 1],
+	    call: [end]
+	  });
 	
-	    player.tracks.lightColor.smoothTo({
-	        to: colors.yellow,
-	        time: 0.025806451612903226 * t,
-	        ease: [0, 0.95, 1]
-	    }).over(0.7387096774193549 * t - 192000, {
-	        to: colors.white,
-	        time: 0.7387096774193549 * t
-	    });
+	  player.tracks.lightColor.smoothTo({
+	    to: colors.yellow,
+	    time: 0.025806451612903226 * t,
+	    ease: [0, 0.95, 1]
+	  }).over(0.7387096774193549 * t - 192000, {
+	    to: colors.white,
+	    time: 0.7387096774193549 * t
+	  });
 	
-	    player.tracks.fadeColor.smoothTo({
-	        to: colors.white,
-	        time: 0.025806451612903226 * t,
-	        ease: [0, 0.95, 1]
-	    }).over(0.05161290322580645 * t, {
-	        to: colors.pink,
-	        time: 0.3935483870967742 * t
-	    }).to({
-	        to: colors.orange,
-	        time: 0.41935483870967744 * t
-	    });
+	  player.tracks.fadeColor.smoothTo({
+	    to: colors.white,
+	    time: 0.025806451612903226 * t,
+	    ease: [0, 0.95, 1]
+	  }).over(0.05161290322580645 * t, {
+	    to: colors.pink,
+	    time: 0.3935483870967742 * t
+	  }).to({
+	    to: colors.orange,
+	    time: 0.41935483870967744 * t
+	  });
 	};
 
 /***/ }),
@@ -22151,7 +22151,7 @@
 	'use strict';
 	
 	Object.defineProperty(exports, "__esModule", {
-	    value: true
+	  value: true
 	});
 	
 	var _colors = __webpack_require__(547);
@@ -22161,145 +22161,145 @@
 	function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
 	
 	exports.default = function (player, end, audio) {
-	    var t = audio.duration * 1000;
+	  var t = audio.duration * 1000;
 	
-	    player.tracks.main.to({
-	        to: {
-	            audioMode: 'waveform',
-	            audioScale: 1,
-	            audioOrder: 1,
-	            silent: 0.00001,
-	            soundWarp: 0.01,
-	            soundSmooth: 0.3,
-	            meanFulcrum: 0.3,
-	            ringAlpha: 0.1,
-	            noiseSpeed: 0.0001,
-	            noiseWarp: 0.04,
-	            otherAlpha: 0,
-	            otherEdge: 10,
-	            triangleAlpha: 0,
-	            triangleEdge: 10,
-	            bokehRadius: 1,
-	            bokehAmount: 0.1
-	        },
-	        time: 500
-	    }).smoothTo({
-	        to: {
-	            ringRadius: 0.25,
-	            noiseWarp: 0.3
-	        },
-	        time: 0.04198473282442748 * t,
-	        ease: [0, 0, 1]
-	    }).smoothTo({
-	        to: {
-	            ringThick: 0.2,
-	            soundWarp: 0.003
-	        },
-	        time: 0.08396946564885496 * t,
-	        ease: [0, 0, 1]
-	    }).smoothTo({
-	        to: {
-	            bokehRadius: 12,
-	            ringAlpha: 100
-	        },
-	        time: 0.1717557251908397 * t,
-	        ease: [0, 0, 1]
-	    }).smoothTo({
-	        to: {
-	            otherAlpha: 0.01
-	        },
-	        time: 0.2099236641221374 * t,
-	        ease: [0, 0, 1]
-	    }).smoothTo({
-	        to: {
-	            noiseSpeed: 0.001
-	        },
-	        time: 0.22900763358778625 * t,
-	        ease: [0, 0, 1]
-	    }).smoothOver(0.007633587786259542 * t, {
-	        to: {
-	            ringRadius: 0.5,
-	            soundWarp: 0.0005,
-	            otherEdge: 20,
-	            otherRadius: 10
-	        },
-	        time: 0.3053435114503817 * t,
-	        ease: [0, 0, 1]
-	    }).smoothOver(0.007633587786259542 * t, {
-	        to: {
-	            noiseWarp: 0.6,
-	            otherEdge: 10,
-	            otherThick: 0.0000002
-	        },
-	        time: 0.4312977099236641 * t,
-	        ease: [0, 0, 1]
-	    }).smoothOver(0.015267175572519083 * t, {
-	        to: {
-	            ringRadius: 0.8,
-	            noiseWarp: 1,
-	            otherThick: 0.000001,
-	            otherAlpha: 0.00001
-	        },
-	        time: 0.5267175572519084 * t,
-	        ease: [0, 0, 1]
-	    }).smoothOver(0.022900763358778626 * t, {
-	        to: {
-	            ringThick: 0.000001
-	        },
-	        time: 0.5954198473282443 * t,
-	        ease: [0, 0, 1]
-	    }).smoothOver(0.019083969465648856 * t, {
-	        to: {
-	            ringRadius: 1,
-	            noiseWarp: 10
-	        },
-	        time: 0.6793893129770993 * t,
-	        ease: [0, 0, 1]
-	    }).smoothTo({
-	        to: {
-	            noiseScale: 1
-	        },
-	        time: 0.7137404580152672 * t,
-	        ease: [0, 0, 1]
-	    }).smoothTo({
-	        to: {
-	            noiseScale: 10
-	        },
-	        time: 0.7519083969465649 * t,
-	        ease: [0, 0, 1]
-	    }).smoothTo({
-	        to: {
-	            noiseScale: 0.01,
-	            noiseWarp: 30
-	        },
-	        time: 0.9541984732824428 * t,
-	        ease: [0, 0.3, 1]
-	    }).smoothTo({
-	        to: {
-	            ringThick: 1
-	        },
-	        time: 0.9770992366412213 * t,
-	        ease: [0, 0, 1]
-	    }).smoothTo({
-	        to: {
-	            ringThick: 60
-	        },
-	        time: 0.9961832061068703 * t,
-	        ease: [0, 0, 1],
-	        call: [end]
-	    });
+	  player.tracks.main.to({
+	    to: {
+	      audioMode: 'waveform',
+	      audioScale: 1,
+	      audioOrder: 1,
+	      silent: 0.00001,
+	      soundWarp: 0.01,
+	      soundSmooth: 0.3,
+	      meanFulcrum: 0.3,
+	      ringAlpha: 0.1,
+	      noiseSpeed: 0.0001,
+	      noiseWarp: 0.04,
+	      otherAlpha: 0,
+	      otherEdge: 10,
+	      triangleAlpha: 0,
+	      triangleEdge: 10,
+	      bokehRadius: 1,
+	      bokehAmount: 0.1
+	    },
+	    time: 500
+	  }).smoothTo({
+	    to: {
+	      ringRadius: 0.25,
+	      noiseWarp: 0.3
+	    },
+	    time: 0.04198473282442748 * t,
+	    ease: [0, 0, 1]
+	  }).smoothTo({
+	    to: {
+	      ringThick: 0.2,
+	      soundWarp: 0.003
+	    },
+	    time: 0.08396946564885496 * t,
+	    ease: [0, 0, 1]
+	  }).smoothTo({
+	    to: {
+	      bokehRadius: 12,
+	      ringAlpha: 100
+	    },
+	    time: 0.1717557251908397 * t,
+	    ease: [0, 0, 1]
+	  }).smoothTo({
+	    to: {
+	      otherAlpha: 0.01
+	    },
+	    time: 0.2099236641221374 * t,
+	    ease: [0, 0, 1]
+	  }).smoothTo({
+	    to: {
+	      noiseSpeed: 0.001
+	    },
+	    time: 0.22900763358778625 * t,
+	    ease: [0, 0, 1]
+	  }).smoothOver(0.007633587786259542 * t, {
+	    to: {
+	      ringRadius: 0.5,
+	      soundWarp: 0.0005,
+	      otherEdge: 20,
+	      otherRadius: 10
+	    },
+	    time: 0.3053435114503817 * t,
+	    ease: [0, 0, 1]
+	  }).smoothOver(0.007633587786259542 * t, {
+	    to: {
+	      noiseWarp: 0.6,
+	      otherEdge: 10,
+	      otherThick: 0.0000002
+	    },
+	    time: 0.4312977099236641 * t,
+	    ease: [0, 0, 1]
+	  }).smoothOver(0.015267175572519083 * t, {
+	    to: {
+	      ringRadius: 0.8,
+	      noiseWarp: 1,
+	      otherThick: 0.000001,
+	      otherAlpha: 0.00001
+	    },
+	    time: 0.5267175572519084 * t,
+	    ease: [0, 0, 1]
+	  }).smoothOver(0.022900763358778626 * t, {
+	    to: {
+	      ringThick: 0.000001
+	    },
+	    time: 0.5954198473282443 * t,
+	    ease: [0, 0, 1]
+	  }).smoothOver(0.019083969465648856 * t, {
+	    to: {
+	      ringRadius: 1,
+	      noiseWarp: 10
+	    },
+	    time: 0.6793893129770993 * t,
+	    ease: [0, 0, 1]
+	  }).smoothTo({
+	    to: {
+	      noiseScale: 1
+	    },
+	    time: 0.7137404580152672 * t,
+	    ease: [0, 0, 1]
+	  }).smoothTo({
+	    to: {
+	      noiseScale: 10
+	    },
+	    time: 0.7519083969465649 * t,
+	    ease: [0, 0, 1]
+	  }).smoothTo({
+	    to: {
+	      noiseScale: 0.01,
+	      noiseWarp: 30
+	    },
+	    time: 0.9541984732824428 * t,
+	    ease: [0, 0.3, 1]
+	  }).smoothTo({
+	    to: {
+	      ringThick: 1
+	    },
+	    time: 0.9770992366412213 * t,
+	    ease: [0, 0, 1]
+	  }).smoothTo({
+	    to: {
+	      ringThick: 60
+	    },
+	    time: 0.9961832061068703 * t,
+	    ease: [0, 0, 1],
+	    call: [end]
+	  });
 	
-	    player.tracks.lightColor.smoothTo({
-	        to: colors.white,
-	        time: 0.019083969465648856 * t,
-	        ease: [0, 0.95, 1]
-	    });
+	  player.tracks.lightColor.smoothTo({
+	    to: colors.white,
+	    time: 0.019083969465648856 * t,
+	    ease: [0, 0.95, 1]
+	  });
 	
-	    player.tracks.fadeColor.smoothTo({
-	        to: colors.lightBlueA,
-	        time: 0.019083969465648856 * t,
-	        ease: [0, 0.95, 1]
-	    });
+	  player.tracks.fadeColor.smoothTo({
+	    to: colors.lightBlueA,
+	    time: 0.019083969465648856 * t,
+	    ease: [0, 0.95, 1]
+	  });
 	};
 
 /***/ }),
@@ -22309,7 +22309,7 @@
 	'use strict';
 	
 	Object.defineProperty(exports, "__esModule", {
-	    value: true
+	  value: true
 	});
 	
 	var _colors = __webpack_require__(547);
@@ -22319,144 +22319,144 @@
 	function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
 	
 	exports.default = function (player, end, audio) {
-	    var t = audio.duration * 1000;
+	  var t = audio.duration * 1000;
 	
-	    player.tracks.main.to({
-	        to: {
-	            audioMode: 'waveform',
-	            audioOrder: 3,
-	            audioScale: 1,
-	            silent: 0.00001,
-	            soundWarp: 0.000003,
-	            meanFulcrum: 0.7,
-	            ringAlpha: 0.01,
-	            noiseSpeed: 0.0001,
-	            noiseWarp: 0,
-	            otherAlpha: 0,
-	            otherEdge: 0.01,
-	            triangleAlpha: 0,
-	            triangleFat: 0.01,
-	            triangleEdge: 0.01,
-	            grow: -2,
-	            jitter: 0,
-	            fadeAlpha: 0,
-	            bokehRadius: 7,
-	            bokehAmount: 40
-	        },
-	        time: 500
-	    }).smoothTo({
-	        to: {
-	            soundWarp: 0.00002,
-	            ringRadius: 0.7,
-	            fadeAlpha: 0.95,
-	            grow: -0.1
-	        },
-	        time: 0.07692307692307693 * t,
-	        ease: [0, 0.4, 1]
-	    }).smoothTo({
-	        to: {
-	            ringRadius: 0.4,
-	            grow: 0.1
-	        },
-	        time: 0.1623931623931624 * t,
-	        ease: [0, 0, 1]
-	    }).smoothTo({
-	        to: {
-	            ringRadius: 0.1
-	        },
-	        time: 0.23504273504273504 * t,
-	        ease: [0, 0, 1]
-	    }).smoothTo({
-	        to: {
-	            grow: 0.3
-	        },
-	        time: 0.29914529914529914 * t,
-	        ease: [0, 0, 1]
-	    }).smoothOver(0.07264957264957266 * t, {
-	        to: {
-	            ringRadius: 0.4,
-	            ringThick: 0.04,
-	            soundWarp: 0.00004,
-	            grow: 0.08,
-	            triangleEdge: 230,
-	            triangleAlpha: 0.0001
-	        },
-	        time: 0.405982905982906 * t,
-	        ease: [0, 0, 1]
-	    }).smoothOver(0.01282051282051282 * t, {
-	        to: {
-	            grow: 0.04,
-	            growLimit: 1
-	        },
-	        time: 0.4444444444444444 * t,
-	        ease: [0, 0, 1]
-	    }).smoothOver(0.1111111111111111 * t, {
-	        to: {
-	            ringRadius: 0.6,
-	            ringThick: 0.01,
-	            soundWarp: 0.00001,
-	            growLimit: 0.4
-	        },
-	        time: 0.6068376068376068 * t,
-	        ease: [0, 0, 1]
-	    }).smoothOver(0.03418803418803419 * t, {
-	        to: {
-	            ringThick: 0.05,
-	            triangleFat: 1,
-	            triangleEdge: 200,
-	            grow: -0.003
-	        },
-	        time: 0.6794871794871795 * t,
-	        ease: [0, 1, 1]
-	    }).smoothOver(0.02564102564102564 * t, {
-	        to: {
-	            ringThick: 0.15,
-	            growLimit: 2
-	        },
-	        time: 0.8632478632478633 * t,
-	        ease: [0, 1, 1]
-	    }).smoothOver(0.08547008547008547 * t, {
-	        to: {
-	            grow: 0.1,
-	            triangleAlpha: 0
-	        },
-	        time: 0.9829059829059829 * t,
-	        ease: [0, 1, 1]
-	    }).smoothTo({
-	        to: {
-	            ringRadius: 0.1,
-	            ringThick: 2.5
-	        },
-	        time: 0.9978632478632479 * t,
-	        ease: [0, 0.2, 1],
-	        call: [end]
-	    });
+	  player.tracks.main.to({
+	    to: {
+	      audioMode: 'waveform',
+	      audioOrder: 3,
+	      audioScale: 1,
+	      silent: 0.00001,
+	      soundWarp: 0.000003,
+	      meanFulcrum: 0.7,
+	      ringAlpha: 0.01,
+	      noiseSpeed: 0.0001,
+	      noiseWarp: 0,
+	      otherAlpha: 0,
+	      otherEdge: 0.01,
+	      triangleAlpha: 0,
+	      triangleFat: 0.01,
+	      triangleEdge: 0.01,
+	      grow: -2,
+	      jitter: 0,
+	      fadeAlpha: 0,
+	      bokehRadius: 7,
+	      bokehAmount: 40
+	    },
+	    time: 500
+	  }).smoothTo({
+	    to: {
+	      soundWarp: 0.00002,
+	      ringRadius: 0.7,
+	      fadeAlpha: 0.95,
+	      grow: -0.1
+	    },
+	    time: 0.07692307692307693 * t,
+	    ease: [0, 0.4, 1]
+	  }).smoothTo({
+	    to: {
+	      ringRadius: 0.4,
+	      grow: 0.1
+	    },
+	    time: 0.1623931623931624 * t,
+	    ease: [0, 0, 1]
+	  }).smoothTo({
+	    to: {
+	      ringRadius: 0.1
+	    },
+	    time: 0.23504273504273504 * t,
+	    ease: [0, 0, 1]
+	  }).smoothTo({
+	    to: {
+	      grow: 0.3
+	    },
+	    time: 0.29914529914529914 * t,
+	    ease: [0, 0, 1]
+	  }).smoothOver(0.07264957264957266 * t, {
+	    to: {
+	      ringRadius: 0.4,
+	      ringThick: 0.04,
+	      soundWarp: 0.00004,
+	      grow: 0.08,
+	      triangleEdge: 230,
+	      triangleAlpha: 0.0001
+	    },
+	    time: 0.405982905982906 * t,
+	    ease: [0, 0, 1]
+	  }).smoothOver(0.01282051282051282 * t, {
+	    to: {
+	      grow: 0.04,
+	      growLimit: 1
+	    },
+	    time: 0.4444444444444444 * t,
+	    ease: [0, 0, 1]
+	  }).smoothOver(0.1111111111111111 * t, {
+	    to: {
+	      ringRadius: 0.6,
+	      ringThick: 0.01,
+	      soundWarp: 0.00001,
+	      growLimit: 0.4
+	    },
+	    time: 0.6068376068376068 * t,
+	    ease: [0, 0, 1]
+	  }).smoothOver(0.03418803418803419 * t, {
+	    to: {
+	      ringThick: 0.05,
+	      triangleFat: 1,
+	      triangleEdge: 200,
+	      grow: -0.003
+	    },
+	    time: 0.6794871794871795 * t,
+	    ease: [0, 1, 1]
+	  }).smoothOver(0.02564102564102564 * t, {
+	    to: {
+	      ringThick: 0.15,
+	      growLimit: 2
+	    },
+	    time: 0.8632478632478633 * t,
+	    ease: [0, 1, 1]
+	  }).smoothOver(0.08547008547008547 * t, {
+	    to: {
+	      grow: 0.1,
+	      triangleAlpha: 0
+	    },
+	    time: 0.9829059829059829 * t,
+	    ease: [0, 1, 1]
+	  }).smoothTo({
+	    to: {
+	      ringRadius: 0.1,
+	      ringThick: 2.5
+	    },
+	    time: 0.9978632478632479 * t,
+	    ease: [0, 0.2, 1],
+	    call: [end]
+	  });
 	
-	    player.tracks.lightColor.to({
-	        to: colors.white,
-	        time: 500
-	    });
+	  player.tracks.lightColor.to({
+	    to: colors.white,
+	    time: 500
+	  });
 	
-	    player.tracks.fadeColor.to({
-	        to: colors.none,
-	        time: 500
-	    }).smoothTo({
-	        to: colors.lightBlueC,
-	        time: 0.017094017094017096 * t,
-	        ease: [0, 0, 1]
-	    }).smoothOver(0.017094017094017096 * t, {
-	        to: colors.lightBlueB,
-	        time: 0.3418803418803419 * t,
-	        ease: [0, 0, 1]
-	    }).smoothOver(0.042735042735042736 * t, {
-	        to: colors.lightBlueA,
-	        time: 0.6794871794871795 * t,
-	        ease: [0, 0, 1]
-	    }).smoothOver(0.05982905982905983 * t, {
-	        to: colors.white,
-	        time: 0.9978632478632479 * t,
-	        ease: [0, 0, 1]
-	    });
+	  player.tracks.fadeColor.to({
+	    to: colors.none,
+	    time: 500
+	  }).smoothTo({
+	    to: colors.lightBlueC,
+	    time: 0.017094017094017096 * t,
+	    ease: [0, 0, 1]
+	  }).smoothOver(0.017094017094017096 * t, {
+	    to: colors.lightBlueB,
+	    time: 0.3418803418803419 * t,
+	    ease: [0, 0, 1]
+	  }).smoothOver(0.042735042735042736 * t, {
+	    to: colors.lightBlueA,
+	    time: 0.6794871794871795 * t,
+	    ease: [0, 0, 1]
+	  }).smoothOver(0.05982905982905983 * t, {
+	    to: colors.white,
+	    time: 0.9978632478632479 * t,
+	    ease: [0, 0, 1]
+	  });
 	};
 
 /***/ }),
@@ -22466,7 +22466,7 @@
 	'use strict';
 	
 	Object.defineProperty(exports, "__esModule", {
-	    value: true
+	  value: true
 	});
 	
 	var _colors = __webpack_require__(547);
@@ -22476,165 +22476,165 @@
 	function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
 	
 	exports.default = function (player, end, audio) {
-	    var t = audio.duration * 1000;
+	  var t = audio.duration * 1000;
 	
-	    player.tracks.main.to({
-	        to: {
-	            audioMode: 'frequencies',
-	            audioScale: 1,
-	            audioOrder: 0,
-	            silent: 0.0000001,
-	            soundWarp: 0.000003,
-	            soundSmooth: 0.3,
-	            meanFulcrum: 0.3,
-	            ringAlpha: 0.5,
-	            ringThick: 0.001,
-	            noiseSpeed: 0.0001,
-	            noiseWarp: 0,
-	            otherRadius: 0,
-	            otherThick: 0,
-	            otherAlpha: 0.0002,
-	            otherEdge: 500,
-	            triangleAlpha: 0,
-	            triangleEdge: 210,
-	            staticScale: 150,
-	            staticSpeed: 0.5,
-	            staticShift: 0.8,
-	            staticAlpha: 0.05,
-	            grow: -0.001,
-	            fadeAlpha: 0.91,
-	            bokehRadius: 3,
-	            bokehAmount: 40
-	        },
-	        time: 210
-	    }).smoothTo({
-	        to: {
-	            ringRadius: 0.5,
-	            noiseWarp: 0.1
-	        },
-	        time: 0.056 * t,
-	        ease: [0, 0, 1]
-	    }).smoothOver(0.0475 * t, {
-	        to: {
-	            soundWarp: 0.00004,
-	            staticAlpha: 0.01
-	        },
-	        time: 0.094 * t,
-	        ease: [0, 0, 1]
-	    }).smoothTo({
-	        to: {
-	            ringThick: 0.01
-	        },
-	        time: 0.145 * t,
-	        ease: [0, 0, 1]
-	    }).smoothTo({
-	        to: {
-	            ringRadius: 0.6,
-	            ringThick: 0.001
-	        },
-	        time: 0.1888 * t,
-	        ease: [0, 0, 1]
-	    }).smoothTo({
-	        to: {
-	            otherEdge: 250,
-	            otherRadius: 20,
-	            otherThick: 0.0000001
-	        },
-	        time: 0.1592 * t,
-	        ease: [0, 0, 1]
-	    }).smoothOver(0.052789 * t, {
-	        to: {
-	            otherRadius: 15,
-	            otherThick: 0.0000001
-	        },
-	        time: 0.2748 * t,
-	        ease: [0, 0, 1]
-	    }).smoothTo({
-	        to: {
-	            otherRadius: 60,
-	            ringRadius: 1,
-	            soundWarp: -0.00002
-	        },
-	        time: 0.33257 * t,
-	        ease: [0, 0, 1]
-	    }).smoothOver(0.0211 * t, {
-	        to: {
-	            grow: 0.003,
-	            soundWarp: -0.00005
-	        },
-	        time: 0.4223 * t,
-	        ease: [0, 0, 1]
-	    }).smoothTo({
-	        to: {
-	            otherRadius: 1
-	        },
-	        time: 0.51777 * t,
-	        ease: [0, 0, 1]
-	    }).smoothTo({
-	        to: {
-	            otherRadius: 1,
-	            soundWarp: -0.00008
-	        },
-	        time: 0.53623 * t,
-	        ease: [0, 0, 1]
-	    }).smoothTo({
-	        to: {
-	            otherRadius: 10,
-	            soundWarp: 0.00008
-	        },
-	        time: 0.6305468 * t,
-	        ease: [0, 0, 1]
-	    }).smoothOver(0.81143 * t - 0.722088 * t, {
-	        to: {
-	            fadeAlpha: 0.99
-	        },
-	        time: 0.81143 * t,
-	        ease: [0, 0, 1]
-	    }).smoothOver(0.960922 * t - 0.90467 * t, {
-	        to: {
-	            ringThick: 0.1
-	        },
-	        time: 0.960922 * t,
-	        ease: [0, 0, 1]
-	    }).smoothOver(6000, {
-	        to: {
-	            soundWarp: -0.001,
-	            ringAlpha: 50,
-	            silent: 1,
-	            fadeAlpha: 1
-	        },
-	        time: t,
-	        ease: [0, 0, 1],
-	        call: [end]
-	    });
+	  player.tracks.main.to({
+	    to: {
+	      audioMode: 'frequencies',
+	      audioScale: 1,
+	      audioOrder: 0,
+	      silent: 0.0000001,
+	      soundWarp: 0.000003,
+	      soundSmooth: 0.3,
+	      meanFulcrum: 0.3,
+	      ringAlpha: 0.5,
+	      ringThick: 0.001,
+	      noiseSpeed: 0.0001,
+	      noiseWarp: 0,
+	      otherRadius: 0,
+	      otherThick: 0,
+	      otherAlpha: 0.0002,
+	      otherEdge: 500,
+	      triangleAlpha: 0,
+	      triangleEdge: 210,
+	      staticScale: 150,
+	      staticSpeed: 0.5,
+	      staticShift: 0.8,
+	      staticAlpha: 0.05,
+	      grow: -0.001,
+	      fadeAlpha: 0.91,
+	      bokehRadius: 3,
+	      bokehAmount: 40
+	    },
+	    time: 210
+	  }).smoothTo({
+	    to: {
+	      ringRadius: 0.5,
+	      noiseWarp: 0.1
+	    },
+	    time: 0.056 * t,
+	    ease: [0, 0, 1]
+	  }).smoothOver(0.0475 * t, {
+	    to: {
+	      soundWarp: 0.00004,
+	      staticAlpha: 0.01
+	    },
+	    time: 0.094 * t,
+	    ease: [0, 0, 1]
+	  }).smoothTo({
+	    to: {
+	      ringThick: 0.01
+	    },
+	    time: 0.145 * t,
+	    ease: [0, 0, 1]
+	  }).smoothTo({
+	    to: {
+	      ringRadius: 0.6,
+	      ringThick: 0.001
+	    },
+	    time: 0.1888 * t,
+	    ease: [0, 0, 1]
+	  }).smoothTo({
+	    to: {
+	      otherEdge: 250,
+	      otherRadius: 20,
+	      otherThick: 0.0000001
+	    },
+	    time: 0.1592 * t,
+	    ease: [0, 0, 1]
+	  }).smoothOver(0.052789 * t, {
+	    to: {
+	      otherRadius: 15,
+	      otherThick: 0.0000001
+	    },
+	    time: 0.2748 * t,
+	    ease: [0, 0, 1]
+	  }).smoothTo({
+	    to: {
+	      otherRadius: 60,
+	      ringRadius: 1,
+	      soundWarp: -0.00002
+	    },
+	    time: 0.33257 * t,
+	    ease: [0, 0, 1]
+	  }).smoothOver(0.0211 * t, {
+	    to: {
+	      grow: 0.003,
+	      soundWarp: -0.00005
+	    },
+	    time: 0.4223 * t,
+	    ease: [0, 0, 1]
+	  }).smoothTo({
+	    to: {
+	      otherRadius: 1
+	    },
+	    time: 0.51777 * t,
+	    ease: [0, 0, 1]
+	  }).smoothTo({
+	    to: {
+	      otherRadius: 1,
+	      soundWarp: -0.00008
+	    },
+	    time: 0.53623 * t,
+	    ease: [0, 0, 1]
+	  }).smoothTo({
+	    to: {
+	      otherRadius: 10,
+	      soundWarp: 0.00008
+	    },
+	    time: 0.6305468 * t,
+	    ease: [0, 0, 1]
+	  }).smoothOver(0.81143 * t - 0.722088 * t, {
+	    to: {
+	      fadeAlpha: 0.99
+	    },
+	    time: 0.81143 * t,
+	    ease: [0, 0, 1]
+	  }).smoothOver(0.960922 * t - 0.90467 * t, {
+	    to: {
+	      ringThick: 0.1
+	    },
+	    time: 0.960922 * t,
+	    ease: [0, 0, 1]
+	  }).smoothOver(6000, {
+	    to: {
+	      soundWarp: -0.001,
+	      ringAlpha: 50,
+	      silent: 1,
+	      fadeAlpha: 1
+	    },
+	    time: t,
+	    ease: [0, 0, 1],
+	    call: [end]
+	  });
 	
-	    player.tracks.lightColor.smoothTo({
-	        to: colors.white,
-	        time: 0.0052789 * t,
-	        ease: [0, 0.95, 1]
-	    }).smoothTo({
-	        to: colors.lightBlueC,
-	        time: 0.02639 * t,
-	        ease: [0, 0.95, 1]
-	    }).smoothOver(0.0422 * t, {
-	        to: colors.white,
-	        time: t,
-	        ease: [0, 0.95, 1]
-	    });
+	  player.tracks.lightColor.smoothTo({
+	    to: colors.white,
+	    time: 0.0052789 * t,
+	    ease: [0, 0.95, 1]
+	  }).smoothTo({
+	    to: colors.lightBlueC,
+	    time: 0.02639 * t,
+	    ease: [0, 0.95, 1]
+	  }).smoothOver(0.0422 * t, {
+	    to: colors.white,
+	    time: t,
+	    ease: [0, 0.95, 1]
+	  });
 	
-	    player.tracks.fadeColor.smoothTo({
-	        to: colors.white,
-	        time: 0.0052789 * t,
-	        ease: [0, 0.95, 1]
-	    }).smoothTo({
-	        to: colors.lightBlueA,
-	        time: 0.02639 * t,
-	        ease: [0, 0.95, 1]
-	    }).smoothOver(0.0211 * t, {
-	        to: colors.white,
-	        time: t,
-	        ease: [0, 0.95, 1]
-	    });
+	  player.tracks.fadeColor.smoothTo({
+	    to: colors.white,
+	    time: 0.0052789 * t,
+	    ease: [0, 0.95, 1]
+	  }).smoothTo({
+	    to: colors.lightBlueA,
+	    time: 0.02639 * t,
+	    ease: [0, 0.95, 1]
+	  }).smoothOver(0.0211 * t, {
+	    to: colors.white,
+	    time: t,
+	    ease: [0, 0.95, 1]
+	  });
 	};
 
 /***/ }),
@@ -22644,7 +22644,7 @@
 	'use strict';
 	
 	Object.defineProperty(exports, "__esModule", {
-	    value: true
+	  value: true
 	});
 	
 	var _colors = __webpack_require__(547);
@@ -22654,186 +22654,186 @@
 	function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
 	
 	exports.default = function (player, end, audio) {
-	    var t = audio.duration * 1000;
+	  var t = audio.duration * 1000;
 	
-	    player.tracks.main.to({
-	        to: {
-	            audioMode: 'waveform',
-	            audioScale: 1,
-	            audioOrder: 1,
-	            silent: 0.00001,
-	            soundWarp: 0.1,
-	            soundSmooth: 0.3,
-	            meanFulcrum: 0.3,
-	            ringAlpha: 0.005,
-	            noiseSpeed: 0.0001,
-	            noiseWarp: 0.04,
-	            otherAlpha: 0,
-	            otherEdge: 10000,
-	            triangleAlpha: 0,
-	            triangleEdge: 10000,
-	            bokehRadius: 4,
-	            bokehAmount: 0.01
-	        },
-	        time: 500
-	    }).smoothOver(0.003365976 * t, {
-	        to: {
-	            soundWarp: 0.1
-	        },
-	        time: 0.01178 * t,
-	        ease: [0, 1, 1]
-	    }).smoothTo({
-	        to: {
-	            silent: 0,
-	            spin: 0.001,
-	            ringRadius: 0.35,
-	            ringThick: 0.001,
-	            soundWarp: 0.5
-	        },
-	        time: 0.0370 * t,
-	        ease: [0, 0, 1]
-	    }).smoothTo({
-	        to: {
-	            noiseSpeed: 0.0001,
-	            noiseWarp: 0.03
-	        },
-	        time: 0.080866 * t,
-	        ease: [0, 0, 1]
-	    }).smoothTo({
-	        to: {
-	            ringRadius: 1.1,
-	            ringThick: 0.0001,
-	            soundWarp: 1,
-	            fadeAlpha: 0.5
-	        },
-	        time: 0.1098 * t,
-	        ease: [0, 1, 1]
-	    }).smoothTo({
-	        to: {
-	            grow: -0.0006,
-	            silent: 0.01,
-	            triangleAlpha: 0.0001,
-	            triangleEdge: 10,
-	            triangleRadius: 10
-	        },
-	        time: 0.127956 * t,
-	        ease: [0, 0, 1]
-	    }).smoothTo({
-	        to: {
-	            grow: 0.0006,
-	            silent: 1,
-	            triangleAlpha: 0.0001,
-	            triangleEdge: 10,
-	            triangleRadius: 10,
-	            triangleFat: 0.1,
-	            fadeAlpha: 0.9
-	        },
-	        time: 0.1494855 * t,
-	        ease: [0, 0, 1]
-	    }).smoothOver(0.03365976 * t, {
-	        to: {
-	            otherAlpha: 0.00001,
-	            otherEdge: 3,
-	            otherRadius: 0.7,
-	            otherThick: 0.00001
-	        },
-	        time: 0.24475 * t,
-	        ease: [0, 0, 1]
-	    }).smoothOver(0.03366 * t, {
-	        to: {
-	            ringRadius: 2,
-	            otherEdge: 4,
-	            otherThick: 0.000001
-	        },
-	        time: 0.2704 * t,
-	        ease: [0, 0, 1]
-	    }).over(0.00673 * t, {
-	        to: {
-	            ringRadius: 0.1,
-	            ringThick: 0,
-	            ringAlpha: 0,
-	            soundWarp: 0
-	        },
-	        time: 0.31116 * t
-	    }).smoothTo({
-	        to: {
-	            ringRadius: 0.25,
-	            ringAlpha: 0.0005,
-	            soundWarp: 0.1
-	        },
-	        time: 0.3096698 * t,
-	        ease: [0, 1, 1]
-	    }).smoothTo({
-	        to: {
-	            ringThick: 0.005,
-	            ringRadius: 0.33
-	        },
-	        time: 0.31976776 * t,
-	        ease: [0, 0, 1]
-	    }).smoothTo({
-	        to: {
-	            noiseWarp: 0.1
-	        },
-	        time: 0.3365976 * t,
-	        ease: [0, 0, 1]
-	    }).smoothTo({
-	        to: {
-	            noiseWarp: 0.16,
-	            otherThick: 0.0001
-	        },
-	        time: 0.3534275 * t,
-	        ease: [0, 0, 1]
-	    }).smoothTo({
-	        to: {
-	            soundWarp: 0.02,
-	            noiseWarp: 0.4,
-	            noiseScale: 0.25,
-	            noiseSpeed: 0.001,
-	            otherRadius: 0.3,
-	            otherThick: 0.1,
-	            grow: -0.002
-	        },
-	        time: 0.4039 * t,
-	        ease: [0, 0, 1]
-	    }).smoothTo({
-	        to: {
-	            ringAlpha: 0.001,
-	            fadeAlpha: 0.99,
-	            otherAlpha: -0.00001,
-	            staticAlpha: 0.05,
-	            staticScale: 60,
-	            staticShift: 1
-	        },
-	        time: 0.407283 * t,
-	        ease: [0, 0, 1]
-	    }).smoothOver(0.03365976 * t, {
-	        to: {
-	            ringRadius: 0.4,
-	            ringAlpha: 0.005,
-	            ringThick: 0.01,
-	            noiseWarp: 0.05,
-	            noiseSpeed: 0.0003,
-	            staticAlpha: 0.5
-	        },
-	        time: t,
-	        ease: [0, 0, 1],
-	        call: [end]
-	    });
+	  player.tracks.main.to({
+	    to: {
+	      audioMode: 'waveform',
+	      audioScale: 1,
+	      audioOrder: 1,
+	      silent: 0.00001,
+	      soundWarp: 0.1,
+	      soundSmooth: 0.3,
+	      meanFulcrum: 0.3,
+	      ringAlpha: 0.005,
+	      noiseSpeed: 0.0001,
+	      noiseWarp: 0.04,
+	      otherAlpha: 0,
+	      otherEdge: 10000,
+	      triangleAlpha: 0,
+	      triangleEdge: 10000,
+	      bokehRadius: 4,
+	      bokehAmount: 0.01
+	    },
+	    time: 500
+	  }).smoothOver(0.003365976 * t, {
+	    to: {
+	      soundWarp: 0.1
+	    },
+	    time: 0.01178 * t,
+	    ease: [0, 1, 1]
+	  }).smoothTo({
+	    to: {
+	      silent: 0,
+	      spin: 0.001,
+	      ringRadius: 0.35,
+	      ringThick: 0.001,
+	      soundWarp: 0.5
+	    },
+	    time: 0.0370 * t,
+	    ease: [0, 0, 1]
+	  }).smoothTo({
+	    to: {
+	      noiseSpeed: 0.0001,
+	      noiseWarp: 0.03
+	    },
+	    time: 0.080866 * t,
+	    ease: [0, 0, 1]
+	  }).smoothTo({
+	    to: {
+	      ringRadius: 1.1,
+	      ringThick: 0.0001,
+	      soundWarp: 1,
+	      fadeAlpha: 0.5
+	    },
+	    time: 0.1098 * t,
+	    ease: [0, 1, 1]
+	  }).smoothTo({
+	    to: {
+	      grow: -0.0006,
+	      silent: 0.01,
+	      triangleAlpha: 0.0001,
+	      triangleEdge: 10,
+	      triangleRadius: 10
+	    },
+	    time: 0.127956 * t,
+	    ease: [0, 0, 1]
+	  }).smoothTo({
+	    to: {
+	      grow: 0.0006,
+	      silent: 1,
+	      triangleAlpha: 0.0001,
+	      triangleEdge: 10,
+	      triangleRadius: 10,
+	      triangleFat: 0.1,
+	      fadeAlpha: 0.9
+	    },
+	    time: 0.1494855 * t,
+	    ease: [0, 0, 1]
+	  }).smoothOver(0.03365976 * t, {
+	    to: {
+	      otherAlpha: 0.00001,
+	      otherEdge: 3,
+	      otherRadius: 0.7,
+	      otherThick: 0.00001
+	    },
+	    time: 0.24475 * t,
+	    ease: [0, 0, 1]
+	  }).smoothOver(0.03366 * t, {
+	    to: {
+	      ringRadius: 2,
+	      otherEdge: 4,
+	      otherThick: 0.000001
+	    },
+	    time: 0.2704 * t,
+	    ease: [0, 0, 1]
+	  }).over(0.00673 * t, {
+	    to: {
+	      ringRadius: 0.1,
+	      ringThick: 0,
+	      ringAlpha: 0,
+	      soundWarp: 0
+	    },
+	    time: 0.31116 * t
+	  }).smoothTo({
+	    to: {
+	      ringRadius: 0.25,
+	      ringAlpha: 0.0005,
+	      soundWarp: 0.1
+	    },
+	    time: 0.3096698 * t,
+	    ease: [0, 1, 1]
+	  }).smoothTo({
+	    to: {
+	      ringThick: 0.005,
+	      ringRadius: 0.33
+	    },
+	    time: 0.31976776 * t,
+	    ease: [0, 0, 1]
+	  }).smoothTo({
+	    to: {
+	      noiseWarp: 0.1
+	    },
+	    time: 0.3365976 * t,
+	    ease: [0, 0, 1]
+	  }).smoothTo({
+	    to: {
+	      noiseWarp: 0.16,
+	      otherThick: 0.0001
+	    },
+	    time: 0.3534275 * t,
+	    ease: [0, 0, 1]
+	  }).smoothTo({
+	    to: {
+	      soundWarp: 0.02,
+	      noiseWarp: 0.4,
+	      noiseScale: 0.25,
+	      noiseSpeed: 0.001,
+	      otherRadius: 0.3,
+	      otherThick: 0.1,
+	      grow: -0.002
+	    },
+	    time: 0.4039 * t,
+	    ease: [0, 0, 1]
+	  }).smoothTo({
+	    to: {
+	      ringAlpha: 0.001,
+	      fadeAlpha: 0.99,
+	      otherAlpha: -0.00001,
+	      staticAlpha: 0.05,
+	      staticScale: 60,
+	      staticShift: 1
+	    },
+	    time: 0.407283 * t,
+	    ease: [0, 0, 1]
+	  }).smoothOver(0.03365976 * t, {
+	    to: {
+	      ringRadius: 0.4,
+	      ringAlpha: 0.005,
+	      ringThick: 0.01,
+	      noiseWarp: 0.05,
+	      noiseSpeed: 0.0003,
+	      staticAlpha: 0.5
+	    },
+	    time: t,
+	    ease: [0, 0, 1],
+	    call: [end]
+	  });
 	
-	    player.tracks.lightColor.smoothTo({
-	        to: colors.white,
-	        time: 0.0168 * t,
-	        ease: [0, 0.95, 1]
-	    });
+	  player.tracks.lightColor.smoothTo({
+	    to: colors.white,
+	    time: 0.0168 * t,
+	    ease: [0, 0.95, 1]
+	  });
 	
-	    player.tracks.fadeColor.smoothTo({
-	        to: colors.yellow,
-	        time: 0.0168 * t,
-	        ease: [0, 0.95, 1]
-	    }).over(0.03365976 * t, {
-	        to: colors.white,
-	        time: t
-	    });
+	  player.tracks.fadeColor.smoothTo({
+	    to: colors.yellow,
+	    time: 0.0168 * t,
+	    ease: [0, 0.95, 1]
+	  }).over(0.03365976 * t, {
+	    to: colors.white,
+	    time: t
+	  });
 	};
 
 /***/ })

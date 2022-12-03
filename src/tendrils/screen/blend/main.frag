@@ -10,18 +10,18 @@ uniform float alphas[numViews];
 uniform vec2 resolution;
 
 void main() {
-    vec2 uv = gl_FragCoord.xy/resolution;
+  vec2 uv = gl_FragCoord.xy/resolution;
 
-    // Accumulate colors
-    
-    vec4 sum = vec4(0.0);
+  // Accumulate colors
 
-    for(int i = 0; i < numViews; ++i) {
-        vec4 color = texture2D(views[i], uv);
+  vec4 sum = vec4(0.0);
 
-        // Pre-multiplied alpha so they don't cross over
-        sum = blend(sum, color, alphas[i]);
-    }
+  for(int i = 0; i < numViews; ++i) {
+    vec4 color = texture2D(views[i], uv);
 
-    gl_FragColor = sum;
+    // Pre-multiplied alpha so they don't cross over
+    sum = blend(sum, color, alphas[i]);
+  }
+
+  gl_FragColor = sum;
 }

@@ -19721,25 +19721,25 @@
 	'use strict';
 	
 	Object.defineProperty(exports, "__esModule", {
-	    value: true
+	  value: true
 	});
 	exports.step = step;
 	function step(array) {
-	    var next = Array.prototype.pop.call(array);
+	  var next = Array.prototype.pop.call(array);
 	
-	    Array.prototype.unshift.call(array, next);
+	  Array.prototype.unshift.call(array, next);
 	
-	    return next;
+	  return next;
 	}
 	
 	var wrapIndex = exports.wrapIndex = function wrapIndex(index, array) {
-	    return array[(array.length + Math.round(index)) % array.length];
+	  return array[(array.length + Math.round(index)) % array.length];
 	};
 	
 	var invLog2 = 1 / Math.log(2);
 	
 	var nextPow2 = exports.nextPow2 = function nextPow2(x) {
-	    return Math.pow(2, Math.ceil(Math.log(x) * invLog2));
+	  return Math.pow(2, Math.ceil(Math.log(x) * invLog2));
 	};
 	
 	// Handle paths on different hosts
@@ -19752,19 +19752,19 @@
 	'use strict';
 	
 	Object.defineProperty(exports, "__esModule", {
-	    value: true
+	  value: true
 	});
 	var defaultExcept = exports.defaultExcept = ['127.0.0.1', '0.0.0.0', 'localhost'];
 	
 	var redirect = exports.redirect = function redirect() {
-	    var protocol = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 'https';
-	    var except = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : defaultExcept;
+	  var protocol = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 'https';
+	  var except = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : defaultExcept;
 	
-	    var proto = protocol + ':';
+	  var proto = protocol + ':';
 	
-	    if (document.location.protocol !== proto && except.indexOf(document.location.hostname) < 0) {
-	        document.location.protocol = proto;
-	    }
+	  if (document.location.protocol !== proto && except.indexOf(document.location.hostname) < 0) {
+	    document.location.protocol = proto;
+	  }
 	};
 	
 	exports.default = redirect;
@@ -25556,7 +25556,7 @@
 	'use strict';
 	
 	Object.defineProperty(exports, "__esModule", {
-	    value: true
+	  value: true
 	});
 	exports.Particles = exports.defaults = undefined;
 	
@@ -25569,12 +25569,12 @@
 	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      * particles data).
 	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      *
 	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      * @todo Ideally, to render more logic than 4 floats (RGBA) in a single pass,
-	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      *       we'd like to render to multiple buffers at once - using
-	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      *       WEBGL_draw_buffers, as shown [here](https://hacks.mozilla.org/2014/01/webgl-deferred-shading/).
-	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      *       At the time of writing, that extension has only [57% support across all
-	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      *       devices](//webglstats.com/).
-	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      *       So, for now, have to consider other methods (multi-pass,
-	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      *       encoding/packing more info into each fragment).
+	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      *     we'd like to render to multiple buffers at once - using
+	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      *     WEBGL_draw_buffers, as shown [here](https://hacks.mozilla.org/2014/01/webgl-deferred-shading/).
+	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      *     At the time of writing, that extension has only [57% support across all
+	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      *     devices](//webglstats.com/).
+	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      *     So, for now, have to consider other methods (multi-pass,
+	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      *     encoding/packing more info into each fragment).
 	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      */
 	
 	/* global Float32Array */
@@ -25616,186 +25616,186 @@
 	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 	
 	var defaults = exports.defaults = function defaults() {
-	    return {
-	        shape: [64, 64],
-	        geomShape: null,
+	  return {
+	    shape: [64, 64],
+	    geomShape: null,
 	
-	        logic: null,
-	        logicVert: _index2.default,
-	        logicFrag: null,
+	    logic: null,
+	    logicVert: _index2.default,
+	    logicFrag: null,
 	
-	        render: null,
-	        renderVert: null,
-	        renderFrag: null
-	    };
+	    render: null,
+	    renderVert: null,
+	    renderFrag: null
+	  };
 	};
 	
 	var Particles = exports.Particles = function () {
-	    function Particles(gl, options) {
-	        _classCallCheck(this, Particles);
+	  function Particles(gl, options) {
+	    _classCallCheck(this, Particles);
 	
-	        var params = _extends({}, defaults(), options);
+	    var params = _extends({}, defaults(), options);
 	
-	        this.gl = gl;
+	    this.gl = gl;
 	
-	        this.screen = new _screen2.default(this.gl);
+	    this.screen = new _screen2.default(this.gl);
 	
-	        // The dimensions of the state data FBOs. Can be 1:1 with the number of
-	        // particle vertices, or
-	        this.shape = params.shape;
-	        this.geomShape = params.geomShape || [].concat(_toConsumableArray(this.shape));
+	    // The dimensions of the state data FBOs. Can be 1:1 with the number of
+	    // particle vertices, or
+	    this.shape = params.shape;
+	    this.geomShape = params.geomShape || [].concat(_toConsumableArray(this.shape));
 	
-	        var logic = params.logic || [params.logicVert, params.logicFrag];
+	    var logic = params.logic || [params.logicVert, params.logicFrag];
 	
-	        this.logic = Array.isArray(logic) ? _glShader2.default.apply(undefined, [gl].concat(_toConsumableArray(logic))) : logic;
+	    this.logic = Array.isArray(logic) ? _glShader2.default.apply(undefined, [gl].concat(_toConsumableArray(logic))) : logic;
 	
-	        var render = params.render || [params.renderVert, params.renderFrag];
+	    var render = params.render || [params.renderVert, params.renderFrag];
 	
-	        this.render = Array.isArray(render) ? _glShader2.default.apply(undefined, [gl].concat(_toConsumableArray(render))) : render;
+	    this.render = Array.isArray(render) ? _glShader2.default.apply(undefined, [gl].concat(_toConsumableArray(render))) : render;
 	
-	        this.geom = (0, _glGeometry2.default)(gl);
-	        this.geom.attr('uv', Particles.generateLUT(this.geomShape), { size: 2 });
+	    this.geom = (0, _glGeometry2.default)(gl);
+	    this.geom.attr('uv', Particles.generateLUT(this.geomShape), { size: 2 });
 	
-	        this.buffers = [];
+	    this.buffers = [];
 	
-	        this.pixels = (0, _ndarray2.default)(new Float32Array(this.shape[0] * this.shape[1] * 4), [this.shape[0], this.shape[1], 4]);
+	    this.pixels = (0, _ndarray2.default)(new Float32Array(this.shape[0] * this.shape[1] * 4), [this.shape[0], this.shape[1], 4]);
+	  }
+	
+	  _createClass(Particles, [{
+	    key: 'setup',
+	    value: function setup() {
+	      var numBuffers = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 1;
+	
+	      // Add any needed new buffers
+	      while (this.buffers.length < numBuffers) {
+	        this.buffers.push((0, _glFbo2.default)(this.gl, [this.shape[0], this.shape[1]], { float: true }));
+	      }
+	
+	      // Remove any unneeded old buffers
+	      while (this.buffers.length > numBuffers) {
+	        this.buffers.pop().dispose();
+	      }
+	    }
+	  }, {
+	    key: 'spawn',
+	    value: function spawn(map) {
+	      var pixels = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : this.pixels;
+	      var offset = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : [0, 0];
+	
+	      var data = new Float32Array(4);
+	
+	      var pixelsShape = pixels.shape;
+	      var pixelsData = pixels.data;
+	
+	      var i = 0;
+	
+	      for (var x = 0; x < pixelsShape[0]; ++x) {
+	        for (var y = 0; y < pixelsShape[1]; ++y) {
+	          data[0] = data[1] = data[2] = data[3] = 0;
+	
+	          map(data, x, y);
+	
+	          pixelsData[i++] = data[0];
+	          pixelsData[i++] = data[1];
+	          pixelsData[i++] = data[2];
+	          pixelsData[i++] = data[3];
+	        }
+	      }
+	
+	      this.buffers.forEach(function (buffer) {
+	        return buffer.color[0].setPixels(pixels, offset);
+	      });
 	    }
 	
-	    _createClass(Particles, [{
-	        key: 'setup',
-	        value: function setup() {
-	            var numBuffers = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 1;
+	    /**
+	     * @todo Find a way to use free texture bind units without having to
+	     *     manually remember them
+	     */
 	
-	            // Add any needed new buffers
-	            while (this.buffers.length < numBuffers) {
-	                this.buffers.push((0, _glFbo2.default)(this.gl, [this.shape[0], this.shape[1]], { float: true }));
-	            }
+	  }, {
+	    key: 'step',
+	    value: function step(update, buffer) {
+	      if (buffer) {
+	        buffer.bind();
+	      } else {
+	        (0, _utils.step)(this.buffers);
+	        this.buffers[0].bind();
+	      }
 	
-	            // Remove any unneeded old buffers
-	            while (this.buffers.length > numBuffers) {
-	                this.buffers.pop().dispose();
-	            }
+	      this.gl.viewport(0, 0, this.shape[0], this.shape[1]);
+	
+	      this.logic.bind();
+	
+	      Particles.applyUpdate(Object.assign(this.logic.uniforms, {
+	        dataRes: this.shape,
+	        geomRes: this.geomShape,
+	        particles: this.buffers[1].color[0].bind(0)
+	      }), update);
+	
+	      this.screen.render();
+	      this.gl.bindFramebuffer(this.gl.FRAMEBUFFER, null);
+	    }
+	  }, {
+	    key: 'draw',
+	    value: function draw(update) {
+	      var mode = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : this.gl.POINTS;
+	
+	      this.geom.bind(this.render);
+	
+	      Particles.applyUpdate(Object.assign(this.render.uniforms, {
+	        dataRes: this.shape,
+	        geomRes: this.geomShape,
+	        particles: this.buffers[0].color[0].bind(0)
+	      }), update);
+	
+	      this.geom.draw(mode);
+	    }
+	  }, {
+	    key: 'updateLogic',
+	    value: function updateLogic(logicFrag) {
+	      this.logic.update(_index2.default, logicFrag);
+	    }
+	  }, {
+	    key: 'updateRender',
+	    value: function updateRender(renderFrag, renderVert) {
+	      this.render.update(renderVert, renderFrag);
+	    }
+	
+	    // @todo
+	
+	  }, {
+	    key: 'dispose',
+	    value: function dispose() {}
+	  }], [{
+	    key: 'generateLUT',
+	    value: function generateLUT(shape) {
+	      var size = shape[0] * shape[1] * 2;
+	      var data = new Float32Array(size);
+	      var k = 0;
+	
+	      var w = Math.max(shape[0], 2);
+	      var h = Math.max(shape[1], 2);
+	
+	      var invX = 1 / (w - 1);
+	      var invY = 1 / (h - 1);
+	
+	      for (var i = 0; i < w; ++i) {
+	        for (var j = 0; j < h; ++j) {
+	          data[k++] = i * invX;
+	          data[k++] = j * invY;
 	        }
-	    }, {
-	        key: 'spawn',
-	        value: function spawn(map) {
-	            var pixels = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : this.pixels;
-	            var offset = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : [0, 0];
+	      }
 	
-	            var data = new Float32Array(4);
+	      return data;
+	    }
+	  }, {
+	    key: 'applyUpdate',
+	    value: function applyUpdate(state, update) {
+	      return (0, _isFunction2.default)(update) ? update(state) : Object.assign(state, update);
+	    }
+	  }]);
 	
-	            var pixelsShape = pixels.shape;
-	            var pixelsData = pixels.data;
-	
-	            var i = 0;
-	
-	            for (var x = 0; x < pixelsShape[0]; ++x) {
-	                for (var y = 0; y < pixelsShape[1]; ++y) {
-	                    data[0] = data[1] = data[2] = data[3] = 0;
-	
-	                    map(data, x, y);
-	
-	                    pixelsData[i++] = data[0];
-	                    pixelsData[i++] = data[1];
-	                    pixelsData[i++] = data[2];
-	                    pixelsData[i++] = data[3];
-	                }
-	            }
-	
-	            this.buffers.forEach(function (buffer) {
-	                return buffer.color[0].setPixels(pixels, offset);
-	            });
-	        }
-	
-	        /**
-	         * @todo Find a way to use free texture bind units without having to
-	         *       manually remember them
-	         */
-	
-	    }, {
-	        key: 'step',
-	        value: function step(update, buffer) {
-	            if (buffer) {
-	                buffer.bind();
-	            } else {
-	                (0, _utils.step)(this.buffers);
-	                this.buffers[0].bind();
-	            }
-	
-	            this.gl.viewport(0, 0, this.shape[0], this.shape[1]);
-	
-	            this.logic.bind();
-	
-	            Particles.applyUpdate(Object.assign(this.logic.uniforms, {
-	                dataRes: this.shape,
-	                geomRes: this.geomShape,
-	                particles: this.buffers[1].color[0].bind(0)
-	            }), update);
-	
-	            this.screen.render();
-	            this.gl.bindFramebuffer(this.gl.FRAMEBUFFER, null);
-	        }
-	    }, {
-	        key: 'draw',
-	        value: function draw(update) {
-	            var mode = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : this.gl.POINTS;
-	
-	            this.geom.bind(this.render);
-	
-	            Particles.applyUpdate(Object.assign(this.render.uniforms, {
-	                dataRes: this.shape,
-	                geomRes: this.geomShape,
-	                particles: this.buffers[0].color[0].bind(0)
-	            }), update);
-	
-	            this.geom.draw(mode);
-	        }
-	    }, {
-	        key: 'updateLogic',
-	        value: function updateLogic(logicFrag) {
-	            this.logic.update(_index2.default, logicFrag);
-	        }
-	    }, {
-	        key: 'updateRender',
-	        value: function updateRender(renderFrag, renderVert) {
-	            this.render.update(renderVert, renderFrag);
-	        }
-	
-	        // @todo
-	
-	    }, {
-	        key: 'dispose',
-	        value: function dispose() {}
-	    }], [{
-	        key: 'generateLUT',
-	        value: function generateLUT(shape) {
-	            var size = shape[0] * shape[1] * 2;
-	            var data = new Float32Array(size);
-	            var k = 0;
-	
-	            var w = Math.max(shape[0], 2);
-	            var h = Math.max(shape[1], 2);
-	
-	            var invX = 1 / (w - 1);
-	            var invY = 1 / (h - 1);
-	
-	            for (var i = 0; i < w; ++i) {
-	                for (var j = 0; j < h; ++j) {
-	                    data[k++] = i * invX;
-	                    data[k++] = j * invY;
-	                }
-	            }
-	
-	            return data;
-	        }
-	    }, {
-	        key: 'applyUpdate',
-	        value: function applyUpdate(state, update) {
-	            return (0, _isFunction2.default)(update) ? update(state) : Object.assign(state, update);
-	        }
-	    }]);
-	
-	    return Particles;
+	  return Particles;
 	}();
 	
 	exports.default = Particles;
@@ -26679,7 +26679,7 @@
 	'use strict';
 	
 	Object.defineProperty(exports, "__esModule", {
-	    value: true
+	  value: true
 	});
 	exports.Screen = undefined;
 	
@@ -26702,24 +26702,24 @@
 	// optimisation options).
 	
 	var Screen = exports.Screen = function (_Triangle) {
-	    _inherits(Screen, _Triangle);
+	  _inherits(Screen, _Triangle);
 	
-	    function Screen() {
-	        _classCallCheck(this, Screen);
+	  function Screen() {
+	    _classCallCheck(this, Screen);
 	
-	        return _possibleConstructorReturn(this, (Screen.__proto__ || Object.getPrototypeOf(Screen)).apply(this, arguments));
+	    return _possibleConstructorReturn(this, (Screen.__proto__ || Object.getPrototypeOf(Screen)).apply(this, arguments));
+	  }
+	
+	  _createClass(Screen, [{
+	    key: 'render',
+	    value: function render() {
+	      _get(Screen.prototype.__proto__ || Object.getPrototypeOf(Screen.prototype), 'bind', this).call(this);
+	      _get(Screen.prototype.__proto__ || Object.getPrototypeOf(Screen.prototype), 'draw', this).call(this);
+	      _get(Screen.prototype.__proto__ || Object.getPrototypeOf(Screen.prototype), 'unbind', this).call(this);
 	    }
+	  }]);
 	
-	    _createClass(Screen, [{
-	        key: 'render',
-	        value: function render() {
-	            _get(Screen.prototype.__proto__ || Object.getPrototypeOf(Screen.prototype), 'bind', this).call(this);
-	            _get(Screen.prototype.__proto__ || Object.getPrototypeOf(Screen.prototype), 'draw', this).call(this);
-	            _get(Screen.prototype.__proto__ || Object.getPrototypeOf(Screen.prototype), 'unbind', this).call(this);
-	        }
-	    }]);
-	
-	    return Screen;
+	  return Screen;
 	}(_glBigTriangle2.default);
 	
 	exports.default = Screen;
@@ -26766,7 +26766,7 @@
 /* 462 */
 /***/ (function(module, exports) {
 
-	module.exports = "precision highp float;\n#define GLSLIFY 1\n\nattribute vec2 position;\nvarying vec2 uv;\n\nvoid main() {\n    uv = position.xy;\n\n    gl_Position = vec4(position, 1.0, 1.0);\n}\n"
+	module.exports = "precision highp float;\n#define GLSLIFY 1\n\nattribute vec2 position;\nvarying vec2 uv;\n\nvoid main() {\n  uv = position.xy;\n\n  gl_Position = vec4(position, 1.0, 1.0);\n}\n"
 
 /***/ }),
 /* 463 */
@@ -26775,7 +26775,7 @@
 	'use strict';
 	
 	Object.defineProperty(exports, "__esModule", {
-	    value: true
+	  value: true
 	});
 	
 	var _inert = __webpack_require__(464);
@@ -26785,10 +26785,10 @@
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 	
 	exports.default = function (data) {
-	    data[0] = data[1] = _inert2.default;
-	    data[2] = data[3] = 0;
+	  data[0] = data[1] = _inert2.default;
+	  data[2] = data[3] = 0;
 	
-	    return data;
+	  return data;
 	};
 
 /***/ }),
@@ -26810,22 +26810,22 @@
 	'use strict';
 	
 	Object.defineProperty(exports, "__esModule", {
-	    value: true
+	  value: true
 	});
 	exports.coverAspect = exports.containAspect = exports.aspect = undefined;
 	
 	var _glMatrix = __webpack_require__(386);
 	
 	var aspect = exports.aspect = function aspect(out, size, scale) {
-	    return _glMatrix.vec2.scale(out, _glMatrix.vec2.inverse(out, size), scale);
+	  return _glMatrix.vec2.scale(out, _glMatrix.vec2.inverse(out, size), scale);
 	};
 	
 	var containAspect = exports.containAspect = function containAspect(out, size) {
-	    return aspect(out, size, Math.min(size[0], size[1]));
+	  return aspect(out, size, Math.min(size[0], size[1]));
 	};
 	
 	var coverAspect = exports.coverAspect = function coverAspect(out, size) {
-	    return aspect(out, size, Math.max(size[0], size[1]));
+	  return aspect(out, size, Math.max(size[0], size[1]));
 	};
 	
 	exports.default = aspect;
@@ -26834,13 +26834,13 @@
 /* 466 */
 /***/ (function(module, exports) {
 
-	module.exports = "precision highp float;\n#define GLSLIFY 1\n\nuniform sampler2D particles;\nuniform sampler2D flow;\nuniform sampler2D targets;\n\nuniform vec2 dataRes;\n\nuniform vec2 viewSize;\n\nuniform float time;\nuniform float dt;\n\nuniform float speedLimit;\nuniform float damping;\n\nuniform float forceWeight;\nuniform float flowWeight;\nuniform float noiseWeight;\n\nuniform float flowDecay;\n\nuniform float noiseSpeed;\nuniform float noiseScale;\n\nuniform float target;\n\n// These are scaled by the values they correspond to\nuniform float varyForce;\nuniform float varyFlow;\nuniform float varyNoise;\nuniform float varyNoiseScale;\nuniform float varyNoiseSpeed;\nuniform float varyTarget;\n\n//\n// Description : Array and textureless GLSL 2D/3D/4D simplex\n//               noise functions.\n//      Author : Ian McEwan, Ashima Arts.\n//  Maintainer : ijm\n//     Lastmod : 20110822 (ijm)\n//     License : Copyright (C) 2011 Ashima Arts. All rights reserved.\n//               Distributed under the MIT License. See LICENSE file.\n//               https://github.com/ashima/webgl-noise\n//\n\nvec3 mod289(vec3 x) {\n  return x - floor(x * (1.0 / 289.0)) * 289.0;\n}\n\nvec4 mod289(vec4 x) {\n  return x - floor(x * (1.0 / 289.0)) * 289.0;\n}\n\nvec4 permute(vec4 x) {\n     return mod289(((x*34.0)+1.0)*x);\n}\n\nvec4 taylorInvSqrt(vec4 r)\n{\n  return 1.79284291400159 - 0.85373472095314 * r;\n}\n\nfloat snoise(vec3 v)\n  {\n  const vec2  C = vec2(1.0/6.0, 1.0/3.0) ;\n  const vec4  D = vec4(0.0, 0.5, 1.0, 2.0);\n\n// First corner\n  vec3 i  = floor(v + dot(v, C.yyy) );\n  vec3 x0 =   v - i + dot(i, C.xxx) ;\n\n// Other corners\n  vec3 g = step(x0.yzx, x0.xyz);\n  vec3 l = 1.0 - g;\n  vec3 i1 = min( g.xyz, l.zxy );\n  vec3 i2 = max( g.xyz, l.zxy );\n\n  //   x0 = x0 - 0.0 + 0.0 * C.xxx;\n  //   x1 = x0 - i1  + 1.0 * C.xxx;\n  //   x2 = x0 - i2  + 2.0 * C.xxx;\n  //   x3 = x0 - 1.0 + 3.0 * C.xxx;\n  vec3 x1 = x0 - i1 + C.xxx;\n  vec3 x2 = x0 - i2 + C.yyy; // 2.0*C.x = 1/3 = C.y\n  vec3 x3 = x0 - D.yyy;      // -1.0+3.0*C.x = -0.5 = -D.y\n\n// Permutations\n  i = mod289(i);\n  vec4 p = permute( permute( permute(\n             i.z + vec4(0.0, i1.z, i2.z, 1.0 ))\n           + i.y + vec4(0.0, i1.y, i2.y, 1.0 ))\n           + i.x + vec4(0.0, i1.x, i2.x, 1.0 ));\n\n// Gradients: 7x7 points over a square, mapped onto an octahedron.\n// The ring size 17*17 = 289 is close to a multiple of 49 (49*6 = 294)\n  float n_ = 0.142857142857; // 1.0/7.0\n  vec3  ns = n_ * D.wyz - D.xzx;\n\n  vec4 j = p - 49.0 * floor(p * ns.z * ns.z);  //  mod(p,7*7)\n\n  vec4 x_ = floor(j * ns.z);\n  vec4 y_ = floor(j - 7.0 * x_ );    // mod(j,N)\n\n  vec4 x = x_ *ns.x + ns.yyyy;\n  vec4 y = y_ *ns.x + ns.yyyy;\n  vec4 h = 1.0 - abs(x) - abs(y);\n\n  vec4 b0 = vec4( x.xy, y.xy );\n  vec4 b1 = vec4( x.zw, y.zw );\n\n  //vec4 s0 = vec4(lessThan(b0,0.0))*2.0 - 1.0;\n  //vec4 s1 = vec4(lessThan(b1,0.0))*2.0 - 1.0;\n  vec4 s0 = floor(b0)*2.0 + 1.0;\n  vec4 s1 = floor(b1)*2.0 + 1.0;\n  vec4 sh = -step(h, vec4(0.0));\n\n  vec4 a0 = b0.xzyw + s0.xzyw*sh.xxyy ;\n  vec4 a1 = b1.xzyw + s1.xzyw*sh.zzww ;\n\n  vec3 p0 = vec3(a0.xy,h.x);\n  vec3 p1 = vec3(a0.zw,h.y);\n  vec3 p2 = vec3(a1.xy,h.z);\n  vec3 p3 = vec3(a1.zw,h.w);\n\n//Normalise gradients\n  vec4 norm = taylorInvSqrt(vec4(dot(p0,p0), dot(p1,p1), dot(p2, p2), dot(p3,p3)));\n  p0 *= norm.x;\n  p1 *= norm.y;\n  p2 *= norm.z;\n  p3 *= norm.w;\n\n// Mix final noise value\n  vec4 m = max(0.6 - vec4(dot(x0,x0), dot(x1,x1), dot(x2,x2), dot(x3,x3)), 0.0);\n  m = m * m;\n  return 42.0 * dot( m*m, vec4( dot(p0,x0), dot(p1,x1),\n                                dot(p2,x2), dot(p3,x3) ) );\n  }\n\nconst vec2 inert = vec2(-1000000.0);\n\n/**\n * @requires {float} levels The number of samples to take at different LODs\n * @requires {float} stride The step up to take between each LOD\n */\n\nfloat map(float value, float inMin, float inMax, float outMin, float outMax) {\n  return outMin + (outMax - outMin) * (value - inMin) / (inMax - inMin);\n}\n\nvec2 map(vec2 value, vec2 inMin, vec2 inMax, vec2 outMin, vec2 outMax) {\n  return outMin + (outMax - outMin) * (value - inMin) / (inMax - inMin);\n}\n\nvec3 map(vec3 value, vec3 inMin, vec3 inMax, vec3 outMin, vec3 outMax) {\n  return outMin + (outMax - outMin) * (value - inMin) / (inMax - inMin);\n}\n\nvec4 map(vec4 value, vec4 inMin, vec4 inMax, vec4 outMin, vec4 outMax) {\n  return outMin + (outMax - outMin) * (value - inMin) / (inMax - inMin);\n}\n\nconst vec4 posRange = vec4(-1.0, -1.0, 1.0, 1.0);\n\nconst vec4 uvRange = vec4(0.0, 0.0, 1.0, 1.0);\n\nvec2 posToUV(vec2 pos) {\n    return map(pos, posRange.xy, posRange.zw, uvRange.xy, uvRange.zw);\n}\n\n// Time/decay\n\nvec2 get(vec3 data, float time, float decay) {\n    return data.xy*max(0.0, 1.0-((time-data.z)*decay));\n}\n\nvec2 get(vec4 data, float time, float decay) {\n    return get(data.xyz, time, decay);\n}\n\n// No time/decay\n\nvec2 get(vec2 data) {\n    return data.xy;\n}\n\nvec2 get(vec3 data) {\n    return get(data.xy);\n}\n\nvec2 get(vec4 data) {\n    return get(data.xy);\n}\n\n/**\n * @return The flow velocity and age for a given screen position, sampling\n *         several scales.\n */\nvec2 flowAtScreenPos(vec2 pos, sampler2D flow, float time, float flowDecay) {\n    vec2 uv = posToUV(pos);\n    vec2 flowForce = vec2(0.0);\n    float flowMax = 0.0;\n\n    for(float level = 0.0; level < 1.0*1.0; level += 1.0) {\n        vec4 flowData = texture2D(flow, uv, level);\n        float factor = 1.0/(level+1.0);\n\n        flowForce += get(flowData, time, flowDecay)*factor;\n        flowMax += factor;\n    }\n\n    return flowForce/flowMax;\n}\n\nfloat vary(float base, float offset, float variance) {\n    return base+(offset*variance*base);\n}\n\nvoid main() {\n    vec2 uv = gl_FragCoord.xy/dataRes;\n\n    vec4 state = texture2D(particles, uv);\n    vec2 pos = state.xy;\n    vec2 vel = state.zw;\n\n    vec2 newPos = pos;\n    vec2 newVel = vel;\n\n    if(pos != inert) {\n        // The 1D index offset of this pixel\n        float i = (gl_FragCoord.x+(gl_FragCoord.y*dataRes.x))/\n                (dataRes.x*dataRes.y);\n\n        // Wander force\n\n        vec2 noisePos = pos*vary(noiseScale, i, varyNoiseScale);\n\n        // @todo This doesn't progress linearly - the speed grows with time...\n        float noiseTime = time*vary(noiseSpeed, i, varyNoiseSpeed);\n\n        vec2 wanderForce = vec2(snoise(vec3(noisePos, uv.x+noiseTime)),\n                snoise(vec3(noisePos, uv.y+noiseTime+1234.5678)));\n\n        // Flow force - left by preceeding particles\n        // (Ensure this is checked before the next flow step is rendered, to avoid\n        // self-influence.)\n\n        vec2 flowForce = flowAtScreenPos(pos*viewSize, flow, time, flowDecay);\n\n        // Accumulate weighted forces and damping\n        newVel = (vel*damping*dt)+\n            (vary(forceWeight, i, varyForce)*\n                ((flowForce*dt*vary(flowWeight, i, varyFlow))+\n                (wanderForce*dt*vary(noiseWeight, i, varyNoise))));\n\n        // Tend towards targets\n        newVel += (texture2D(targets, uv).xy-pos)*vary(target, i, varyTarget);\n        \n        // Normalize and clamp the velocity\n        /**\n         * @todo This seems to cause some problems when dealing with larger max\n         *       speeds - the particles no longer follow flow forces somehow...\n         */\n        float speed = length(newVel);\n\n        newVel *= min(speed, speedLimit)/speed;\n\n        // Integrate motion\n        newPos = pos+newVel;\n    }\n\n    gl_FragColor = vec4(newPos, newVel);\n}\n"
+	module.exports = "precision highp float;\n#define GLSLIFY 1\n\nuniform sampler2D particles;\nuniform sampler2D flow;\nuniform sampler2D targets;\n\nuniform vec2 dataRes;\n\nuniform vec2 viewSize;\n\nuniform float time;\nuniform float dt;\n\nuniform float speedLimit;\nuniform float damping;\n\nuniform float forceWeight;\nuniform float flowWeight;\nuniform float noiseWeight;\n\nuniform float flowDecay;\n\nuniform float noiseSpeed;\nuniform float noiseScale;\n\nuniform float target;\n\n// These are scaled by the values they correspond to\nuniform float varyForce;\nuniform float varyFlow;\nuniform float varyNoise;\nuniform float varyNoiseScale;\nuniform float varyNoiseSpeed;\nuniform float varyTarget;\n\n//\n// Description : Array and textureless GLSL 2D/3D/4D simplex\n//               noise functions.\n//      Author : Ian McEwan, Ashima Arts.\n//  Maintainer : ijm\n//     Lastmod : 20110822 (ijm)\n//     License : Copyright (C) 2011 Ashima Arts. All rights reserved.\n//               Distributed under the MIT License. See LICENSE file.\n//               https://github.com/ashima/webgl-noise\n//\n\nvec3 mod289(vec3 x) {\n  return x - floor(x * (1.0 / 289.0)) * 289.0;\n}\n\nvec4 mod289(vec4 x) {\n  return x - floor(x * (1.0 / 289.0)) * 289.0;\n}\n\nvec4 permute(vec4 x) {\n     return mod289(((x*34.0)+1.0)*x);\n}\n\nvec4 taylorInvSqrt(vec4 r)\n{\n  return 1.79284291400159 - 0.85373472095314 * r;\n}\n\nfloat snoise(vec3 v)\n  {\n  const vec2  C = vec2(1.0/6.0, 1.0/3.0) ;\n  const vec4  D = vec4(0.0, 0.5, 1.0, 2.0);\n\n// First corner\n  vec3 i  = floor(v + dot(v, C.yyy) );\n  vec3 x0 =   v - i + dot(i, C.xxx) ;\n\n// Other corners\n  vec3 g = step(x0.yzx, x0.xyz);\n  vec3 l = 1.0 - g;\n  vec3 i1 = min( g.xyz, l.zxy );\n  vec3 i2 = max( g.xyz, l.zxy );\n\n  //   x0 = x0 - 0.0 + 0.0 * C.xxx;\n  //   x1 = x0 - i1  + 1.0 * C.xxx;\n  //   x2 = x0 - i2  + 2.0 * C.xxx;\n  //   x3 = x0 - 1.0 + 3.0 * C.xxx;\n  vec3 x1 = x0 - i1 + C.xxx;\n  vec3 x2 = x0 - i2 + C.yyy; // 2.0*C.x = 1/3 = C.y\n  vec3 x3 = x0 - D.yyy;      // -1.0+3.0*C.x = -0.5 = -D.y\n\n// Permutations\n  i = mod289(i);\n  vec4 p = permute( permute( permute(\n             i.z + vec4(0.0, i1.z, i2.z, 1.0 ))\n           + i.y + vec4(0.0, i1.y, i2.y, 1.0 ))\n           + i.x + vec4(0.0, i1.x, i2.x, 1.0 ));\n\n// Gradients: 7x7 points over a square, mapped onto an octahedron.\n// The ring size 17*17 = 289 is close to a multiple of 49 (49*6 = 294)\n  float n_ = 0.142857142857; // 1.0/7.0\n  vec3  ns = n_ * D.wyz - D.xzx;\n\n  vec4 j = p - 49.0 * floor(p * ns.z * ns.z);  //  mod(p,7*7)\n\n  vec4 x_ = floor(j * ns.z);\n  vec4 y_ = floor(j - 7.0 * x_ );    // mod(j,N)\n\n  vec4 x = x_ *ns.x + ns.yyyy;\n  vec4 y = y_ *ns.x + ns.yyyy;\n  vec4 h = 1.0 - abs(x) - abs(y);\n\n  vec4 b0 = vec4( x.xy, y.xy );\n  vec4 b1 = vec4( x.zw, y.zw );\n\n  //vec4 s0 = vec4(lessThan(b0,0.0))*2.0 - 1.0;\n  //vec4 s1 = vec4(lessThan(b1,0.0))*2.0 - 1.0;\n  vec4 s0 = floor(b0)*2.0 + 1.0;\n  vec4 s1 = floor(b1)*2.0 + 1.0;\n  vec4 sh = -step(h, vec4(0.0));\n\n  vec4 a0 = b0.xzyw + s0.xzyw*sh.xxyy ;\n  vec4 a1 = b1.xzyw + s1.xzyw*sh.zzww ;\n\n  vec3 p0 = vec3(a0.xy,h.x);\n  vec3 p1 = vec3(a0.zw,h.y);\n  vec3 p2 = vec3(a1.xy,h.z);\n  vec3 p3 = vec3(a1.zw,h.w);\n\n//Normalise gradients\n  vec4 norm = taylorInvSqrt(vec4(dot(p0,p0), dot(p1,p1), dot(p2, p2), dot(p3,p3)));\n  p0 *= norm.x;\n  p1 *= norm.y;\n  p2 *= norm.z;\n  p3 *= norm.w;\n\n// Mix final noise value\n  vec4 m = max(0.6 - vec4(dot(x0,x0), dot(x1,x1), dot(x2,x2), dot(x3,x3)), 0.0);\n  m = m * m;\n  return 42.0 * dot( m*m, vec4( dot(p0,x0), dot(p1,x1),\n                                dot(p2,x2), dot(p3,x3) ) );\n  }\n\nconst vec2 inert = vec2(-1000000.0);\n\n/**\n * @requires {float} levels The number of samples to take at different LODs\n * @requires {float} stride The step up to take between each LOD\n */\n\nfloat map(float value, float inMin, float inMax, float outMin, float outMax) {\n  return outMin + (outMax - outMin) * (value - inMin) / (inMax - inMin);\n}\n\nvec2 map(vec2 value, vec2 inMin, vec2 inMax, vec2 outMin, vec2 outMax) {\n  return outMin + (outMax - outMin) * (value - inMin) / (inMax - inMin);\n}\n\nvec3 map(vec3 value, vec3 inMin, vec3 inMax, vec3 outMin, vec3 outMax) {\n  return outMin + (outMax - outMin) * (value - inMin) / (inMax - inMin);\n}\n\nvec4 map(vec4 value, vec4 inMin, vec4 inMax, vec4 outMin, vec4 outMax) {\n  return outMin + (outMax - outMin) * (value - inMin) / (inMax - inMin);\n}\n\nconst vec4 posRange = vec4(-1.0, -1.0, 1.0, 1.0);\n\nconst vec4 uvRange = vec4(0.0, 0.0, 1.0, 1.0);\n\nvec2 posToUV(vec2 pos) {\n  return map(pos, posRange.xy, posRange.zw, uvRange.xy, uvRange.zw);\n}\n\n// Time/decay\n\nvec2 get(vec3 data, float time, float decay) {\n  return data.xy*max(0.0, 1.0-((time-data.z)*decay));\n}\n\nvec2 get(vec4 data, float time, float decay) {\n  return get(data.xyz, time, decay);\n}\n\n// No time/decay\n\nvec2 get(vec2 data) {\n  return data.xy;\n}\n\nvec2 get(vec3 data) {\n  return get(data.xy);\n}\n\nvec2 get(vec4 data) {\n  return get(data.xy);\n}\n\n/**\n * @return The flow velocity and age for a given screen position, sampling\n *     several scales.\n */\nvec2 flowAtScreenPos(vec2 pos, sampler2D flow, float time, float flowDecay) {\n  vec2 uv = posToUV(pos);\n  vec2 flowForce = vec2(0.0);\n  float flowMax = 0.0;\n\n  for(float level = 0.0; level < 1.0*1.0; level += 1.0) {\n    vec4 flowData = texture2D(flow, uv, level);\n    float factor = 1.0/(level+1.0);\n\n    flowForce += get(flowData, time, flowDecay)*factor;\n    flowMax += factor;\n  }\n\n  return flowForce/flowMax;\n}\n\nfloat vary(float base, float offset, float variance) {\n  return base+(offset*variance*base);\n}\n\nvoid main() {\n  vec2 uv = gl_FragCoord.xy/dataRes;\n\n  vec4 state = texture2D(particles, uv);\n  vec2 pos = state.xy;\n  vec2 vel = state.zw;\n\n  vec2 newPos = pos;\n  vec2 newVel = vel;\n\n  if(pos != inert) {\n    // The 1D index offset of this pixel\n    float i = (gl_FragCoord.x+(gl_FragCoord.y*dataRes.x))/\n        (dataRes.x*dataRes.y);\n\n    // Wander force\n\n    vec2 noisePos = pos*vary(noiseScale, i, varyNoiseScale);\n\n    // @todo This doesn't progress linearly - the speed grows with time...\n    float noiseTime = time*vary(noiseSpeed, i, varyNoiseSpeed);\n\n    vec2 wanderForce = vec2(snoise(vec3(noisePos, uv.x+noiseTime)),\n        snoise(vec3(noisePos, uv.y+noiseTime+1234.5678)));\n\n    // Flow force - left by preceeding particles\n    // (Ensure this is checked before the next flow step is rendered, to avoid\n    // self-influence.)\n\n    vec2 flowForce = flowAtScreenPos(pos*viewSize, flow, time, flowDecay);\n\n    // Accumulate weighted forces and damping\n    newVel = (vel*damping*dt)+\n      (vary(forceWeight, i, varyForce)*\n        ((flowForce*dt*vary(flowWeight, i, varyFlow))+\n        (wanderForce*dt*vary(noiseWeight, i, varyNoise))));\n\n    // Tend towards targets\n    newVel += (texture2D(targets, uv).xy-pos)*vary(target, i, varyTarget);\n\n    // Normalize and clamp the velocity\n    /**\n     * @todo This seems to cause some problems when dealing with larger max\n     *     speeds - the particles no longer follow flow forces somehow...\n     */\n    float speed = length(newVel);\n\n    newVel *= min(speed, speedLimit)/speed;\n\n    // Integrate motion\n    newPos = pos+newVel;\n  }\n\n  gl_FragColor = vec4(newPos, newVel);\n}\n"
 
 /***/ }),
 /* 467 */
 /***/ (function(module, exports) {
 
-	module.exports = "precision highp float;\n#define GLSLIFY 1\n\nuniform sampler2D previous;\nuniform sampler2D particles;\n\nuniform vec2 dataRes;\nuniform vec2 geomRes;\n\nuniform vec2 viewSize;\n\nuniform sampler2D colorMap;\nuniform float colorMapAlpha;\n\nuniform vec4 flowColor;\nuniform vec4 baseColor;\n\nuniform float time;\nuniform float speedLimit;\nuniform float flowDecay;\n\nuniform float speedAlpha;\n\nattribute vec2 uv;\n\nvarying vec4 color;\n\n/**\n * Pre-generated constants, equivalent to:\n *     flowAxisR: `angleToVec(0)`\n *     flowAxisG: `angleToVec(tau/3.0)`\n *     flowAxisB: `angleToVec(tau*2.0/3.0)`\n */\nconst vec2 flowAxisR = vec2(1.0, 0.0);\nconst vec2 flowAxisG = vec2(-0.5000000000000004, -0.8660254037844385);\nconst vec2 flowAxisB = vec2(-0.4999999999999998, 0.8660254037844387);\n\nconst vec4 minColor = vec4(0.0);\nconst vec4 maxColor = vec4(1.0);\n\nconst vec4 minAlign = vec4(-1.0);\nconst vec4 maxAlign = vec4(1.0);\n\n// @todo Turn some of these `const`s into `uniform`s\nconst vec2 center = vec2(0.0);\nconst vec2 fadeRange = vec2(0.2, 1.0);\nconst vec3 falloff = vec3(fadeRange.x, fadeRange.y, fadeRange.y);\n\nfloat map(float value, float inMin, float inMax, float outMin, float outMax) {\n  return outMin + (outMax - outMin) * (value - inMin) / (inMax - inMin);\n}\n\nvec2 map(vec2 value, vec2 inMin, vec2 inMax, vec2 outMin, vec2 outMax) {\n  return outMin + (outMax - outMin) * (value - inMin) / (inMax - inMin);\n}\n\nvec3 map(vec3 value, vec3 inMin, vec3 inMax, vec3 outMin, vec3 outMax) {\n  return outMin + (outMax - outMin) * (value - inMin) / (inMax - inMin);\n}\n\nvec4 map(vec4 value, vec4 inMin, vec4 inMax, vec4 outMin, vec4 outMax) {\n  return outMin + (outMax - outMin) * (value - inMin) / (inMax - inMin);\n}\n\nconst vec2 inert = vec2(-1000000.0);\n\nfloat length2(vec2 vec) {\n    return dot(vec, vec);\n}\n\nfloat length2(vec3 vec) {\n    return dot(vec, vec);\n}\n\nfloat length2(vec4 vec) {\n    return dot(vec, vec);\n}\n\n/**\n * Adapted from `bezier`.\n */\n\nfloat bezier(vec2 cp, float t) {\n    return cp.x+(cp.y-cp.x)*t;\n}\n\nfloat bezier(vec3 cp, float t) {\n    float ut = 1.0-t;\n\n    return (cp.x*ut+cp.y*t)*ut+(cp.y*ut+cp.z*t)*t;\n}\n\nfloat bezier(vec4 cp, float t) {\n    float ut = 1.0-t;\n    float a1 = cp.y*ut+cp.z*t;\n\n    return ((cp.x*ut+cp.y*t)*ut+a1*t)*ut+(a1*ut+(cp.z*ut+cp.w*t)*t)*t;\n}\n\n// @todo Remove the `1.0-` here?\nfloat amount(vec2 point, vec2 mid, float limit) {\n    return min(1.0-(length(point-mid)/limit), 1.0);\n}\n\nfloat vignette(vec2 point, vec2 mid, float limit) {\n    return max(0.0, amount(point, mid, limit));\n}\n\nfloat vignette(vec2 point, vec2 mid, float limit, float curve) {\n    return max(0.0, curve*amount(point, mid, limit));\n}\n\nfloat vignette(vec2 point, vec2 mid, float limit, vec2 curve) {\n    return max(0.0, bezier(curve, amount(point, mid, limit)));\n}\n\nfloat vignette(vec2 point, vec2 mid, float limit, vec3 curve) {\n    return max(0.0, bezier(curve, amount(point, mid, limit)));\n}\n\nfloat vignette(vec2 point, vec2 mid, float limit, vec4 curve) {\n    return max(0.0, bezier(curve, amount(point, mid, limit)));\n}\n\nvec4 preAlpha(vec3 color, float alpha) {\n    return vec4(color.rgb*alpha, alpha);\n}\n\nvec4 preAlpha(vec4 color) {\n    return preAlpha(color.rgb, color.a);\n}\n\nconst float frameOffset = 0.25;\n\n/**\n * For every data point, we have two vertices - current and previous state.\n * Every other vertex looks up previous data. In this way, (vertical)\n * neighbours alternate from previous to current state.\n * (Vertical neighbours, because WebGL iterates column-major.)\n *\n * @return State data for the vertex, either current or previous.\n */\n\nvec4 stateAtFrame(vec2 uv, vec2 shape, sampler2D previous, sampler2D current) {\n    float nearIndex = uv.y*shape.y;\n    float offset = fract(nearIndex);\n    vec2 lookup = vec2(uv.x, floor(nearIndex)/shape.y);\n\n    // @note Some systems comlain about this form of texture lookup:\n    // return texture2D(((offset > frameOffset)? current : previous), lookup);\n    return ((offset > frameOffset)?\n            texture2D(current, lookup)\n        :   texture2D(previous, lookup));\n}\n\nvoid main() {\n    vec4 state = stateAtFrame(uv, dataRes, previous, particles);\n\n    if(state.xy != inert) {\n        vec2 pos = state.xy;\n        vec2 vel = state.zw/speedLimit;\n        float speedRate = min(length2(vel)/speedAlpha, 1.0);\n\n        // Color map\n\n        vec4 mappedColor = texture2D(colorMap, uv*geomRes/dataRes);\n\n        mappedColor *= colorMapAlpha;\n\n        // Flow color\n        \n        vec3 alignRGB = vec3(dot(vel, flowAxisR),\n                dot(vel, flowAxisG), dot(vel, flowAxisB));\n\n        vec3 flowAlign = map(mix(alignRGB, alignRGB.gbr*(1.0-flowDecay),\n                    sin(time*flowDecay)),\n                minAlign.rgb, maxAlign.rgb, minColor.rgb, maxColor.rgb);\n\n        vec4 flowAlignedColor = vec4(flowColor.rgb*flowAlign, flowColor.a);\n\n        // Color summation, clamping and pre-multiplying alpha so they don't\n        // cross over\n\n        color = clamp(preAlpha(baseColor), minColor, maxColor)+\n            clamp(preAlpha(mappedColor), minColor, maxColor)+\n            clamp(preAlpha(flowAlignedColor), minColor, maxColor);\n\n        color.a *= speedRate*clamp(vignette(pos, center, 1.0, falloff),\n                        fadeRange.x, fadeRange.y);\n\n        // Position\n        gl_Position = vec4(pos*viewSize, 0.0, 1.0);\n    }\n}\n"
+	module.exports = "precision highp float;\n#define GLSLIFY 1\n\nuniform sampler2D previous;\nuniform sampler2D particles;\n\nuniform vec2 dataRes;\nuniform vec2 geomRes;\n\nuniform vec2 viewSize;\n\nuniform sampler2D colorMap;\nuniform float colorMapAlpha;\n\nuniform vec4 flowColor;\nuniform vec4 baseColor;\n\nuniform float time;\nuniform float speedLimit;\nuniform float flowDecay;\n\nuniform float speedAlpha;\n\nattribute vec2 uv;\n\nvarying vec4 color;\n\n/**\n * Pre-generated constants, equivalent to:\n *     flowAxisR: `angleToVec(0)`\n *     flowAxisG: `angleToVec(tau/3.0)`\n *     flowAxisB: `angleToVec(tau*2.0/3.0)`\n */\nconst vec2 flowAxisR = vec2(1.0, 0.0);\nconst vec2 flowAxisG = vec2(-0.5000000000000004, -0.8660254037844385);\nconst vec2 flowAxisB = vec2(-0.4999999999999998, 0.8660254037844387);\n\nconst vec4 minColor = vec4(0.0);\nconst vec4 maxColor = vec4(1.0);\n\nconst vec4 minAlign = vec4(-1.0);\nconst vec4 maxAlign = vec4(1.0);\n\n// @todo Turn some of these `const`s into `uniform`s\nconst vec2 center = vec2(0.0);\nconst vec2 fadeRange = vec2(0.2, 1.0);\nconst vec3 falloff = vec3(fadeRange.x, fadeRange.y, fadeRange.y);\n\nfloat map(float value, float inMin, float inMax, float outMin, float outMax) {\n  return outMin + (outMax - outMin) * (value - inMin) / (inMax - inMin);\n}\n\nvec2 map(vec2 value, vec2 inMin, vec2 inMax, vec2 outMin, vec2 outMax) {\n  return outMin + (outMax - outMin) * (value - inMin) / (inMax - inMin);\n}\n\nvec3 map(vec3 value, vec3 inMin, vec3 inMax, vec3 outMin, vec3 outMax) {\n  return outMin + (outMax - outMin) * (value - inMin) / (inMax - inMin);\n}\n\nvec4 map(vec4 value, vec4 inMin, vec4 inMax, vec4 outMin, vec4 outMax) {\n  return outMin + (outMax - outMin) * (value - inMin) / (inMax - inMin);\n}\n\nconst vec2 inert = vec2(-1000000.0);\n\nfloat length2(vec2 vec) {\n  return dot(vec, vec);\n}\n\nfloat length2(vec3 vec) {\n  return dot(vec, vec);\n}\n\nfloat length2(vec4 vec) {\n  return dot(vec, vec);\n}\n\n/**\n * Adapted from `bezier`.\n */\n\nfloat bezier(vec2 cp, float t) {\n  return cp.x+(cp.y-cp.x)*t;\n}\n\nfloat bezier(vec3 cp, float t) {\n  float ut = 1.0-t;\n\n  return (cp.x*ut+cp.y*t)*ut+(cp.y*ut+cp.z*t)*t;\n}\n\nfloat bezier(vec4 cp, float t) {\n  float ut = 1.0-t;\n  float a1 = cp.y*ut+cp.z*t;\n\n  return ((cp.x*ut+cp.y*t)*ut+a1*t)*ut+(a1*ut+(cp.z*ut+cp.w*t)*t)*t;\n}\n\n// @todo Remove the `1.0-` here?\nfloat amount(vec2 point, vec2 mid, float limit) {\n  return min(1.0-(length(point-mid)/limit), 1.0);\n}\n\nfloat vignette(vec2 point, vec2 mid, float limit) {\n  return max(0.0, amount(point, mid, limit));\n}\n\nfloat vignette(vec2 point, vec2 mid, float limit, float curve) {\n  return max(0.0, curve*amount(point, mid, limit));\n}\n\nfloat vignette(vec2 point, vec2 mid, float limit, vec2 curve) {\n  return max(0.0, bezier(curve, amount(point, mid, limit)));\n}\n\nfloat vignette(vec2 point, vec2 mid, float limit, vec3 curve) {\n  return max(0.0, bezier(curve, amount(point, mid, limit)));\n}\n\nfloat vignette(vec2 point, vec2 mid, float limit, vec4 curve) {\n  return max(0.0, bezier(curve, amount(point, mid, limit)));\n}\n\nvec4 preAlpha(vec3 color, float alpha) {\n  return vec4(color.rgb*alpha, alpha);\n}\n\nvec4 preAlpha(vec4 color) {\n  return preAlpha(color.rgb, color.a);\n}\n\nconst float frameOffset = 0.25;\n\n/**\n * For every data point, we have two vertices - current and previous state.\n * Every other vertex looks up previous data. In this way, (vertical)\n * neighbours alternate from previous to current state.\n * (Vertical neighbours, because WebGL iterates column-major.)\n *\n * @return State data for the vertex, either current or previous.\n */\n\nvec4 stateAtFrame(vec2 uv, vec2 shape, sampler2D previous, sampler2D current) {\n  float nearIndex = uv.y*shape.y;\n  float offset = fract(nearIndex);\n  vec2 lookup = vec2(uv.x, floor(nearIndex)/shape.y);\n\n  // @note Some systems comlain about this form of texture lookup:\n  // return texture2D(((offset > frameOffset)? current : previous), lookup);\n  return ((offset > frameOffset)?\n      texture2D(current, lookup)\n    : texture2D(previous, lookup));\n}\n\nvoid main() {\n    vec4 state = stateAtFrame(uv, dataRes, previous, particles);\n\n    if(state.xy != inert) {\n        vec2 pos = state.xy;\n        vec2 vel = state.zw/speedLimit;\n        float speedRate = min(length2(vel)/speedAlpha, 1.0);\n\n        // Color map\n\n        vec4 mappedColor = texture2D(colorMap, uv*geomRes/dataRes);\n\n        mappedColor *= colorMapAlpha;\n\n        // Flow color\n        \n        vec3 alignRGB = vec3(dot(vel, flowAxisR),\n                dot(vel, flowAxisG), dot(vel, flowAxisB));\n\n        vec3 flowAlign = map(mix(alignRGB, alignRGB.gbr*(1.0-flowDecay),\n                    sin(time*flowDecay)),\n                minAlign.rgb, maxAlign.rgb, minColor.rgb, maxColor.rgb);\n\n        vec4 flowAlignedColor = vec4(flowColor.rgb*flowAlign, flowColor.a);\n\n        // Color summation, clamping and pre-multiplying alpha so they don't\n        // cross over\n\n        color = clamp(preAlpha(baseColor), minColor, maxColor)+\n            clamp(preAlpha(mappedColor), minColor, maxColor)+\n            clamp(preAlpha(flowAlignedColor), minColor, maxColor);\n\n        color.a *= speedRate*clamp(vignette(pos, center, 1.0, falloff),\n                        fadeRange.x, fadeRange.y);\n\n        // Position\n        gl_Position = vec4(pos*viewSize, 0.0, 1.0);\n    }\n}\n"
 
 /***/ }),
 /* 468 */
@@ -26852,25 +26852,25 @@
 /* 469 */
 /***/ (function(module, exports) {
 
-	module.exports = "precision highp float;\n#define GLSLIFY 1\n\nuniform sampler2D previous;\nuniform sampler2D data;\n\nuniform vec2 dataRes;\n\nuniform vec2 viewSize;\n\nuniform float time;\nuniform float speedLimit;\nuniform float flowDecay;\n\nattribute vec2 uv;\n\nvarying vec4 color;\n\n/**\n * @requires {float} time The current time in ms\n */\n\nvec4 flow(vec2 vel) {\n    // Faster particles leave a greater influence (opacity).\n    // Linear interpolation - inaccurate for vectors, will it be OK without\n    // sudden turns, or do we need a per-fragment lookup?\n    return vec4(vel, time, length(vel));\n}\n\nvec4 flow(vec2 vel, float speedLimit) {\n    vec4 values = flow(vel);\n\n    return vec4(values.xyz, min(values.a/speedLimit, 1.0));\n}\n\n/**\n * @requires `./head.vert`\n * @requires {function} apply A function applying a `vec4` state into a `vec3`\n *                            color to be drawn.\n */\n\nconst vec2 inert = vec2(-1000000.0);\n\nconst float frameOffset = 0.25;\n\n/**\n * For every data point, we have two vertices - current and previous state.\n * Every other vertex looks up previous data. In this way, (vertical)\n * neighbours alternate from previous to current state.\n * (Vertical neighbours, because WebGL iterates column-major.)\n *\n * @return State data for the vertex, either current or previous.\n */\n\nvec4 stateAtFrame(vec2 uv, vec2 shape, sampler2D previous, sampler2D current) {\n    float nearIndex = uv.y*shape.y;\n    float offset = fract(nearIndex);\n    vec2 lookup = vec2(uv.x, floor(nearIndex)/shape.y);\n\n    // @note Some systems comlain about this form of texture lookup:\n    // return texture2D(((offset > frameOffset)? current : previous), lookup);\n    return ((offset > frameOffset)?\n            texture2D(current, lookup)\n        :   texture2D(previous, lookup));\n}\n\nvoid main() {\n    vec4 state = stateAtFrame(uv, dataRes, previous, data);\n\n    if(state.xy != inert) {\n        gl_Position = vec4(state.xy*viewSize, 1.0, 1.0);\n        color = flow(state.zw, speedLimit);\n    }\n}\n\n"
+	module.exports = "precision highp float;\n#define GLSLIFY 1\n\nuniform sampler2D previous;\nuniform sampler2D data;\n\nuniform vec2 dataRes;\n\nuniform vec2 viewSize;\n\nuniform float time;\nuniform float speedLimit;\nuniform float flowDecay;\n\nattribute vec2 uv;\n\nvarying vec4 color;\n\n/**\n * @requires {float} time The current time in ms\n */\n\nvec4 flow(vec2 vel) {\n  // Faster particles leave a greater influence (opacity).\n  // Linear interpolation - inaccurate for vectors, will it be OK without\n  // sudden turns, or do we need a per-fragment lookup?\n  return vec4(vel, time, length(vel));\n}\n\nvec4 flow(vec2 vel, float speedLimit) {\n  vec4 values = flow(vel);\n\n  return vec4(values.xyz, min(values.a/speedLimit, 1.0));\n}\n\n/**\n * @requires `./head.vert`\n * @requires {function} apply A function applying a `vec4` state into a `vec3`\n *              color to be drawn.\n */\n\nconst vec2 inert = vec2(-1000000.0);\n\nconst float frameOffset = 0.25;\n\n/**\n * For every data point, we have two vertices - current and previous state.\n * Every other vertex looks up previous data. In this way, (vertical)\n * neighbours alternate from previous to current state.\n * (Vertical neighbours, because WebGL iterates column-major.)\n *\n * @return State data for the vertex, either current or previous.\n */\n\nvec4 stateAtFrame(vec2 uv, vec2 shape, sampler2D previous, sampler2D current) {\n  float nearIndex = uv.y*shape.y;\n  float offset = fract(nearIndex);\n  vec2 lookup = vec2(uv.x, floor(nearIndex)/shape.y);\n\n  // @note Some systems comlain about this form of texture lookup:\n  // return texture2D(((offset > frameOffset)? current : previous), lookup);\n  return ((offset > frameOffset)?\n      texture2D(current, lookup)\n    : texture2D(previous, lookup));\n}\n\nvoid main() {\n  vec4 state = stateAtFrame(uv, dataRes, previous, data);\n\n  if(state.xy != inert) {\n    gl_Position = vec4(state.xy*viewSize, 1.0, 1.0);\n    color = flow(state.zw, speedLimit);\n  }\n}\n\n"
 
 /***/ }),
 /* 470 */
 /***/ (function(module, exports) {
 
-	module.exports = "precision highp float;\n#define GLSLIFY 1\n\nvarying vec4 color;\n\nvoid main() {\n    // @todo SDF from line, to weaken force further away\n    gl_FragColor = color.rgba;\n}\n"
+	module.exports = "precision highp float;\n#define GLSLIFY 1\n\nvarying vec4 color;\n\nvoid main() {\n  // @todo SDF from line, to weaken force further away\n  gl_FragColor = color.rgba;\n}\n"
 
 /***/ }),
 /* 471 */
 /***/ (function(module, exports) {
 
-	module.exports = "precision highp float;\n#define GLSLIFY 1\n\nuniform vec4 color;\n\nvoid main() {\n    gl_FragColor = color.rgba;\n}\n"
+	module.exports = "precision highp float;\n#define GLSLIFY 1\n\nuniform vec4 color;\n\nvoid main() {\n  gl_FragColor = color.rgba;\n}\n"
 
 /***/ }),
 /* 472 */
 /***/ (function(module, exports) {
 
-	module.exports = "precision highp float;\n#define GLSLIFY 1\n\nuniform sampler2D view;\nuniform vec2 viewRes;\n\n// #pragma glslify: fxaa = require(glsl-fxaa)\n\nvoid main() {\n    gl_FragColor = texture2D(view, gl_FragCoord.xy/viewRes);\n    // gl_FragColor = fxaa(view, gl_FragCoord.xy, viewRes);\n}\n"
+	module.exports = "precision highp float;\n#define GLSLIFY 1\n\nuniform sampler2D view;\nuniform vec2 viewRes;\n\n// #pragma glslify: fxaa = require(glsl-fxaa)\n\nvoid main() {\n  gl_FragColor = texture2D(view, gl_FragCoord.xy/viewRes);\n  // gl_FragColor = fxaa(view, gl_FragCoord.xy, viewRes);\n}\n"
 
 /***/ }),
 /* 473 */
@@ -26879,7 +26879,7 @@
 	'use strict';
 	
 	Object.defineProperty(exports, "__esModule", {
-	    value: true
+	  value: true
 	});
 	exports.PixelSpawner = exports.defaults = undefined;
 	
@@ -26917,70 +26917,70 @@
 	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 	
 	var defaults = exports.defaults = function defaults() {
-	    return {
-	        shader: [_index2.default, _index4.default],
-	        // buffer: [[1, 1]]
-	        buffer: [[1, 1], { float: true }],
-	        spawnSize: [1, 1],
-	        jitterRad: 2,
-	        speed: 1,
-	        bias: 1
-	    };
+	  return {
+	    shader: [_index2.default, _index4.default],
+	    // buffer: [[1, 1]]
+	    buffer: [[1, 1], { float: true }],
+	    spawnSize: [1, 1],
+	    jitterRad: 2,
+	    speed: 1,
+	    bias: 1
+	  };
 	};
 	
 	var PixelSpawner = exports.PixelSpawner = function () {
-	    function PixelSpawner(gl, options) {
-	        _classCallCheck(this, PixelSpawner);
+	  function PixelSpawner(gl, options) {
+	    _classCallCheck(this, PixelSpawner);
 	
-	        this.gl = gl;
+	    this.gl = gl;
 	
-	        var params = Object.assign(defaults(), options);
+	    var params = Object.assign(defaults(), options);
 	
-	        this.shader = Array.isArray(params.shader) ? _glShader2.default.apply(undefined, [this.gl].concat(_toConsumableArray(params.shader))) : params.shader;
+	    this.shader = Array.isArray(params.shader) ? _glShader2.default.apply(undefined, [this.gl].concat(_toConsumableArray(params.shader))) : params.shader;
 	
-	        this.buffer = Array.isArray(params.buffer) ? _glFbo2.default.apply(undefined, [this.gl].concat(_toConsumableArray(params.buffer))) : params.buffer;
+	    this.buffer = Array.isArray(params.buffer) ? _glFbo2.default.apply(undefined, [this.gl].concat(_toConsumableArray(params.buffer))) : params.buffer;
 	
-	        this.speed = params.speed;
-	        this.bias = params.bias;
+	    this.speed = params.speed;
+	    this.bias = params.bias;
 	
-	        this.jitterRad = params.jitterRad;
-	        this.jitter = _glMatrix.vec2.create();
+	    this.jitterRad = params.jitterRad;
+	    this.jitter = _glMatrix.vec2.create();
 	
-	        this.spawnSize = params.spawnSize;
-	        this.spawnMatrix = _glMatrix.mat3.create();
+	    this.spawnSize = params.spawnSize;
+	    this.spawnMatrix = _glMatrix.mat3.create();
+	  }
+	
+	  _createClass(PixelSpawner, [{
+	    key: 'update',
+	    value: function update(uniforms) {
+	      return Object.assign(uniforms, {
+	        spawnData: this.buffer.color[0].bind(1),
+	        spawnSize: this.spawnSize,
+	        spawnMatrix: this.spawnMatrix,
+	        speed: this.speed,
+	        jitter: (0, _aspect2.default)(this.jitter, uniforms.viewRes, this.jitterRad),
+	        bias: this.bias
+	      });
 	    }
+	  }, {
+	    key: 'spawn',
+	    value: function spawn(tendrils) {
+	      var update = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : this.update.bind(this);
 	
-	    _createClass(PixelSpawner, [{
-	        key: 'update',
-	        value: function update(uniforms) {
-	            return Object.assign(uniforms, {
-	                spawnData: this.buffer.color[0].bind(1),
-	                spawnSize: this.spawnSize,
-	                spawnMatrix: this.spawnMatrix,
-	                speed: this.speed,
-	                jitter: (0, _aspect2.default)(this.jitter, uniforms.viewRes, this.jitterRad),
-	                bias: this.bias
-	            });
-	        }
-	    }, {
-	        key: 'spawn',
-	        value: function spawn(tendrils) {
-	            var update = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : this.update.bind(this);
+	      for (var _len = arguments.length, rest = Array(_len > 2 ? _len - 2 : 0), _key = 2; _key < _len; _key++) {
+	        rest[_key - 2] = arguments[_key];
+	      }
 	
-	            for (var _len = arguments.length, rest = Array(_len > 2 ? _len - 2 : 0), _key = 2; _key < _len; _key++) {
-	                rest[_key - 2] = arguments[_key];
-	            }
+	      return tendrils.spawnShader.apply(tendrils, [this.shader, update].concat(rest));
+	    }
+	  }, {
+	    key: 'setPixels',
+	    value: function setPixels(pixels) {
+	      return this.buffer.color[0].setPixels(pixels);
+	    }
+	  }]);
 	
-	            return tendrils.spawnShader.apply(tendrils, [this.shader, update].concat(rest));
-	        }
-	    }, {
-	        key: 'setPixels',
-	        value: function setPixels(pixels) {
-	            return this.buffer.color[0].setPixels(pixels);
-	        }
-	    }]);
-	
-	    return PixelSpawner;
+	  return PixelSpawner;
 	}();
 	
 	exports.default = PixelSpawner;
@@ -26989,25 +26989,25 @@
 /* 474 */
 /***/ (function(module, exports) {
 
-	module.exports = "precision highp float;\n#define GLSLIFY 1\n\nuniform sampler2D particles;\nuniform sampler2D spawnData;\n\nuniform vec2 dataRes;\nuniform vec2 geomRes;\nuniform vec2 spawnSize;\n\nuniform vec2 jitter;\nuniform float time;\nuniform float speed;\n\nuniform mat3 spawnMatrix;\n\n/**\n * @todo Some bug with `glslify-import` & sons breaks `node_modules` aliased\n *       `require`s in `import`ed files, so we need to do it the looooooong way.\n */\n// #pragma glslify: random = require(glsl-random)\nhighp float random(vec2 co)\n{\n    highp float a = 12.9898;\n    highp float b = 78.233;\n    highp float c = 43758.5453;\n    highp float dt= dot(co.xy ,vec2(a,b));\n    highp float sn= mod(dt,3.14);\n    return fract(sin(sn) * c);\n}\n\nfloat map(float value, float inMin, float inMax, float outMin, float outMax) {\n  return outMin + (outMax - outMin) * (value - inMin) / (inMax - inMin);\n}\n\nvec2 map(vec2 value, vec2 inMin, vec2 inMax, vec2 outMin, vec2 outMax) {\n  return outMin + (outMax - outMin) * (value - inMin) / (inMax - inMin);\n}\n\nvec3 map(vec3 value, vec3 inMin, vec3 inMax, vec3 outMin, vec3 outMax) {\n  return outMin + (outMax - outMin) * (value - inMin) / (inMax - inMin);\n}\n\nvec4 map(vec4 value, vec4 inMin, vec4 inMax, vec4 outMin, vec4 outMax) {\n  return outMin + (outMax - outMin) * (value - inMin) / (inMax - inMin);\n}\n\nconst vec4 uvRange = vec4(0.0, 0.0, 1.0, 1.0);\n\nconst vec4 posRange = vec4(-1.0, -1.0, 1.0, 1.0);\n\nvec2 uvToPos(vec2 uv) {\n    return map(uv, uvRange.xy, uvRange.zw, posRange.xy, posRange.zw);\n}\n\nfloat transform(mat2 m, float v) {\n    return (m*vec2(v, 1.0)).x;\n}\n\nvec2 transform(mat3 m, vec2 v) {\n    return (m*vec3(v, 1.0)).xy;\n}\n\nvec3 transform(mat4 m, vec3 v) {\n    return (m*vec4(v, 1.0)).xyz;\n}\n\nconst vec2 flipUV = vec2(1.0, -1.0);\n\nvec2 spawnToPos(vec2 uv) {\n    // Jittering around a UV cell to get rid of boxy scaled sampling artefacts\n    vec2 offset = vec2(mix(-jitter.x, jitter.x, random(uv-1.2345+(time*0.001))),\n            mix(-jitter.y, jitter.y, random(uv+1.2345+(time*0.001))));\n\n    return transform(spawnMatrix, uvToPos(uv+offset)*flipUV*spawnSize);\n}\n\n// `import`-able convenience for setting up a vignette - should be replaced with\n// a proper `uniform`-ed version.\n\nconst vec3 curve = vec3(0.1, 1.0, 1.0);\nconst vec2 mid = vec2(0.5);\nconst float limit = 0.6;\n\n// #pragma glslify: vignette = require(../../filter/pass/vignette, curve = curve, mid = mid, limit = limit)\n\n/**\n * Directly uses a normal image - brightness being speed in a direction defined\n * by the `rgba` channels.\n *\n * @requires {float} time The current time\n */\n\nconst vec4 k = vec4(0.0, -1.0/3.0, 2.0/3.0, -1.0);\nconst float e = 1.0e-10;\n\nvec3 rgb2hsv(vec3 c) {\n    vec4 p = ((c.g < c.b)? vec4(c.bg, k.wz) : vec4(c.gb, k.xy));\n    vec4 q = ((c.r < p.x)? vec4(p.xyw, c.r) : vec4(c.r, p.yzx));\n\n    float d = q.x-min(q.w, q.y);\n\n    return vec3(abs(q.z+(q.w-q.y)/(6.0*d+e)), d/(q.x+e), q.x);\n}\n\nconst float tau = 6.28318530717958647692;\n\nvec2 angleToVec(float rad) {\n    return vec2(cos(rad), sin(rad));\n}\n\nvec4 apply(vec2 uv, vec2 pos, vec4 pixel) {\n    vec3 hsv = rgb2hsv(pixel.rgb);\n\n    return vec4(pos, angleToVec((hsv.r+(time*0.00003))*tau)*hsv.g*hsv.b*pixel.a);\n}\n\n// #pragma glslify: applier = require(./apply/brightest)\n/**\n * @requires {vec2} mid The center of the vignette\n * @requires {float} limit The radius of the vignette\n * @requires {(float|vec2|vec3|vec4)} curve Bezier curve points, shaping falloff\n */\n\n/**\n * Adapted from `bezier`.\n */\n\nfloat bezier(vec2 cp, float t) {\n    return cp.x+(cp.y-cp.x)*t;\n}\n\nfloat bezier(vec3 cp, float t) {\n    float ut = 1.0-t;\n\n    return (cp.x*ut+cp.y*t)*ut+(cp.y*ut+cp.z*t)*t;\n}\n\nfloat bezier(vec4 cp, float t) {\n    float ut = 1.0-t;\n    float a1 = cp.y*ut+cp.z*t;\n\n    return ((cp.x*ut+cp.y*t)*ut+a1*t)*ut+(a1*ut+(cp.z*ut+cp.w*t)*t)*t;\n}\n\n// @todo Remove the `1.0-` here?\nfloat amount(vec2 point, vec2 mid, float limit) {\n    return min(1.0-(length(point-mid)/limit), 1.0);\n}\n\nfloat vignette(vec2 point, vec2 mid, float limit) {\n    return max(0.0, amount(point, mid, limit));\n}\n\nfloat vignette(vec2 point, vec2 mid, float limit, float curve) {\n    return max(0.0, curve*amount(point, mid, limit));\n}\n\nfloat vignette(vec2 point, vec2 mid, float limit, vec2 curve) {\n    return max(0.0, bezier(curve, amount(point, mid, limit)));\n}\n\nfloat vignette(vec2 point, vec2 mid, float limit, vec3 curve) {\n    return max(0.0, bezier(curve, amount(point, mid, limit)));\n}\n\nfloat vignette(vec2 point, vec2 mid, float limit, vec4 curve) {\n    return max(0.0, bezier(curve, amount(point, mid, limit)));\n}\n\nvec4 pass(vec2 uv, vec4 pixel) {\n    return pixel*vignette(uv, mid, limit, curve);\n}\n\n/**\n * A way to easily compose filter passes on the pixel before applying it.\n *\n * @see `../../../filter/`\n * @see `./`\n * @requires {function} pass The filter pass function, given the pixel.\n * @requires {function} apply The apply function, given the result of `pass`.\n */\n\nvec4 compose(vec2 uv, vec2 pos, vec4 pixel) {\n    return apply(uv, pos, pass(uv, pixel));\n}\n\n// #pragma glslify: apply = require(./apply/color, time = time)\n// #pragma glslify: apply = require(./apply/brightest)\n\n/**\n * Directly spawns a particle according to its euivalent position/values in the\n * given texture.\n *\n * @requires {function} apply A function that transforms a `vec4` of data into a\n *                            valid `vec4` state.\n */\n\nvoid main() {\n    /**\n     * @todo I have no idea why this seems to be required here and not in the\n     *       main logic shader... seems to do with the data/geometry size ratio.\n     */\n    // vec2 uv = gl_FragCoord.xy/dataRes;\n    vec2 uv = (gl_FragCoord.xy/dataRes)*(geomRes/dataRes);\n\n    vec4 state = compose(uv, spawnToPos(uv), texture2D(spawnData, uv));\n\n    gl_FragColor = vec4(state.xy, state.zw*speed);\n}\n\n"
+	module.exports = "precision highp float;\n#define GLSLIFY 1\n\nuniform sampler2D particles;\nuniform sampler2D spawnData;\n\nuniform vec2 dataRes;\nuniform vec2 geomRes;\nuniform vec2 spawnSize;\n\nuniform vec2 jitter;\nuniform float time;\nuniform float speed;\n\nuniform mat3 spawnMatrix;\n\n/**\n * @todo Some bug with `glslify-import` & sons breaks `node_modules` aliased\n *     `require`s in `import`ed files, so we need to do it the looooooong way.\n */\n// #pragma glslify: random = require(glsl-random)\nhighp float random(vec2 co)\n{\n    highp float a = 12.9898;\n    highp float b = 78.233;\n    highp float c = 43758.5453;\n    highp float dt= dot(co.xy ,vec2(a,b));\n    highp float sn= mod(dt,3.14);\n    return fract(sin(sn) * c);\n}\n\nfloat map(float value, float inMin, float inMax, float outMin, float outMax) {\n  return outMin + (outMax - outMin) * (value - inMin) / (inMax - inMin);\n}\n\nvec2 map(vec2 value, vec2 inMin, vec2 inMax, vec2 outMin, vec2 outMax) {\n  return outMin + (outMax - outMin) * (value - inMin) / (inMax - inMin);\n}\n\nvec3 map(vec3 value, vec3 inMin, vec3 inMax, vec3 outMin, vec3 outMax) {\n  return outMin + (outMax - outMin) * (value - inMin) / (inMax - inMin);\n}\n\nvec4 map(vec4 value, vec4 inMin, vec4 inMax, vec4 outMin, vec4 outMax) {\n  return outMin + (outMax - outMin) * (value - inMin) / (inMax - inMin);\n}\n\nconst vec4 uvRange = vec4(0.0, 0.0, 1.0, 1.0);\n\nconst vec4 posRange = vec4(-1.0, -1.0, 1.0, 1.0);\n\nvec2 uvToPos(vec2 uv) {\n  return map(uv, uvRange.xy, uvRange.zw, posRange.xy, posRange.zw);\n}\n\nfloat transform(mat2 m, float v) {\n  return (m*vec2(v, 1.0)).x;\n}\n\nvec2 transform(mat3 m, vec2 v) {\n  return (m*vec3(v, 1.0)).xy;\n}\n\nvec3 transform(mat4 m, vec3 v) {\n  return (m*vec4(v, 1.0)).xyz;\n}\n\nconst vec2 flipUV = vec2(1.0, -1.0);\n\nvec2 spawnToPos(vec2 uv) {\n  // Jittering around a UV cell to get rid of boxy scaled sampling artefacts\n  vec2 offset = vec2(mix(-jitter.x, jitter.x, random(uv-1.2345+(time*0.001))),\n      mix(-jitter.y, jitter.y, random(uv+1.2345+(time*0.001))));\n\n  return transform(spawnMatrix, uvToPos(uv+offset)*flipUV*spawnSize);\n}\n\n// `import`-able convenience for setting up a vignette - should be replaced with\n// a proper `uniform`-ed version.\n\nconst vec3 curve = vec3(0.1, 1.0, 1.0);\nconst vec2 mid = vec2(0.5);\nconst float limit = 0.6;\n\n// #pragma glslify: vignette = require(../../filter/pass/vignette, curve = curve, mid = mid, limit = limit)\n\n/**\n * Directly uses a normal image - brightness being speed in a direction defined\n * by the `rgba` channels.\n *\n * @requires {float} time The current time\n */\n\nconst vec4 k = vec4(0.0, -1.0/3.0, 2.0/3.0, -1.0);\nconst float e = 1.0e-10;\n\nvec3 rgb2hsv(vec3 c) {\n  vec4 p = ((c.g < c.b)? vec4(c.bg, k.wz) : vec4(c.gb, k.xy));\n  vec4 q = ((c.r < p.x)? vec4(p.xyw, c.r) : vec4(c.r, p.yzx));\n\n  float d = q.x-min(q.w, q.y);\n\n  return vec3(abs(q.z+(q.w-q.y)/(6.0*d+e)), d/(q.x+e), q.x);\n}\n\nconst float tau = 6.28318530717958647692;\n\nvec2 angleToVec(float rad) {\n    return vec2(cos(rad), sin(rad));\n}\n\nvec4 apply(vec2 uv, vec2 pos, vec4 pixel) {\n  vec3 hsv = rgb2hsv(pixel.rgb);\n\n  return vec4(pos, angleToVec((hsv.r+(time*0.00003))*tau)*hsv.g*hsv.b*pixel.a);\n}\n\n// #pragma glslify: applier = require(./apply/brightest)\n/**\n * @requires {vec2} mid The center of the vignette\n * @requires {float} limit The radius of the vignette\n * @requires {(float|vec2|vec3|vec4)} curve Bezier curve points, shaping falloff\n */\n\n/**\n * Adapted from `bezier`.\n */\n\nfloat bezier(vec2 cp, float t) {\n  return cp.x+(cp.y-cp.x)*t;\n}\n\nfloat bezier(vec3 cp, float t) {\n  float ut = 1.0-t;\n\n  return (cp.x*ut+cp.y*t)*ut+(cp.y*ut+cp.z*t)*t;\n}\n\nfloat bezier(vec4 cp, float t) {\n  float ut = 1.0-t;\n  float a1 = cp.y*ut+cp.z*t;\n\n  return ((cp.x*ut+cp.y*t)*ut+a1*t)*ut+(a1*ut+(cp.z*ut+cp.w*t)*t)*t;\n}\n\n// @todo Remove the `1.0-` here?\nfloat amount(vec2 point, vec2 mid, float limit) {\n  return min(1.0-(length(point-mid)/limit), 1.0);\n}\n\nfloat vignette(vec2 point, vec2 mid, float limit) {\n  return max(0.0, amount(point, mid, limit));\n}\n\nfloat vignette(vec2 point, vec2 mid, float limit, float curve) {\n  return max(0.0, curve*amount(point, mid, limit));\n}\n\nfloat vignette(vec2 point, vec2 mid, float limit, vec2 curve) {\n  return max(0.0, bezier(curve, amount(point, mid, limit)));\n}\n\nfloat vignette(vec2 point, vec2 mid, float limit, vec3 curve) {\n  return max(0.0, bezier(curve, amount(point, mid, limit)));\n}\n\nfloat vignette(vec2 point, vec2 mid, float limit, vec4 curve) {\n  return max(0.0, bezier(curve, amount(point, mid, limit)));\n}\n\nvec4 pass(vec2 uv, vec4 pixel) {\n  return pixel*vignette(uv, mid, limit, curve);\n}\n\n/**\n * A way to easily compose filter passes on the pixel before applying it.\n *\n * @see `../../../filter/`\n * @see `./`\n * @requires {function} pass The filter pass function, given the pixel.\n * @requires {function} apply The apply function, given the result of `pass`.\n */\n\nvec4 compose(vec2 uv, vec2 pos, vec4 pixel) {\n  return apply(uv, pos, pass(uv, pixel));\n}\n\n// #pragma glslify: apply = require(./apply/color, time = time)\n// #pragma glslify: apply = require(./apply/brightest)\n\n/**\n * Directly spawns a particle according to its euivalent position/values in the\n * given texture.\n *\n * @requires {function} apply A function that transforms a `vec4` of data into a\n *              valid `vec4` state.\n */\n\nvoid main() {\n  /**\n   * @todo I have no idea why this seems to be required here and not in the\n   *     main logic shader... seems to do with the data/geometry size ratio.\n   */\n  // vec2 uv = gl_FragCoord.xy/dataRes;\n  vec2 uv = (gl_FragCoord.xy/dataRes)*(geomRes/dataRes);\n\n  vec4 state = compose(uv, spawnToPos(uv), texture2D(spawnData, uv));\n\n  gl_FragColor = vec4(state.xy, state.zw*speed);\n}\n\n"
 
 /***/ }),
 /* 475 */
 /***/ (function(module, exports) {
 
-	module.exports = "/**\n * Tries a number of times to randomly select a pixel scored highest by a given\n * function.\n */\n\nprecision highp float;\n#define GLSLIFY 1\n\nuniform sampler2D particles;\nuniform sampler2D spawnData;\n\nuniform vec2 dataRes;\nuniform vec2 geomRes;\nuniform vec2 spawnSize;\n\nuniform vec2 jitter;\nuniform float time;\nuniform float speed;\n\nuniform mat3 spawnMatrix;\n\n/**\n * @todo Some bug with `glslify-import` & sons breaks `node_modules` aliased\n *       `require`s in `import`ed files, so we need to do it the looooooong way.\n */\n// #pragma glslify: random = require(glsl-random)\nhighp float random(vec2 co)\n{\n    highp float a = 12.9898;\n    highp float b = 78.233;\n    highp float c = 43758.5453;\n    highp float dt= dot(co.xy ,vec2(a,b));\n    highp float sn= mod(dt,3.14);\n    return fract(sin(sn) * c);\n}\n\nfloat map(float value, float inMin, float inMax, float outMin, float outMax) {\n  return outMin + (outMax - outMin) * (value - inMin) / (inMax - inMin);\n}\n\nvec2 map(vec2 value, vec2 inMin, vec2 inMax, vec2 outMin, vec2 outMax) {\n  return outMin + (outMax - outMin) * (value - inMin) / (inMax - inMin);\n}\n\nvec3 map(vec3 value, vec3 inMin, vec3 inMax, vec3 outMin, vec3 outMax) {\n  return outMin + (outMax - outMin) * (value - inMin) / (inMax - inMin);\n}\n\nvec4 map(vec4 value, vec4 inMin, vec4 inMax, vec4 outMin, vec4 outMax) {\n  return outMin + (outMax - outMin) * (value - inMin) / (inMax - inMin);\n}\n\nconst vec4 uvRange = vec4(0.0, 0.0, 1.0, 1.0);\n\nconst vec4 posRange = vec4(-1.0, -1.0, 1.0, 1.0);\n\nvec2 uvToPos(vec2 uv) {\n    return map(uv, uvRange.xy, uvRange.zw, posRange.xy, posRange.zw);\n}\n\nfloat transform(mat2 m, float v) {\n    return (m*vec2(v, 1.0)).x;\n}\n\nvec2 transform(mat3 m, vec2 v) {\n    return (m*vec3(v, 1.0)).xy;\n}\n\nvec3 transform(mat4 m, vec3 v) {\n    return (m*vec4(v, 1.0)).xyz;\n}\n\nconst vec2 flipUV = vec2(1.0, -1.0);\n\nvec2 spawnToPos(vec2 uv) {\n    // Jittering around a UV cell to get rid of boxy scaled sampling artefacts\n    vec2 offset = vec2(mix(-jitter.x, jitter.x, random(uv-1.2345+(time*0.001))),\n            mix(-jitter.y, jitter.y, random(uv+1.2345+(time*0.001))));\n\n    return transform(spawnMatrix, uvToPos(uv+offset)*flipUV*spawnSize);\n}\n\n// `import`-able convenience for setting up a vignette - should be replaced with\n// a proper `uniform`-ed version.\n\nconst vec3 curve = vec3(0.1, 1.0, 1.0);\nconst vec2 mid = vec2(0.5);\nconst float limit = 0.6;\n\n// #pragma glslify: vignette = require(../../filter/pass/vignette, curve = curve, mid = mid, limit = limit)\n\n/**\n * Directly uses a normal image - brightness being speed in a direction defined\n * by the `rgba` channels.\n *\n * @requires {float} time The current time\n */\n\nconst vec4 k = vec4(0.0, -1.0/3.0, 2.0/3.0, -1.0);\nconst float e = 1.0e-10;\n\nvec3 rgb2hsv(vec3 c) {\n    vec4 p = ((c.g < c.b)? vec4(c.bg, k.wz) : vec4(c.gb, k.xy));\n    vec4 q = ((c.r < p.x)? vec4(p.xyw, c.r) : vec4(c.r, p.yzx));\n\n    float d = q.x-min(q.w, q.y);\n\n    return vec3(abs(q.z+(q.w-q.y)/(6.0*d+e)), d/(q.x+e), q.x);\n}\n\nconst float tau = 6.28318530717958647692;\n\nvec2 angleToVec(float rad) {\n    return vec2(cos(rad), sin(rad));\n}\n\nvec4 apply(vec2 uv, vec2 pos, vec4 pixel) {\n    vec3 hsv = rgb2hsv(pixel.rgb);\n\n    return vec4(pos, angleToVec((hsv.r+(time*0.00003))*tau)*hsv.g*hsv.b*pixel.a);\n}\n\n// #pragma glslify: applier = require(./apply/brightest)\n/**\n * @requires {vec2} mid The center of the vignette\n * @requires {float} limit The radius of the vignette\n * @requires {(float|vec2|vec3|vec4)} curve Bezier curve points, shaping falloff\n */\n\n/**\n * Adapted from `bezier`.\n */\n\nfloat bezier(vec2 cp, float t) {\n    return cp.x+(cp.y-cp.x)*t;\n}\n\nfloat bezier(vec3 cp, float t) {\n    float ut = 1.0-t;\n\n    return (cp.x*ut+cp.y*t)*ut+(cp.y*ut+cp.z*t)*t;\n}\n\nfloat bezier(vec4 cp, float t) {\n    float ut = 1.0-t;\n    float a1 = cp.y*ut+cp.z*t;\n\n    return ((cp.x*ut+cp.y*t)*ut+a1*t)*ut+(a1*ut+(cp.z*ut+cp.w*t)*t)*t;\n}\n\n// @todo Remove the `1.0-` here?\nfloat amount(vec2 point, vec2 mid, float limit) {\n    return min(1.0-(length(point-mid)/limit), 1.0);\n}\n\nfloat vignette(vec2 point, vec2 mid, float limit) {\n    return max(0.0, amount(point, mid, limit));\n}\n\nfloat vignette(vec2 point, vec2 mid, float limit, float curve) {\n    return max(0.0, curve*amount(point, mid, limit));\n}\n\nfloat vignette(vec2 point, vec2 mid, float limit, vec2 curve) {\n    return max(0.0, bezier(curve, amount(point, mid, limit)));\n}\n\nfloat vignette(vec2 point, vec2 mid, float limit, vec3 curve) {\n    return max(0.0, bezier(curve, amount(point, mid, limit)));\n}\n\nfloat vignette(vec2 point, vec2 mid, float limit, vec4 curve) {\n    return max(0.0, bezier(curve, amount(point, mid, limit)));\n}\n\nvec4 pass(vec2 uv, vec4 pixel) {\n    return pixel*vignette(uv, mid, limit, curve);\n}\n\n/**\n * A way to easily compose filter passes on the pixel before applying it.\n *\n * @see `../../../filter/`\n * @see `./`\n * @requires {function} pass The filter pass function, given the pixel.\n * @requires {function} apply The apply function, given the result of `pass`.\n */\n\nvec4 compose(vec2 uv, vec2 pos, vec4 pixel) {\n    return apply(uv, pos, pass(uv, pixel));\n}\n\n// #pragma glslify: apply = require(./apply/color, time = time)\n// #pragma glslify: apply = require(./apply/brightest)\n\n/**\n * Pick the Highest velocity.\n * Uses the same data structure as the particles.\n */\n\nfloat length2(vec2 vec) {\n    return dot(vec, vec);\n}\n\nfloat length2(vec3 vec) {\n    return dot(vec, vec);\n}\n\nfloat length2(vec4 vec) {\n    return dot(vec, vec);\n}\n\nfloat test(vec4 data) {\n    return length2(data.zw);\n}\n\nconst float samples = 6.0;\n\n/**\n * Tries a number of times to randomly select a pixel scored highest by a given\n * function.\n *\n * @requires {function} apply A function that transforms a `vec4` of data into a\n *                            valid `vec4` state.\n * @requires {function} test A function that returns a float value for a given\n *                           `vec4` state; greater values win the comparison.\n */\n\n// Over 1 favours changing to new data; under 1 favours current data.\nuniform float bias;\n\n/**\n * @todo Some bug with `glslify-import` & sons breaks `node_modules` aliased\n *       `require`s in `import`ed files, so we need to do it the looooooong way.\n */\n// #pragma glslify: random = require(glsl-random)\n\nvec4 pick(vec4 current, vec4 next) {\n    return ((test(current) > bias*test(next))? current : next);\n}\n\nvoid main() {\n    /**\n     * @todo This was needed in `./direct-main.frag` - is it needed here too?\n     */\n    vec2 uv = gl_FragCoord.xy/dataRes;\n    // vec2 uv = (gl_FragCoord.xy/dataRes)*(geomRes/dataRes);\n    \n    vec4 state = texture2D(particles, uv);\n\n    vec4 baseSeed = state+vec4(uv, uv)+vec4(1.2345+(time*0.001));\n\n    for(float n = 0.0; n < samples; n += 1.0) {\n        vec4 seed = baseSeed+vec4(n);\n        vec2 spawnUV = mod(vec2(random(seed.xy), random(seed.zw)), 1.0);\n        vec4 other = compose(spawnUV, spawnToPos(spawnUV),\n                texture2D(spawnData, spawnUV));\n\n        state = pick(state, vec4(other.xy, other.zw*speed));\n    }\n\n    gl_FragColor = state;\n}\n\n"
+	module.exports = "/**\n * Tries a number of times to randomly select a pixel scored highest by a given\n * function.\n */\n\nprecision highp float;\n#define GLSLIFY 1\n\nuniform sampler2D particles;\nuniform sampler2D spawnData;\n\nuniform vec2 dataRes;\nuniform vec2 geomRes;\nuniform vec2 spawnSize;\n\nuniform vec2 jitter;\nuniform float time;\nuniform float speed;\n\nuniform mat3 spawnMatrix;\n\n/**\n * @todo Some bug with `glslify-import` & sons breaks `node_modules` aliased\n *     `require`s in `import`ed files, so we need to do it the looooooong way.\n */\n// #pragma glslify: random = require(glsl-random)\nhighp float random(vec2 co)\n{\n    highp float a = 12.9898;\n    highp float b = 78.233;\n    highp float c = 43758.5453;\n    highp float dt= dot(co.xy ,vec2(a,b));\n    highp float sn= mod(dt,3.14);\n    return fract(sin(sn) * c);\n}\n\nfloat map(float value, float inMin, float inMax, float outMin, float outMax) {\n  return outMin + (outMax - outMin) * (value - inMin) / (inMax - inMin);\n}\n\nvec2 map(vec2 value, vec2 inMin, vec2 inMax, vec2 outMin, vec2 outMax) {\n  return outMin + (outMax - outMin) * (value - inMin) / (inMax - inMin);\n}\n\nvec3 map(vec3 value, vec3 inMin, vec3 inMax, vec3 outMin, vec3 outMax) {\n  return outMin + (outMax - outMin) * (value - inMin) / (inMax - inMin);\n}\n\nvec4 map(vec4 value, vec4 inMin, vec4 inMax, vec4 outMin, vec4 outMax) {\n  return outMin + (outMax - outMin) * (value - inMin) / (inMax - inMin);\n}\n\nconst vec4 uvRange = vec4(0.0, 0.0, 1.0, 1.0);\n\nconst vec4 posRange = vec4(-1.0, -1.0, 1.0, 1.0);\n\nvec2 uvToPos(vec2 uv) {\n  return map(uv, uvRange.xy, uvRange.zw, posRange.xy, posRange.zw);\n}\n\nfloat transform(mat2 m, float v) {\n  return (m*vec2(v, 1.0)).x;\n}\n\nvec2 transform(mat3 m, vec2 v) {\n  return (m*vec3(v, 1.0)).xy;\n}\n\nvec3 transform(mat4 m, vec3 v) {\n  return (m*vec4(v, 1.0)).xyz;\n}\n\nconst vec2 flipUV = vec2(1.0, -1.0);\n\nvec2 spawnToPos(vec2 uv) {\n  // Jittering around a UV cell to get rid of boxy scaled sampling artefacts\n  vec2 offset = vec2(mix(-jitter.x, jitter.x, random(uv-1.2345+(time*0.001))),\n      mix(-jitter.y, jitter.y, random(uv+1.2345+(time*0.001))));\n\n  return transform(spawnMatrix, uvToPos(uv+offset)*flipUV*spawnSize);\n}\n\n// `import`-able convenience for setting up a vignette - should be replaced with\n// a proper `uniform`-ed version.\n\nconst vec3 curve = vec3(0.1, 1.0, 1.0);\nconst vec2 mid = vec2(0.5);\nconst float limit = 0.6;\n\n// #pragma glslify: vignette = require(../../filter/pass/vignette, curve = curve, mid = mid, limit = limit)\n\n/**\n * Directly uses a normal image - brightness being speed in a direction defined\n * by the `rgba` channels.\n *\n * @requires {float} time The current time\n */\n\nconst vec4 k = vec4(0.0, -1.0/3.0, 2.0/3.0, -1.0);\nconst float e = 1.0e-10;\n\nvec3 rgb2hsv(vec3 c) {\n  vec4 p = ((c.g < c.b)? vec4(c.bg, k.wz) : vec4(c.gb, k.xy));\n  vec4 q = ((c.r < p.x)? vec4(p.xyw, c.r) : vec4(c.r, p.yzx));\n\n  float d = q.x-min(q.w, q.y);\n\n  return vec3(abs(q.z+(q.w-q.y)/(6.0*d+e)), d/(q.x+e), q.x);\n}\n\nconst float tau = 6.28318530717958647692;\n\nvec2 angleToVec(float rad) {\n    return vec2(cos(rad), sin(rad));\n}\n\nvec4 apply(vec2 uv, vec2 pos, vec4 pixel) {\n  vec3 hsv = rgb2hsv(pixel.rgb);\n\n  return vec4(pos, angleToVec((hsv.r+(time*0.00003))*tau)*hsv.g*hsv.b*pixel.a);\n}\n\n// #pragma glslify: applier = require(./apply/brightest)\n/**\n * @requires {vec2} mid The center of the vignette\n * @requires {float} limit The radius of the vignette\n * @requires {(float|vec2|vec3|vec4)} curve Bezier curve points, shaping falloff\n */\n\n/**\n * Adapted from `bezier`.\n */\n\nfloat bezier(vec2 cp, float t) {\n  return cp.x+(cp.y-cp.x)*t;\n}\n\nfloat bezier(vec3 cp, float t) {\n  float ut = 1.0-t;\n\n  return (cp.x*ut+cp.y*t)*ut+(cp.y*ut+cp.z*t)*t;\n}\n\nfloat bezier(vec4 cp, float t) {\n  float ut = 1.0-t;\n  float a1 = cp.y*ut+cp.z*t;\n\n  return ((cp.x*ut+cp.y*t)*ut+a1*t)*ut+(a1*ut+(cp.z*ut+cp.w*t)*t)*t;\n}\n\n// @todo Remove the `1.0-` here?\nfloat amount(vec2 point, vec2 mid, float limit) {\n  return min(1.0-(length(point-mid)/limit), 1.0);\n}\n\nfloat vignette(vec2 point, vec2 mid, float limit) {\n  return max(0.0, amount(point, mid, limit));\n}\n\nfloat vignette(vec2 point, vec2 mid, float limit, float curve) {\n  return max(0.0, curve*amount(point, mid, limit));\n}\n\nfloat vignette(vec2 point, vec2 mid, float limit, vec2 curve) {\n  return max(0.0, bezier(curve, amount(point, mid, limit)));\n}\n\nfloat vignette(vec2 point, vec2 mid, float limit, vec3 curve) {\n  return max(0.0, bezier(curve, amount(point, mid, limit)));\n}\n\nfloat vignette(vec2 point, vec2 mid, float limit, vec4 curve) {\n  return max(0.0, bezier(curve, amount(point, mid, limit)));\n}\n\nvec4 pass(vec2 uv, vec4 pixel) {\n  return pixel*vignette(uv, mid, limit, curve);\n}\n\n/**\n * A way to easily compose filter passes on the pixel before applying it.\n *\n * @see `../../../filter/`\n * @see `./`\n * @requires {function} pass The filter pass function, given the pixel.\n * @requires {function} apply The apply function, given the result of `pass`.\n */\n\nvec4 compose(vec2 uv, vec2 pos, vec4 pixel) {\n  return apply(uv, pos, pass(uv, pixel));\n}\n\n// #pragma glslify: apply = require(./apply/color, time = time)\n// #pragma glslify: apply = require(./apply/brightest)\n\n/**\n * Pick the Highest velocity.\n * Uses the same data structure as the particles.\n */\n\nfloat length2(vec2 vec) {\n  return dot(vec, vec);\n}\n\nfloat length2(vec3 vec) {\n  return dot(vec, vec);\n}\n\nfloat length2(vec4 vec) {\n  return dot(vec, vec);\n}\n\nfloat test(vec4 data) {\n  return length2(data.zw);\n}\n\nconst float samples = 6.0;\n\n/**\n * Tries a number of times to randomly select a pixel scored highest by a given\n * function.\n *\n * @requires {function} apply A function that transforms a `vec4` of data into a\n *              valid `vec4` state.\n * @requires {function} test A function that returns a float value for a given\n *               `vec4` state; greater values win the comparison.\n */\n\n// Over 1 favours changing to new data; under 1 favours current data.\nuniform float bias;\n\n/**\n * @todo Some bug with `glslify-import` & sons breaks `node_modules` aliased\n *     `require`s in `import`ed files, so we need to do it the looooooong way.\n */\n// #pragma glslify: random = require(glsl-random)\n\nvec4 pick(vec4 current, vec4 next) {\n  return ((test(current) > bias*test(next))? current : next);\n}\n\nvoid main() {\n  /**\n   * @todo This was needed in `./direct-main.frag` - is it needed here too?\n   */\n  vec2 uv = gl_FragCoord.xy/dataRes;\n  // vec2 uv = (gl_FragCoord.xy/dataRes)*(geomRes/dataRes);\n\n  vec4 state = texture2D(particles, uv);\n\n  vec4 baseSeed = state+vec4(uv, uv)+vec4(1.2345+(time*0.001));\n\n  for(float n = 0.0; n < samples; n += 1.0) {\n    vec4 seed = baseSeed+vec4(n);\n    vec2 spawnUV = mod(vec2(random(seed.xy), random(seed.zw)), 1.0);\n    vec4 other = compose(spawnUV, spawnToPos(spawnUV),\n        texture2D(spawnData, spawnUV));\n\n    state = pick(state, vec4(other.xy, other.zw*speed));\n  }\n\n  gl_FragColor = state;\n}\n\n"
 
 /***/ }),
 /* 476 */
 /***/ (function(module, exports) {
 
-	module.exports = "precision highp float;\n#define GLSLIFY 1\n\nuniform sampler2D particles;\nuniform sampler2D spawnData;\n\nuniform vec2 dataRes;\nuniform vec2 geomRes;\nuniform vec2 spawnSize;\n\nuniform vec2 jitter;\nuniform float time;\nuniform float speed;\n\nuniform mat3 spawnMatrix;\n\n/**\n * @todo Some bug with `glslify-import` & sons breaks `node_modules` aliased\n *       `require`s in `import`ed files, so we need to do it the looooooong way.\n */\n// #pragma glslify: random = require(glsl-random)\nhighp float random(vec2 co)\n{\n    highp float a = 12.9898;\n    highp float b = 78.233;\n    highp float c = 43758.5453;\n    highp float dt= dot(co.xy ,vec2(a,b));\n    highp float sn= mod(dt,3.14);\n    return fract(sin(sn) * c);\n}\n\nfloat map(float value, float inMin, float inMax, float outMin, float outMax) {\n  return outMin + (outMax - outMin) * (value - inMin) / (inMax - inMin);\n}\n\nvec2 map(vec2 value, vec2 inMin, vec2 inMax, vec2 outMin, vec2 outMax) {\n  return outMin + (outMax - outMin) * (value - inMin) / (inMax - inMin);\n}\n\nvec3 map(vec3 value, vec3 inMin, vec3 inMax, vec3 outMin, vec3 outMax) {\n  return outMin + (outMax - outMin) * (value - inMin) / (inMax - inMin);\n}\n\nvec4 map(vec4 value, vec4 inMin, vec4 inMax, vec4 outMin, vec4 outMax) {\n  return outMin + (outMax - outMin) * (value - inMin) / (inMax - inMin);\n}\n\nconst vec4 uvRange = vec4(0.0, 0.0, 1.0, 1.0);\n\nconst vec4 posRange = vec4(-1.0, -1.0, 1.0, 1.0);\n\nvec2 uvToPos(vec2 uv) {\n    return map(uv, uvRange.xy, uvRange.zw, posRange.xy, posRange.zw);\n}\n\nfloat transform(mat2 m, float v) {\n    return (m*vec2(v, 1.0)).x;\n}\n\nvec2 transform(mat3 m, vec2 v) {\n    return (m*vec3(v, 1.0)).xy;\n}\n\nvec3 transform(mat4 m, vec3 v) {\n    return (m*vec4(v, 1.0)).xyz;\n}\n\nconst vec2 flipUV = vec2(1.0, -1.0);\n\nvec2 spawnToPos(vec2 uv) {\n    // Jittering around a UV cell to get rid of boxy scaled sampling artefacts\n    vec2 offset = vec2(mix(-jitter.x, jitter.x, random(uv-1.2345+(time*0.001))),\n            mix(-jitter.y, jitter.y, random(uv+1.2345+(time*0.001))));\n\n    return transform(spawnMatrix, uvToPos(uv+offset)*flipUV*spawnSize);\n}\n\nuniform float flowDecay;\n\n/**\n * Use the pixel position, and the particle velocity.\n * Same data structure as the flow.\n *\n * @requires {float} time The current time\n * @requires {float} decay The rate of decay of the flow over time\n */\n\n// Time/decay\n\nvec2 get(vec3 data, float time, float decay) {\n    return data.xy*max(0.0, 1.0-((time-data.z)*decay));\n}\n\nvec2 get(vec4 data, float time, float decay) {\n    return get(data.xyz, time, decay);\n}\n\n// No time/decay\n\nvec2 get(vec2 data) {\n    return data.xy;\n}\n\nvec2 get(vec3 data) {\n    return get(data.xy);\n}\n\nvec2 get(vec4 data) {\n    return get(data.xy);\n}\n\nvec4 apply(vec2 uv, vec2 pos, vec4 pixel) {\n    return vec4(pos, get(pixel, time, flowDecay));\n}\n\n/**\n * Pick the Highest velocity.\n * Uses the same data structure as the particles.\n */\n\nfloat length2(vec2 vec) {\n    return dot(vec, vec);\n}\n\nfloat length2(vec3 vec) {\n    return dot(vec, vec);\n}\n\nfloat length2(vec4 vec) {\n    return dot(vec, vec);\n}\n\nfloat test(vec4 data) {\n    return length2(data.zw);\n}\n\nconst float samples = 5.0;\n\n/**\n * Tries a number of times to randomly select a pixel scored highest by a given\n * function.\n *\n * @requires {function} apply A function that transforms a `vec4` of data into a\n *                            valid `vec4` state.\n * @requires {function} test A function that returns a float value for a given\n *                           `vec4` state; greater values win the comparison.\n */\n\n// Over 1 favours changing to new data; under 1 favours current data.\nuniform float bias;\n\n/**\n * @todo Some bug with `glslify-import` & sons breaks `node_modules` aliased\n *       `require`s in `import`ed files, so we need to do it the looooooong way.\n */\n// #pragma glslify: random = require(glsl-random)\n\nvec4 pick(vec4 current, vec4 next) {\n    return ((test(current) > bias*test(next))? current : next);\n}\n\nvoid main() {\n    /**\n     * @todo This was needed in `./direct-main.frag` - is it needed here too?\n     */\n    vec2 uv = gl_FragCoord.xy/dataRes;\n    // vec2 uv = (gl_FragCoord.xy/dataRes)*(geomRes/dataRes);\n    \n    vec4 state = texture2D(particles, uv);\n\n    vec4 baseSeed = state+vec4(uv, uv)+vec4(1.2345+(time*0.001));\n\n    for(float n = 0.0; n < samples; n += 1.0) {\n        vec4 seed = baseSeed+vec4(n);\n        vec2 spawnUV = mod(vec2(random(seed.xy), random(seed.zw)), 1.0);\n        vec4 other = apply(spawnUV, spawnToPos(spawnUV),\n                texture2D(spawnData, spawnUV));\n\n        state = pick(state, vec4(other.xy, other.zw*speed));\n    }\n\n    gl_FragColor = state;\n}\n\n"
+	module.exports = "precision highp float;\n#define GLSLIFY 1\n\nuniform sampler2D particles;\nuniform sampler2D spawnData;\n\nuniform vec2 dataRes;\nuniform vec2 geomRes;\nuniform vec2 spawnSize;\n\nuniform vec2 jitter;\nuniform float time;\nuniform float speed;\n\nuniform mat3 spawnMatrix;\n\n/**\n * @todo Some bug with `glslify-import` & sons breaks `node_modules` aliased\n *     `require`s in `import`ed files, so we need to do it the looooooong way.\n */\n// #pragma glslify: random = require(glsl-random)\nhighp float random(vec2 co)\n{\n    highp float a = 12.9898;\n    highp float b = 78.233;\n    highp float c = 43758.5453;\n    highp float dt= dot(co.xy ,vec2(a,b));\n    highp float sn= mod(dt,3.14);\n    return fract(sin(sn) * c);\n}\n\nfloat map(float value, float inMin, float inMax, float outMin, float outMax) {\n  return outMin + (outMax - outMin) * (value - inMin) / (inMax - inMin);\n}\n\nvec2 map(vec2 value, vec2 inMin, vec2 inMax, vec2 outMin, vec2 outMax) {\n  return outMin + (outMax - outMin) * (value - inMin) / (inMax - inMin);\n}\n\nvec3 map(vec3 value, vec3 inMin, vec3 inMax, vec3 outMin, vec3 outMax) {\n  return outMin + (outMax - outMin) * (value - inMin) / (inMax - inMin);\n}\n\nvec4 map(vec4 value, vec4 inMin, vec4 inMax, vec4 outMin, vec4 outMax) {\n  return outMin + (outMax - outMin) * (value - inMin) / (inMax - inMin);\n}\n\nconst vec4 uvRange = vec4(0.0, 0.0, 1.0, 1.0);\n\nconst vec4 posRange = vec4(-1.0, -1.0, 1.0, 1.0);\n\nvec2 uvToPos(vec2 uv) {\n  return map(uv, uvRange.xy, uvRange.zw, posRange.xy, posRange.zw);\n}\n\nfloat transform(mat2 m, float v) {\n  return (m*vec2(v, 1.0)).x;\n}\n\nvec2 transform(mat3 m, vec2 v) {\n  return (m*vec3(v, 1.0)).xy;\n}\n\nvec3 transform(mat4 m, vec3 v) {\n  return (m*vec4(v, 1.0)).xyz;\n}\n\nconst vec2 flipUV = vec2(1.0, -1.0);\n\nvec2 spawnToPos(vec2 uv) {\n  // Jittering around a UV cell to get rid of boxy scaled sampling artefacts\n  vec2 offset = vec2(mix(-jitter.x, jitter.x, random(uv-1.2345+(time*0.001))),\n      mix(-jitter.y, jitter.y, random(uv+1.2345+(time*0.001))));\n\n  return transform(spawnMatrix, uvToPos(uv+offset)*flipUV*spawnSize);\n}\n\nuniform float flowDecay;\n\n/**\n * Use the pixel position, and the particle velocity.\n * Same data structure as the flow.\n *\n * @requires {float} time The current time\n * @requires {float} decay The rate of decay of the flow over time\n */\n\n// Time/decay\n\nvec2 get(vec3 data, float time, float decay) {\n  return data.xy*max(0.0, 1.0-((time-data.z)*decay));\n}\n\nvec2 get(vec4 data, float time, float decay) {\n  return get(data.xyz, time, decay);\n}\n\n// No time/decay\n\nvec2 get(vec2 data) {\n  return data.xy;\n}\n\nvec2 get(vec3 data) {\n  return get(data.xy);\n}\n\nvec2 get(vec4 data) {\n  return get(data.xy);\n}\n\nvec4 apply(vec2 uv, vec2 pos, vec4 pixel) {\n  return vec4(pos, get(pixel, time, flowDecay));\n}\n\n/**\n * Pick the Highest velocity.\n * Uses the same data structure as the particles.\n */\n\nfloat length2(vec2 vec) {\n  return dot(vec, vec);\n}\n\nfloat length2(vec3 vec) {\n  return dot(vec, vec);\n}\n\nfloat length2(vec4 vec) {\n  return dot(vec, vec);\n}\n\nfloat test(vec4 data) {\n  return length2(data.zw);\n}\n\nconst float samples = 5.0;\n\n/**\n * Tries a number of times to randomly select a pixel scored highest by a given\n * function.\n *\n * @requires {function} apply A function that transforms a `vec4` of data into a\n *              valid `vec4` state.\n * @requires {function} test A function that returns a float value for a given\n *               `vec4` state; greater values win the comparison.\n */\n\n// Over 1 favours changing to new data; under 1 favours current data.\nuniform float bias;\n\n/**\n * @todo Some bug with `glslify-import` & sons breaks `node_modules` aliased\n *     `require`s in `import`ed files, so we need to do it the looooooong way.\n */\n// #pragma glslify: random = require(glsl-random)\n\nvec4 pick(vec4 current, vec4 next) {\n  return ((test(current) > bias*test(next))? current : next);\n}\n\nvoid main() {\n  /**\n   * @todo This was needed in `./direct-main.frag` - is it needed here too?\n   */\n  vec2 uv = gl_FragCoord.xy/dataRes;\n  // vec2 uv = (gl_FragCoord.xy/dataRes)*(geomRes/dataRes);\n\n  vec4 state = texture2D(particles, uv);\n\n  vec4 baseSeed = state+vec4(uv, uv)+vec4(1.2345+(time*0.001));\n\n  for(float n = 0.0; n < samples; n += 1.0) {\n    vec4 seed = baseSeed+vec4(n);\n    vec2 spawnUV = mod(vec2(random(seed.xy), random(seed.zw)), 1.0);\n    vec4 other = apply(spawnUV, spawnToPos(spawnUV),\n        texture2D(spawnData, spawnUV));\n\n    state = pick(state, vec4(other.xy, other.zw*speed));\n  }\n\n  gl_FragColor = state;\n}\n\n"
 
 /***/ }),
 /* 477 */
 /***/ (function(module, exports) {
 
-	module.exports = "precision highp float;\n#define GLSLIFY 1\n\nuniform sampler2D particles;\nuniform sampler2D spawnData;\n\nuniform vec2 dataRes;\nuniform vec2 geomRes;\nuniform vec2 spawnSize;\n\nuniform vec2 jitter;\nuniform float time;\nuniform float speed;\n\nuniform mat3 spawnMatrix;\n\n/**\n * @todo Some bug with `glslify-import` & sons breaks `node_modules` aliased\n *       `require`s in `import`ed files, so we need to do it the looooooong way.\n */\n// #pragma glslify: random = require(glsl-random)\nhighp float random(vec2 co)\n{\n    highp float a = 12.9898;\n    highp float b = 78.233;\n    highp float c = 43758.5453;\n    highp float dt= dot(co.xy ,vec2(a,b));\n    highp float sn= mod(dt,3.14);\n    return fract(sin(sn) * c);\n}\n\nfloat map(float value, float inMin, float inMax, float outMin, float outMax) {\n  return outMin + (outMax - outMin) * (value - inMin) / (inMax - inMin);\n}\n\nvec2 map(vec2 value, vec2 inMin, vec2 inMax, vec2 outMin, vec2 outMax) {\n  return outMin + (outMax - outMin) * (value - inMin) / (inMax - inMin);\n}\n\nvec3 map(vec3 value, vec3 inMin, vec3 inMax, vec3 outMin, vec3 outMax) {\n  return outMin + (outMax - outMin) * (value - inMin) / (inMax - inMin);\n}\n\nvec4 map(vec4 value, vec4 inMin, vec4 inMax, vec4 outMin, vec4 outMax) {\n  return outMin + (outMax - outMin) * (value - inMin) / (inMax - inMin);\n}\n\nconst vec4 uvRange = vec4(0.0, 0.0, 1.0, 1.0);\n\nconst vec4 posRange = vec4(-1.0, -1.0, 1.0, 1.0);\n\nvec2 uvToPos(vec2 uv) {\n    return map(uv, uvRange.xy, uvRange.zw, posRange.xy, posRange.zw);\n}\n\nfloat transform(mat2 m, float v) {\n    return (m*vec2(v, 1.0)).x;\n}\n\nvec2 transform(mat3 m, vec2 v) {\n    return (m*vec3(v, 1.0)).xy;\n}\n\nvec3 transform(mat4 m, vec3 v) {\n    return (m*vec4(v, 1.0)).xyz;\n}\n\nconst vec2 flipUV = vec2(1.0, -1.0);\n\nvec2 spawnToPos(vec2 uv) {\n    // Jittering around a UV cell to get rid of boxy scaled sampling artefacts\n    vec2 offset = vec2(mix(-jitter.x, jitter.x, random(uv-1.2345+(time*0.001))),\n            mix(-jitter.y, jitter.y, random(uv+1.2345+(time*0.001))));\n\n    return transform(spawnMatrix, uvToPos(uv+offset)*flipUV*spawnSize);\n}\n\n// `import`-able convenience for setting up a vignette - should be replaced with\n// a proper `uniform`-ed version.\n\nconst vec3 curve = vec3(0.1, 1.0, 1.0);\nconst vec2 mid = vec2(0.5);\nconst float limit = 0.6;\n\n// #pragma glslify: vignette = require(../../filter/pass/vignette, curve = curve, mid = mid, limit = limit)\n\n/**\n * Identity\n */\nvec4 apply(vec2 uv, vec2 pos, vec4 pixel) {\n    return pixel;\n}\n\n/**\n * @requires {vec2} mid The center of the vignette\n * @requires {float} limit The radius of the vignette\n * @requires {(float|vec2|vec3|vec4)} curve Bezier curve points, shaping falloff\n */\n\n/**\n * Adapted from `bezier`.\n */\n\nfloat bezier(vec2 cp, float t) {\n    return cp.x+(cp.y-cp.x)*t;\n}\n\nfloat bezier(vec3 cp, float t) {\n    float ut = 1.0-t;\n\n    return (cp.x*ut+cp.y*t)*ut+(cp.y*ut+cp.z*t)*t;\n}\n\nfloat bezier(vec4 cp, float t) {\n    float ut = 1.0-t;\n    float a1 = cp.y*ut+cp.z*t;\n\n    return ((cp.x*ut+cp.y*t)*ut+a1*t)*ut+(a1*ut+(cp.z*ut+cp.w*t)*t)*t;\n}\n\n// @todo Remove the `1.0-` here?\nfloat amount(vec2 point, vec2 mid, float limit) {\n    return min(1.0-(length(point-mid)/limit), 1.0);\n}\n\nfloat vignette(vec2 point, vec2 mid, float limit) {\n    return max(0.0, amount(point, mid, limit));\n}\n\nfloat vignette(vec2 point, vec2 mid, float limit, float curve) {\n    return max(0.0, curve*amount(point, mid, limit));\n}\n\nfloat vignette(vec2 point, vec2 mid, float limit, vec2 curve) {\n    return max(0.0, bezier(curve, amount(point, mid, limit)));\n}\n\nfloat vignette(vec2 point, vec2 mid, float limit, vec3 curve) {\n    return max(0.0, bezier(curve, amount(point, mid, limit)));\n}\n\nfloat vignette(vec2 point, vec2 mid, float limit, vec4 curve) {\n    return max(0.0, bezier(curve, amount(point, mid, limit)));\n}\n\nvec4 pass(vec2 uv, vec4 pixel) {\n    return pixel*vignette(uv, mid, limit, curve);\n}\n\n/**\n * A way to easily compose filter passes on the pixel before applying it.\n *\n * @see `../../../filter/`\n * @see `./`\n * @requires {function} pass The filter pass function, given the pixel.\n * @requires {function} apply The apply function, given the result of `pass`.\n */\n\nvec4 compose(vec2 uv, vec2 pos, vec4 pixel) {\n    return apply(uv, pos, pass(uv, pixel));\n}\n\n/**\n * Pick the Highest velocity.\n * Uses the same data structure as the particles.\n */\n\nfloat length2(vec2 vec) {\n    return dot(vec, vec);\n}\n\nfloat length2(vec3 vec) {\n    return dot(vec, vec);\n}\n\nfloat length2(vec4 vec) {\n    return dot(vec, vec);\n}\n\nfloat test(vec4 data) {\n    return length2(data.zw);\n}\n\nconst float samples = 2.0;\n\n/**\n * Tries a number of times to randomly select a pixel scored highest by a given\n * function.\n *\n * @requires {function} apply A function that transforms a `vec4` of data into a\n *                            valid `vec4` state.\n * @requires {function} test A function that returns a float value for a given\n *                           `vec4` state; greater values win the comparison.\n */\n\n// Over 1 favours changing to new data; under 1 favours current data.\nuniform float bias;\n\n/**\n * @todo Some bug with `glslify-import` & sons breaks `node_modules` aliased\n *       `require`s in `import`ed files, so we need to do it the looooooong way.\n */\n// #pragma glslify: random = require(glsl-random)\n\nvec4 pick(vec4 current, vec4 next) {\n    return ((test(current) > bias*test(next))? current : next);\n}\n\nvoid main() {\n    /**\n     * @todo This was needed in `./direct-main.frag` - is it needed here too?\n     */\n    vec2 uv = gl_FragCoord.xy/dataRes;\n    // vec2 uv = (gl_FragCoord.xy/dataRes)*(geomRes/dataRes);\n    \n    vec4 state = texture2D(particles, uv);\n\n    vec4 baseSeed = state+vec4(uv, uv)+vec4(1.2345+(time*0.001));\n\n    for(float n = 0.0; n < samples; n += 1.0) {\n        vec4 seed = baseSeed+vec4(n);\n        vec2 spawnUV = mod(vec2(random(seed.xy), random(seed.zw)), 1.0);\n        vec4 other = compose(spawnUV, spawnToPos(spawnUV),\n                texture2D(spawnData, spawnUV));\n\n        state = pick(state, vec4(other.xy, other.zw*speed));\n    }\n\n    gl_FragColor = state;\n}\n\n"
+	module.exports = "precision highp float;\n#define GLSLIFY 1\n\nuniform sampler2D particles;\nuniform sampler2D spawnData;\n\nuniform vec2 dataRes;\nuniform vec2 geomRes;\nuniform vec2 spawnSize;\n\nuniform vec2 jitter;\nuniform float time;\nuniform float speed;\n\nuniform mat3 spawnMatrix;\n\n/**\n * @todo Some bug with `glslify-import` & sons breaks `node_modules` aliased\n *     `require`s in `import`ed files, so we need to do it the looooooong way.\n */\n// #pragma glslify: random = require(glsl-random)\nhighp float random(vec2 co)\n{\n    highp float a = 12.9898;\n    highp float b = 78.233;\n    highp float c = 43758.5453;\n    highp float dt= dot(co.xy ,vec2(a,b));\n    highp float sn= mod(dt,3.14);\n    return fract(sin(sn) * c);\n}\n\nfloat map(float value, float inMin, float inMax, float outMin, float outMax) {\n  return outMin + (outMax - outMin) * (value - inMin) / (inMax - inMin);\n}\n\nvec2 map(vec2 value, vec2 inMin, vec2 inMax, vec2 outMin, vec2 outMax) {\n  return outMin + (outMax - outMin) * (value - inMin) / (inMax - inMin);\n}\n\nvec3 map(vec3 value, vec3 inMin, vec3 inMax, vec3 outMin, vec3 outMax) {\n  return outMin + (outMax - outMin) * (value - inMin) / (inMax - inMin);\n}\n\nvec4 map(vec4 value, vec4 inMin, vec4 inMax, vec4 outMin, vec4 outMax) {\n  return outMin + (outMax - outMin) * (value - inMin) / (inMax - inMin);\n}\n\nconst vec4 uvRange = vec4(0.0, 0.0, 1.0, 1.0);\n\nconst vec4 posRange = vec4(-1.0, -1.0, 1.0, 1.0);\n\nvec2 uvToPos(vec2 uv) {\n  return map(uv, uvRange.xy, uvRange.zw, posRange.xy, posRange.zw);\n}\n\nfloat transform(mat2 m, float v) {\n  return (m*vec2(v, 1.0)).x;\n}\n\nvec2 transform(mat3 m, vec2 v) {\n  return (m*vec3(v, 1.0)).xy;\n}\n\nvec3 transform(mat4 m, vec3 v) {\n  return (m*vec4(v, 1.0)).xyz;\n}\n\nconst vec2 flipUV = vec2(1.0, -1.0);\n\nvec2 spawnToPos(vec2 uv) {\n  // Jittering around a UV cell to get rid of boxy scaled sampling artefacts\n  vec2 offset = vec2(mix(-jitter.x, jitter.x, random(uv-1.2345+(time*0.001))),\n      mix(-jitter.y, jitter.y, random(uv+1.2345+(time*0.001))));\n\n  return transform(spawnMatrix, uvToPos(uv+offset)*flipUV*spawnSize);\n}\n\n// `import`-able convenience for setting up a vignette - should be replaced with\n// a proper `uniform`-ed version.\n\nconst vec3 curve = vec3(0.1, 1.0, 1.0);\nconst vec2 mid = vec2(0.5);\nconst float limit = 0.6;\n\n// #pragma glslify: vignette = require(../../filter/pass/vignette, curve = curve, mid = mid, limit = limit)\n\n/**\n * Identity\n */\nvec4 apply(vec2 uv, vec2 pos, vec4 pixel) {\n  return pixel;\n}\n\n/**\n * @requires {vec2} mid The center of the vignette\n * @requires {float} limit The radius of the vignette\n * @requires {(float|vec2|vec3|vec4)} curve Bezier curve points, shaping falloff\n */\n\n/**\n * Adapted from `bezier`.\n */\n\nfloat bezier(vec2 cp, float t) {\n  return cp.x+(cp.y-cp.x)*t;\n}\n\nfloat bezier(vec3 cp, float t) {\n  float ut = 1.0-t;\n\n  return (cp.x*ut+cp.y*t)*ut+(cp.y*ut+cp.z*t)*t;\n}\n\nfloat bezier(vec4 cp, float t) {\n  float ut = 1.0-t;\n  float a1 = cp.y*ut+cp.z*t;\n\n  return ((cp.x*ut+cp.y*t)*ut+a1*t)*ut+(a1*ut+(cp.z*ut+cp.w*t)*t)*t;\n}\n\n// @todo Remove the `1.0-` here?\nfloat amount(vec2 point, vec2 mid, float limit) {\n  return min(1.0-(length(point-mid)/limit), 1.0);\n}\n\nfloat vignette(vec2 point, vec2 mid, float limit) {\n  return max(0.0, amount(point, mid, limit));\n}\n\nfloat vignette(vec2 point, vec2 mid, float limit, float curve) {\n  return max(0.0, curve*amount(point, mid, limit));\n}\n\nfloat vignette(vec2 point, vec2 mid, float limit, vec2 curve) {\n  return max(0.0, bezier(curve, amount(point, mid, limit)));\n}\n\nfloat vignette(vec2 point, vec2 mid, float limit, vec3 curve) {\n  return max(0.0, bezier(curve, amount(point, mid, limit)));\n}\n\nfloat vignette(vec2 point, vec2 mid, float limit, vec4 curve) {\n  return max(0.0, bezier(curve, amount(point, mid, limit)));\n}\n\nvec4 pass(vec2 uv, vec4 pixel) {\n  return pixel*vignette(uv, mid, limit, curve);\n}\n\n/**\n * A way to easily compose filter passes on the pixel before applying it.\n *\n * @see `../../../filter/`\n * @see `./`\n * @requires {function} pass The filter pass function, given the pixel.\n * @requires {function} apply The apply function, given the result of `pass`.\n */\n\nvec4 compose(vec2 uv, vec2 pos, vec4 pixel) {\n  return apply(uv, pos, pass(uv, pixel));\n}\n\n/**\n * Pick the Highest velocity.\n * Uses the same data structure as the particles.\n */\n\nfloat length2(vec2 vec) {\n  return dot(vec, vec);\n}\n\nfloat length2(vec3 vec) {\n  return dot(vec, vec);\n}\n\nfloat length2(vec4 vec) {\n  return dot(vec, vec);\n}\n\nfloat test(vec4 data) {\n  return length2(data.zw);\n}\n\nconst float samples = 2.0;\n\n/**\n * Tries a number of times to randomly select a pixel scored highest by a given\n * function.\n *\n * @requires {function} apply A function that transforms a `vec4` of data into a\n *              valid `vec4` state.\n * @requires {function} test A function that returns a float value for a given\n *               `vec4` state; greater values win the comparison.\n */\n\n// Over 1 favours changing to new data; under 1 favours current data.\nuniform float bias;\n\n/**\n * @todo Some bug with `glslify-import` & sons breaks `node_modules` aliased\n *     `require`s in `import`ed files, so we need to do it the looooooong way.\n */\n// #pragma glslify: random = require(glsl-random)\n\nvec4 pick(vec4 current, vec4 next) {\n  return ((test(current) > bias*test(next))? current : next);\n}\n\nvoid main() {\n  /**\n   * @todo This was needed in `./direct-main.frag` - is it needed here too?\n   */\n  vec2 uv = gl_FragCoord.xy/dataRes;\n  // vec2 uv = (gl_FragCoord.xy/dataRes)*(geomRes/dataRes);\n\n  vec4 state = texture2D(particles, uv);\n\n  vec4 baseSeed = state+vec4(uv, uv)+vec4(1.2345+(time*0.001));\n\n  for(float n = 0.0; n < samples; n += 1.0) {\n    vec4 seed = baseSeed+vec4(n);\n    vec2 spawnUV = mod(vec2(random(seed.xy), random(seed.zw)), 1.0);\n    vec4 other = compose(spawnUV, spawnToPos(spawnUV),\n        texture2D(spawnData, spawnUV));\n\n    state = pick(state, vec4(other.xy, other.zw*speed));\n  }\n\n  gl_FragColor = state;\n}\n\n"
 
 /***/ }),
 /* 478 */
@@ -27016,7 +27016,7 @@
 	'use strict';
 	
 	Object.defineProperty(exports, "__esModule", {
-	    value: true
+	  value: true
 	});
 	exports.spawnBall = exports.defaults = undefined;
 	
@@ -27033,19 +27033,19 @@
 	function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
 	
 	var defaults = exports.defaults = function defaults() {
-	    return {
-	        shader: [init.defaults().shader[0], _index2.default],
-	        uniforms: {
-	            radius: 1,
-	            speed: 0
-	        }
-	    };
+	  return {
+	    shader: [init.defaults().shader[0], _index2.default],
+	    uniforms: {
+	      radius: 1,
+	      speed: 0
+	    }
+	  };
 	};
 	
 	var baseOptions = defaults();
 	
 	var spawnBall = exports.spawnBall = function spawnBall(gl, options) {
-	    return init.spawner(gl, Object.assign(baseOptions, options));
+	  return init.spawner(gl, Object.assign(baseOptions, options));
 	};
 	
 	exports.default = spawnBall;
@@ -27057,7 +27057,7 @@
 	'use strict';
 	
 	Object.defineProperty(exports, "__esModule", {
-	    value: true
+	  value: true
 	});
 	exports.spawner = exports.defaults = undefined;
 	
@@ -27078,29 +27078,29 @@
 	function _toConsumableArray(arr) { if (Array.isArray(arr)) { for (var i = 0, arr2 = Array(arr.length); i < arr.length; i++) { arr2[i] = arr[i]; } return arr2; } else { return Array.from(arr); } }
 	
 	var defaults = exports.defaults = function defaults() {
-	    return {
-	        shader: [_index2.default, _index4.default],
-	        uniforms: null
-	    };
+	  return {
+	    shader: [_index2.default, _index4.default],
+	    uniforms: null
+	  };
 	};
 	
 	var spawner = exports.spawner = function spawner(gl, options) {
-	    var params = Object.assign(defaults(), options);
+	  var params = Object.assign(defaults(), options);
 	
-	    return {
-	        gl: gl,
-	        uniforms: params.uniforms,
+	  return {
+	    gl: gl,
+	    uniforms: params.uniforms,
 	
-	        shader: Array.isArray(params.shader) ? _glShader2.default.apply(undefined, [gl].concat(_toConsumableArray(params.shader))) : params.shader,
+	    shader: Array.isArray(params.shader) ? _glShader2.default.apply(undefined, [gl].concat(_toConsumableArray(params.shader))) : params.shader,
 	
-	        spawn: function spawn(tendrils) {
-	            for (var _len = arguments.length, rest = Array(_len > 1 ? _len - 1 : 0), _key = 1; _key < _len; _key++) {
-	                rest[_key - 1] = arguments[_key];
-	            }
+	    spawn: function spawn(tendrils) {
+	      for (var _len = arguments.length, rest = Array(_len > 1 ? _len - 1 : 0), _key = 1; _key < _len; _key++) {
+	        rest[_key - 1] = arguments[_key];
+	      }
 	
-	            tendrils.spawnShader.apply(tendrils, [this.shader, this.uniforms].concat(rest));
-	        }
-	    };
+	      tendrils.spawnShader.apply(tendrils, [this.shader, this.uniforms].concat(rest));
+	    }
+	  };
 	};
 	
 	exports.default = spawner;
@@ -27109,13 +27109,13 @@
 /* 480 */
 /***/ (function(module, exports) {
 
-	module.exports = "precision highp float;\n#define GLSLIFY 1\n\nconst vec2 inert = vec2(-1000000.0);\n\nconst vec2 pos = vec2(inert);\nconst vec2 vel = vec2(0.0);\n\nvoid main() {\n    gl_FragColor = vec4(pos, vel);\n}\n"
+	module.exports = "precision highp float;\n#define GLSLIFY 1\n\nconst vec2 inert = vec2(-1000000.0);\n\nconst vec2 pos = vec2(inert);\nconst vec2 vel = vec2(0.0);\n\nvoid main() {\n  gl_FragColor = vec4(pos, vel);\n}\n"
 
 /***/ }),
 /* 481 */
 /***/ (function(module, exports) {
 
-	module.exports = "precision highp float;\n#define GLSLIFY 1\n\nuniform float radius;\nuniform float speed;\n\nhighp float random(vec2 co)\n{\n    highp float a = 12.9898;\n    highp float b = 78.233;\n    highp float c = 43758.5453;\n    highp float dt= dot(co.xy ,vec2(a,b));\n    highp float sn= mod(dt,3.14);\n    return fract(sin(sn) * c);\n}\n\nvec2 angleToVec(float rad) {\n    return vec2(cos(rad), sin(rad));\n}\n\nconst float tau = 6.28318530717958647692;\n\nvoid main() {\n    vec4 randoms = vec4(random((gl_FragCoord.xy*1.7654)+2.3675),\n        random((gl_FragCoord.xy*1.23494)+0.36434),\n        random((gl_FragCoord.xy*0.327789)+3.498787),\n        random((gl_FragCoord.xy*9.0374)+0.2773));\n\n    gl_FragColor = vec4(angleToVec(randoms.x*tau)*randoms.y*radius,\n        angleToVec(randoms.z*tau)*randoms.w*speed);\n}\n"
+	module.exports = "precision highp float;\n#define GLSLIFY 1\n\nuniform float radius;\nuniform float speed;\n\nhighp float random(vec2 co)\n{\n    highp float a = 12.9898;\n    highp float b = 78.233;\n    highp float c = 43758.5453;\n    highp float dt= dot(co.xy ,vec2(a,b));\n    highp float sn= mod(dt,3.14);\n    return fract(sin(sn) * c);\n}\n\nvec2 angleToVec(float rad) {\n    return vec2(cos(rad), sin(rad));\n}\n\nconst float tau = 6.28318530717958647692;\n\nvoid main() {\n  vec4 randoms = vec4(random((gl_FragCoord.xy*1.7654)+2.3675),\n    random((gl_FragCoord.xy*1.23494)+0.36434),\n    random((gl_FragCoord.xy*0.327789)+3.498787),\n    random((gl_FragCoord.xy*9.0374)+0.2773));\n\n  gl_FragColor = vec4(angleToVec(randoms.x*tau)*randoms.y*radius,\n    angleToVec(randoms.z*tau)*randoms.w*speed);\n}\n"
 
 /***/ }),
 /* 482 */
@@ -27124,7 +27124,7 @@
 	'use strict';
 	
 	Object.defineProperty(exports, "__esModule", {
-	    value: true
+	  value: true
 	});
 	exports.GeometrySpawner = exports.defaults = undefined;
 	
@@ -27179,103 +27179,103 @@
 	// import frag from '../pixels/color-sample.frag';
 	
 	var defaults = exports.defaults = function defaults() {
-	    return {
-	        shader: [spawnPixels.defaults().shader[0], _brightSample2.default],
-	        drawShader: [_index2.default, _index4.default],
-	        color: [1, 1, 1, 1],
-	        positions: Array(2 * 3 * 1).fill(0)
-	    };
+	  return {
+	    shader: [spawnPixels.defaults().shader[0], _brightSample2.default],
+	    drawShader: [_index2.default, _index4.default],
+	    color: [1, 1, 1, 1],
+	    positions: Array(2 * 3 * 1).fill(0)
+	  };
 	};
 	
 	var GeometrySpawner = exports.GeometrySpawner = function (_spawnPixels$PixelSpa) {
-	    _inherits(GeometrySpawner, _spawnPixels$PixelSpa);
+	  _inherits(GeometrySpawner, _spawnPixels$PixelSpa);
 	
-	    function GeometrySpawner(gl, options) {
-	        _classCallCheck(this, GeometrySpawner);
+	  function GeometrySpawner(gl, options) {
+	    _classCallCheck(this, GeometrySpawner);
 	
-	        var params = Object.assign(defaults(), options);
+	    var params = Object.assign(defaults(), options);
 	
-	        var _this = _possibleConstructorReturn(this, (GeometrySpawner.__proto__ || Object.getPrototypeOf(GeometrySpawner)).call(this, gl, Object.assign(defaults(), options)));
+	    var _this = _possibleConstructorReturn(this, (GeometrySpawner.__proto__ || Object.getPrototypeOf(GeometrySpawner)).call(this, gl, Object.assign(defaults(), options)));
 	
-	        _this.geometry = (0, _glGeometry2.default)(gl);
+	    _this.geometry = (0, _glGeometry2.default)(gl);
 	
-	        _this.drawShader = Array.isArray(params.drawShader) ? _glShader2.default.apply(undefined, [_this.gl].concat(_toConsumableArray(params.drawShader))) : params.drawShader;
+	    _this.drawShader = Array.isArray(params.drawShader) ? _glShader2.default.apply(undefined, [_this.gl].concat(_toConsumableArray(params.drawShader))) : params.drawShader;
 	
-	        _this.color = params.color;
-	        _this.positions = params.positions;
-	        return _this;
+	    _this.color = params.color;
+	    _this.positions = params.positions;
+	    return _this;
+	  }
+	
+	  _createClass(GeometrySpawner, [{
+	    key: 'shuffle',
+	    value: function shuffle() {
+	      // @todo Make all this more open/configurable - not worth the time now
+	      var size = 2;
+	      var num = 3;
+	      var step = size * num;
+	      var tau = Math.PI * 2;
+	
+	      var rad = void 0;
+	      var radius = function radius() {
+	        return 0.25 + Math.random() * 1.3;
+	      };
+	
+	      // Triangles, one vertex always in the center
+	      for (var t = this.positions.length - 1; t >= 0; t -= step) {
+	        var angle = tau * Math.random();
+	
+	        var range = tau * (
+	        // Minimum range offset
+	        0.01 +
+	        // Acute or obtuse?
+	        Math.round(Math.random()) * 0.25 +
+	        // Range of size
+	        Math.random() * 0.03);
+	
+	        rad = radius();
+	        this.positions[t - 3] = Math.cos(angle - range) * rad;
+	        this.positions[t - 2] = Math.sin(angle - range) * rad;
+	
+	        rad = radius();
+	        this.positions[t - 1] = Math.cos(angle + range) * rad;
+	        this.positions[t - 0] = Math.sin(angle + range) * rad;
+	
+	        // Skipping the center vertex, stays at [0, 0]
+	      }
+	
+	      this.geometry.attr('position', this.positions, { size: size });
+	
+	      return this;
 	    }
+	  }, {
+	    key: 'spawn',
+	    value: function spawn(tendrils) {
+	      var _get2;
 	
-	    _createClass(GeometrySpawner, [{
-	        key: 'shuffle',
-	        value: function shuffle() {
-	            // @todo Make all this more open/configurable - not worth the time now
-	            var size = 2;
-	            var num = 3;
-	            var step = size * num;
-	            var tau = Math.PI * 2;
+	      _glMatrix.vec2.scale(this.buffer.shape, tendrils.viewRes, 0.2);
+	      // this.buffer.shape = tendrils.viewRes;
 	
-	            var rad = void 0;
-	            var radius = function radius() {
-	                return 0.25 + Math.random() * 1.3;
-	            };
+	      this.buffer.bind();
+	      this.gl.clear(this.gl.COLOR_BUFFER_BIT);
 	
-	            // Triangles, one vertex always in the center
-	            for (var t = this.positions.length - 1; t >= 0; t -= step) {
-	                var angle = tau * Math.random();
+	      this.drawShader.bind();
 	
-	                var range = tau * (
-	                // Minimum range offset
-	                0.01 +
-	                // Acute or obtuse?
-	                Math.round(Math.random()) * 0.25 +
-	                // Range of size
-	                Math.random() * 0.03);
+	      this.drawShader.uniforms.color = this.color;
+	      this.drawShader.uniforms.viewSize = tendrils.viewSize;
 	
-	                rad = radius();
-	                this.positions[t - 3] = Math.cos(angle - range) * rad;
-	                this.positions[t - 2] = Math.sin(angle - range) * rad;
+	      this.geometry.bind(this.drawShader);
+	      this.geometry.draw();
+	      this.geometry.unbind();
 	
-	                rad = radius();
-	                this.positions[t - 1] = Math.cos(angle + range) * rad;
-	                this.positions[t - 0] = Math.sin(angle + range) * rad;
+	      for (var _len = arguments.length, rest = Array(_len > 1 ? _len - 1 : 0), _key = 1; _key < _len; _key++) {
+	        rest[_key - 1] = arguments[_key];
+	      }
 	
-	                // Skipping the center vertex, stays at [0, 0]
-	            }
+	      return (_get2 = _get(GeometrySpawner.prototype.__proto__ || Object.getPrototypeOf(GeometrySpawner.prototype), 'spawn', this)).call.apply(_get2, [this, tendrils].concat(rest));
+	    }
+	  }]);
 	
-	            this.geometry.attr('position', this.positions, { size: size });
-	
-	            return this;
-	        }
-	    }, {
-	        key: 'spawn',
-	        value: function spawn(tendrils) {
-	            var _get2;
-	
-	            _glMatrix.vec2.scale(this.buffer.shape, tendrils.viewRes, 0.2);
-	            // this.buffer.shape = tendrils.viewRes;
-	
-	            this.buffer.bind();
-	            this.gl.clear(this.gl.COLOR_BUFFER_BIT);
-	
-	            this.drawShader.bind();
-	
-	            this.drawShader.uniforms.color = this.color;
-	            this.drawShader.uniforms.viewSize = tendrils.viewSize;
-	
-	            this.geometry.bind(this.drawShader);
-	            this.geometry.draw();
-	            this.geometry.unbind();
-	
-	            for (var _len = arguments.length, rest = Array(_len > 1 ? _len - 1 : 0), _key = 1; _key < _len; _key++) {
-	                rest[_key - 1] = arguments[_key];
-	            }
-	
-	            return (_get2 = _get(GeometrySpawner.prototype.__proto__ || Object.getPrototypeOf(GeometrySpawner.prototype), 'spawn', this)).call.apply(_get2, [this, tendrils].concat(rest));
-	        }
-	    }]);
-	
-	    return GeometrySpawner;
+	  return GeometrySpawner;
 	}(spawnPixels.PixelSpawner);
 	
 	exports.default = GeometrySpawner;
@@ -27284,19 +27284,19 @@
 /* 483 */
 /***/ (function(module, exports) {
 
-	module.exports = "precision highp float;\n#define GLSLIFY 1\n\nuniform sampler2D particles;\nuniform sampler2D spawnData;\n\nuniform vec2 dataRes;\nuniform vec2 geomRes;\nuniform vec2 spawnSize;\n\nuniform vec2 jitter;\nuniform float time;\nuniform float speed;\n\nuniform mat3 spawnMatrix;\n\n/**\n * @todo Some bug with `glslify-import` & sons breaks `node_modules` aliased\n *       `require`s in `import`ed files, so we need to do it the looooooong way.\n */\n// #pragma glslify: random = require(glsl-random)\nhighp float random(vec2 co)\n{\n    highp float a = 12.9898;\n    highp float b = 78.233;\n    highp float c = 43758.5453;\n    highp float dt= dot(co.xy ,vec2(a,b));\n    highp float sn= mod(dt,3.14);\n    return fract(sin(sn) * c);\n}\n\nfloat map(float value, float inMin, float inMax, float outMin, float outMax) {\n  return outMin + (outMax - outMin) * (value - inMin) / (inMax - inMin);\n}\n\nvec2 map(vec2 value, vec2 inMin, vec2 inMax, vec2 outMin, vec2 outMax) {\n  return outMin + (outMax - outMin) * (value - inMin) / (inMax - inMin);\n}\n\nvec3 map(vec3 value, vec3 inMin, vec3 inMax, vec3 outMin, vec3 outMax) {\n  return outMin + (outMax - outMin) * (value - inMin) / (inMax - inMin);\n}\n\nvec4 map(vec4 value, vec4 inMin, vec4 inMax, vec4 outMin, vec4 outMax) {\n  return outMin + (outMax - outMin) * (value - inMin) / (inMax - inMin);\n}\n\nconst vec4 uvRange = vec4(0.0, 0.0, 1.0, 1.0);\n\nconst vec4 posRange = vec4(-1.0, -1.0, 1.0, 1.0);\n\nvec2 uvToPos(vec2 uv) {\n    return map(uv, uvRange.xy, uvRange.zw, posRange.xy, posRange.zw);\n}\n\nfloat transform(mat2 m, float v) {\n    return (m*vec2(v, 1.0)).x;\n}\n\nvec2 transform(mat3 m, vec2 v) {\n    return (m*vec3(v, 1.0)).xy;\n}\n\nvec3 transform(mat4 m, vec3 v) {\n    return (m*vec4(v, 1.0)).xyz;\n}\n\nconst vec2 flipUV = vec2(1.0, -1.0);\n\nvec2 spawnToPos(vec2 uv) {\n    // Jittering around a UV cell to get rid of boxy scaled sampling artefacts\n    vec2 offset = vec2(mix(-jitter.x, jitter.x, random(uv-1.2345+(time*0.001))),\n            mix(-jitter.y, jitter.y, random(uv+1.2345+(time*0.001))));\n\n    return transform(spawnMatrix, uvToPos(uv+offset)*flipUV*spawnSize);\n}\n\n/**\n * Directly uses a normal image - brightness being speed in a random direction.\n */\n\nfloat luma(vec3 color) {\n  return dot(color, vec3(0.299, 0.587, 0.114));\n}\n\nfloat luma(vec4 color) {\n  return dot(color.rgb, vec3(0.299, 0.587, 0.114));\n}\n\nconst float tau = 6.28318530717958647692;\n\nvec2 angleToVec(float rad) {\n    return vec2(cos(rad), sin(rad));\n}\n\nvec4 apply(vec2 uv, vec2 pos, vec4 pixel) {\n    return vec4(pos,\n        angleToVec(mod(random(uv*dot(pixel.rg, pixel.ba)), 1.0)*tau)*\n            luma(pixel)*pixel.a);\n}\n\n/**\n * Pick the Highest velocity.\n * Uses the same data structure as the particles.\n */\n\nfloat length2(vec2 vec) {\n    return dot(vec, vec);\n}\n\nfloat length2(vec3 vec) {\n    return dot(vec, vec);\n}\n\nfloat length2(vec4 vec) {\n    return dot(vec, vec);\n}\n\nfloat test(vec4 data) {\n    return length2(data.zw);\n}\n\nconst float samples = 6.0;\n\n/**\n * Tries a number of times to randomly select a pixel scored highest by a given\n * function.\n *\n * @requires {function} apply A function that transforms a `vec4` of data into a\n *                            valid `vec4` state.\n * @requires {function} test A function that returns a float value for a given\n *                           `vec4` state; greater values win the comparison.\n */\n\n// Over 1 favours changing to new data; under 1 favours current data.\nuniform float bias;\n\n/**\n * @todo Some bug with `glslify-import` & sons breaks `node_modules` aliased\n *       `require`s in `import`ed files, so we need to do it the looooooong way.\n */\n// #pragma glslify: random = require(glsl-random)\n\nvec4 pick(vec4 current, vec4 next) {\n    return ((test(current) > bias*test(next))? current : next);\n}\n\nvoid main() {\n    /**\n     * @todo This was needed in `./direct-main.frag` - is it needed here too?\n     */\n    vec2 uv = gl_FragCoord.xy/dataRes;\n    // vec2 uv = (gl_FragCoord.xy/dataRes)*(geomRes/dataRes);\n    \n    vec4 state = texture2D(particles, uv);\n\n    vec4 baseSeed = state+vec4(uv, uv)+vec4(1.2345+(time*0.001));\n\n    for(float n = 0.0; n < samples; n += 1.0) {\n        vec4 seed = baseSeed+vec4(n);\n        vec2 spawnUV = mod(vec2(random(seed.xy), random(seed.zw)), 1.0);\n        vec4 other = apply(spawnUV, spawnToPos(spawnUV),\n                texture2D(spawnData, spawnUV));\n\n        state = pick(state, vec4(other.xy, other.zw*speed));\n    }\n\n    gl_FragColor = state;\n}\n\n"
+	module.exports = "precision highp float;\n#define GLSLIFY 1\n\nuniform sampler2D particles;\nuniform sampler2D spawnData;\n\nuniform vec2 dataRes;\nuniform vec2 geomRes;\nuniform vec2 spawnSize;\n\nuniform vec2 jitter;\nuniform float time;\nuniform float speed;\n\nuniform mat3 spawnMatrix;\n\n/**\n * @todo Some bug with `glslify-import` & sons breaks `node_modules` aliased\n *     `require`s in `import`ed files, so we need to do it the looooooong way.\n */\n// #pragma glslify: random = require(glsl-random)\nhighp float random(vec2 co)\n{\n    highp float a = 12.9898;\n    highp float b = 78.233;\n    highp float c = 43758.5453;\n    highp float dt= dot(co.xy ,vec2(a,b));\n    highp float sn= mod(dt,3.14);\n    return fract(sin(sn) * c);\n}\n\nfloat map(float value, float inMin, float inMax, float outMin, float outMax) {\n  return outMin + (outMax - outMin) * (value - inMin) / (inMax - inMin);\n}\n\nvec2 map(vec2 value, vec2 inMin, vec2 inMax, vec2 outMin, vec2 outMax) {\n  return outMin + (outMax - outMin) * (value - inMin) / (inMax - inMin);\n}\n\nvec3 map(vec3 value, vec3 inMin, vec3 inMax, vec3 outMin, vec3 outMax) {\n  return outMin + (outMax - outMin) * (value - inMin) / (inMax - inMin);\n}\n\nvec4 map(vec4 value, vec4 inMin, vec4 inMax, vec4 outMin, vec4 outMax) {\n  return outMin + (outMax - outMin) * (value - inMin) / (inMax - inMin);\n}\n\nconst vec4 uvRange = vec4(0.0, 0.0, 1.0, 1.0);\n\nconst vec4 posRange = vec4(-1.0, -1.0, 1.0, 1.0);\n\nvec2 uvToPos(vec2 uv) {\n  return map(uv, uvRange.xy, uvRange.zw, posRange.xy, posRange.zw);\n}\n\nfloat transform(mat2 m, float v) {\n  return (m*vec2(v, 1.0)).x;\n}\n\nvec2 transform(mat3 m, vec2 v) {\n  return (m*vec3(v, 1.0)).xy;\n}\n\nvec3 transform(mat4 m, vec3 v) {\n  return (m*vec4(v, 1.0)).xyz;\n}\n\nconst vec2 flipUV = vec2(1.0, -1.0);\n\nvec2 spawnToPos(vec2 uv) {\n  // Jittering around a UV cell to get rid of boxy scaled sampling artefacts\n  vec2 offset = vec2(mix(-jitter.x, jitter.x, random(uv-1.2345+(time*0.001))),\n      mix(-jitter.y, jitter.y, random(uv+1.2345+(time*0.001))));\n\n  return transform(spawnMatrix, uvToPos(uv+offset)*flipUV*spawnSize);\n}\n\n/**\n * Directly uses a normal image - brightness being speed in a random direction.\n */\n\nfloat luma(vec3 color) {\n  return dot(color, vec3(0.299, 0.587, 0.114));\n}\n\nfloat luma(vec4 color) {\n  return dot(color.rgb, vec3(0.299, 0.587, 0.114));\n}\n\nconst float tau = 6.28318530717958647692;\n\nvec2 angleToVec(float rad) {\n    return vec2(cos(rad), sin(rad));\n}\n\nvec4 apply(vec2 uv, vec2 pos, vec4 pixel) {\n  return vec4(pos,\n    angleToVec(mod(random(uv*dot(pixel.rg, pixel.ba)), 1.0)*tau)*\n      luma(pixel)*pixel.a);\n}\n\n/**\n * Pick the Highest velocity.\n * Uses the same data structure as the particles.\n */\n\nfloat length2(vec2 vec) {\n  return dot(vec, vec);\n}\n\nfloat length2(vec3 vec) {\n  return dot(vec, vec);\n}\n\nfloat length2(vec4 vec) {\n  return dot(vec, vec);\n}\n\nfloat test(vec4 data) {\n  return length2(data.zw);\n}\n\nconst float samples = 6.0;\n\n/**\n * Tries a number of times to randomly select a pixel scored highest by a given\n * function.\n *\n * @requires {function} apply A function that transforms a `vec4` of data into a\n *              valid `vec4` state.\n * @requires {function} test A function that returns a float value for a given\n *               `vec4` state; greater values win the comparison.\n */\n\n// Over 1 favours changing to new data; under 1 favours current data.\nuniform float bias;\n\n/**\n * @todo Some bug with `glslify-import` & sons breaks `node_modules` aliased\n *     `require`s in `import`ed files, so we need to do it the looooooong way.\n */\n// #pragma glslify: random = require(glsl-random)\n\nvec4 pick(vec4 current, vec4 next) {\n  return ((test(current) > bias*test(next))? current : next);\n}\n\nvoid main() {\n  /**\n   * @todo This was needed in `./direct-main.frag` - is it needed here too?\n   */\n  vec2 uv = gl_FragCoord.xy/dataRes;\n  // vec2 uv = (gl_FragCoord.xy/dataRes)*(geomRes/dataRes);\n\n  vec4 state = texture2D(particles, uv);\n\n  vec4 baseSeed = state+vec4(uv, uv)+vec4(1.2345+(time*0.001));\n\n  for(float n = 0.0; n < samples; n += 1.0) {\n    vec4 seed = baseSeed+vec4(n);\n    vec2 spawnUV = mod(vec2(random(seed.xy), random(seed.zw)), 1.0);\n    vec4 other = apply(spawnUV, spawnToPos(spawnUV),\n        texture2D(spawnData, spawnUV));\n\n    state = pick(state, vec4(other.xy, other.zw*speed));\n  }\n\n  gl_FragColor = state;\n}\n\n"
 
 /***/ }),
 /* 484 */
 /***/ (function(module, exports) {
 
-	module.exports = "precision highp float;\n#define GLSLIFY 1\n\nattribute vec2 position;\n\nuniform vec2 viewSize;\n\nvoid main() {\n    gl_Position = vec4(position*viewSize, 0.0, 1.0);\n}\n"
+	module.exports = "precision highp float;\n#define GLSLIFY 1\n\nattribute vec2 position;\n\nuniform vec2 viewSize;\n\nvoid main() {\n  gl_Position = vec4(position*viewSize, 0.0, 1.0);\n}\n"
 
 /***/ }),
 /* 485 */
 /***/ (function(module, exports) {
 
-	module.exports = "precision highp float;\n#define GLSLIFY 1\n\nuniform vec4 color;\n\nvoid main() {\n    gl_FragColor = color;\n}\n"
+	module.exports = "precision highp float;\n#define GLSLIFY 1\n\nuniform vec4 color;\n\nvoid main() {\n  gl_FragColor = color;\n}\n"
 
 /***/ }),
 /* 486 */
@@ -27305,7 +27305,7 @@
 	'use strict';
 	
 	Object.defineProperty(exports, "__esModule", {
-	    value: true
+	  value: true
 	});
 	exports.AudioTrigger = exports.defaultTest = undefined;
 	
@@ -27335,89 +27335,89 @@
 	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 	
 	var defaultTest = exports.defaultTest = function defaultTest(trigger) {
-	    return (0, _analyse.peak)(trigger.dataOrder(-1)) > trigger.limit;
+	  return (0, _analyse.peak)(trigger.dataOrder(-1)) > trigger.limit;
 	};
 	
 	var AudioTrigger = exports.AudioTrigger = function () {
-	    function AudioTrigger(analyser, orders) {
-	        var limit = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : 200;
+	  function AudioTrigger(analyser, orders) {
+	    var limit = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : 200;
 	
-	        var _this = this;
+	    var _this = this;
 	
-	        var test = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : null;
-	        var react = arguments.length > 4 && arguments[4] !== undefined ? arguments[4] : null;
+	    var test = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : null;
+	    var react = arguments.length > 4 && arguments[4] !== undefined ? arguments[4] : null;
 	
-	        _classCallCheck(this, AudioTrigger);
+	    _classCallCheck(this, AudioTrigger);
 	
-	        this.analyser = analyser;
+	    this.analyser = analyser;
 	
-	        this.orderLog = (0, _dataLog.makeOrderLog)(orders, function (size) {
-	            return (0, _dataLog.makeLog)(size, function () {
-	                return (0, _data2.default)(_this.analyser, size === orders ? Uint8Array : Float32Array);
-	            });
-	        });
+	    this.orderLog = (0, _dataLog.makeOrderLog)(orders, function (size) {
+	      return (0, _dataLog.makeLog)(size, function () {
+	        return (0, _data2.default)(_this.analyser, size === orders ? Uint8Array : Float32Array);
+	      });
+	    });
 	
-	        // Not really needed
-	        this.limit = limit;
-	        this.test = test;
-	        this.react = react;
+	    // Not really needed
+	    this.limit = limit;
+	    this.test = test;
+	    this.react = react;
+	  }
+	
+	  // Update the sample logs from the analyser.
+	
+	
+	  _createClass(AudioTrigger, [{
+	    key: 'sample',
+	    value: function sample() {
+	      var dt = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 1;
+	      var method = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 'frequencies';
+	
+	      this.analyser[method]((0, _utils.step)(this.orderLog[0]));
+	      (0, _analyse.orderLogRates)(this.orderLog, dt);
+	
+	      return this;
 	    }
 	
-	    // Update the sample logs from the analyser.
+	    // The most recent sample at the nth-order log. Negative `nth` indexes in
+	    // reverse (highest-lowest).
 	
+	  }, {
+	    key: 'dataOrder',
+	    value: function dataOrder(nth) {
+	      return (0, _utils.wrapIndex)(nth, this.orderLog)[0];
+	    }
 	
-	    _createClass(AudioTrigger, [{
-	        key: 'sample',
-	        value: function sample() {
-	            var dt = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 1;
-	            var method = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 'frequencies';
+	    // Not relly needed - more a demo than anything.
+	    // Test if the latest sample breaks the limit to trigger a response.
 	
-	            this.analyser[method]((0, _utils.step)(this.orderLog[0]));
-	            (0, _analyse.orderLogRates)(this.orderLog, dt);
+	  }, {
+	    key: 'fire',
+	    value: function fire() {
+	      var react = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : this.react;
+	      var test = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : this.test || defaultTest;
 	
-	            return this;
-	        }
+	      var triggered = !!test(this);
 	
-	        // The most recent sample at the nth-order log. Negative `nth` indexes in
-	        // reverse (highest-lowest).
+	      if (triggered) {
+	        react(this);
+	      }
 	
-	    }, {
-	        key: 'dataOrder',
-	        value: function dataOrder(nth) {
-	            return (0, _utils.wrapIndex)(nth, this.orderLog)[0];
-	        }
+	      return triggered;
+	    }
+	  }, {
+	    key: 'clear',
+	    value: function clear() {
+	      (0, _each2.default)(function (log) {
+	        return (0, _each2.default)(function (data) {
+	          return (0, _each2.default)(function (v, i) {
+	            return data[i] = 0;
+	          }, data);
+	        }, log);
+	      }, this.orderLog);
+	    }
+	  }]);
 	
-	        // Not relly needed - more a demo than anything.
-	        // Test if the latest sample breaks the limit to trigger a response.
-	
-	    }, {
-	        key: 'fire',
-	        value: function fire() {
-	            var react = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : this.react;
-	            var test = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : this.test || defaultTest;
-	
-	            var triggered = !!test(this);
-	
-	            if (triggered) {
-	                react(this);
-	            }
-	
-	            return triggered;
-	        }
-	    }, {
-	        key: 'clear',
-	        value: function clear() {
-	            (0, _each2.default)(function (log) {
-	                return (0, _each2.default)(function (data) {
-	                    return (0, _each2.default)(function (v, i) {
-	                        return data[i] = 0;
-	                    }, data);
-	                }, log);
-	            }, this.orderLog);
-	        }
-	    }]);
-	
-	    return AudioTrigger;
+	  return AudioTrigger;
 	}();
 	
 	exports.default = AudioTrigger;
@@ -27535,7 +27535,7 @@
 	 *
 	 * @param {Number} size The size of the data log.
 	 * @param {Function} dataMaker Creates new data storage instances, given an
-	 *                             index.
+	 *               index.
 	 * @return {Array} An array of data bins.
 	 */
 	var makeLog = exports.makeLog = function makeLog(size) {
@@ -27550,16 +27550,16 @@
 	 * as in integration, differentiation) of base data.
 	 *
 	 * (3) => [
-	 *     [*, *, *],
-	 *     [*, *],
-	 *     [*]
+	 *   [*, *, *],
+	 *   [*, *],
+	 *   [*]
 	 * ]
 	 *
 	 * @param {Number} order The order of the slope log - the total number of logs
-	 *                       will be a factorial of this value (`order!`),
-	 *                       descending in length at each level from `order` to 1.
+	 *             will be a factorial of this value (`order!`),
+	 *             descending in length at each level from `order` to 1.
 	 * @param {Function} logMaker Creates new data storage log instances, given a
-	 *                            size.
+	 *              size.
 	 * @return {Array} A 2D array, of logs of logs of data.
 	 */
 	var makeOrderLog = exports.makeOrderLog = function makeOrderLog(order) {
@@ -27798,7 +27798,7 @@
 	'use strict';
 	
 	Object.defineProperty(exports, "__esModule", {
-	    value: true
+	  value: true
 	});
 	exports.meanWeight = exports.mean = exports.sumWeight = exports.sum = exports.peakPos = exports.peak = exports.logRates = undefined;
 	exports.orderLogRates = orderLogRates;
@@ -27821,10 +27821,10 @@
 	/* global Uint8Array */
 	
 	var logRates = exports.logRates = function logRates(last, current, dt) {
-	    var out = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : new Uint8Array(last.length);
-	    return (0, _map.mapList)(function (v, i) {
-	        return (0, _euler.eulerDyDt)(v, current[i], dt);
-	    }, last, out);
+	  var out = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : new Uint8Array(last.length);
+	  return (0, _map.mapList)(function (v, i) {
+	    return (0, _euler.eulerDyDt)(v, current[i], dt);
+	  }, last, out);
 	};
 	
 	/**
@@ -27834,57 +27834,57 @@
 	 * @see `makeOrderLog` in `../data-log/`.
 	 */
 	function orderLogRates(orderLog) {
-	    var dt = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 1;
+	  var dt = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 1;
 	
-	    for (var o = 1, oL = orderLog.length; o < oL; ++o) {
-	        logRates(orderLog[o - 1][1], orderLog[o - 1][0], dt, (0, _utils.step)(orderLog[o]));
-	    }
+	  for (var o = 1, oL = orderLog.length; o < oL; ++o) {
+	    logRates(orderLog[o - 1][1], orderLog[o - 1][0], dt, (0, _utils.step)(orderLog[o]));
+	  }
 	
-	    return orderLog;
+	  return orderLog;
 	}
 	
 	// Interpret from that info.
 	
 	var peak = exports.peak = function peak(data) {
-	    return (0, _reduce.reduceList)(function (max, v) {
-	        return Math.abs(v) > Math.abs(max) ? v : max;
-	    }, data, 0);
+	  return (0, _reduce.reduceList)(function (max, v) {
+	    return Math.abs(v) > Math.abs(max) ? v : max;
+	  }, data, 0);
 	};
 	
 	var peakPos = exports.peakPos = function peakPos(data) {
-	    return (0, _reduce.reduceList)(function (max, v, i) {
-	        if (Math.abs(v) > Math.abs(max.peak)) {
-	            max.peak = v;
-	            max.pos = i;
-	        }
+	  return (0, _reduce.reduceList)(function (max, v, i) {
+	    if (Math.abs(v) > Math.abs(max.peak)) {
+	      max.peak = v;
+	      max.pos = i;
+	    }
 	
-	        return max;
-	    }, data, {
-	        peak: 0,
-	        pos: -1
-	    });
+	    return max;
+	  }, data, {
+	    peak: 0,
+	    pos: -1
+	  });
 	};
 	
 	var sum = exports.sum = function sum(data) {
-	    return (0, _reduce.reduceList)(function (sum, v) {
-	        return sum + Math.abs(v);
-	    }, data, 0);
+	  return (0, _reduce.reduceList)(function (sum, v) {
+	    return sum + Math.abs(v);
+	  }, data, 0);
 	};
 	
 	var sumWeight = exports.sumWeight = function sumWeight(data) {
-	    var fulcrum = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 0.5;
-	    return (0, _reduce.reduceList)(function (sum, v, i) {
-	        return sum + Math.abs(v * (1 - Math.abs(i / (data.length - 1) - fulcrum)));
-	    }, data, 0);
+	  var fulcrum = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 0.5;
+	  return (0, _reduce.reduceList)(function (sum, v, i) {
+	    return sum + Math.abs(v * (1 - Math.abs(i / (data.length - 1) - fulcrum)));
+	  }, data, 0);
 	};
 	
 	var mean = exports.mean = function mean(data) {
-	    return sum(data) / data.length;
+	  return sum(data) / data.length;
 	};
 	
 	var meanWeight = exports.meanWeight = function meanWeight(data) {
-	    var fulcrum = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 0.5;
-	    return sumWeight(data, fulcrum) / data.length;
+	  var fulcrum = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 0.5;
+	  return sumWeight(data, fulcrum) / data.length;
 	};
 
 /***/ }),
@@ -28021,7 +28021,7 @@
 	'use strict';
 	
 	Object.defineProperty(exports, "__esModule", {
-	    value: true
+	  value: true
 	});
 	exports.AudioTexture = undefined;
 	
@@ -28055,64 +28055,64 @@
 	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 	
 	var assignMap = function assignMap(v) {
-	    return v;
+	  return v;
 	};
 	
 	var AudioTexture = exports.AudioTexture = function () {
-	    function AudioTexture(gl, array, texture) {
-	        _classCallCheck(this, AudioTexture);
+	  function AudioTexture(gl, array, texture) {
+	    _classCallCheck(this, AudioTexture);
 	
-	        this.gl = gl;
+	    this.gl = gl;
 	
-	        this.array = array && array.length ? (0, _ndarray2.default)(array, [array.length, 1]) : (0, _isNumber2.default)(array) ? (0, _ndarray2.default)(new Float32Array(array), [array, 1]) : array;
+	    this.array = array && array.length ? (0, _ndarray2.default)(array, [array.length, 1]) : (0, _isNumber2.default)(array) ? (0, _ndarray2.default)(new Float32Array(array), [array, 1]) : array;
 	
-	        this.texture = texture || (0, _glTexture2d2.default)(gl, this.array, { float: true });
+	    this.texture = texture || (0, _glTexture2d2.default)(gl, this.array, { float: true });
+	  }
+	
+	  _createClass(AudioTexture, [{
+	    key: 'apply',
+	    value: function apply() {
+	      var array = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : this.array;
+	
+	      this.texture.setPixels(array);
+	
+	      return this;
 	    }
 	
-	    _createClass(AudioTexture, [{
-	        key: 'apply',
-	        value: function apply() {
-	            var array = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : this.array;
+	    /**
+	     * Transform `web-audio-analyser` data values into a WebGL data texture range.
+	     */
 	
-	            this.texture.setPixels(array);
+	  }, {
+	    key: 'assign',
+	    value: function assign() {
+	      var data = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : this.array.data;
 	
-	            return this;
-	        }
+	      (0, _map.mapList)(assignMap, data, this.array.data);
 	
-	        /**
-	         * Transform `web-audio-analyser` data values into a WebGL data texture range.
-	         */
+	      return this;
+	    }
+	  }, {
+	    key: 'waveform',
+	    value: function waveform() {
+	      var data = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : this.array.data;
 	
-	    }, {
-	        key: 'assign',
-	        value: function assign() {
-	            var data = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : this.array.data;
+	      (0, _map.mapList)(_utils.waveformMap, data, this.array.data);
 	
-	            (0, _map.mapList)(assignMap, data, this.array.data);
+	      return this;
+	    }
+	  }, {
+	    key: 'frequencies',
+	    value: function frequencies() {
+	      var data = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : this.array.data;
 	
-	            return this;
-	        }
-	    }, {
-	        key: 'waveform',
-	        value: function waveform() {
-	            var data = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : this.array.data;
+	      (0, _map.mapList)(_utils.frequencyMap, data, this.array.data);
 	
-	            (0, _map.mapList)(_utils.waveformMap, data, this.array.data);
+	      return this;
+	    }
+	  }]);
 	
-	            return this;
-	        }
-	    }, {
-	        key: 'frequencies',
-	        value: function frequencies() {
-	            var data = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : this.array.data;
-	
-	            (0, _map.mapList)(_utils.frequencyMap, data, this.array.data);
-	
-	            return this;
-	        }
-	    }]);
-	
-	    return AudioTexture;
+	  return AudioTexture;
 	}();
 	
 	exports.default = AudioTexture;
@@ -28187,7 +28187,7 @@
 	'use strict';
 	
 	Object.defineProperty(exports, "__esModule", {
-	    value: true
+	  value: true
 	});
 	exports.FlowLines = undefined;
 	
@@ -28208,32 +28208,32 @@
 	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 	
 	var FlowLines = exports.FlowLines = function () {
-	    function FlowLines(gl) {
-	        _classCallCheck(this, FlowLines);
+	  function FlowLines(gl) {
+	    _classCallCheck(this, FlowLines);
 	
-	        this.gl = gl;
-	        this.active = {};
+	    this.gl = gl;
+	    this.active = {};
+	  }
+	
+	  _createClass(FlowLines, [{
+	    key: 'get',
+	    value: function get(id, options) {
+	      return this.active[id] || (this.active[id] = new _2.default(this.gl, options));
 	    }
+	  }, {
+	    key: 'trim',
+	    value: function trim() {
+	      for (var _len = arguments.length, times = Array(_len), _key = 0; _key < _len; _key++) {
+	        times[_key] = arguments[_key];
+	      }
 	
-	    _createClass(FlowLines, [{
-	        key: 'get',
-	        value: function get(id, options) {
-	            return this.active[id] || (this.active[id] = new _2.default(this.gl, options));
-	        }
-	    }, {
-	        key: 'trim',
-	        value: function trim() {
-	            for (var _len = arguments.length, times = Array(_len), _key = 0; _key < _len; _key++) {
-	                times[_key] = arguments[_key];
-	            }
+	      return (0, _reduce2.default)(function (remaining, flowLine, id, active) {
+	        return flowLine.trim.apply(flowLine, times) === 0 && delete active[id] ? remaining : remaining + 1;
+	      }, this.active, 0);
+	    }
+	  }]);
 	
-	            return (0, _reduce2.default)(function (remaining, flowLine, id, active) {
-	                return flowLine.trim.apply(flowLine, times) === 0 && delete active[id] ? remaining : remaining + 1;
-	            }, this.active, 0);
-	        }
-	    }]);
-	
-	    return FlowLines;
+	  return FlowLines;
 	}();
 	
 	exports.default = FlowLines;
@@ -28245,7 +28245,7 @@
 	'use strict';
 	
 	Object.defineProperty(exports, "__esModule", {
-	    value: true
+	  value: true
 	});
 	exports.FlowLine = undefined;
 	
@@ -28255,7 +28255,7 @@
 	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      * Draw forms into a tendrils flow FBO.
 	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      *
 	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      * @todo Improve the smoothness of this - currently very uneven and jagged,
-	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      *       especially over short gaps.
+	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      *     especially over short gaps.
 	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      */
 	
 	var _line2 = __webpack_require__(506);
@@ -28275,151 +28275,151 @@
 	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 	
 	var wrapIndex = function wrapIndex(i, l) {
-	    return i < 0 ? l + i : i % l;
+	  return i < 0 ? l + i : i % l;
 	};
 	
 	var FlowLine = exports.FlowLine = function () {
-	    function FlowLine(gl) {
-	        var options = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
+	  function FlowLine(gl) {
+	    var options = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
 	
-	        _classCallCheck(this, FlowLine);
+	    _classCallCheck(this, FlowLine);
 	
-	        this.line = new _line3.default(gl, _extends({
-	            shader: [_index2.default, _index4.default],
-	            uniforms: _extends({}, (0, _line2.defaults)().uniforms, {
-	                speed: 3,
-	                speedLimit: 0.01,
-	                rad: 0.1,
-	                crestShape: 0.6
-	            }),
-	            attributes: _extends({}, (0, _line2.defaults)().attributes, {
-	                previous: { getSize: function getSize(line) {
-	                        return line.vertSize;
-	                    } },
-	                time: { size: 1 },
-	                dt: { size: 1 }
-	            })
-	        }, options));
+	    this.line = new _line3.default(gl, _extends({
+	      shader: [_index2.default, _index4.default],
+	      uniforms: _extends({}, (0, _line2.defaults)().uniforms, {
+	        speed: 3,
+	        speedLimit: 0.01,
+	        rad: 0.1,
+	        crestShape: 0.6
+	      }),
+	      attributes: _extends({}, (0, _line2.defaults)().attributes, {
+	        previous: { getSize: function getSize(line) {
+	            return line.vertSize;
+	          } },
+	        time: { size: 1 },
+	        dt: { size: 1 }
+	      })
+	    }, options));
 	
-	        /**
-	         * An array of times matching each point in the line path.
-	         * @type {Array}
-	         */
-	        this.times = options.times || [];
+	    /**
+	     * An array of times matching each point in the line path.
+	     * @type {Array}
+	     */
+	    this.times = options.times || [];
+	  }
+	
+	  _createClass(FlowLine, [{
+	    key: 'update',
+	    value: function update() {
+	      var setAttributes = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : this.setAttributes;
+	
+	      // @todo Unsure if this makes sense - reconsider closed loop times.
+	      var drawnTimes = this.line.closed && this.line.path.length ? this.times.concat(this.times[0]) : this.times;
+	
+	      this.line.update(function () {
+	        for (var _len = arguments.length, rest = Array(_len), _key = 0; _key < _len; _key++) {
+	          rest[_key] = arguments[_key];
+	        }
+	
+	        return setAttributes.apply(undefined, [drawnTimes].concat(rest));
+	      });
+	
+	      return this;
+	    }
+	  }, {
+	    key: 'draw',
+	    value: function draw() {
+	      var _line;
+	
+	      (_line = this.line).draw.apply(_line, arguments);
+	
+	      return this;
+	    }
+	  }, {
+	    key: 'setAttributes',
+	    value: function setAttributes(times, values, index, attributes, line) {
+	      line.setAttributes(values, index, attributes, line);
+	
+	      var prev = line.closed ? wrapIndex(index.path - 1, line.path.length) : Math.max(0, index.path - 1);
+	
+	      attributes.previous.data.set(line.path[prev], index.data * attributes.previous.size);
+	
+	      var time = times[index.path];
+	
+	      attributes.time.data[index.data] = time;
+	      attributes.dt.data[index.data] = time - times[prev];
+	    }
+	  }, {
+	    key: 'add',
+	    value: function add(time, point) {
+	      this.times.push(time);
+	      this.line.path.push(point);
+	
+	      return this;
+	    }
+	  }, {
+	    key: 'insert',
+	    value: function insert(time, point) {
+	      var index = this.findIndex(time);
+	
+	      this.times.splice(index, 0, time);
+	      this.line.path.splice(index, 0, point);
+	
+	      return this;
+	    }
+	  }, {
+	    key: 'at',
+	    value: function at(index) {
+	      var out = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
+	
+	      out.time = this.times[index];
+	      out.point = this.line.path[index];
+	
+	      return out;
+	    }
+	  }, {
+	    key: 'findIndex',
+	    value: function findIndex(time) {
+	      var next = this.times.findIndex(function (other) {
+	        return other > time;
+	      });
+	
+	      return next < 0 ? this.times.length : next;
 	    }
 	
-	    _createClass(FlowLine, [{
-	        key: 'update',
-	        value: function update() {
-	            var setAttributes = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : this.setAttributes;
+	    /**
+	     * Remove any path segments older than the given amunt of time ago.
+	     * Oldest times start at the back (from 0 up) of the path.
+	     *
+	     * @param  {Number} ago The amount of time ago (in ms) before which to trim.
+	     * @param  {Number} now The current time.
+	     */
 	
-	            // @todo Unsure if this makes sense - reconsider closed loop times.
-	            var drawnTimes = this.line.closed && this.line.path.length ? this.times.concat(this.times[0]) : this.times;
+	  }, {
+	    key: 'trim',
+	    value: function trim(ago) {
+	      var now = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : Date.now();
 	
-	            this.line.update(function () {
-	                for (var _len = arguments.length, rest = Array(_len), _key = 0; _key < _len; _key++) {
-	                    rest[_key] = arguments[_key];
-	                }
+	      var times = this.times;
+	      var path = this.line.path;
 	
-	                return setAttributes.apply(undefined, [drawnTimes].concat(rest));
-	            });
+	      var oldest = now - ago;
 	
-	            return this;
-	        }
-	    }, {
-	        key: 'draw',
-	        value: function draw() {
-	            var _line;
+	      while (times[0] < oldest) {
+	        times.shift();
+	        path.shift();
+	      }
 	
-	            (_line = this.line).draw.apply(_line, arguments);
+	      return this.length;
+	    }
+	  }, {
+	    key: 'length',
+	    get: function get() {
+	      return this.times.length;
+	    }
+	  }]);
 	
-	            return this;
-	        }
-	    }, {
-	        key: 'setAttributes',
-	        value: function setAttributes(times, values, index, attributes, line) {
-	            line.setAttributes(values, index, attributes, line);
-	
-	            var prev = line.closed ? wrapIndex(index.path - 1, line.path.length) : Math.max(0, index.path - 1);
-	
-	            attributes.previous.data.set(line.path[prev], index.data * attributes.previous.size);
-	
-	            var time = times[index.path];
-	
-	            attributes.time.data[index.data] = time;
-	            attributes.dt.data[index.data] = time - times[prev];
-	        }
-	    }, {
-	        key: 'add',
-	        value: function add(time, point) {
-	            this.times.push(time);
-	            this.line.path.push(point);
-	
-	            return this;
-	        }
-	    }, {
-	        key: 'insert',
-	        value: function insert(time, point) {
-	            var index = this.findIndex(time);
-	
-	            this.times.splice(index, 0, time);
-	            this.line.path.splice(index, 0, point);
-	
-	            return this;
-	        }
-	    }, {
-	        key: 'at',
-	        value: function at(index) {
-	            var out = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
-	
-	            out.time = this.times[index];
-	            out.point = this.line.path[index];
-	
-	            return out;
-	        }
-	    }, {
-	        key: 'findIndex',
-	        value: function findIndex(time) {
-	            var next = this.times.findIndex(function (other) {
-	                return other > time;
-	            });
-	
-	            return next < 0 ? this.times.length : next;
-	        }
-	
-	        /**
-	         * Remove any path segments older than the given amunt of time ago.
-	         * Oldest times start at the back (from 0 up) of the path.
-	         *
-	         * @param  {Number} ago The amount of time ago (in ms) before which to trim.
-	         * @param  {Number} now The current time.
-	         */
-	
-	    }, {
-	        key: 'trim',
-	        value: function trim(ago) {
-	            var now = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : Date.now();
-	
-	            var times = this.times;
-	            var path = this.line.path;
-	
-	            var oldest = now - ago;
-	
-	            while (times[0] < oldest) {
-	                times.shift();
-	                path.shift();
-	            }
-	
-	            return this.length;
-	        }
-	    }, {
-	        key: 'length',
-	        get: function get() {
-	            return this.times.length;
-	        }
-	    }]);
-	
-	    return FlowLine;
+	  return FlowLine;
 	}();
 	
 	exports.default = FlowLine;
@@ -28431,7 +28431,7 @@
 	'use strict';
 	
 	Object.defineProperty(exports, "__esModule", {
-	    value: true
+	  value: true
 	});
 	exports.Line = exports.defaults = undefined;
 	
@@ -28474,174 +28474,174 @@
 	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 	
 	var defaults = exports.defaults = function defaults() {
-	    return {
-	        shader: [_index2.default, _index4.default],
-	        uniforms: {
-	            color: [1, 1, 1, 1],
-	            rad: 0.1,
-	            viewSize: [1, 1]
-	        },
-	        attributes: null,
-	        vertNum: 2,
-	        vertSize: 2,
-	        path: [],
-	        closed: false
-	    };
+	  return {
+	    shader: [_index2.default, _index4.default],
+	    uniforms: {
+	      color: [1, 1, 1, 1],
+	      rad: 0.1,
+	      viewSize: [1, 1]
+	    },
+	    attributes: null,
+	    vertNum: 2,
+	    vertSize: 2,
+	    path: [],
+	    closed: false
+	  };
 	};
 	
 	var Line = exports.Line = function () {
-	    function Line(gl, options) {
-	        var _this = this;
+	  function Line(gl, options) {
+	    var _this = this;
 	
-	        _classCallCheck(this, Line);
+	    _classCallCheck(this, Line);
 	
-	        var params = _extends({}, defaults(), options);
+	    var params = _extends({}, defaults(), options);
 	
-	        this.gl = gl;
-	        this.uniforms = params.uniforms;
+	    this.gl = gl;
+	    this.uniforms = params.uniforms;
 	
-	        this.shader = Array.isArray(params.shader) ? _glShader2.default.apply(undefined, [gl].concat(_toConsumableArray(params.shader))) : params.shader;
+	    this.shader = Array.isArray(params.shader) ? _glShader2.default.apply(undefined, [gl].concat(_toConsumableArray(params.shader))) : params.shader;
 	
-	        this.vertNum = params.vertNum;
-	        this.vertSize = params.vertSize;
+	    this.vertNum = params.vertNum;
+	    this.vertSize = params.vertSize;
 	
-	        this.path = params.path || [];
-	        this.closed = params.closed;
+	    this.path = params.path || [];
+	    this.closed = params.closed;
 	
-	        // Add any new attributes you like according to this structure.
-	        // See `update`, `initAttributes`, `setAttributes`.
-	        this.attributes = _extends({
-	            position: {
-	                data: null,
-	                getSize: function getSize() {
-	                    return _this.vertSize;
-	                }
-	            },
-	            normal: {
-	                data: null,
-	                getSize: function getSize() {
-	                    return _this.vertSize;
-	                }
-	            },
-	            miter: {
-	                data: null,
-	                size: 1
-	            }
-	        }, params.attributes);
+	    // Add any new attributes you like according to this structure.
+	    // See `update`, `initAttributes`, `setAttributes`.
+	    this.attributes = _extends({
+	      position: {
+	        data: null,
+	        getSize: function getSize() {
+	          return _this.vertSize;
+	        }
+	      },
+	      normal: {
+	        data: null,
+	        getSize: function getSize() {
+	          return _this.vertSize;
+	        }
+	      },
+	      miter: {
+	        data: null,
+	        size: 1
+	      }
+	    }, params.attributes);
 	
-	        // Drawn properties, derived from the above on `update`.
-	        this.drawnPath = this.drawnNormals = null;
+	    // Drawn properties, derived from the above on `update`.
+	    this.drawnPath = this.drawnNormals = null;
 	
-	        this.geometry = (0, _glGeometry2.default)(gl);
+	    this.geometry = (0, _glGeometry2.default)(gl);
+	  }
+	
+	  _createClass(Line, [{
+	    key: 'update',
+	    value: function update() {
+	      var _this2 = this;
+	
+	      var setAttributes = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : this.setAttributes;
+	
+	      this.drawnPath = this.path;
+	      this.drawnNormals = (0, _polylineNormals2.default)(this.drawnPath, this.closed);
+	
+	      if (this.closed && this.path.length) {
+	        this.drawnPath = this.drawnPath.concat(this.drawnPath[0]);
+	        this.drawnNormals.push(this.drawnNormals[0]);
+	      }
+	
+	      this.initAttributes();
+	
+	      // Caches
+	      var drawnPath = this.drawnPath;
+	      var drawnNormals = this.drawnNormals;
+	      var attributes = this.attributes;
+	      var vertNum = this.vertNum;
+	      var values = {};
+	      var index = {};
+	
+	      // Set up attribute data
+	      for (var p = 0, pL = drawnNormals.length; p < pL; ++p) {
+	        var pointNormal = drawnNormals[p];
+	
+	        values.point = drawnPath[p];
+	        values.normal = pointNormal[0];
+	        values.miter = pointNormal[1];
+	
+	        index.path = p;
+	        index.point = p * vertNum;
+	
+	        for (var v = 0; v < vertNum; ++v) {
+	          index.vert = v;
+	          index.data = index.point + v;
+	
+	          setAttributes(values, index, attributes, this);
+	        }
+	      }
+	
+	      // Bind to geometry attributes
+	      (0, _each2.default)(function (attribute, name) {
+	        return _this2.geometry.attr(name, attribute.data, { size: attribute.size });
+	      }, attributes);
+	
+	      return this;
 	    }
+	  }, {
+	    key: 'draw',
+	    value: function draw() {
+	      var mode = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : this.gl.TRIANGLE_STRIP;
 	
-	    _createClass(Line, [{
-	        key: 'update',
-	        value: function update() {
-	            var _this2 = this;
+	      if (this.path.length > 0) {
+	        var _geometry;
 	
-	            var setAttributes = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : this.setAttributes;
+	        this.geometry.bind(this.shader);
+	        Object.assign(this.shader.uniforms, this.uniforms);
 	
-	            this.drawnPath = this.path;
-	            this.drawnNormals = (0, _polylineNormals2.default)(this.drawnPath, this.closed);
-	
-	            if (this.closed && this.path.length) {
-	                this.drawnPath = this.drawnPath.concat(this.drawnPath[0]);
-	                this.drawnNormals.push(this.drawnNormals[0]);
-	            }
-	
-	            this.initAttributes();
-	
-	            // Caches
-	            var drawnPath = this.drawnPath;
-	            var drawnNormals = this.drawnNormals;
-	            var attributes = this.attributes;
-	            var vertNum = this.vertNum;
-	            var values = {};
-	            var index = {};
-	
-	            // Set up attribute data
-	            for (var p = 0, pL = drawnNormals.length; p < pL; ++p) {
-	                var pointNormal = drawnNormals[p];
-	
-	                values.point = drawnPath[p];
-	                values.normal = pointNormal[0];
-	                values.miter = pointNormal[1];
-	
-	                index.path = p;
-	                index.point = p * vertNum;
-	
-	                for (var v = 0; v < vertNum; ++v) {
-	                    index.vert = v;
-	                    index.data = index.point + v;
-	
-	                    setAttributes(values, index, attributes, this);
-	                }
-	            }
-	
-	            // Bind to geometry attributes
-	            (0, _each2.default)(function (attribute, name) {
-	                return _this2.geometry.attr(name, attribute.data, { size: attribute.size });
-	            }, attributes);
-	
-	            return this;
+	        for (var _len = arguments.length, rest = Array(_len > 1 ? _len - 1 : 0), _key = 1; _key < _len; _key++) {
+	          rest[_key - 1] = arguments[_key];
 	        }
-	    }, {
-	        key: 'draw',
-	        value: function draw() {
-	            var mode = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : this.gl.TRIANGLE_STRIP;
 	
-	            if (this.path.length > 0) {
-	                var _geometry;
+	        (_geometry = this.geometry).draw.apply(_geometry, [mode].concat(rest));
+	      }
 	
-	                this.geometry.bind(this.shader);
-	                Object.assign(this.shader.uniforms, this.uniforms);
+	      return this;
+	    }
+	  }, {
+	    key: 'initAttributes',
+	    value: function initAttributes() {
+	      var _this3 = this;
 	
-	                for (var _len = arguments.length, rest = Array(_len > 1 ? _len - 1 : 0), _key = 1; _key < _len; _key++) {
-	                    rest[_key - 1] = arguments[_key];
-	                }
+	      var num = this.drawnPath.length * this.vertNum;
 	
-	                (_geometry = this.geometry).draw.apply(_geometry, [mode].concat(rest));
-	            }
-	
-	            return this;
+	      (0, _each2.default)(function (attribute) {
+	        // Cache any computed sizes.
+	        if (attribute.getSize) {
+	          attribute.size = attribute.getSize(_this3);
 	        }
-	    }, {
-	        key: 'initAttributes',
-	        value: function initAttributes() {
-	            var _this3 = this;
 	
-	            var num = this.drawnPath.length * this.vertNum;
+	        // Initialise new data if needed.
+	        var length = num * attribute.size;
 	
-	            (0, _each2.default)(function (attribute) {
-	                // Cache any computed sizes.
-	                if (attribute.getSize) {
-	                    attribute.size = attribute.getSize(_this3);
-	                }
-	
-	                // Initialise new data if needed.
-	                var length = num * attribute.size;
-	
-	                if (!attribute.data || attribute.data.length !== length) {
-	                    attribute.data = new Float32Array(length);
-	                }
-	            }, this.attributes);
-	
-	            return this;
+	        if (!attribute.data || attribute.data.length !== length) {
+	          attribute.data = new Float32Array(length);
 	        }
-	    }, {
-	        key: 'setAttributes',
-	        value: function setAttributes(values, index, attributes) {
-	            attributes.position.data.set(values.point, index.data * attributes.position.size);
+	      }, this.attributes);
 	
-	            attributes.normal.data.set(values.normal, index.data * attributes.normal.size);
+	      return this;
+	    }
+	  }, {
+	    key: 'setAttributes',
+	    value: function setAttributes(values, index, attributes) {
+	      attributes.position.data.set(values.point, index.data * attributes.position.size);
 	
-	            // Flip odd miters
-	            attributes.miter.data[index.data] = values.miter * (index.data % 2 * 2 - 1);
-	        }
-	    }]);
+	      attributes.normal.data.set(values.normal, index.data * attributes.normal.size);
 	
-	    return Line;
+	      // Flip odd miters
+	      attributes.miter.data[index.data] = values.miter * (index.data % 2 * 2 - 1);
+	    }
+	  }]);
+	
+	  return Line;
 	}();
 	
 	exports.default = Line;
@@ -28863,25 +28863,25 @@
 /* 514 */
 /***/ (function(module, exports) {
 
-	module.exports = "/**\n * Drawing lines in a vertex shader, from https://mattdesl.svbtle.com/drawing-lines-is-hard#expanding-in-a-vertex-shader_2\n * Pushes a point along its normal by its radius.\n */\n\nprecision highp float;\n#define GLSLIFY 1\n\nattribute vec2 position;\n\nuniform vec2 viewSize;\n\nattribute vec2 normal;\nattribute float miter;\n\nuniform float rad;\n\nvarying float sdf;\n\n/**\n * Drawing lines, from https://mattdesl.svbtle.com/drawing-lines-is-hard#expanding-in-a-vertex-shader_2\n * Pushes a point along its normal by its radius, in the direction of miter.\n */\n\nvec2 expand(vec2 position, vec2 normal, float rad, float miter) {\n    return position+(normal*rad*miter);\n}\n\nvoid main() {\n    vec2 pos = expand(position, normal, rad, miter);\n\n    sdf = sign(miter);\n\n    gl_Position = vec4(pos*viewSize, 0.0, 1.0);\n}\n"
+	module.exports = "/**\n * Drawing lines in a vertex shader, from https://mattdesl.svbtle.com/drawing-lines-is-hard#expanding-in-a-vertex-shader_2\n * Pushes a point along its normal by its radius.\n */\n\nprecision highp float;\n#define GLSLIFY 1\n\nattribute vec2 position;\n\nuniform vec2 viewSize;\n\nattribute vec2 normal;\nattribute float miter;\n\nuniform float rad;\n\nvarying float sdf;\n\n/**\n * Drawing lines, from https://mattdesl.svbtle.com/drawing-lines-is-hard#expanding-in-a-vertex-shader_2\n * Pushes a point along its normal by its radius, in the direction of miter.\n */\n\nvec2 expand(vec2 position, vec2 normal, float rad, float miter) {\n  return position+(normal*rad*miter);\n}\n\nvoid main() {\n  vec2 pos = expand(position, normal, rad, miter);\n\n  sdf = sign(miter);\n\n  gl_Position = vec4(pos*viewSize, 0.0, 1.0);\n}\n"
 
 /***/ }),
 /* 515 */
 /***/ (function(module, exports) {
 
-	module.exports = "/**\n * For a smooth line, check distance from line per-fragment.\n */\n\nprecision highp float;\n#define GLSLIFY 1\n\nuniform vec4 color;\n\nvarying float sdf;\n\nvoid main() {\n    gl_FragColor = vec4(color.rgb, color.a-abs(sdf));\n}\n"
+	module.exports = "/**\n * For a smooth line, check distance from line per-fragment.\n */\n\nprecision highp float;\n#define GLSLIFY 1\n\nuniform vec4 color;\n\nvarying float sdf;\n\nvoid main() {\n  gl_FragColor = vec4(color.rgb, color.a-abs(sdf));\n}\n"
 
 /***/ }),
 /* 516 */
 /***/ (function(module, exports) {
 
-	module.exports = "/**\n * Drawing lines in a vertex shader, from https://mattdesl.svbtle.com/drawing-lines-is-hard#expanding-in-a-vertex-shader_2\n * Pushes a point along its normal by its radius.\n */\n\nprecision highp float;\n#define GLSLIFY 1\n\nattribute vec2 position;\n\nuniform vec2 viewSize;\n\nattribute vec2 normal;\nattribute float miter;\n\nuniform float rad;\n\nuniform float speed;\nuniform float speedLimit;\n// uniform float time;\n\nattribute vec2 previous;\nattribute float time;\nattribute float dt;\n\nvarying vec4 values;\nvarying vec2 crest;\nvarying float sdf;\n\n/**\n * @requires {float} time The current time in ms\n */\n\nvec4 flow(vec2 vel) {\n    // Faster particles leave a greater influence (opacity).\n    // Linear interpolation - inaccurate for vectors, will it be OK without\n    // sudden turns, or do we need a per-fragment lookup?\n    return vec4(vel, time, length(vel));\n}\n\nvec4 flow(vec2 vel, float speedLimit) {\n    vec4 values = flow(vel);\n\n    return vec4(values.xyz, min(values.a/speedLimit, 1.0));\n}\n\n// #pragma glslify: flow = require(../flow/apply/screen, time = time, flowDecay = 0.001)\n\nvec2 perp(vec2 vec) {\n    return vec2(-vec.y, vec.x);\n}\n\nvec2 perp(vec2 vec, bool anti) {\n    return ((anti)? vec2(vec.y, -vec.x) : perp(vec));\n}\n\n/**\n * Drawing lines, from https://mattdesl.svbtle.com/drawing-lines-is-hard#expanding-in-a-vertex-shader_2\n * Pushes a point along its normal by its radius, in the direction of miter.\n */\n\nvec2 expand(vec2 position, vec2 normal, float rad, float miter) {\n    return position+(normal*rad*miter);\n}\n\nvoid main() {\n    sdf = sign(miter);\n\n    float rate = speed/max(dt, 1.0);\n\n    // @note For some reason, using these have different effects.\n    vec2 vel = (position-previous)*rate;\n    // vec2 vel = perp(normal, true)*length(position-previous)*rate;\n\n    values = flow(vel, speedLimit);\n\n    crest = normal*miter;\n\n    vec2 vert = expand(position, normal, rad*values.a, miter);\n\n    gl_Position = vec4(vert*viewSize, 0.0, 1.0);\n}\n"
+	module.exports = "/**\n * Drawing lines in a vertex shader, from https://mattdesl.svbtle.com/drawing-lines-is-hard#expanding-in-a-vertex-shader_2\n * Pushes a point along its normal by its radius.\n */\n\nprecision highp float;\n#define GLSLIFY 1\n\nattribute vec2 position;\n\nuniform vec2 viewSize;\n\nattribute vec2 normal;\nattribute float miter;\n\nuniform float rad;\n\nuniform float speed;\nuniform float speedLimit;\n// uniform float time;\n\nattribute vec2 previous;\nattribute float time;\nattribute float dt;\n\nvarying vec4 values;\nvarying vec2 crest;\nvarying float sdf;\n\n/**\n * @requires {float} time The current time in ms\n */\n\nvec4 flow(vec2 vel) {\n  // Faster particles leave a greater influence (opacity).\n  // Linear interpolation - inaccurate for vectors, will it be OK without\n  // sudden turns, or do we need a per-fragment lookup?\n  return vec4(vel, time, length(vel));\n}\n\nvec4 flow(vec2 vel, float speedLimit) {\n  vec4 values = flow(vel);\n\n  return vec4(values.xyz, min(values.a/speedLimit, 1.0));\n}\n\n// #pragma glslify: flow = require(../flow/apply/screen, time = time, flowDecay = 0.001)\n\nvec2 perp(vec2 vec) {\n  return vec2(-vec.y, vec.x);\n}\n\nvec2 perp(vec2 vec, bool anti) {\n  return ((anti)? vec2(vec.y, -vec.x) : perp(vec));\n}\n\n/**\n * Drawing lines, from https://mattdesl.svbtle.com/drawing-lines-is-hard#expanding-in-a-vertex-shader_2\n * Pushes a point along its normal by its radius, in the direction of miter.\n */\n\nvec2 expand(vec2 position, vec2 normal, float rad, float miter) {\n  return position+(normal*rad*miter);\n}\n\nvoid main() {\n  sdf = sign(miter);\n\n  float rate = speed/max(dt, 1.0);\n\n  // @note For some reason, using these have different effects.\n  vec2 vel = (position-previous)*rate;\n  // vec2 vel = perp(normal, true)*length(position-previous)*rate;\n\n  values = flow(vel, speedLimit);\n\n  crest = normal*miter;\n\n  vec2 vert = expand(position, normal, rad*values.a, miter);\n\n  gl_Position = vec4(vert*viewSize, 0.0, 1.0);\n}\n"
 
 /***/ }),
 /* 517 */
 /***/ (function(module, exports) {
 
-	module.exports = "precision highp float;\n#define GLSLIFY 1\n\n// Where the crest limit is (0 is the path direction, 1 is perpendicular/away).\nuniform float crestShape;\n\nvarying vec4 values;\nvarying vec2 crest;\nvarying float sdf;\n\nvoid main() {\n    float d = abs(sdf);\n    float speed = length(values.rg)*(1.0-d);\n\n    vec2 vel = normalize(mix(values.rg, crest, d*crestShape))*speed;\n\n    gl_FragColor = vec4(vel, values.b, values.a-d);\n}\n"
+	module.exports = "precision highp float;\n#define GLSLIFY 1\n\n// Where the crest limit is (0 is the path direction, 1 is perpendicular/away).\nuniform float crestShape;\n\nvarying vec4 values;\nvarying vec2 crest;\nvarying float sdf;\n\nvoid main() {\n  float d = abs(sdf);\n  float speed = length(values.rg)*(1.0-d);\n\n  vec2 vel = normalize(mix(values.rg, crest, d*crestShape))*speed;\n\n  gl_FragColor = vec4(vel, values.b, values.a-d);\n}\n"
 
 /***/ }),
 /* 518 */
@@ -29703,7 +29703,7 @@
 	'use strict';
 	
 	Object.defineProperty(exports, "__esModule", {
-	    value: true
+	  value: true
 	});
 	exports.filter = exports.filterList = undefined;
 	
@@ -29716,14 +29716,14 @@
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 	
 	var filterList = exports.filterList = function filterList(f, x) {
-	    var out = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : [];
-	    return (0, _reduce.reduceList)(function (acc, v, i) {
-	        if (f(v, i, x)) {
-	            acc.push(v);
-	        }
+	  var out = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : [];
+	  return (0, _reduce.reduceList)(function (acc, v, i) {
+	    if (f(v, i, x)) {
+	      acc.push(v);
+	    }
 	
-	        return acc;
-	    }, x, out);
+	    return acc;
+	  }, x, out);
 	};
 	
 	/**
@@ -29732,16 +29732,16 @@
 	 * properties.
 	 */
 	var filter = exports.filter = function filter(f, any) {
-	    var out = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : null;
-	    return (0, _reduce.reduceList)(function (acc, k, i, keys) {
-	        var v = any[k];
+	  var out = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : null;
+	  return (0, _reduce.reduceList)(function (acc, k, i, keys) {
+	    var v = any[k];
 	
-	        if (f(v, k, any, i, keys)) {
-	            (acc || (acc = {}))[k] = v;
-	        }
+	    if (f(v, k, any, i, keys)) {
+	      (acc || (acc = {}))[k] = v;
+	    }
 	
-	        return acc;
-	    }, (0, _iterable2.default)(any), out);
+	    return acc;
+	  }, (0, _iterable2.default)(any), out);
 	};
 	
 	exports.default = filter;
@@ -29911,7 +29911,7 @@
 	'use strict';
 	
 	Object.defineProperty(exports, "__esModule", {
-	    value: true
+	  value: true
 	});
 	exports.Blend = exports.defaults = undefined;
 	
@@ -29944,71 +29944,71 @@
 	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 	
 	var defaults = exports.defaults = function defaults() {
-	    return {
-	        shader: [_index2.default, _index4.default],
-	        views: [],
-	        alphas: [],
-	        resolution: [1, 1]
-	    };
+	  return {
+	    shader: [_index2.default, _index4.default],
+	    views: [],
+	    alphas: [],
+	    resolution: [1, 1]
+	  };
 	};
 	
 	var Blend = exports.Blend = function () {
-	    function Blend(gl, options) {
-	        _classCallCheck(this, Blend);
+	  function Blend(gl, options) {
+	    _classCallCheck(this, Blend);
 	
-	        this.gl = gl;
+	    this.gl = gl;
 	
-	        var params = Object.assign(defaults(), options);
+	    var params = Object.assign(defaults(), options);
 	
-	        this.shader = Array.isArray(params.shader) ? _glShader2.default.apply(undefined, [this.gl].concat(_toConsumableArray(params.shader))) : params.shader;
+	    this.shader = Array.isArray(params.shader) ? _glShader2.default.apply(undefined, [this.gl].concat(_toConsumableArray(params.shader))) : params.shader;
 	
-	        this.screen = new _2.default(gl);
+	    this.screen = new _2.default(gl);
 	
-	        this.views = params.views;
-	        this.alphas = params.alphas;
-	        this.resolution = params.resolution;
+	    this.views = params.views;
+	    this.alphas = params.alphas;
+	    this.resolution = params.resolution;
 	
-	        this.uniforms = {};
+	    this.uniforms = {};
+	  }
+	
+	  _createClass(Blend, [{
+	    key: 'draw',
+	    value: function draw(target) {
+	      var resolution = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : target && target.shape;
+	      var clear = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : true;
+	
+	      if (target) {
+	        target.bind();
+	      }
+	
+	      if (resolution) {
+	        this.gl.viewport(0, 0, resolution[0], resolution[1]);
+	        this.resolution = resolution;
+	      }
+	
+	      if (clear) {
+	        this.gl.clear(this.gl.COLOR_BUFFER_BIT);
+	      }
+	
+	      this.shader.bind();
+	
+	      Object.assign(this.shader.uniforms, this.uniforms, {
+	        views: (0, _map.mapList)(function (view, v) {
+	          return (view.color ? view.color[0] : view).bind(v);
+	        }, this.views, this.uniforms.views),
+	        alphas: this.alphas,
+	        resolution: this.resolution
+	      });
+	
+	      this.screen.render();
+	
+	      if (target) {
+	        this.gl.bindFramebuffer(this.gl.FRAMEBUFFER, null);
+	      }
 	    }
+	  }]);
 	
-	    _createClass(Blend, [{
-	        key: 'draw',
-	        value: function draw(target) {
-	            var resolution = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : target && target.shape;
-	            var clear = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : true;
-	
-	            if (target) {
-	                target.bind();
-	            }
-	
-	            if (resolution) {
-	                this.gl.viewport(0, 0, resolution[0], resolution[1]);
-	                this.resolution = resolution;
-	            }
-	
-	            if (clear) {
-	                this.gl.clear(this.gl.COLOR_BUFFER_BIT);
-	            }
-	
-	            this.shader.bind();
-	
-	            Object.assign(this.shader.uniforms, this.uniforms, {
-	                views: (0, _map.mapList)(function (view, v) {
-	                    return (view.color ? view.color[0] : view).bind(v);
-	                }, this.views, this.uniforms.views),
-	                alphas: this.alphas,
-	                resolution: this.resolution
-	            });
-	
-	            this.screen.render();
-	
-	            if (target) {
-	                this.gl.bindFramebuffer(this.gl.FRAMEBUFFER, null);
-	            }
-	        }
-	    }]);
-	
-	    return Blend;
+	  return Blend;
 	}();
 	
 	exports.default = Blend;
@@ -30017,13 +30017,13 @@
 /* 528 */
 /***/ (function(module, exports) {
 
-	module.exports = "precision highp float;\n#define GLSLIFY 1\n\nconst int numViews = 2;\n\nvec4 preAlpha(vec3 color, float alpha) {\n    return vec4(color.rgb*alpha, alpha);\n}\n\nvec4 preAlpha(vec4 color) {\n    return preAlpha(color.rgb, color.a);\n}\n\nvec4 blend(vec4 sum, vec4 color, float alpha) {\n    return sum+preAlpha(color.rgb, color.a*alpha);\n}\n\n/**\n * Color summation from multiple views, each blending with a global alpha.\n *\n * @requires {float} numViews The number of source views to blend together\n * @requires {function} blend A function blending a source buffer into a sum\n */\n\nuniform sampler2D views[numViews];\nuniform float alphas[numViews];\nuniform vec2 resolution;\n\nvoid main() {\n    vec2 uv = gl_FragCoord.xy/resolution;\n\n    // Accumulate colors\n    \n    vec4 sum = vec4(0.0);\n\n    for(int i = 0; i < numViews; ++i) {\n        vec4 color = texture2D(views[i], uv);\n\n        // Pre-multiplied alpha so they don't cross over\n        sum = blend(sum, color, alphas[i]);\n    }\n\n    gl_FragColor = sum;\n}\n\n"
+	module.exports = "precision highp float;\n#define GLSLIFY 1\n\nconst int numViews = 2;\n\nvec4 preAlpha(vec3 color, float alpha) {\n  return vec4(color.rgb*alpha, alpha);\n}\n\nvec4 preAlpha(vec4 color) {\n  return preAlpha(color.rgb, color.a);\n}\n\nvec4 blend(vec4 sum, vec4 color, float alpha) {\n  return sum+preAlpha(color.rgb, color.a*alpha);\n}\n\n/**\n * Color summation from multiple views, each blending with a global alpha.\n *\n * @requires {float} numViews The number of source views to blend together\n * @requires {function} blend A function blending a source buffer into a sum\n */\n\nuniform sampler2D views[numViews];\nuniform float alphas[numViews];\nuniform vec2 resolution;\n\nvoid main() {\n  vec2 uv = gl_FragCoord.xy/resolution;\n\n  // Accumulate colors\n\n  vec4 sum = vec4(0.0);\n\n  for(int i = 0; i < numViews; ++i) {\n    vec4 color = texture2D(views[i], uv);\n\n    // Pre-multiplied alpha so they don't cross over\n    sum = blend(sum, color, alphas[i]);\n  }\n\n  gl_FragColor = sum;\n}\n\n"
 
 /***/ }),
 /* 529 */
 /***/ (function(module, exports) {
 
-	module.exports = "/**\n * A vignette hash blur\n * @todo Make the `const`s here into `uniform`s.\n */\n\nprecision highp float;\n#define GLSLIFY 1\n\nuniform sampler2D view;\nuniform vec2 resolution;\nuniform float time;\nuniform float radius;\nuniform float limit;\n\nvec3 sampler(vec2 uv) {\n    return texture2D(view, uv).rgb;\n}\n\nhighp float random(vec2 co)\n{\n    highp float a = 12.9898;\n    highp float b = 78.233;\n    highp float c = 43758.5453;\n    highp float dt= dot(co.xy ,vec2(a,b));\n    highp float sn= mod(dt,3.14);\n    return fract(sin(sn) * c);\n}\n\n#ifndef TAU\n  #define TAU 6.28318530718\n#endif\n\n//Use last part of hash function to generate new random radius and angle\nvec2 mult(inout vec2 r) {\n  r = fract(r * vec2(12.9898,78.233));\n  return sqrt(r.x + .001) * vec2(sin(r.y * TAU), cos(r.y * TAU));\n}\n\nvec3 blur(vec2 uv, float radius, float aspect, float offset) {\n  vec2 circle = vec2(radius);\n  circle.x *= aspect;\n  vec2 rnd = vec2(random(vec2(uv + offset)));\n\n  vec3 acc = vec3(0.0);\n  for (int i = 0; i < 20; i++) {\n    acc += sampler(uv + circle * mult(rnd)).xyz;\n  }\n  return acc / float(20);\n}\n\nvec3 blur(vec2 uv, float radius, float aspect) {\n  return blur(uv, radius, aspect, 0.0);\n}\n\nvec3 blur(vec2 uv, float radius) {\n  return blur(uv, radius, 1.0);\n}\n\n/**\n * Adapted from `bezier`.\n */\n\nfloat bezier(vec2 cp, float t) {\n    return cp.x+(cp.y-cp.x)*t;\n}\n\nfloat bezier(vec3 cp, float t) {\n    float ut = 1.0-t;\n\n    return (cp.x*ut+cp.y*t)*ut+(cp.y*ut+cp.z*t)*t;\n}\n\nfloat bezier(vec4 cp, float t) {\n    float ut = 1.0-t;\n    float a1 = cp.y*ut+cp.z*t;\n\n    return ((cp.x*ut+cp.y*t)*ut+a1*t)*ut+(a1*ut+(cp.z*ut+cp.w*t)*t)*t;\n}\n\n// @todo Remove the `1.0-` here?\nfloat amount_0(vec2 point, vec2 mid, float limit) {\n    return min(1.0-(length(point-mid)/limit), 1.0);\n}\n\nfloat vignette(vec2 point, vec2 mid, float limit) {\n    return max(0.0, amount_0(point, mid, limit));\n}\n\nfloat vignette(vec2 point, vec2 mid, float limit, float curve) {\n    return max(0.0, curve*amount_0(point, mid, limit));\n}\n\nfloat vignette(vec2 point, vec2 mid, float limit, vec2 curve) {\n    return max(0.0, bezier(curve, amount_0(point, mid, limit)));\n}\n\nfloat vignette(vec2 point, vec2 mid, float limit, vec3 curve) {\n    return max(0.0, bezier(curve, amount_0(point, mid, limit)));\n}\n\nfloat vignette(vec2 point, vec2 mid, float limit, vec4 curve) {\n    return max(0.0, bezier(curve, amount_0(point, mid, limit)));\n}\n\nconst vec3 falloff = vec3(0.0, 1.0, 1.0);\nconst vec2 mid = vec2(0.5);\n\nvoid main() {\n    vec2 uv = gl_FragCoord.xy/resolution;\n    float texel = 1.0/min(resolution.x, resolution.y);\n    float amount = (1.0-vignette(uv, mid, limit, falloff))*texel;\n    float aspect = resolution.x/resolution.y;\n    float jitter = mod(time, 20.0);\n\n    gl_FragColor = vec4(blur(uv, radius*amount, aspect, jitter),\n            texture2D(view, uv).a);\n}\n"
+	module.exports = "/**\n * A vignette hash blur\n * @todo Make the `const`s here into `uniform`s.\n */\n\nprecision highp float;\n#define GLSLIFY 1\n\nuniform sampler2D view;\nuniform vec2 resolution;\nuniform float time;\nuniform float radius;\nuniform float limit;\n\nvec3 sampler(vec2 uv) {\n  return texture2D(view, uv).rgb;\n}\n\nhighp float random(vec2 co)\n{\n    highp float a = 12.9898;\n    highp float b = 78.233;\n    highp float c = 43758.5453;\n    highp float dt= dot(co.xy ,vec2(a,b));\n    highp float sn= mod(dt,3.14);\n    return fract(sin(sn) * c);\n}\n\n#ifndef TAU\n  #define TAU 6.28318530718\n#endif\n\n//Use last part of hash function to generate new random radius and angle\nvec2 mult(inout vec2 r) {\n  r = fract(r * vec2(12.9898,78.233));\n  return sqrt(r.x + .001) * vec2(sin(r.y * TAU), cos(r.y * TAU));\n}\n\nvec3 blur(vec2 uv, float radius, float aspect, float offset) {\n  vec2 circle = vec2(radius);\n  circle.x *= aspect;\n  vec2 rnd = vec2(random(vec2(uv + offset)));\n\n  vec3 acc = vec3(0.0);\n  for (int i = 0; i < 20; i++) {\n    acc += sampler(uv + circle * mult(rnd)).xyz;\n  }\n  return acc / float(20);\n}\n\nvec3 blur(vec2 uv, float radius, float aspect) {\n  return blur(uv, radius, aspect, 0.0);\n}\n\nvec3 blur(vec2 uv, float radius) {\n  return blur(uv, radius, 1.0);\n}\n\n/**\n * Adapted from `bezier`.\n */\n\nfloat bezier(vec2 cp, float t) {\n  return cp.x+(cp.y-cp.x)*t;\n}\n\nfloat bezier(vec3 cp, float t) {\n  float ut = 1.0-t;\n\n  return (cp.x*ut+cp.y*t)*ut+(cp.y*ut+cp.z*t)*t;\n}\n\nfloat bezier(vec4 cp, float t) {\n  float ut = 1.0-t;\n  float a1 = cp.y*ut+cp.z*t;\n\n  return ((cp.x*ut+cp.y*t)*ut+a1*t)*ut+(a1*ut+(cp.z*ut+cp.w*t)*t)*t;\n}\n\n// @todo Remove the `1.0-` here?\nfloat amount_0(vec2 point, vec2 mid, float limit) {\n  return min(1.0-(length(point-mid)/limit), 1.0);\n}\n\nfloat vignette(vec2 point, vec2 mid, float limit) {\n  return max(0.0, amount_0(point, mid, limit));\n}\n\nfloat vignette(vec2 point, vec2 mid, float limit, float curve) {\n  return max(0.0, curve*amount_0(point, mid, limit));\n}\n\nfloat vignette(vec2 point, vec2 mid, float limit, vec2 curve) {\n  return max(0.0, bezier(curve, amount_0(point, mid, limit)));\n}\n\nfloat vignette(vec2 point, vec2 mid, float limit, vec3 curve) {\n  return max(0.0, bezier(curve, amount_0(point, mid, limit)));\n}\n\nfloat vignette(vec2 point, vec2 mid, float limit, vec4 curve) {\n  return max(0.0, bezier(curve, amount_0(point, mid, limit)));\n}\n\nconst vec3 falloff = vec3(0.0, 1.0, 1.0);\nconst vec2 mid = vec2(0.5);\n\nvoid main() {\n  vec2 uv = gl_FragCoord.xy/resolution;\n  float texel = 1.0/min(resolution.x, resolution.y);\n  float amount = (1.0-vignette(uv, mid, limit, falloff))*texel;\n  float aspect = resolution.x/resolution.y;\n  float jitter = mod(time, 20.0);\n\n  gl_FragColor = vec4(blur(uv, radius*amount, aspect, jitter),\n      texture2D(view, uv).a);\n}\n"
 
 /***/ }),
 /* 530 */
@@ -30032,7 +30032,7 @@
 	'use strict';
 	
 	Object.defineProperty(exports, "__esModule", {
-	    value: true
+	  value: true
 	});
 	exports.OpticalFlow = exports.defaults = undefined;
 	
@@ -30074,73 +30074,73 @@
 	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 	
 	var defaults = exports.defaults = function defaults() {
-	    return {
-	        options: {
-	            shader: [_index2.default, _index4.default],
-	            buffers: [[[1, 1]], [[1, 1]]]
-	        },
-	        uniforms: {
-	            imageSize: [1, 1],
-	            viewSize: [1, 1],
-	            offset: 1,
-	            lambda: 0.001,
-	            speed: 1,
-	            speedLimit: 1,
-	            time: 1
-	        }
-	    };
+	  return {
+	    options: {
+	      shader: [_index2.default, _index4.default],
+	      buffers: [[[1, 1]], [[1, 1]]]
+	    },
+	    uniforms: {
+	      imageSize: [1, 1],
+	      viewSize: [1, 1],
+	      offset: 1,
+	      lambda: 0.001,
+	      speed: 1,
+	      speedLimit: 1,
+	      time: 1
+	    }
+	  };
 	};
 	
 	var OpticalFlow = exports.OpticalFlow = function () {
-	    function OpticalFlow(gl, options, uniforms) {
-	        var _this = this;
+	  function OpticalFlow(gl, options, uniforms) {
+	    var _this = this;
 	
-	        _classCallCheck(this, OpticalFlow);
+	    _classCallCheck(this, OpticalFlow);
 	
-	        this.gl = gl;
+	    this.gl = gl;
 	
-	        var base = defaults();
-	        var params = Object.assign(base.options, options);
+	    var base = defaults();
+	    var params = Object.assign(base.options, options);
 	
-	        this.shader = Array.isArray(params.shader) ? _glShader2.default.apply(undefined, [this.gl].concat(_toConsumableArray(params.shader))) : params.shader;
+	    this.shader = Array.isArray(params.shader) ? _glShader2.default.apply(undefined, [this.gl].concat(_toConsumableArray(params.shader))) : params.shader;
 	
-	        this.buffers = (0, _map2.default)(function (buffer) {
-	            return Array.isArray(buffer) ? _glFbo2.default.apply(undefined, [_this.gl].concat(_toConsumableArray(buffer))) : buffer;
-	        }, params.buffers);
+	    this.buffers = (0, _map2.default)(function (buffer) {
+	      return Array.isArray(buffer) ? _glFbo2.default.apply(undefined, [_this.gl].concat(_toConsumableArray(buffer))) : buffer;
+	    }, params.buffers);
 	
-	        this.uniforms = Object.assign(base.uniforms, uniforms);
+	    this.uniforms = Object.assign(base.uniforms, uniforms);
+	  }
+	
+	  _createClass(OpticalFlow, [{
+	    key: 'update',
+	    value: function update(uniforms) {
+	      this.shader.bind();
+	
+	      Object.assign(this.shader.uniforms, {
+	        view: this.buffers[0].color[0].bind(1),
+	        last: this.buffers[1].color[0].bind(2)
+	      }, this.uniforms, uniforms);
 	    }
+	  }, {
+	    key: 'step',
+	    value: function step() {
+	      (0, _utils.step)(this.buffers);
+	    }
+	  }, {
+	    key: 'setPixels',
+	    value: function setPixels(pixels) {
+	      return this.buffers[0].color[0].setPixels(pixels);
+	    }
+	  }, {
+	    key: 'resize',
+	    value: function resize(size) {
+	      (0, _each2.default)(function (buffer) {
+	        return buffer.shape = size;
+	      }, this.buffers);
+	    }
+	  }]);
 	
-	    _createClass(OpticalFlow, [{
-	        key: 'update',
-	        value: function update(uniforms) {
-	            this.shader.bind();
-	
-	            Object.assign(this.shader.uniforms, {
-	                view: this.buffers[0].color[0].bind(1),
-	                last: this.buffers[1].color[0].bind(2)
-	            }, this.uniforms, uniforms);
-	        }
-	    }, {
-	        key: 'step',
-	        value: function step() {
-	            (0, _utils.step)(this.buffers);
-	        }
-	    }, {
-	        key: 'setPixels',
-	        value: function setPixels(pixels) {
-	            return this.buffers[0].color[0].setPixels(pixels);
-	        }
-	    }, {
-	        key: 'resize',
-	        value: function resize(size) {
-	            (0, _each2.default)(function (buffer) {
-	                return buffer.shape = size;
-	            }, this.buffers);
-	        }
-	    }]);
-	
-	    return OpticalFlow;
+	  return OpticalFlow;
 	}();
 	
 	exports.default = OpticalFlow;
@@ -30149,7 +30149,7 @@
 /* 531 */
 /***/ (function(module, exports) {
 
-	module.exports = "/**\n * @see https://forum.openframeworks.cc/t/ofxflowtools-optical-flow-fluid-dynamics-and-particles-in-glsl/15470\n * @see https://github.com/moostrik/ofxFlowTools\n * @see https://github.com/diwi/PixelFlow\n * @see http://thomasdiewald.com/blog/?p=2766\n * @see https://adamferriss.com/gush/\n * @see https://github.com/princemio/ofxMIOFlowGLSL/blob/master/src/FlowShader.cpp\n */\n\nprecision highp float;\n#define GLSLIFY 1\n\nuniform sampler2D view;\nuniform sampler2D last;\n\nuniform vec2 viewSize;\n\nuniform float offset;\nuniform float lambda;\n\nuniform float time;\nuniform float speed;\nuniform float speedLimit;\n\nvarying vec2 uv;\n\n/**\n * Adapted from `bezier`.\n */\n\nfloat bezier(vec2 cp, float t) {\n    return cp.x+(cp.y-cp.x)*t;\n}\n\nfloat bezier(vec3 cp, float t) {\n    float ut = 1.0-t;\n\n    return (cp.x*ut+cp.y*t)*ut+(cp.y*ut+cp.z*t)*t;\n}\n\nfloat bezier(vec4 cp, float t) {\n    float ut = 1.0-t;\n    float a1 = cp.y*ut+cp.z*t;\n\n    return ((cp.x*ut+cp.y*t)*ut+a1*t)*ut+(a1*ut+(cp.z*ut+cp.w*t)*t)*t;\n}\n\nvec4 grayScale(vec4 color) {\n\treturn vec4(vec3(dot(color.rgb, vec3(0.3, 0.59, 0.11))), 1.0);\n}\n\n/**\n * @requires {float} time The current time in ms\n */\n\nvec4 flow(vec2 vel) {\n    // Faster particles leave a greater influence (opacity).\n    // Linear interpolation - inaccurate for vectors, will it be OK without\n    // sudden turns, or do we need a per-fragment lookup?\n    return vec4(vel, time, length(vel));\n}\n\nvec4 flow(vec2 vel, float speedLimit) {\n    vec4 values = flow(vel);\n\n    return vec4(values.xyz, min(values.a/speedLimit, 1.0));\n}\n\nfloat map(float value, float inMin, float inMax, float outMin, float outMax) {\n  return outMin + (outMax - outMin) * (value - inMin) / (inMax - inMin);\n}\n\nvec2 map(vec2 value, vec2 inMin, vec2 inMax, vec2 outMin, vec2 outMax) {\n  return outMin + (outMax - outMin) * (value - inMin) / (inMax - inMin);\n}\n\nvec3 map(vec3 value, vec3 inMin, vec3 inMax, vec3 outMin, vec3 outMax) {\n  return outMin + (outMax - outMin) * (value - inMin) / (inMax - inMin);\n}\n\nvec4 map(vec4 value, vec4 inMin, vec4 inMax, vec4 outMin, vec4 outMax) {\n  return outMin + (outMax - outMin) * (value - inMin) / (inMax - inMin);\n}\n\nconst vec4 posRange = vec4(-1.0, -1.0, 1.0, 1.0);\n\nconst vec4 uvRange = vec4(0.0, 0.0, 1.0, 1.0);\n\nvec2 posToUV(vec2 pos) {\n    return map(pos, posRange.xy, posRange.zw, uvRange.xy, uvRange.zw);\n}\n\nconst vec2 zero = vec2(0.0);\nconst vec2 flipUV = vec2(-1.0);\nconst vec3 falloff = vec3(0.0, 0.0, 1.0);\n/*\nvec4 mapColor(vec2 vec, vec2 scale) {\n    vec2 x = vec2(max(vec.x, 0.0), abs(min(vec.x, 0.0)))*scale.x;\n    vec2 y = vec2(max(vec.y, 0.0), abs(min(vec.y, 0.0)))*scale.y;\n\n    float dirY = ((y.x > y.y)? 0.9 : 1.0);\n\n    return vec4(x.xy, max(y.x, y.y), dirY);\n}*/\n\n#if 1\n    vec4 pixel(sampler2D texture, vec2 uv) {\n        return grayScale(texture2D(texture, uv));\n    }\n#else\n    vec4 pixel(sampler2D texture, vec2 uv) {\n        return texture2D(texture, uv);\n    }\n#endif\n\nvoid main() {\n    vec2 st = posToUV(uv*flipUV/viewSize);\n\n    vec2 offsetX = vec2(offset, 0.0);\n    vec2 offsetY = vec2(0.0, offset);\n\n    // Gradient\n\n    vec4 gradX = (pixel(view, st+offsetX)-pixel(view, st-offsetX))+\n        (pixel(last, st+offsetX)-pixel(last, st-offsetX));\n\n    vec4 gradY = (pixel(view, st+offsetY)-pixel(view, st-offsetY))+\n        (pixel(last, st+offsetY)-pixel(last, st-offsetY));\n\n    vec4 gradMag = sqrt((gradX*gradX)+(gradY*gradY)+vec4(lambda));\n\n    // Difference\n    vec4 diff = pixel(view, st)-pixel(last, st);\n\n    // vec2 vec = vec2((diff*(gradX/gradMag)).x, (diff*(gradY/gradMag)).x);\n\n    // gl_FragColor = mapColor(vec, scale);\n\n    vec2 vec = vec2((diff*(gradX/gradMag)).x, (diff*(gradY/gradMag)).x)*speed;\n\n    gl_FragColor = flow(bezier(falloff, length(vec)/speedLimit)*vec, speedLimit);\n}\n"
+	module.exports = "/**\n * @see https://forum.openframeworks.cc/t/ofxflowtools-optical-flow-fluid-dynamics-and-particles-in-glsl/15470\n * @see https://github.com/moostrik/ofxFlowTools\n * @see https://github.com/diwi/PixelFlow\n * @see http://thomasdiewald.com/blog/?p=2766\n * @see https://adamferriss.com/gush/\n * @see https://github.com/princemio/ofxMIOFlowGLSL/blob/master/src/FlowShader.cpp\n */\n\nprecision highp float;\n#define GLSLIFY 1\n\nuniform sampler2D view;\nuniform sampler2D last;\n\nuniform vec2 viewSize;\n\nuniform float offset;\nuniform float lambda;\n\nuniform float time;\nuniform float speed;\nuniform float speedLimit;\n\nvarying vec2 uv;\n\n/**\n * Adapted from `bezier`.\n */\n\nfloat bezier(vec2 cp, float t) {\n  return cp.x+(cp.y-cp.x)*t;\n}\n\nfloat bezier(vec3 cp, float t) {\n  float ut = 1.0-t;\n\n  return (cp.x*ut+cp.y*t)*ut+(cp.y*ut+cp.z*t)*t;\n}\n\nfloat bezier(vec4 cp, float t) {\n  float ut = 1.0-t;\n  float a1 = cp.y*ut+cp.z*t;\n\n  return ((cp.x*ut+cp.y*t)*ut+a1*t)*ut+(a1*ut+(cp.z*ut+cp.w*t)*t)*t;\n}\n\nvec4 grayScale(vec4 color) {\n\treturn vec4(vec3(dot(color.rgb, vec3(0.3, 0.59, 0.11))), 1.0);\n}\n\n/**\n * @requires {float} time The current time in ms\n */\n\nvec4 flow(vec2 vel) {\n  // Faster particles leave a greater influence (opacity).\n  // Linear interpolation - inaccurate for vectors, will it be OK without\n  // sudden turns, or do we need a per-fragment lookup?\n  return vec4(vel, time, length(vel));\n}\n\nvec4 flow(vec2 vel, float speedLimit) {\n  vec4 values = flow(vel);\n\n  return vec4(values.xyz, min(values.a/speedLimit, 1.0));\n}\n\nfloat map(float value, float inMin, float inMax, float outMin, float outMax) {\n  return outMin + (outMax - outMin) * (value - inMin) / (inMax - inMin);\n}\n\nvec2 map(vec2 value, vec2 inMin, vec2 inMax, vec2 outMin, vec2 outMax) {\n  return outMin + (outMax - outMin) * (value - inMin) / (inMax - inMin);\n}\n\nvec3 map(vec3 value, vec3 inMin, vec3 inMax, vec3 outMin, vec3 outMax) {\n  return outMin + (outMax - outMin) * (value - inMin) / (inMax - inMin);\n}\n\nvec4 map(vec4 value, vec4 inMin, vec4 inMax, vec4 outMin, vec4 outMax) {\n  return outMin + (outMax - outMin) * (value - inMin) / (inMax - inMin);\n}\n\nconst vec4 posRange = vec4(-1.0, -1.0, 1.0, 1.0);\n\nconst vec4 uvRange = vec4(0.0, 0.0, 1.0, 1.0);\n\nvec2 posToUV(vec2 pos) {\n  return map(pos, posRange.xy, posRange.zw, uvRange.xy, uvRange.zw);\n}\n\nconst vec2 zero = vec2(0.0);\nconst vec2 flipUV = vec2(-1.0);\nconst vec3 falloff = vec3(0.0, 0.0, 1.0);\n/*\nvec4 mapColor(vec2 vec, vec2 scale) {\n  vec2 x = vec2(max(vec.x, 0.0), abs(min(vec.x, 0.0)))*scale.x;\n  vec2 y = vec2(max(vec.y, 0.0), abs(min(vec.y, 0.0)))*scale.y;\n\n  float dirY = ((y.x > y.y)? 0.9 : 1.0);\n\n  return vec4(x.xy, max(y.x, y.y), dirY);\n}*/\n\n#if 1\n  vec4 pixel(sampler2D texture, vec2 uv) {\n    return grayScale(texture2D(texture, uv));\n  }\n#else\n  vec4 pixel(sampler2D texture, vec2 uv) {\n    return texture2D(texture, uv);\n  }\n#endif\n\nvoid main() {\n  vec2 st = posToUV(uv*flipUV/viewSize);\n\n  vec2 offsetX = vec2(offset, 0.0);\n  vec2 offsetY = vec2(0.0, offset);\n\n  // Gradient\n\n  vec4 gradX = (pixel(view, st+offsetX)-pixel(view, st-offsetX))+\n    (pixel(last, st+offsetX)-pixel(last, st-offsetX));\n\n  vec4 gradY = (pixel(view, st+offsetY)-pixel(view, st-offsetY))+\n    (pixel(last, st+offsetY)-pixel(last, st-offsetY));\n\n  vec4 gradMag = sqrt((gradX*gradX)+(gradY*gradY)+vec4(lambda));\n\n  // Difference\n  vec4 diff = pixel(view, st)-pixel(last, st);\n\n  // vec2 vec = vec2((diff*(gradX/gradMag)).x, (diff*(gradY/gradMag)).x);\n\n  // gl_FragColor = mapColor(vec, scale);\n\n  vec2 vec = vec2((diff*(gradX/gradMag)).x, (diff*(gradY/gradMag)).x)*speed;\n\n  gl_FragColor = flow(bezier(falloff, length(vec)/speedLimit)*vec, speedLimit);\n}\n"
 
 /***/ }),
 /* 532 */
@@ -30158,7 +30158,7 @@
 	"use strict";
 	
 	Object.defineProperty(exports, "__esModule", {
-	    value: true
+	  value: true
 	});
 	/**
 	 * Returns a wrap of the function `f`, which accumulates the arguments of each
@@ -30166,19 +30166,19 @@
 	 * the previously accumulated arguments.
 	 */
 	var part = exports.part = function part(f) {
-	    return function () {
-	        for (var _len = arguments.length, rest = Array(_len), _key = 0; _key < _len; _key++) {
-	            rest[_key] = arguments[_key];
-	        }
+	  return function () {
+	    for (var _len = arguments.length, rest = Array(_len), _key = 0; _key < _len; _key++) {
+	      rest[_key] = arguments[_key];
+	    }
 	
-	        return rest.length ? part(function () {
-	            for (var _len2 = arguments.length, next = Array(_len2), _key2 = 0; _key2 < _len2; _key2++) {
-	                next[_key2] = arguments[_key2];
-	            }
+	    return rest.length ? part(function () {
+	      for (var _len2 = arguments.length, next = Array(_len2), _key2 = 0; _key2 < _len2; _key2++) {
+	        next[_key2] = arguments[_key2];
+	      }
 	
-	            return f.apply(undefined, rest.concat(next));
-	        }) : f();
-	    };
+	      return f.apply(undefined, rest.concat(next));
+	    }) : f();
+	  };
 	};
 	
 	/**
@@ -30187,20 +30187,20 @@
 	 * `arity`.
 	 */
 	var curry = exports.curry = function curry(f) {
-	    var arity = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : f.length;
-	    return function () {
-	        for (var _len3 = arguments.length, rest = Array(_len3), _key3 = 0; _key3 < _len3; _key3++) {
-	            rest[_key3] = arguments[_key3];
-	        }
+	  var arity = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : f.length;
+	  return function () {
+	    for (var _len3 = arguments.length, rest = Array(_len3), _key3 = 0; _key3 < _len3; _key3++) {
+	      rest[_key3] = arguments[_key3];
+	    }
 	
-	        return arity > rest.length ? curry(function () {
-	            for (var _len4 = arguments.length, next = Array(_len4), _key4 = 0; _key4 < _len4; _key4++) {
-	                next[_key4] = arguments[_key4];
-	            }
+	    return arity > rest.length ? curry(function () {
+	      for (var _len4 = arguments.length, next = Array(_len4), _key4 = 0; _key4 < _len4; _key4++) {
+	        next[_key4] = arguments[_key4];
+	      }
 	
-	            return f.apply(undefined, rest.concat(next));
-	        }, arity - rest.length) : f.apply(undefined, rest);
-	    };
+	      return f.apply(undefined, rest.concat(next));
+	    }, arity - rest.length) : f.apply(undefined, rest);
+	  };
 	};
 	
 	exports.default = part;
@@ -30228,32 +30228,32 @@
 	 */
 	
 	var readyCallbacks = {
-	    loading: function loading() {
-	        document.addEventListener('readystatechange', updateState);
-	    },
-	    interactive: function interactive() {
-	        var canvas = document.querySelector('canvas');
+	  loading: function loading() {
+	    document.addEventListener('readystatechange', updateState);
+	  },
+	  interactive: function interactive() {
+	    var canvas = document.querySelector('canvas');
 	
-	        (0, _demo2.default)(canvas);
-	        canvas.classList.add('epok-dark');
+	    (0, _demo2.default)(canvas);
+	    canvas.classList.add('epok-dark');
 	
-	        document.removeEventListener('readystatechange', updateState);
-	    }
+	    document.removeEventListener('readystatechange', updateState);
+	  }
 	};
 	var last = 0;
 	
 	function updateState() {
-	    for (var s = readyStates.indexOf(document.readyState); last <= s; ++last) {
-	        var callback = readyCallbacks[readyStates[last]];
+	  for (var s = readyStates.indexOf(document.readyState); last <= s; ++last) {
+	    var callback = readyCallbacks[readyStates[last]];
 	
-	        if (callback) {
-	            try {
-	                callback();
-	            } catch (e) {
-	                console.error(e);
-	            }
-	        }
+	    if (callback) {
+	      try {
+	        callback();
+	      } catch (e) {
+	        console.error(e);
+	      }
 	    }
+	  }
 	}
 	
 	updateState();

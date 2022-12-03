@@ -1,24 +1,24 @@
 # Portfolio
 
 - Layout
-    - Big
-        - Logo in the middle, bio and links on the left, showcase nav on the right
-    - Little
-        - Logo center top, scroll down for the rest (and what happens in the background?)
+  - Big
+    - Logo in the middle, bio and links on the left, showcase nav on the right
+  - Little
+    - Logo center top, scroll down for the rest (and what happens in the background?)
 - Tendrils showcase
-    - Light logo in the middle, light background, dark tendrils explode from central circle to separate logo from background.
-    - Later, get vector info from the logo SVG and use it to influence flow.
-    - Hide controls etc, or maybe keep it separate and link to the Trust visuals?
+  - Light logo in the middle, light background, dark tendrils explode from central circle to separate logo from background.
+  - Later, get vector info from the logo SVG and use it to influence flow.
+  - Hide controls etc, or maybe keep it separate and link to the Trust visuals?
 - Content
-    - Left
-        - Intro
-            - Name? Scramble the letters as a gag on the spelling?
-            - Brief one-liner of skills and interests
-                - Graded highlight to surface critical info versus scan-readers?
-            - CV and platform links
-        - Demo list
-    - Right
-        - Demo controls/context
+  - Left
+    - Intro
+      - Name? Scramble the letters as a gag on the spelling?
+      - Brief one-liner of skills and interests
+        - Graded highlight to surface critical info versus scan-readers?
+      - CV and platform links
+    - Demo list
+  - Right
+    - Demo controls/context
 
 
 # Tendrils - Max Cooper

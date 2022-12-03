@@ -5,6 +5,6 @@ import { mapList } from './map';
  * given arguments rearranged according to the sequence of `order`.
  */
 export const reArg = (f, ...order) => (...rest) =>
-    f(...mapList((v, i) => rest[((i >= order.length)? i : order[i])], rest));
+  f(...mapList((v, i) => rest[((i >= order.length)? i : order[i])], rest));
 
 export default reArg;

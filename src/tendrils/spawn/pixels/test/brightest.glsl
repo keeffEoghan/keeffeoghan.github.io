@@ -5,7 +5,7 @@
 #pragma glslify: luma = require(glsl-luma)
 
 float test(vec4 data) {
-    return luma(data);
+  return luma(data);
 }
 
 #pragma glslify: export(test)

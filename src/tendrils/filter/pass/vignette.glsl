@@ -7,7 +7,7 @@
 #pragma glslify: vignette = require(../vignette)
 
 vec4 pass(vec2 uv, vec4 pixel) {
-    return pixel*vignette(uv, mid, limit, curve);
+  return pixel*vignette(uv, mid, limit, curve);
 }
 
 #pragma glslify: export(pass)

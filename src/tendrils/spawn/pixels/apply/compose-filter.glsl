@@ -8,7 +8,7 @@
  */
 
 vec4 compose(vec2 uv, vec2 pos, vec4 pixel) {
-    return apply(uv, pos, pass(uv, pixel));
+  return apply(uv, pos, pass(uv, pixel));
 }
 
 #pragma glslify: export(compose)

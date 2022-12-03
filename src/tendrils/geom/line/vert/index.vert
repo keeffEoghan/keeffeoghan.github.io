@@ -5,9 +5,9 @@ varying float sdf;
 #pragma glslify: expand = require(../expand)
 
 void main() {
-    vec2 pos = expand(position, normal, rad, miter);
+  vec2 pos = expand(position, normal, rad, miter);
 
-    sdf = sign(miter);
+  sdf = sign(miter);
 
-    gl_Position = vec4(pos*viewSize, 0.0, 1.0);
+  gl_Position = vec4(pos*viewSize, 0.0, 1.0);
 }

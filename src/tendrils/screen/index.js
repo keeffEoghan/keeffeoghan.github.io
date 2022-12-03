@@ -5,11 +5,11 @@
 import Triangle from 'gl-big-triangle';
 
 export class Screen extends Triangle {
-    render() {
-        super.bind();
-        super.draw();
-        super.unbind();
-    }
+  render() {
+    super.bind();
+    super.draw();
+    super.unbind();
+  }
 }
 
 export default Screen;

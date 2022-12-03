@@ -6,7 +6,7 @@
 #pragma glslify: length2 = require(../../../utils/length-2)
 
 float test(vec4 data) {
-    return length2(data.zw);
+  return length2(data.zw);
 }
 
 #pragma glslify: export(test)

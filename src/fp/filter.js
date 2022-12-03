@@ -2,13 +2,11 @@ import { reduceList } from './reduce';
 import iterable from './iterable';
 
 export const filterList = (f, x, out = []) => reduceList((acc, v, i) => {
-        if(f(v, i, x)) {
-            acc.push(v);
-        }
+    if(f(v, i, x)) { acc.push(v); }
 
-        return acc;
-    },
-    x, out);
+    return acc;
+  },
+  x, out);
 
 /**
  * Map any type of object.
@@ -16,15 +14,13 @@ export const filterList = (f, x, out = []) => reduceList((acc, v, i) => {
  * properties.
  */
 export const filter = (f, any, out = null) => reduceList((acc, k, i, keys) => {
-        const v = any[k];
+    const v = any[k];
 
-        if(f(v, k, any, i, keys)) {
-            (acc || (acc = {}))[k] = v;
-        }
+    if(f(v, k, any, i, keys)) { (acc || (acc = {}))[k] = v; }
 
-        return acc;
-    },
-    iterable(any), out);
+    return acc;
+  },
+  iterable(any), out);
 
 
 export default filter;

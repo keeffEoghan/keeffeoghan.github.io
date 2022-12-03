@@ -10,33 +10,33 @@ const readyStates = ['loading', 'interactive', 'complete'];
 
 // Load in stages.
 let readyCallbacks = {
-    loading() {
-        document.addEventListener('readystatechange', updateState);
-    },
-    interactive() {
-        const canvas = document.querySelector('canvas');
+  loading() {
+    document.addEventListener('readystatechange', updateState);
+  },
+  interactive() {
+    const canvas = document.querySelector('canvas');
 
-        tendrilsDemo(canvas);
-        canvas.classList.add('epok-dark');
+    tendrilsDemo(canvas);
+    canvas.classList.add('epok-dark');
 
-        document.removeEventListener('readystatechange', updateState);
-    }
+    document.removeEventListener('readystatechange', updateState);
+  }
 };
 let last = 0;
 
 function updateState() {
-    for(let s = readyStates.indexOf(document.readyState); last <= s; ++last) {
-        let callback = readyCallbacks[readyStates[last]];
+  for(let s = readyStates.indexOf(document.readyState); last <= s; ++last) {
+    let callback = readyCallbacks[readyStates[last]];
 
-        if(callback) {
-            try {
-                callback();
-            }
-            catch(e) {
-                console.error(e);
-            }
-        }
+    if(callback) {
+      try {
+        callback();
+      }
+      catch(e) {
+        console.error(e);
+      }
     }
+  }
 }
 
 updateState();

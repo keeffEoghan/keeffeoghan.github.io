@@ -19,19 +19,19 @@ varying float sdf;
 #pragma glslify: expand = require(../geom/line/expand)
 
 void main() {
-    sdf = sign(miter);
+  sdf = sign(miter);
 
-    float rate = speed/max(dt, 1.0);
+  float rate = speed/max(dt, 1.0);
 
-    // @note For some reason, using these have different effects.
-    vec2 vel = (position-previous)*rate;
-    // vec2 vel = perp(normal, true)*length(position-previous)*rate;
+  // @note For some reason, using these have different effects.
+  vec2 vel = (position-previous)*rate;
+  // vec2 vel = perp(normal, true)*length(position-previous)*rate;
 
-    values = flow(vel, speedLimit);
+  values = flow(vel, speedLimit);
 
-    crest = normal*miter;
+  crest = normal*miter;
 
-    vec2 vert = expand(position, normal, rad*values.a, miter);
+  vec2 vert = expand(position, normal, rad*values.a, miter);
 
-    gl_Position = vec4(vert*viewSize, 0.0, 1.0);
+  gl_Position = vec4(vert*viewSize, 0.0, 1.0);
 }

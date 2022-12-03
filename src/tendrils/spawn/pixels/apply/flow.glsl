@@ -9,7 +9,7 @@
 #pragma glslify: getFlow = require(../../../flow/get)
 
 vec4 apply(vec2 uv, vec2 pos, vec4 pixel) {
-    return vec4(pos, getFlow(pixel, time, decay));
+  return vec4(pos, getFlow(pixel, time, decay));
 }
 
 #pragma glslify: export(apply)

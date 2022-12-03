@@ -4,6 +4,6 @@
  */
 
 export const expand = (position, normal, rad, miter) =>
-    position+(normal*rad*miter);
+  position+(normal*rad*miter);
 
 export default expand;

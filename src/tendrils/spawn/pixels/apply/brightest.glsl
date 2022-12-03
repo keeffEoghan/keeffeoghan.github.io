@@ -9,9 +9,9 @@
 #pragma glslify: angleToVec = require(../../../utils/angle-to-vec)
 
 vec4 apply(vec2 uv, vec2 pos, vec4 pixel) {
-    return vec4(pos,
-        angleToVec(mod(random(uv*dot(pixel.rg, pixel.ba)), 1.0)*tau)*
-            luma(pixel)*pixel.a);
+  return vec4(pos,
+    angleToVec(mod(random(uv*dot(pixel.rg, pixel.ba)), 1.0)*tau)*
+      luma(pixel)*pixel.a);
 }
 
 #pragma glslify: export(apply)

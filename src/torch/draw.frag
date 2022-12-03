@@ -13,8 +13,8 @@ uniform float bokehAmount;
 
 
 vec4 color(vec2 uv) {
-    return (texture2D(light, uv)*lightColor)+
-        (texture2D(fade, uv)*fadeColor);
+  return (texture2D(light, uv)*lightColor)+
+    (texture2D(fade, uv)*fadeColor);
 }
 
 #pragma glslify: bokeh = require(../../libs/bokeh, iterations = 20, sample = color)
@@ -28,11 +28,11 @@ const float limit = 0.6;
 const vec4 black = vec4(vec3(0.0), 1.0);
 
 void main() {
-    vec2 uv = gl_FragCoord.xy/viewRes;
+  vec2 uv = gl_FragCoord.xy/viewRes;
 
-    vec2 texel = 1.0/viewRes;
-    float edge = 1.0-vignette(uv, mid, limit, falloff);
+  vec2 texel = 1.0/viewRes;
+  float edge = 1.0-vignette(uv, mid, limit, falloff);
 
-    gl_FragColor = black+
-        vec4(bokeh(texel, uv, bokehRadius*edge, bokehAmount*edge), color(uv).a);
+  gl_FragColor = black+
+    vec4(bokeh(texel, uv, bokehRadius*edge, bokehAmount*edge), color(uv).a);
 }

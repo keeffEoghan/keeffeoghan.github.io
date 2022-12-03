@@ -20,11 +20,11 @@ uniform float jitter;
 uniform float fadeAlpha;
 
 vec4 color(vec2 uv) {
-    return ((texture2D(past, uv)*fadeAlpha)+texture2D(next, uv));
+  return ((texture2D(past, uv)*fadeAlpha)+texture2D(next, uv));
 }
 
 vec3 sampler(vec2 uv) {
-    return color(uv).rgb;
+  return color(uv).rgb;
 }
 
 // @todo Noise in form as well?
@@ -37,20 +37,20 @@ const vec2 mid = vec2(0.5);
 const vec3 curve = vec3(0.0, 1.0, 1.0);
 
 void main() {
-    vec2 uv = gl_FragCoord.xy/viewRes;
-    vec2 pos = uvToPos(uv)/viewSize;
+  vec2 uv = gl_FragCoord.xy/viewRes;
+  vec2 pos = uvToPos(uv)/viewSize;
 
-    float dist = length(pos);
+  float dist = length(pos);
 
-    // Sample and grow
-    
-    float growRate = clamp(bezier(curve, dist/growLimit), 0.0, 1.0);
-    vec2 st = uv+((mid-uv)*grow*dt*(1.0-growRate));
+  // Sample and grow
 
-    vec4 fade = color(st);
+  float growRate = clamp(bezier(curve, dist/growLimit), 0.0, 1.0);
+  vec2 st = uv+((mid-uv)*grow*dt*(1.0-growRate));
 
-    fade.rgb = blur(st, jitter*growRate, viewRes.x/viewRes.y,
-        mod(time, 20.0));
+  vec4 fade = color(st);
 
-    gl_FragColor = vec4(clamp(fade, 0.0, 1.0));
+  fade.rgb = blur(st, jitter*growRate, viewRes.x/viewRes.y,
+    mod(time, 20.0));
+
+  gl_FragColor = vec4(clamp(fade, 0.0, 1.0));
 }

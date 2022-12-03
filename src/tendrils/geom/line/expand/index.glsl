@@ -4,7 +4,7 @@
  */
 
 vec2 expand(vec2 position, vec2 normal, float rad, float miter) {
-    return position+(normal*rad*miter);
+  return position+(normal*rad*miter);
 }
 
 #pragma glslify: export(expand)

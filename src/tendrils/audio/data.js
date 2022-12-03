@@ -13,8 +13,8 @@
  * @return {TypedArray} The data array instance.
  */
 export const makeData = (aa, Data = Uint8Array) =>
-    new Data(((aa.analyser)? (aa.analyser[0] || aa.analyser) : (aa[0] || aa))
-        .frequencyBinCount);
+  new Data(((aa.analyser)? (aa.analyser[0] || aa.analyser) : (aa[0] || aa))
+    .frequencyBinCount);
 
 
 export default makeData;

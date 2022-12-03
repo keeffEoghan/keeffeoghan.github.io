@@ -6,8 +6,8 @@ import iterable from './iterable';
  * Supports the native one-value behaviour.
  */
 export const reduceList = (f, list, out) => ((out === undefined)?
-        Array.prototype.reduce.call(list, f)
-    :   Array.prototype.reduce.call(list, f, out));
+    Array.prototype.reduce.call(list, f)
+  : Array.prototype.reduce.call(list, f, out));
 
 /**
  * Reduce any type of object.
@@ -16,10 +16,9 @@ export const reduceList = (f, list, out) => ((out === undefined)?
  * Supports the native one-value behaviour.
  */
 export const reduce = (f, any, out) =>
-    reduceList(((out === undefined)?
-                (acc, k, i, keys) =>
-                    f(((i)? acc : any[acc]), any[k], k, any, i, keys)
-            :   (acc, k, i, keys) => f(acc, any[k], k, any, i, keys)),
-        iterable(any), out);
+  reduceList(((out === undefined)?
+        (acc, k, i, keys) => f(((i)? acc : any[acc]), any[k], k, any, i, keys)
+      : (acc, k, i, keys) => f(acc, any[k], k, any, i, keys)),
+    iterable(any), out);
 
 export default reduce;

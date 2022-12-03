@@ -18,28 +18,20 @@ body {
 }
 
 .epok-folio__intro {
-  padding: 0.75em 0;
-}
-
-.epok-folio__intro {
   font-family: monospace;
+  padding: 0.75em 0;
   bottom: 0;
   left: 0;
   max-width: 90%;
 }
 
-.epok-folio__tag,
-.epok-folio__content {
+.epok-folio__tag {
+  display: inline-block;
   line-height: 1.75em;
   padding: 0.65em 2em;
   border: solid transparent;
   border-width: 0.1em 0.5em;
   margin: 0.5em 0;
-  clear: both;
-}
-
-.epok-folio__tag {
-  display: inline-block;
   float: left;
   clear: both;
   color: #000;

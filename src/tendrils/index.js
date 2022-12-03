@@ -26,32 +26,32 @@ import copyFrag from './screen/copy.frag';
 
 
 export const defaults = () => ({
-    state: {
-        rootNum: Math.pow(2, 9),
+  state: {
+    rootNum: Math.pow(2, 9),
 
-        autoClearView: false,
-        autoFade: true,
+    autoClearView: false,
+    autoFade: true,
 
-        damping: 0.043,
-        speedLimit: 0.01,
+    damping: 0.043,
+    speedLimit: 0.01,
 
-        forceWeight: 0.016,
-        varyForce: -0.1,
+    forceWeight: 0.016,
+    varyForce: -0.1,
 
-        flowWeight: 1,
-        varyFlow: 0.2,
+    flowWeight: 1,
+    varyFlow: 0.2,
 
-        noiseWeight: 0.002,
-        varyNoise: 0.3,
+    noiseWeight: 0.002,
+    varyNoise: 0.3,
 
-        flowDecay: 0.003,
-        flowWidth: 5,
+    flowDecay: 0.003,
+    flowWidth: 5,
 
-        noiseScale: 2.125,
-        varyNoiseScale: 0.5,
+    noiseScale: 2.125,
+    varyNoiseScale: 0.5,
 
-        noiseSpeed: 0.00025,
-        varyNoiseSpeed: 0.1,
+    noiseSpeed: 0.00025,
+      varyNoiseSpeed: 0.1,
 
         target: 0,
         varyTarget: 1,
@@ -113,19 +113,19 @@ export class Tendrils {
 
         this.renderShader = ((Array.isArray(params.renderShader))?
                 shader(this.gl, ...params.renderShader)
-            :   params.renderShader);
+            : params.renderShader);
 
         this.flowShader = ((Array.isArray(params.flowShader))?
                 shader(this.gl, ...params.flowShader)
-            :   params.flowShader);
+            : params.flowShader);
 
         this.copyShader = ((Array.isArray(params.copyShader))?
                 shader(this.gl, ...params.copyShader)
-            :   params.copyShader);
+            : params.copyShader);
 
         this.fillShader = ((Array.isArray(params.fillShader))?
                 shader(this.gl, ...params.fillShader)
-            :   params.fillShader);
+            : params.fillShader);
 
 
         this.uniforms = {

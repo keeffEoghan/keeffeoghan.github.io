@@ -3,15 +3,15 @@
  */
 
 float line(vec2 p, vec2 start, vec2 end, float rad) {
-    vec2 rel = start-p;
-    vec2 dir = start-end;
-    float l = length(dir);
-    
-    dir /= l;
+  vec2 rel = start-p;
+  vec2 dir = start-end;
+  float l = length(dir);
 
-    vec2 proj = clamp(dot(rel, dir), 0.0, l)*dir;
+  dir /= l;
 
-    return length(rel-proj)-rad;
+  vec2 proj = clamp(dot(rel, dir), 0.0, l)*dir;
+
+  return length(rel-proj)-rad;
 }
 
 #pragma glslify: export(line)

@@ -8,10 +8,10 @@ varying vec2 crest;
 varying float sdf;
 
 void main() {
-    float d = abs(sdf);
-    float speed = length(values.rg)*(1.0-d);
+  float d = abs(sdf);
+  float speed = length(values.rg)*(1.0-d);
 
-    vec2 vel = normalize(mix(values.rg, crest, d*crestShape))*speed;
+  vec2 vel = normalize(mix(values.rg, crest, d*crestShape))*speed;
 
-    gl_FragColor = vec4(vel, values.b, values.a-d);
+  gl_FragColor = vec4(vel, values.b, values.a-d);
 }

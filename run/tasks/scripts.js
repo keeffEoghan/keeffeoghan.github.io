@@ -22,7 +22,7 @@ var webpack = webpackStream.webpack;
  * @return {Object} - Stream.
  */
 gulp.task('scripts', function() {
-    return runWebpack();
+  return runWebpack();
 });
 
 /**
@@ -33,7 +33,7 @@ gulp.task('scripts', function() {
  * @return {Object} - Stream.
  */
 gulp.task('scripts:watch', function() {
-    return runWebpack({ watch: true });
+  return runWebpack({ watch: true });
 });
 
 /**
@@ -43,32 +43,32 @@ gulp.task('scripts:watch', function() {
  * based upon command-line arguments and task options.
  *
  * Note: Uglification greatly increases compile times,
- *       as does source maps.
+ *     as does source maps.
  *
  * @param {Object} taskOptions - Options from gulp tasks.
  */
 function runWebpack(taskOptions) {
-    // Ensure there is an options object (incase none were supplied to this function).
-    taskOptions = (taskOptions || {});
+  // Ensure there is an options object (incase none were supplied to this function).
+  taskOptions = (taskOptions || {});
 
-    // Bind a shorter reference to the script settings from the global file.
-    var scriptSettings = globalSettings.taskConfiguration.scripts;
+  // Bind a shorter reference to the script settings from the global file.
+  var scriptSettings = globalSettings.taskConfiguration.scripts;
 
-    // If production argument was specified then add UglifyJS plugin into webpack.
-    if(args.hasOwnProperty('is-production') && args['is-production'] === true) {
-        scriptSettings.webpackSettings.plugins
-            .push(new webpack.optimize.UglifyJsPlugin(scriptSettings.uglifySettings));
-    }
+  // If production argument was specified then add UglifyJS plugin into webpack.
+  if(args.hasOwnProperty('is-production') && args['is-production'] === true) {
+    scriptSettings.webpackSettings.plugins
+      .push(new webpack.optimize.UglifyJsPlugin(scriptSettings.uglifySettings));
+  }
 
-    // Asking webpack to watch will keep the process running until it's cancelled.
-    if(taskOptions.watch) {
-        scriptSettings.webpackSettings.watch = true;
-    }
+  // Asking webpack to watch will keep the process running until it's cancelled.
+  if(taskOptions.watch) {
+    scriptSettings.webpackSettings.watch = true;
+  }
 
-    // Open a stream, trigger webpack-stream compilation and push output to file system.
-    return gulp.src(scriptSettings.sourcePaths)
-        // Pass a named file stream to webpack, for multiple entry points
-        .pipe(named((file) => file.relative.replace(/\.main\.js$/gi, '')))
-        .pipe(webpackStream(scriptSettings.webpackSettings))
-        .pipe(gulp.dest(scriptSettings.destPath));
+  // Open a stream, trigger webpack-stream compilation and push output to file system.
+  return gulp.src(scriptSettings.sourcePaths)
+    // Pass a named file stream to webpack, for multiple entry points
+    .pipe(named((file) => file.relative.replace(/\.main\.js$/gi, '')))
+    .pipe(webpackStream(scriptSettings.webpackSettings))
+    .pipe(gulp.dest(scriptSettings.destPath));
 }

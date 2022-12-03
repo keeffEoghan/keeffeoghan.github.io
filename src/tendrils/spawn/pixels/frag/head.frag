@@ -15,7 +15,7 @@ uniform mat3 spawnMatrix;
 
 /**
  * @todo Some bug with `glslify-import` & sons breaks `node_modules` aliased
- *       `require`s in `import`ed files, so we need to do it the looooooong way.
+ *     `require`s in `import`ed files, so we need to do it the looooooong way.
  */
 // #pragma glslify: random = require(glsl-random)
 #pragma glslify: random = require(../../../../../node_modules/glsl-random)
@@ -26,9 +26,9 @@ uniform mat3 spawnMatrix;
 const vec2 flipUV = vec2(1.0, -1.0);
 
 vec2 spawnToPos(vec2 uv) {
-    // Jittering around a UV cell to get rid of boxy scaled sampling artefacts
-    vec2 offset = vec2(mix(-jitter.x, jitter.x, random(uv-1.2345+(time*0.001))),
-            mix(-jitter.y, jitter.y, random(uv+1.2345+(time*0.001))));
+  // Jittering around a UV cell to get rid of boxy scaled sampling artefacts
+  vec2 offset = vec2(mix(-jitter.x, jitter.x, random(uv-1.2345+(time*0.001))),
+      mix(-jitter.y, jitter.y, random(uv+1.2345+(time*0.001))));
 
-    return transform(spawnMatrix, uvToPos(uv+offset)*flipUV*spawnSize);
+  return transform(spawnMatrix, uvToPos(uv+offset)*flipUV*spawnSize);
 }

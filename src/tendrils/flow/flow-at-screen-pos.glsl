@@ -8,22 +8,22 @@
 
 /**
  * @return The flow velocity and age for a given screen position, sampling
- *         several scales.
+ *     several scales.
  */
 vec2 flowAtScreenPos(vec2 pos, sampler2D flow, float time, float flowDecay) {
-    vec2 uv = posToUV(pos);
-    vec2 flowForce = vec2(0.0);
-    float flowMax = 0.0;
+  vec2 uv = posToUV(pos);
+  vec2 flowForce = vec2(0.0);
+  float flowMax = 0.0;
 
-    for(float level = 0.0; level < levels*stride; level += stride) {
-        vec4 flowData = texture2D(flow, uv, level);
-        float factor = 1.0/(level+1.0);
+  for(float level = 0.0; level < levels*stride; level += stride) {
+    vec4 flowData = texture2D(flow, uv, level);
+    float factor = 1.0/(level+1.0);
 
-        flowForce += getFlow(flowData, time, flowDecay)*factor;
-        flowMax += factor;
-    }
+    flowForce += getFlow(flowData, time, flowDecay)*factor;
+    flowMax += factor;
+  }
 
-    return flowForce/flowMax;
+  return flowForce/flowMax;
 }
 
 #pragma glslify: export(flowAtScreenPos)

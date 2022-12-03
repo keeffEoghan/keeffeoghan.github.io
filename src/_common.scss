@@ -1,43 +1,43 @@
 @import '../libs/build/reset';
 
 @viewport {
-    zoom: 1;
-    width: device-width;
+  zoom: 1;
+  width: device-width;
 }
 
 html {
-    box-sizing: border-box;
-    font-family: sans-serif;
-    font-size: 14px;
-    zoom: 1;
+  box-sizing: border-box;
+  font-family: sans-serif;
+  font-size: 14px;
+  zoom: 1;
 
-    @media (min-width: 480px) {
-        font-size: 16px;
-    }
+  @media (min-width: 480px) {
+    font-size: 16px;
+  }
 }
 
 *,
 *:before,
 *:after {
-    box-sizing: inherit;
+  box-sizing: inherit;
 }
 
 html,
 body {
-    width: 100%;
-    height: 100%;
-    width: 100vw;
-    height: 100vh;
+  width: 100%;
+  height: 100%;
+  width: 100vw;
+  height: 100vh;
 }
 
 body {
-    margin: 0;
+  margin: 0;
 }
 
 main {
-    min-height: 100%;
+  min-height: 100%;
 }
 
 small {
-    font-size: 0.75em;
+  font-size: 0.75em;
 }

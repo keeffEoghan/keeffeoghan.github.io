@@ -11,30 +11,30 @@
  */
 
 float verlet(float acc, float pos0, float pos1, float dt0, float dt1) {
-    return (2.0*pos1)-pos0+(acc*dt0*dt1);
+  return (2.0*pos1)-pos0+(acc*dt0*dt1);
 }
 
 vec2 verlet(vec2 acc, vec2 pos0, vec2 pos1, float dt0, float dt1) {
-    return (2.0*pos1)-pos0+(acc*dt0*dt1);
+  return (2.0*pos1)-pos0+(acc*dt0*dt1);
 }
 
 vec3 verlet(vec3 acc, vec3 pos0, vec3 pos1, float dt0, float dt1) {
-    return (2.0*pos1)-pos0+(acc*dt0*dt1);
+  return (2.0*pos1)-pos0+(acc*dt0*dt1);
 }
 
 
 // Constant time step
 
 float verlet(float acc, float pos0, float pos1, float dt) {
-    return verlet(acc, pos0, pos1, dt, dt);
+  return verlet(acc, pos0, pos1, dt, dt);
 }
 
 vec2 verlet(vec2 acc, vec2 pos0, vec2 pos1, float dt) {
-    return verlet(acc, pos0, pos1, dt, dt);
+  return verlet(acc, pos0, pos1, dt, dt);
 }
 
 vec3 verlet(vec3 acc, vec3 pos0, vec3 pos1, float dt) {
-    return verlet(acc, pos0, pos1, dt, dt);
+  return verlet(acc, pos0, pos1, dt, dt);
 }
 
 

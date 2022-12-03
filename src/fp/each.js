@@ -5,11 +5,11 @@ import iterable from './iterable';
  * Similar to native, but with iteratee-first arguments.
  */
 export const eachList = (f, x) => {
-    Array.prototype.forEach.call(x, f);
-    // @todo
-    // Array.prototype.some.call(x, f);
+  Array.prototype.forEach.call(x, f);
+  // @todo
+  // Array.prototype.some.call(x, f);
 
-    return x;
+  return x;
 };
 
 /**
@@ -18,9 +18,9 @@ export const eachList = (f, x) => {
  * properties.
  */
 export const each = (f, any) => {
-    eachList((k, i, keys) => f(any[k], k, any, i, keys), iterable(any));
+  eachList((k, i, keys) => f(any[k], k, any, i, keys), iterable(any));
 
-    return any;
+  return any;
 };
 
 export default each;

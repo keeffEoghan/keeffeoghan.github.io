@@ -144,13 +144,13 @@ export default (canvas, options) => {
                 decodeURIComponent(settings.track)
             : ((''+settings.local_stream !== 'true')?
                 'https://soundcloud.com/max-cooper/trust-feat-kathrin-deboer'
-            :   localTrackURL))),
+            : localTrackURL))),
 
         animate: (''+settings.animate !== 'false'),
         useMedia: (''+settings.use_media !== 'false'),
         staticImage: ((settings.static_image)?
                 decodeURIComponent(settings.static_image)
-            :   rootPath+'build/images/max/max-crop-gradient.png')
+            : rootPath+'build/images/max/max-crop-gradient.png')
     };
 
     if(''+settings.cursor === 'false') {
@@ -906,7 +906,7 @@ export default (canvas, options) => {
         toggle(toggle) {
             const show = ((typeof toggle !== 'undefined')?
                     toggle
-                :   intro.info.classList.contains('epok-hide'));
+                : intro.info.classList.contains('epok-hide'));
 
             if(show) {
                 intro.info.classList.remove('epok-hide');
@@ -919,7 +919,7 @@ export default (canvas, options) => {
         toggleMore(toggle) {
             const show = ((typeof toggle !== 'undefined')?
                     toggle
-                :   intro.more.classList.contains('epok-hide'));
+                : intro.more.classList.contains('epok-hide'));
 
             if(show) {
                 intro.more.classList.remove('epok-hide');
@@ -2846,7 +2846,7 @@ export default (canvas, options) => {
 
     const showExport = ((''+settings.prompt_show !== 'false')?
             (...rest) => self.prompt(...rest)
-        :   (...rest) => console.log(...rest));
+        : (...rest) => console.log(...rest));
 
     Object.assign(rootControls, {
             showLink: () => showExport('Link:',

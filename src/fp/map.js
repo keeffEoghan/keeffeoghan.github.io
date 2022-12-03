@@ -7,11 +7,11 @@ import iterable from './iterable';
  * into which properties will be mapped to be defined (a new array, by default).
  */
 export const mapList = (f, x, out = []) => reduceList((acc, v, i) => {
-        acc[i] = f(v, i, x);
+    acc[i] = f(v, i, x);
 
-        return acc;
-    },
-    x, out);
+    return acc;
+  },
+  x, out);
 
 /**
  * Map any type of object.
@@ -19,10 +19,10 @@ export const mapList = (f, x, out = []) => reduceList((acc, v, i) => {
  * properties.
  */
 export const map = (f, any, out = []) => reduceList((acc, k, i, keys) => {
-        acc[k] = f(any[k], k, any, i, keys);
+    acc[k] = f(any[k], k, any, i, keys);
 
-        return acc;
-    },
-    iterable(any), out);
+    return acc;
+  },
+  iterable(any), out);
 
 export default map;

@@ -19,47 +19,47 @@ var config = globalConfig.taskConfiguration.customDeps;
 
 // Create a stream of "fake" vinyl files.
 function stringStream(string, filename) {
-    var s = stream.Readable({ objectMode: true });
+  var s = stream.Readable({ objectMode: true });
 
-    s._read = function () {
-        this.push(new gutil.File({
-                cwd: '',
-                base: '',
-                path: filename,
-                contents: new Buffer(string)
-            }));
+  s._read = function () {
+    this.push(new gutil.File({
+        cwd: '',
+        base: '',
+        path: filename,
+        contents: new Buffer(string)
+      }));
 
-        this.push(null);
-    }
+    this.push(null);
+  }
 
-    return s;
+  return s;
 }
 
 gulp.task('custom-deps', function() {
-    var merged = merge();
+  var merged = merge();
 
-    config.copyToSCSS.forEach(function(file) {
-        var renaming = gulp.src(file.path+file.name, { base: './'+file.path })
-                .pipe(rename(function(path) {
-                    path.basename = '_'+path.basename;
-                    path.extname = '.scss';
-                }))
-                .pipe(gulp.dest(config.destPath));
+  config.copyToSCSS.forEach(function(file) {
+    var renaming = gulp.src(file.path+file.name, { base: './'+file.path })
+        .pipe(rename(function(path) {
+          path.basename = '_'+path.basename;
+          path.extname = '.scss';
+        }))
+        .pipe(gulp.dest(config.destPath));
 
-        merged.add(renaming);
+    merged.add(renaming);
+  });
+
+  var modernizrBuilt = new Promise(function(resolve) {
+      modernizr.build(config.modernizrConfig, function(result) {
+        var writing = stringStream(result, 'modernizr.js')
+            .pipe(gulp.dest(config.destPath));
+
+        resolve(merged.add(writing));
+      });
     });
 
-    var modernizrBuilt = new Promise(function(resolve) {
-            modernizr.build(config.modernizrConfig, function(result) {
-                var writing = stringStream(result, 'modernizr.js')
-                        .pipe(gulp.dest(config.destPath));
 
-                resolve(merged.add(writing));
-            });
-        });
-
-
-    return modernizrBuilt.then(function() {
-            console.log(chalk.bgGreen.white(' FE Skeleton: Custom dependencies built.'));
-        });
+  return modernizrBuilt.then(function() {
+      console.log(chalk.bgGreen.white(' FE Skeleton: Custom dependencies built.'));
+    });
 });

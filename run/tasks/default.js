@@ -8,8 +8,8 @@
  */
 
 var gulp = require('gulp'),
-    args = require('yargs').argv;
+  args = require('yargs').argv;
 
 gulp.task('default', function() {
-    gulp.start('build');
+  gulp.start('build');
 });

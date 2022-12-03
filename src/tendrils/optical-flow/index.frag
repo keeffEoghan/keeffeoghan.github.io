@@ -34,48 +34,48 @@ const vec2 flipUV = vec2(-1.0);
 const vec3 falloff = vec3(0.0, 0.0, 1.0);
 /*
 vec4 mapColor(vec2 vec, vec2 scale) {
-    vec2 x = vec2(max(vec.x, 0.0), abs(min(vec.x, 0.0)))*scale.x;
-    vec2 y = vec2(max(vec.y, 0.0), abs(min(vec.y, 0.0)))*scale.y;
+  vec2 x = vec2(max(vec.x, 0.0), abs(min(vec.x, 0.0)))*scale.x;
+  vec2 y = vec2(max(vec.y, 0.0), abs(min(vec.y, 0.0)))*scale.y;
 
-    float dirY = ((y.x > y.y)? 0.9 : 1.0);
+  float dirY = ((y.x > y.y)? 0.9 : 1.0);
 
-    return vec4(x.xy, max(y.x, y.y), dirY);
+  return vec4(x.xy, max(y.x, y.y), dirY);
 }*/
 
 #if 1
-    vec4 pixel(sampler2D texture, vec2 uv) {
-        return grayScale(texture2D(texture, uv));
-    }
+  vec4 pixel(sampler2D texture, vec2 uv) {
+    return grayScale(texture2D(texture, uv));
+  }
 #else
-    vec4 pixel(sampler2D texture, vec2 uv) {
-        return texture2D(texture, uv);
-    }
+  vec4 pixel(sampler2D texture, vec2 uv) {
+    return texture2D(texture, uv);
+  }
 #endif
 
 void main() {
-    vec2 st = posToUV(uv*flipUV/viewSize);
+  vec2 st = posToUV(uv*flipUV/viewSize);
 
-    vec2 offsetX = vec2(offset, 0.0);
-    vec2 offsetY = vec2(0.0, offset);
+  vec2 offsetX = vec2(offset, 0.0);
+  vec2 offsetY = vec2(0.0, offset);
 
-    // Gradient
+  // Gradient
 
-    vec4 gradX = (pixel(view, st+offsetX)-pixel(view, st-offsetX))+
-        (pixel(last, st+offsetX)-pixel(last, st-offsetX));
+  vec4 gradX = (pixel(view, st+offsetX)-pixel(view, st-offsetX))+
+    (pixel(last, st+offsetX)-pixel(last, st-offsetX));
 
-    vec4 gradY = (pixel(view, st+offsetY)-pixel(view, st-offsetY))+
-        (pixel(last, st+offsetY)-pixel(last, st-offsetY));
+  vec4 gradY = (pixel(view, st+offsetY)-pixel(view, st-offsetY))+
+    (pixel(last, st+offsetY)-pixel(last, st-offsetY));
 
-    vec4 gradMag = sqrt((gradX*gradX)+(gradY*gradY)+vec4(lambda));
+  vec4 gradMag = sqrt((gradX*gradX)+(gradY*gradY)+vec4(lambda));
 
-    // Difference
-    vec4 diff = pixel(view, st)-pixel(last, st);
+  // Difference
+  vec4 diff = pixel(view, st)-pixel(last, st);
 
-    // vec2 vec = vec2((diff*(gradX/gradMag)).x, (diff*(gradY/gradMag)).x);
+  // vec2 vec = vec2((diff*(gradX/gradMag)).x, (diff*(gradY/gradMag)).x);
 
-    // gl_FragColor = mapColor(vec, scale);
+  // gl_FragColor = mapColor(vec, scale);
 
-    vec2 vec = vec2((diff*(gradX/gradMag)).x, (diff*(gradY/gradMag)).x)*speed;
+  vec2 vec = vec2((diff*(gradX/gradMag)).x, (diff*(gradY/gradMag)).x)*speed;
 
-    gl_FragColor = flow(bezier(falloff, length(vec)/speedLimit)*vec, speedLimit);
+  gl_FragColor = flow(bezier(falloff, length(vec)/speedLimit)*vec, speedLimit);
 }

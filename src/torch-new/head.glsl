@@ -6,7 +6,7 @@ uniform vec2 viewRes;
 
 /**
  * @todo Some bug with `glslify-import` & sons breaks `node_modules` aliased
- *       `require`s in `import`ed files, so we need to do it the looooooong way.
+ *     `require`s in `import`ed files, so we need to do it the looooooong way.
  * @todo Noise in form as well?
  */
 // #pragma glslify: noise = require(glsl-noise/simplex/3d)

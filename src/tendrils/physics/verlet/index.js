@@ -10,16 +10,16 @@
  * @return {Number} Next position (`pos2`).
  */
 export const verlet = (acc, pos0, pos1, dt0, dt1) =>
-    (2*pos1)-pos0+(acc*dt0*(dt1 || dt0));
+  (2*pos1)-pos0+(acc*dt0*(dt1 || dt0));
 
 /**
  * The inverse (differentiation) of the above (integration) - find acceleration
  * from positions and time.
  *
- *     pos2 = (2.0*pos1)-pos0+(acc*dt*dt)
- *     (2.0*pos1)-pos0+(acc*dt*dt) = pos2
- *     acc*dt*dt = pos2-(2.0*pos1)+pos0
- *     acc = (pos2-(2.0*pos1)+pos0)/dt/dt
+ *   pos2 = (2.0*pos1)-pos0+(acc*dt*dt)
+ *   (2.0*pos1)-pos0+(acc*dt*dt) = pos2
+ *   acc*dt*dt = pos2-(2.0*pos1)+pos0
+ *   acc = (pos2-(2.0*pos1)+pos0)/dt/dt
  *
  * @param {Number} pos0 First position.
  * @param {Number} pos1 Last position.
@@ -29,6 +29,6 @@ export const verlet = (acc, pos0, pos1, dt0, dt1) =>
  * @return {Number} The acceleration.
  */
 export const verletDyDt = (pos0, pos1, pos2, dt0, dt1) =>
-    (pos2-(2*pos1)+pos0)/dt0/(dt1 || dt0);
+  (pos2-(2*pos1)+pos0)/dt0/(dt1 || dt0);
 
 export default verlet;

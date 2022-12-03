@@ -31,7 +31,7 @@ export const changed = (past, next) =>
         null
     : ((iterable(past).length && iterable(next).length)?
         filter((v, k) => v !== past[k], next)
-    :   next));
+    : next));
 
 const accumulate = (frame, out = {}) => {
     out.apply = Object.assign((out.apply || {}), frame.to);
@@ -76,7 +76,7 @@ export class Timeline {
         // always playable
         return this.frames = sort((infinite)?
                 [{ time: -Infinity }, ...frames, { time: Infinity }]
-            :   [...frames]);
+            : [...frames]);
     }
 
     merge(frames) {
@@ -369,7 +369,7 @@ export class Timeline {
                     ...diffPast,
                     ...diffNext
                 }
-            :   diffPast);
+            : diffPast);
 
         return {
                 ...full,
