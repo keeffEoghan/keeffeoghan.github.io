@@ -471,15 +471,15 @@ body.epok-folio--intro-run .epok-main-controls { opacity: 0; }
 
 .epok-folio__intro, .epok-logo { position: absolute; z-index: 10; }
 
-.epok-folio__intro { font-family: monospace; padding: 0.75em 0; bottom: 0; left: 0; max-width: 90%; }
+.epok-folio__intro { font-family: monospace; padding: 0.75em 0; bottom: 0; left: 0; max-width: 100%; }
 
-.epok-folio__tag { display: inline-block; line-height: 1.75em; padding: 0.65em 2em; border: solid transparent; border-width: 0.1em 0.5em; margin: 0.5em 0; float: left; clear: both; color: #000; background-color: rgba(255, 255, 255, 0.8); -webkit-transition: opacity 500ms ease-in-out; transition: opacity 500ms ease-in-out; }
+.epok-folio__tag { display: inline-block; line-height: 1.75em; padding: 0.65em 2em; max-width: 80%; border: 2px solid transparent; border-radius: 3px; margin: 0.5em 0 0.5em -3px; float: left; clear: both; white-space: nowrap; overflow: auto; color: #000; background-color: rgba(255, 255, 255, 0.8); -webkit-transition: opacity 500ms ease-in-out; transition: opacity 500ms ease-in-out; }
 
 .epok-folio__tag.epok-hide { opacity: 0; pointer-events: none; }
 
-.epok-folio__name { font-size: 1em; }
+.epok-folio__name { font-size: 1em; white-space: normal; }
 
-.epok-folio__more { white-space: nowrap; max-width: 100%; overflow: auto; }
+.epok-folio__promo { float: right; margin: 0.5em -3px 0.5em 0; white-space: normal; color: #fff; background-color: rgba(0, 0, 0, 0.8); border-color: #fff; }
 
 .epok-logo { top: 50vh; left: 50%; -webkit-transform: translate(-50%, -50%); transform: translate(-50%, -50%); width: 50%; width: 40vmax; max-width: 800px; pointer-events: none; }
 
