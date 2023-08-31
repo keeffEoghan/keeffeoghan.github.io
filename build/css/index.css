@@ -479,7 +479,7 @@ body.epok-folio--intro-run .epok-main-controls { opacity: 0; }
 
 .epok-folio__name { font-size: 1em; white-space: normal; }
 
-.epok-folio__promo { float: right; margin: 0.5em -3px 0.5em 0; white-space: normal; color: #fff; background-color: rgba(0, 0, 0, 0.8); border-color: #fff; }
+.epok-folio__promo { white-space: normal; color: #fff; background-color: rgba(0, 0, 0, 0.8); border-color: #fff; }
 
 .epok-logo { top: 50vh; left: 50%; -webkit-transform: translate(-50%, -50%); transform: translate(-50%, -50%); width: 50%; width: 40vmax; max-width: 800px; pointer-events: none; }
 

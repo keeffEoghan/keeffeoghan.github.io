@@ -53,8 +53,6 @@ body {
 }
 
 .epok-folio__promo {
-  float: right;
-  margin: 0.5em -3px 0.5em 0;
   white-space: normal;
   color: #fff;
   background-color: rgba(0, 0, 0, 0.8);
@@ -113,18 +111,14 @@ body {
   max-height: 90%;
   z-index: 1002;
 
-  .close-button {
-    bottom: 0;
-  }
+  .close-button { bottom: 0; }
 }
 
 .epok-folio__glyph {
   opacity: 0.6;
 }
 
-em {
-  font-style: italic;
-}
+em { font-style: italic; }
 
 .epok-folio__link {
   color: inherit;
