@@ -493,7 +493,7 @@ body.epok-folio--intro-run .epok-main-controls { opacity: 0; }
 
 .epok-logo__background { display: none; }
 
-.epok-folio__demo { position: absolute; top: 0; left: 0; right: 0; height: 100%; overflow: hidden; }
+.epok-folio__demo { position: relative; height: 90%; overflow: hidden; }
 
 .epok-main-controls { left: 2.5em; top: 0; bottom: auto; padding: 1.5em 0; }
 
@@ -514,5 +514,7 @@ em { font-style: italic; }
 .epok-folio__link:hover, .epok-folio__link:focus { opacity: 0.75; }
 
 .epok-folio__link:active { opacity: 0.5; }
+
+.epok-folio__main { position: relative; width: 100%; min-height: 100%; }
 
 /*# sourceMappingURL=index.css.map */
