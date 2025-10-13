@@ -91,11 +91,8 @@ body {
 }
 
 .epok-folio__demo {
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  height: 100%;
+  position: relative;
+  height: 90%;
   overflow: hidden;
 }
 
@@ -144,4 +141,10 @@ em { font-style: italic; }
   &:active {
     opacity: 0.5;
   }
+}
+
+.epok-folio__main {
+  position: relative;
+  width: 100%;
+  min-height: 100%;
 }
