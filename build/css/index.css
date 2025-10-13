@@ -515,6 +515,8 @@ em { font-style: italic; }
 
 .epok-folio__link:active { opacity: 0.5; }
 
-.epok-folio__main { position: relative; width: 100%; min-height: 100%; }
+.epok-folio__main { display: -webkit-box; display: -webkit-flex; display: -ms-flexbox; display: flex; -webkit-box-orient: vertical; -webkit-box-direction: normal; -webkit-flex-flow: column nowrap; -ms-flex-flow: column nowrap; flex-flow: column nowrap; position: relative; width: 100%; min-height: 100%; }
+
+.epok-folio__cv { -webkit-box-flex: 1; -webkit-flex: 1 1 auto; -ms-flex: 1 1 auto; flex: 1 1 auto; }
 
 /*# sourceMappingURL=index.css.map */
