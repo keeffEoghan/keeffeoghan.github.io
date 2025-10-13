@@ -493,7 +493,7 @@ body.epok-folio--intro-run .epok-main-controls { opacity: 0; }
 
 .epok-logo__background { display: none; }
 
-.epok-folio__demo { position: relative; height: 90%; overflow: hidden; }
+.epok-folio__demo { position: relative; height: 100%; overflow: hidden; }
 
 .epok-main-controls { left: 2.5em; top: 0; bottom: auto; padding: 1.5em 0; }
 
